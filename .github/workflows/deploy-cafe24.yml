@@ -1,0 +1,39 @@
+name: Deploy to Cafe24
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          CAFE24_SSH_PRIVATE_KEY: ${{ secrets.CAFE24_SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$CAFE24_SSH_PRIVATE_KEY" > ~/.ssh/cafe24_github_actions
+          chmod 600 ~/.ssh/cafe24_github_actions
+          ssh-keyscan -H games.cafe24app.com >> ~/.ssh/known_hosts
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to Cafe24
+        env:
+          GIT_SSH_COMMAND: >-
+            ssh -i ~/.ssh/cafe24_github_actions
+            -o IdentitiesOnly=yes
+            -o StrictHostKeyChecking=yes
+        run: |
+          git remote add cafe24 thejaram01@games.cafe24app.com:thejaram01_games
+          git push cafe24 HEAD:master --force
