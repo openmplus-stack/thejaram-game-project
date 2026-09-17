@@ -4,23 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>THE JARAM Game Server</title>
+  <meta name="description" content="THE JARAM 수업용 웹앱과 학습 게임 모음">
   <style>
-    :root { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4f6f8; }
-    main { width: min(92vw, 680px); padding: 40px 28px; border-radius: 20px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,.08); text-align: center; }
-    h1 { margin-top: 0; }
-    .ok { font-size: 20px; font-weight: 700; margin: 20px 0 8px; }
-    code { background: #f0f2f4; padding: 6px 8px; border-radius: 7px; }
-    a { display: inline-block; margin-top: 20px; padding: 12px 18px; border-radius: 10px; background: #111827; color: white; text-decoration: none; }
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#183526;background:#f4f8f2}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;padding:40px 20px}
+    main{width:min(94vw,760px);margin:0 auto;background:#fff;border-radius:24px;padding:36px 28px;box-shadow:0 12px 36px rgba(34,74,47,.10)}
+    h1{margin:0 0 8px;font-size:clamp(28px,5vw,42px)}
+    .intro{margin:0 0 28px;color:#52645a;line-height:1.7}
+    .games{display:grid;gap:14px}
+    a{display:block;padding:20px;border:1px solid #dce8d8;border-radius:18px;text-decoration:none;color:inherit;background:#fbfef9;transition:.15s ease}
+    a:hover,a:focus-visible{transform:translateY(-2px);box-shadow:0 7px 18px rgba(34,74,47,.10);outline:none}
+    strong{display:block;font-size:20px;margin-bottom:5px}
+    span{color:#66766d;line-height:1.5}
+    footer{margin-top:28px;color:#7a897f;font-size:14px}
   </style>
 </head>
 <body>
   <main>
     <h1>THE JARAM Game Server</h1>
-    <p class="ok">Cafe24 Node.js 배포 테스트 성공</p>
-    <p>GitHub → Cafe24 자동 배포 파이프라인의 테스트 화면입니다.</p>
-    <p><code>/game-001/</code></p>
-    <a href="/game-001/">테스트 게임 열기</a>
+    <p class="intro">THE JARAM 수업에서 사용하는 웹앱과 학습 게임입니다. GitHub의 <code>main</code> 변경 사항은 Cloudflare Pages를 통해 자동 배포됩니다.</p>
+    <section class="games" aria-label="게임 목록">
+      <a href="/kfc/">
+        <strong>KFC 게임</strong>
+        <span>기존 배포 게임 열기</span>
+      </a>
+      <a href="/frog-actions/">
+        <strong>개구리는 무엇을 할까요?</strong>
+        <span>개구리의 이미지·소리·글자를 연결하며 10가지 행동을 익히는 학습 앱</span>
+      </a>
+    </section>
+    <footer>THE JARAM · games.thejaram.quest</footer>
   </main>
 </body>
 </html>
