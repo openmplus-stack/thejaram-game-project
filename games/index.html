@@ -17,6 +17,7 @@
     a:hover,a:focus-visible{transform:translateY(-2px);box-shadow:0 7px 18px rgba(34,74,47,.10);outline:none}
     strong{display:block;font-size:20px;margin-bottom:5px}
     span{color:#66766d;line-height:1.5}
+    .status{margin-top:16px;color:#7a897f;font-size:14px}
     footer{margin-top:28px;color:#7a897f;font-size:14px}
   </style>
 </head>
@@ -24,17 +25,38 @@
   <main>
     <h1>THE JARAM Game Server</h1>
     <p class="intro">THE JARAM 수업에서 사용하는 웹앱과 학습 게임입니다. GitHub의 <code>main</code> 변경 사항은 Cloudflare Pages를 통해 자동 배포됩니다.</p>
-    <section class="games" aria-label="게임 목록">
-      <a href="/kfc/">
-        <strong>KFC 게임</strong>
-        <span>기존 배포 게임 열기</span>
-      </a>
-      <a href="/frog-actions/">
-        <strong>개구리는 무엇을 할까요?</strong>
-        <span>개구리의 이미지·소리·글자를 연결하며 10가지 행동을 익히는 학습 앱</span>
-      </a>
+    <section id="games" class="games" aria-label="게임 목록">
+      <a href="/kfc/"><strong>KFC 게임</strong><span>기존 배포 게임</span></a>
+      <a href="/frog-actions/"><strong>개구리는 무엇을 할까요?</strong><span>개구리의 이미지·소리·글자를 연결하며 10가지 행동을 익히는 학습 앱</span></a>
     </section>
+    <p id="status" class="status">게임 목록을 확인하는 중입니다.</p>
     <footer>THE JARAM · games.thejaram.quest</footer>
   </main>
+  <script>
+    (async()=>{
+      const box=document.getElementById('games');
+      const status=document.getElementById('status');
+      try{
+        const res=await fetch('/registry.json',{cache:'no-store'});
+        if(!res.ok) throw new Error('registry load failed');
+        const data=await res.json();
+        const games=(data.games||[]).filter(g=>g.status==='published');
+        if(!games.length) throw new Error('empty registry');
+        box.replaceChildren(...games.map(g=>{
+          const a=document.createElement('a');
+          a.href=`/${g.slug}/`;
+          const strong=document.createElement('strong');
+          strong.textContent=g.title;
+          const span=document.createElement('span');
+          span.textContent=g.description||'';
+          a.append(strong,span);
+          return a;
+        }));
+        status.textContent=`현재 ${games.length}개의 게임이 등록되어 있습니다.`;
+      }catch(e){
+        status.textContent='게임 목록 자동 불러오기에 실패해 기본 목록을 표시하고 있습니다.';
+      }
+    })();
+  </script>
 </body>
 </html>
