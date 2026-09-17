@@ -1,0 +1,18 @@
+{
+  "site": "THE JARAM Game Server",
+  "baseUrl": "https://games.thejaram.quest",
+  "games": [
+    {
+      "slug": "kfc",
+      "title": "KFC 게임",
+      "description": "기존 배포 게임",
+      "status": "published"
+    },
+    {
+      "slug": "frog-actions",
+      "title": "개구리는 무엇을 할까요?",
+      "description": "개구리의 이미지·소리·글자를 연결하며 10가지 행동을 익히는 학습 앱",
+      "status": "published"
+    }
+  ]
+}
