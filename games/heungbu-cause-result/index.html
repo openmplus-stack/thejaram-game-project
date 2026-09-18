@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>독서인지 | 흥부와 제비 - 원인과 결과</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,">
+<title>흥부와 제비 독서인지 앱 | 긴문장에서 왜를 찾는 연습</title>\n<meta name="description" content="흥부와 제비 이야기를 읽고 긴문장에서 원인과 결과를 나누며 왜 그런 일이 일어났는지 찾는 독서인지 학습 앱입니다.">
 <style>
-:root{--bg:#f4f6fb;--ink:#202a3a;--muted:#687386;--blue:#4d6fff;--blue2:#eaf0ff;--line:#d9e0eb;--green:#2e9c63;--red:#e45c5c;--yellow:#fff4c7;--card:#fff}
+:root{--bg:#f4f6fb;--ink:#202a3a;--muted:#4f5b6c;--blue:#3658d8;--blue2:#eaf0ff;--line:#d9e0eb;--green:#207845;--red:#e45c5c;--yellow:#fff4c7;--card:#fff}
 *{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink)}
 button,input{font:inherit}.app{max-width:1360px;margin:auto;min-height:100vh;padding:26px 34px 48px}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}.title h1{margin:0;font-size:32px}.title p{margin:6px 0 0;color:var(--muted);font-weight:700}
@@ -27,7 +27,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 @media(max-width:760px){.app{padding:16px}.title h1{font-size:22px}.card{padding:20px}.reader{font-size:21px}.dropwrap{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.reportGrid{grid-template-columns:1fr 1fr}.log{font-size:12px}.hero h2{font-size:32px}}
 @media print{body{background:white}.app>header,.progress,.reportBtns{display:none!important}.screen{display:none!important}#report.screen{display:block!important}.card{box-shadow:none;border:0;padding:0}.log{font-size:11px}}
 </style></head>
-<body><div class="app">
+<body><main class="app">
 <header><div class="title"><h1>독서인지 · 흥부와 제비</h1><p>문장 나누기 → 원인과 결과 → “왜 그랬어?”</p></div>
 <div class="nav"><button id="prev" onclick="goPrev()">← 이전</button><span class="pill" id="pageNo">1 / 24</span><button id="nextTop" onclick="goNext()">다음 →</button></div></header>
 <div class="progress"><div id="prog"></div></div>
