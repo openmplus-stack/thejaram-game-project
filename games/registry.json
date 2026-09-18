@@ -13,6 +13,12 @@
       "title": "개구리는 무엇을 할까요?",
       "description": "개구리의 이미지·소리·글자를 연결하며 10가지 행동을 익히는 학습 앱",
       "status": "published"
+    },
+    {
+      "slug": "heungbu-cause-result",
+      "title": "흥부와 제비 독서인지",
+      "description": "긴문장에서 원인과 결과를 나누고 ‘왜?’의 답을 찾는 독서인지 학습 앱",
+      "status": "published"
     }
   ]
 }
