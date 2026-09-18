@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>독서인지 | 흥부와 제비 - 원인과 결과</title>
+<style>
+:root{--bg:#f4f6fb;--ink:#202a3a;--muted:#687386;--blue:#4d6fff;--blue2:#eaf0ff;--line:#d9e0eb;--green:#2e9c63;--red:#e45c5c;--yellow:#fff4c7;--card:#fff}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink)}
+button,input{font:inherit}.app{max-width:1360px;margin:auto;min-height:100vh;padding:26px 34px 48px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}.title h1{margin:0;font-size:32px}.title p{margin:6px 0 0;color:var(--muted);font-weight:700}
+.nav{display:flex;gap:9px;align-items:center}.nav button,.pill{border:1px solid var(--line);background:white;border-radius:14px;padding:12px 17px;font-weight:800}.nav button:disabled{opacity:.35}
+.progress{height:10px;background:#e1e6ee;border-radius:20px;overflow:hidden;margin:14px 0 20px}.progress div{height:100%;background:var(--blue);transition:.25s}
+.card{background:#fff;border:1px solid var(--line);border-radius:25px;padding:32px;box-shadow:0 8px 24px #23314d0c}
+.center{max-width:1020px;margin:0 auto}.screen{display:none}.screen.active{display:block}
+.hero{text-align:center;padding:65px 30px}.hero .icon{font-size:80px}.hero h2{font-size:44px;margin:16px 0 8px}.hero p{font-size:22px;color:var(--muted)}
+.btn{border:0;border-radius:15px;padding:14px 22px;font-weight:850;cursor:pointer}.primary{background:var(--blue);color:#fff}.soft{background:#edf1f7;color:var(--ink)}.outline{background:#fff;border:1px solid var(--line)}.green{background:var(--green);color:#fff}
+.reader{font-size:27px;line-height:1.95;min-height:500px;text-align:justify;word-break:keep-all}.readingLine{display:block;margin:0 0 .42em}.readingLine.quote{margin:.28em 0 .48em;padding-left:1.1em;text-align:left}.reader .char{opacity:.10;transition:opacity .12s}.reader .char.shown{opacity:1}.reader .char.key{font-weight:900;color:#265bd6}.reader .char.key.shown{background:#eef3ff;border-radius:3px}
+.readerTools{display:flex;gap:10px;margin-bottom:18px}.studyGuide{margin:12px 0 18px;padding:16px 20px;border-radius:18px;background:#eef3ff;border:1px solid #cdd9ff;font-size:20px;line-height:1.55;text-align:justify;word-break:keep-all}.studyGuide b{display:inline}.studyGuide .guideTitle{display:block;margin-bottom:4px;text-align:left}.readerNav{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.note{color:var(--muted);font-size:16px;font-weight:700}
+.qgrid{display:grid;gap:18px}.qrow{padding:18px;border:1px solid var(--line);border-radius:18px}.qrow label{display:block;font-size:20px;font-weight:850;margin-bottom:9px}.qrow input,.typebox{width:100%;padding:15px;border:2px solid #d9e0eb;border-radius:13px;font-size:20px;outline:none}.qrow.ok{border-color:#71c391;background:#f0fbf4}.qrow.bad{border-color:#ef9d9d;background:#fff4f4}
+.sentence{background:linear-gradient(90deg,#fff8db,#fff);border-radius:18px;padding:28px;font-size:32px;font-weight:900;line-height:1.65;margin-bottom:24px}
+.wordbank{display:flex;flex-wrap:wrap;gap:16px;padding:24px;border:1px solid var(--line);border-radius:18px;min-height:120px}.token{background:#fff;border:2px solid #aeb7c5;border-radius:14px;padding:16px 20px;font-size:26px;font-weight:850;line-height:1.35;box-shadow:0 4px 0 #aeb7c5;cursor:grab;touch-action:none;user-select:none}
+.dropwrap{display:grid;grid-template-columns:1fr 70px 1fr;gap:12px;align-items:stretch;margin-top:24px}.drop{border:3px dashed #b7c6f6;background:#f8faff;border-radius:20px;padding:18px;min-height:180px}.drop h3{color:#6075cc;margin:0 0 14px;font-size:25px}.slots{display:flex;gap:10px;flex-wrap:wrap;align-content:flex-start;min-height:105px}.slotToken{background:#fff;border:1px solid #b7bfcc;border-radius:11px;padding:13px 15px;font-weight:850;font-size:23px}.arrow{display:flex;align-items:center;justify-content:center;font-size:42px;color:var(--blue)}
+.feedback{min-height:35px;font-size:20px;font-weight:900;margin:15px 0}.good{color:var(--green)}.wrong{color:var(--red)}
+.reasonHead{background:#fff0f4;border-radius:18px;padding:22px}.reasonHead h2{margin:0 0 7px;color:#bd315a}.hint{display:none;background:#fff8df;border:1px solid #f0d985;border-radius:18px;padding:18px;margin-top:15px}.hint.show{display:block}
+.choices{display:none;gap:14px;margin-top:20px}.choices.show{display:grid!important}.choice{display:block;width:100%;background:#fff;border:2px solid #cbd4e4;border-radius:16px;padding:18px 20px;text-align:left;font-weight:850;font-size:22px;line-height:1.4}.choice.correct{border-color:#66bb84;background:#effaf2}.choice.incorrect{border-color:#e38b8b;background:#fff0f0}
+.reportGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.metric{background:#eef2f7;border-radius:17px;padding:20px}.metric b{display:block;margin-bottom:8px}.metric strong{font-size:25px}.summary{margin-top:20px;border:2px solid var(--blue);background:#f0f3ff;border-radius:18px;padding:20px}.log{margin-top:20px;border-collapse:collapse;width:100%;font-size:15px}.log th,.log td{border-bottom:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}.reportBtns{display:flex;gap:10px;margin-top:20px}
+@media(max-width:760px){.app{padding:16px}.title h1{font-size:22px}.card{padding:20px}.reader{font-size:21px}.dropwrap{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.reportGrid{grid-template-columns:1fr 1fr}.log{font-size:12px}.hero h2{font-size:32px}}
+@media print{body{background:white}.app>header,.progress,.reportBtns{display:none!important}.screen{display:none!important}#report.screen{display:block!important}.card{box-shadow:none;border:0;padding:0}.log{font-size:11px}}
+</style></head>
+<body><div class="app">
+<header><div class="title"><h1>독서인지 · 흥부와 제비</h1><p>문장 나누기 → 원인과 결과 → “왜 그랬어?”</p></div>
+<div class="nav"><button id="prev" onclick="goPrev()">← 이전</button><span class="pill" id="pageNo">1 / 24</span><button id="nextTop" onclick="goNext()">다음 →</button></div></header>
+<div class="progress"><div id="prog"></div></div>
+
+<section id="start" class="screen active"><div class="card center hero"><div class="icon">📖</div><h2>흥부와 제비</h2><p>이야기를 읽고 원인과 결과를 찾아보아요.</p><button class="btn primary" onclick="startReading()">시작하기 →</button></div></section>
+
+<section id="reading" class="screen"><div class="card center">
+<div class="readerTools"><button class="btn primary" onclick="playReading()">🔊 음성과 함께 읽기</button><button class="btn soft" onclick="stopReading()">■ 멈추기</button></div>
+<div class="note">음성이 진행되는 동안 글이 순서대로 나타납니다. 파란색 굵은 문장은 오늘 연습할 9문장입니다.</div>
+<div class="studyGuide"><b class="guideTitle">오늘의 연습 — 원인과 결과 찾기</b>어떤 일이 <b>왜 일어났는지</b>, 그리고 그 뒤에 <b>어떤 결과가 생겼는지</b> 찾아봅니다. <b>‘~때문에’만 찾지 마세요.</b> ‘~아서/어서’, ‘~기에’, ‘~는 바람에’, ‘~덕분에’, ‘~으므로’처럼 원인과 결과를 이어 주는 표현은 여러 가지입니다. 문장을 주의 깊게 살펴보세요.</div>
+<div class="readerNav"><button class="btn outline" onclick="readerPrev()">← 앞 문단</button><b id="readerPage">1 / 4</b><button class="btn outline" onclick="readerNext()">다음 문단 →</button></div>
+<div id="reader" class="reader"></div></div></section>
+
+<section id="basic" class="screen"><div class="card center"><h2>이야기의 기본 내용을 찾아보세요.</h2><p class="note">직접 타이핑한 뒤 확인하세요.</p><div id="basicQs" class="qgrid"></div><div class="feedback" id="basicFb"></div><button class="btn primary" onclick="checkBasic()">정답 확인</button></div></section>
+
+<section id="split" class="screen"><div class="card">
+<div class="sentence" id="splitFull"></div>
+<p class="note" style="font-size:20px">위 문장을 두 개의 짧은 문장으로 나누어 보세요. 단어 조각을 아래 알맞은 칸으로 옮기세요.<br><b>아이패드에서는 단어를 한 번 누른 뒤, 넣을 칸을 누르는 방법도 사용할 수 있습니다.</b></p>
+<div class="wordbank" id="bank"></div>
+<div class="dropwrap"><div class="drop" data-drop="cause"><h3>먼저 있었던 일</h3><div class="slots" id="causeDrop"></div></div><div class="arrow">→</div><div class="drop" data-drop="effect"><h3>그래서 생긴 일</h3><div class="slots" id="effectDrop"></div></div></div>
+<div class="feedback" id="splitFb"></div><button class="btn soft" onclick="resetSplit()">↻ 다시하기</button> <button class="btn primary" onclick="checkSplit()">정답 확인</button>
+</div></section>
+
+<section id="reason" class="screen"><div class="card center">
+<div class="reasonHead"><h2>왜 그랬어?</h2><div id="reasonQ" style="font-size:22px;font-weight:800"></div></div>
+<p class="note">먼저 혼자 생각해서 타이핑해 보세요.</p><input class="typebox" id="reasonInput" placeholder="여기에 답을 써 보세요">
+<div class="feedback" id="reasonFb"></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="checkReasonTyped()">정답 확인</button><button class="btn outline" id="hint1Btn" onclick="showHint1()">💡 힌트 1 보기</button><button class="btn outline" id="hint2Btn" onclick="showHint2()" style="display:none">💡 힌트 2 보기</button></div>
+<div class="hint" id="hint"></div><div class="choices" id="choices"></div>
+</div></section>
+
+<section id="report" class="screen"><div class="card">
+<h2 style="font-size:34px;margin-top:0">📖 독서인지 학습 결과표</h2><p>이 결과는 표준화된 진단검사가 아니라 이번 독서인지 수업에서 관찰된 수행 기록입니다.</p>
+<div class="reportGrid" id="metrics"></div><div class="summary" id="summary"></div>
+<table class="log"><thead><tr><th>번호</th><th>평가 영역</th><th>아동이 타이핑한 답</th><th>도움 수준</th><th>결과</th></tr></thead><tbody id="logBody"></tbody></table>
+<div class="reportBtns"><button class="btn primary" onclick="window.print()">🖨 결과표 인쇄하기</button><button class="btn outline" onclick="saveReportImage()">⬇ 이미지 저장</button><button class="btn soft" onclick="location.reload()">처음부터</button></div>
+</div></section>
+</div>
+<script>
+const items=[["놀부가 흥부네 가족을 내쫓아서 흥부는 아내와 아이들을 데리고 버려진 초가에서 살았습니다.","놀부가 흥부네 가족을 내쫓았습니다.","흥부는 아내와 아이들을 데리고 버려진 초가에서 살았습니다.","흥부는 왜 가족들과 버려진 초가에서 살게 되었을까요?",["놀부","내쫓"],["놀부가 흥부네 가족을 내쫓았기 때문입니다.","놀부가 흥부네 가족을 내쫓아서","흥부가 밭일을 해서","제비가 찾아와서","박이 열려서"]],["더 이상 배고픔을 견딜 수 없었기에 흥부는 놀부를 찾아가 양식을 꾸어 달라고 했습니다.","흥부는 더 이상 배고픔을 견딜 수 없었습니다.","흥부는 놀부를 찾아가 양식을 꾸어 달라고 했습니다.","흥부는 왜 놀부에게 양식을 꾸어 달라고 했을까요?",["배고픔","견딜","없"],["배고픔을 견딜 수 없었기 때문입니다.","배고픔을 견딜 수 없어서","제비가 다쳐서","박씨를 심어서","놀부가 웃어서"]],["구렁이가 둥지를 덮치는 바람에 떨어진 모양이로구나.","구렁이가 제비 둥지를 덮쳤습니다.","제비가 둥지에서 떨어졌습니다.","제비는 왜 둥지에서 떨어졌을까요?",["구렁이","둥지","덮"],["구렁이가 둥지를 덮쳤기 때문입니다.","구렁이가 둥지를 덮치는 바람에","흥부가 제비를 치료해서","제비가 박씨를 가져와서","놀부가 제비를 찾아서"]],["제비가 다리를 심하게 다쳤기에 흥부는 제비의 다리를 정성껏 치료해 주었습니다.","제비가 다리를 심하게 다쳤습니다.","흥부는 제비의 다리를 정성껏 치료해 주었습니다.","흥부는 왜 제비의 다리를 치료해 주었을까요?",["제비","다리","다쳤"],["제비가 다리를 심하게 다쳤기 때문입니다.","제비가 다리를 심하게 다쳐서","박죽을 먹으려고","놀부가 시켜서","제비가 박씨를 줘서"]],["제비는 흥부가 치료해 준 덕분에 건강히 지낼 수 있었다고 대답했습니다.","흥부가 제비를 치료해 주었습니다.","제비는 건강히 지낼 수 있었습니다.","제비는 왜 건강히 지낼 수 있었을까요?",["흥부","치료"],["흥부가 치료해 주었기 때문입니다.","흥부가 치료해 준 덕분에","박에서 돈이 나와서","놀부가 제비를 찾아서","여름이 되어서"]],["흥부네 가족은 먹을 것이 없었으므로 서둘러 잘 익은 박을 탔습니다.","흥부네 가족은 먹을 것이 없었습니다.","흥부네 가족은 서둘러 잘 익은 박을 탔습니다.","흥부네 가족은 왜 박을 탔을까요?",["먹을","없"],["먹을 것이 없었기 때문입니다.","먹을 것이 없었으므로","제비가 날아가서","놀부가 찾아와서","기와집이 생겨서"]],["사람들은 흥부가 착해서 복을 받는다며 축하해 주었습니다.","흥부는 착했습니다.","사람들은 흥부가 복을 받았다고 생각하며 축하해 주었습니다.","사람들은 왜 흥부가 복을 받았다고 생각했을까요?",["흥부","착"],["흥부가 착했기 때문입니다.","흥부가 착해서","놀부가 재산을 차지해서","박에 벌레가 나와서","제비가 다쳐서"]],["놀부는 자기도 박씨를 받고 싶어서 제비를 찾아다녔습니다.","놀부는 자기도 박씨를 받고 싶었습니다.","놀부는 제비를 찾아다녔습니다.","놀부는 왜 제비를 찾아다녔을까요?",["박씨","받고","싶"],["박씨를 받고 싶었기 때문입니다.","박씨를 받고 싶어서","흥부에게 양식을 주려고","제비를 치료받게 하려고","벌레를 잡으려고"]],["사람들은 놀부가 욕심을 부려서 벌을 받는다고 손가락질했습니다.","놀부는 욕심을 부렸습니다.","사람들은 놀부가 벌을 받는다고 생각하며 손가락질했습니다.","사람들은 왜 놀부가 벌을 받는다고 생각했을까요?",["놀부","욕심"],["놀부가 욕심을 부렸기 때문입니다.","놀부가 욕심을 부려서","흥부가 박을 타서","제비가 남쪽으로 가서","사람들이 축하해서"]]];
+const storyParagraphs=["옛날, 어느 마을에 마음씨가 착한 흥부와 욕심이 많은 놀부가 살았습니다. 부모님이 돌아가시자 놀부는 부모님의 재산을 모두 차지했습니다.\n“흥부야! 이제 여긴 내 집이고, 이 모든 것들은 나의 것이니 너는 가족들을 데리고 썩 나가거라!”\n“아이고, 형님. 이 엄동설한에 돈 한 푼 없이 어디로 가라는 말씀입니까?”\n“그야 내가 어찌 알겠느냐! 어서 썩 나가거라!”\n놀부가 흥부네 가족을 내쫓아서 흥부는 아내와 아이들을 데리고 버려진 초가에서 살았습니다. 너무 춥고 배가 고팠습니다. 더 이상 배고픔을 견딜 수 없었기에 흥부는 놀부를 찾아가 양식을 꾸어 달라고 했습니다. 하지만 놀부와 부인은 양식을 주기는커녕 주걱으로 뺨을 때려 내쫓았습니다.", "어느 봄날, 흥부는 밭일을 하고 돌아오다가 마당에 떨어진 새끼 제비 한 마리를 발견했습니다.\n“아이고, 새끼 제비야, 이게 무슨 일이냐?”\n흥부는 서둘러 새끼 제비를 살펴보았습니다. 다리가 부러져 있었습니다. 고개를 들어 제비 둥지를 보니 구렁이 한 마리가 스윽 사라지고 있었습니다.\n“구렁이가 둥지를 덮치는 바람에 떨어진 모양이로구나.”\n제비가 다리를 심하게 다쳤기에 흥부는 제비의 다리를 정성껏 치료해 주었습니다. 건강해진 제비는 따뜻한 남쪽 나라로 날아갔습니다.", "다음 해 봄, 흥부에게 도움을 받았던 제비가 찾아왔습니다.\n“오호, 너는 작년에 다리를 다쳤던 녀석이구나. 그동안 잘 지냈느냐?”\n흥부는 제비를 알아보고 반갑게 인사해 주었습니다. 제비는 흥부의 손에 박씨 한 알을 떨어뜨렸습니다.\n“삐삐삐, 삐삐삐.”\n제비는 흥부가 치료해 준 덕분에 건강히 지낼 수 있었다고 대답했습니다.\n흥부는 제비가 준 박씨를 심었습니다. 여름이 되자 지붕 위에 커다란 박이 열렸습니다. 흥부네 가족은 먹을 것이 없었으므로 서둘러 잘 익은 박을 탔습니다.\n“슬근슬근 톱질하세, 슬근슬근 톱질하세.”\n흥부네 가족은 모처럼 박죽을 배불리 먹을 생각에 행복했습니다. 그런데 박이 쩍 열리자, 박 속이 아니라 쌀과 돈, 그리고 비단이 폭포처럼 쏟아져 나왔습니다. 일꾼들이 나와 순식간에 기와집을 지어 주었습니다. 흥부네 가족은 깜짝 놀랐습니다.\n“경사 났네, 경사 났어~ 아이고 고맙구나, 제비야~.” 흥부는 허허허 웃었습니다. 제비가 물어다 준 박씨 덕분에 흥부 가족은 쌀밥을 배불리 먹었습니다. 비단옷을 입고 따뜻한 집에서 살 수 있게 되었습니다. 사람들은 흥부가 착해서 복을 받는다며 축하해 주었습니다.", "흥부가 잘살게 되었다는 소식을 들은 놀부는 배가 아팠습니다. 놀부는 자기도 박씨를 받고 싶어서 제비를 찾아다녔습니다. 드디어 제비 둥지를 발견한 놀부는 제비 새끼를 꺼내 바닥으로 내동댕이쳤습니다.\n“아이고, 제비 새끼가 떨어졌네. 불쌍하기도 하지.”\n놀부는 제비 다리를 대충 치료해 주었습니다.\n“제비야, 나도 널 치료해 주었으니 금은보화가 나오는 박씨를 잔뜩 가져오너라.”\n이듬해 제비는 놀부에게도 박씨를 가져다주었습니다. 놀부도 박씨를 심었고, 커다란 박이 열리자 박을 탔습니다.\n하지만 놀부의 박에서는 돈과 쌀 대신 징그러운 벌레들과 똥이 나왔습니다. 징그러운 벌레들은 놀부와 부인의 옷 속으로 들어가 괴롭혔고, 똥은 마당과 집 안에 가득 쌓여 지독한 냄새를 풍겼습니다. 게다가 도깨비까지 나타나 놀부와 부인을 커다란 방망이로 마구 때렸습니다.\n“아이고, 잘못했습니다.”\n놀부는 손이 발이 되도록 빌었습니다.\n사람들은 놀부가 욕심을 부려서 벌을 받는다고 손가락질했습니다."];
+const story=storyParagraphs.join("\n\n");
+const basic=[["등장인물은 누구인가요?",["흥부","놀부","제비"]],["언제 있었던 일이에요?",["옛날","봄"]],["어디에서 있었던 일이에요?",["마을","흥부","집","마당"]],["무슨 일이 생겼어요?",["제비","다리","다쳤"]]];
+let stage=0,idx=0,results={basic:[],split:[],reason:[]},readingTimer=null;
+const stages=["start","reading","basic",...Array(9).fill("split"),...Array(9).fill("reason"),"report"];
+function norm(s){return (s||"").replace(/\s|[.,!?~]/g,"").toLowerCase()}
+function containsKeys(s,keys){let n=norm(s);return keys.every(k=>n.includes(norm(k)))}
+function show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function renderStage(){
+ let id=stages[stage]; show(id); idx=id==="split"?stage-3:id==="reason"?stage-12:0;
+ document.getElementById("pageNo").textContent=`${stage+1} / ${stages.length}`;
+ document.getElementById("prog").style.width=`${(stage+1)/stages.length*100}%`;
+ document.getElementById("prev").disabled=stage===0; document.getElementById("nextTop").disabled=(stage===stages.length-1);
+ if(id==="reading")renderReader(); if(id==="basic")renderBasic(); if(id==="split")renderSplit(); if(id==="reason")renderReason(); if(id==="report")renderReport();
+}
+function goNext(){if(stage<stages.length-1){stage++;renderStage()}} function goPrev(){if(stage>0){stage--;renderStage()}}
+function startReading(){stage=1;renderStage();playReading()}
+let readerPara=0, readingUtterance=null;
+function esc(x){return x.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function readingSegments(text){
+ const raw=text.split("\n"), out=[];
+ raw.forEach(line=>{
+   let rest=line.trim();
+   if(!rest)return;
+   // A quotation beginning with “ is always its own line.
+   if(rest.startsWith("“")){
+     const close=rest.indexOf("”");
+     if(close>=0){
+       out.push({text:rest.slice(0,close+1),quote:true});
+       rest=rest.slice(close+1).trim();
+     }
+   }
+   if(rest)out.push({text:rest,quote:false});
+ });
+ return out;
+}
+function keyMask(text){
+ const mask=Array(text.length).fill(false);
+ items.forEach(d=>{
+   let from=0,pos;
+   while((pos=text.indexOf(d[0],from))>=0){
+     for(let i=pos;i<pos+d[0].length;i++)mask[i]=true;
+     from=pos+d[0].length;
+   }
+ });
+ return mask;
+}
+function renderReader(revealAll=false){
+ document.getElementById("readerPage").textContent=`${readerPara+1} / ${storyParagraphs.length}`;
+ const text=storyParagraphs[readerPara], mask=keyMask(text);
+ let globalPos=0, html="";
+ readingSegments(text).forEach(seg=>{
+   const originalStart=text.indexOf(seg.text,globalPos);
+   globalPos=Math.max(globalPos,originalStart)+seg.text.length;
+   html+=`<span class="readingLine${seg.quote?" quote":""}">`;
+   [...seg.text].forEach((ch,j)=>{
+     const p=originalStart+j, key=mask[p]?" key":"", shown=revealAll?" shown":"";
+     html+=`<span class="char${key}${shown}" data-pos="${p}">${esc(ch)}</span>`;
+   });
+   html+=`</span>`;
+ });
+ document.getElementById("reader").innerHTML=html;
+}
+function readerPrev(){stopReading();if(readerPara>0){readerPara--;renderReader(true)}}
+function readerNext(){stopReading();if(readerPara<storyParagraphs.length-1){readerPara++;renderReader(true)}}
+function visibleSyllables(text){return [...text].filter(c=>/[가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9]/.test(c)).length}
+function playReading(){
+ stopReading();renderReader(false);
+ const text=storyParagraphs[readerPara];
+ const chars=[...document.querySelectorAll("#reader .char")];
+ const speechRate=.72; // keep the voice speed the user approved
+
+ // Word start/end positions in the original paragraph.
+ const words=[];
+ const rx=/\S+/g; let m;
+ while((m=rx.exec(text))!==null) words.push({start:m.index,end:m.index+m[0].length-1});
+
+ let lastShown=-1;
+ function revealThroughWord(wordIndex){
+   if(wordIndex<0 || !words.length)return;
+   wordIndex=Math.min(wordIndex,words.length-1);
+   const endPos=words[wordIndex].end;
+   chars.forEach(el=>{
+     if(Number(el.dataset.pos)<=endPos)el.classList.add("shown");
+   });
+   lastShown=Math.max(lastShown,wordIndex);
+ }
+
+ // Show the first word before speech begins, like live transcript lead-in.
+ revealThroughWord(0);
+
+ if(!("speechSynthesis" in window)){
+   let w=1;
+   readingTimer=setInterval(()=>{
+     revealThroughWord(w++);
+     if(w>=words.length){clearInterval(readingTimer);readingTimer=null}
+   },430);
+   return;
+ }
+
+ readingUtterance=new SpeechSynthesisUtterance(text);
+ readingUtterance.lang="ko-KR";
+ readingUtterance.rate=speechRate;
+ readingUtterance.pitch=1;
+
+ // Follow actual speech boundary and keep the display ONE word ahead.
+ readingUtterance.onboundary=(e)=>{
+   if(typeof e.charIndex!=="number")return;
+   let current=0;
+   for(let k=0;k<words.length;k++){
+     if(words[k].start<=e.charIndex)current=k; else break;
+   }
+   revealThroughWord(current+1);
+ };
+ readingUtterance.onstart=()=>revealThroughWord(1);
+ readingUtterance.onend=()=>{
+   revealThroughWord(words.length-1);
+   readingTimer=null;
+ };
+ speechSynthesis.speak(readingUtterance);
+}
+function stopReading(){
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ if(readingTimer){clearInterval(readingTimer);readingTimer=null}
+ readingUtterance=null;
+}
+function renderBasic(){let b=document.getElementById("basicQs");b.innerHTML=basic.map((q,i)=>`<div class="qrow" id="bq${i}"><label>${q[0]}</label><input id="ba${i}" autocomplete="off"></div>`).join("")}
+function checkBasic(){let all=true;basic.forEach((q,i)=>{let v=document.getElementById("ba"+i).value,ok=containsKeys(v,q[1].slice(0,i===0?2:1));results.basic[i]={typed:v,ok};let r=document.getElementById("bq"+i);r.classList.toggle("ok",ok);r.classList.toggle("bad",!ok);if(!ok)all=false});tone(all);document.getElementById("basicFb").innerHTML=all?'<span class="good">잘했어요! 이야기의 기본 배경을 찾았습니다.</span>':'<span class="wrong">빨간 칸을 다시 생각해 보세요.</span>'}
+function tokensFor(s){return s.replace(/[.,]/g,"").split(/\s+/)}
+let placed={cause:[],effect:[]};
+function renderSplit(){let d=items[idx];document.getElementById("splitFull").textContent=d[0];resetSplit()}
+function resetSplit(){placed={cause:[],effect:[]};let toks=[...tokensFor(items[idx][1]),...tokensFor(items[idx][2])].sort(()=>Math.random()-.5);document.getElementById("bank").innerHTML="";toks.forEach((t,k)=>makeToken(t,k));drawDrops();document.getElementById("splitFb").textContent=""}
+let selectedToken=null, dragGhost=null;
+function makeToken(t,k){
+ let el=document.createElement("div"); el.className="token"; el.textContent=t; el.dataset.id=k; el.dataset.text=t;
+ // Desktop HTML5 drag
+ el.draggable=true;
+ el.addEventListener("dragstart",e=>{e.dataTransfer.setData("text/plain",JSON.stringify({t,id:k}))});
+ // Tap-to-select fallback (especially reliable on iPad)
+ el.addEventListener("click",e=>{
+   e.stopPropagation();
+   document.querySelectorAll(".token").forEach(x=>x.style.outline="");
+   selectedToken=el; el.style.outline="4px solid #4d6fff";
+ });
+ // Pointer drag for touch / Apple Pencil / mouse
+ el.addEventListener("pointerdown",e=>{
+   if(e.pointerType==="mouse" && e.button!==0)return;
+   el.setPointerCapture?.(e.pointerId);
+   const r=el.getBoundingClientRect();
+   dragGhost=el.cloneNode(true); dragGhost.style.position="fixed";dragGhost.style.zIndex="9999";
+   dragGhost.style.width=r.width+"px";dragGhost.style.opacity=".9";dragGhost.style.pointerEvents="none";
+   document.body.appendChild(dragGhost);
+   moveGhost(e.clientX,e.clientY,r.width,r.height);
+ });
+ el.addEventListener("pointermove",e=>{if(dragGhost)moveGhost(e.clientX,e.clientY,dragGhost.offsetWidth,dragGhost.offsetHeight)});
+ el.addEventListener("pointerup",e=>{
+   if(!dragGhost)return;
+   dragGhost.remove();dragGhost=null;
+   let target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".drop");
+   if(target){placeToken(el,target.dataset.drop)}
+ });
+ document.getElementById("bank").appendChild(el)
+}
+function moveGhost(x,y,w,h){if(dragGhost){dragGhost.style.left=(x-w/2)+"px";dragGhost.style.top=(y-h/2)+"px"}}
+function placeToken(el,target){
+ if(!el||!target)return; placed[target].push(el.dataset.text); el.remove(); selectedToken=null; drawDrops()
+}
+document.querySelectorAll(".drop").forEach(d=>{
+ d.addEventListener("dragover",e=>e.preventDefault());
+ d.addEventListener("drop",e=>{e.preventDefault();try{let x=JSON.parse(e.dataTransfer.getData("text/plain"));let el=[...document.querySelectorAll(".token")].find(z=>z.dataset.id==x.id);if(el)placeToken(el,d.dataset.drop)}catch(_){}});
+ d.addEventListener("click",()=>{if(selectedToken)placeToken(selectedToken,d.dataset.drop)});
+});
+function drawDrops(){
+ document.getElementById("causeDrop").innerHTML=placed.cause.map((x,j)=>`<button type="button" class="slotToken" onclick="returnPlaced('cause',${j})">${x}</button>`).join("");
+ document.getElementById("effectDrop").innerHTML=placed.effect.map((x,j)=>`<button type="button" class="slotToken" onclick="returnPlaced('effect',${j})">${x}</button>`).join("")
+}
+function returnPlaced(which,j){
+ let t=placed[which].splice(j,1)[0]; if(t!==undefined)makeToken(t,"r"+Date.now()+j); drawDrops()
+}
+function checkSplit(){let d=items[idx],ok=norm(placed.cause.join(" "))===norm(d[1])&&norm(placed.effect.join(" "))===norm(d[2]);results.split[idx]={ok,attempts:(results.split[idx]?.attempts||0)+1};tone(ok);document.getElementById("splitFb").innerHTML=ok?'<span class="good">정답이에요! 먼저 있었던 일 → 그래서 생긴 일을 잘 나누었습니다.</span>':'<span class="wrong">아직 달라요. 두 짧은 문장을 다시 만들어 보세요.</span>';if(ok)setTimeout(()=>{stage++;renderStage()},850)}
+function renderReason(){
+ let d=items[idx];
+ document.getElementById("reasonQ").textContent=d[3];
+ document.getElementById("reasonInput").value="";
+ document.getElementById("reasonFb").textContent="";
+ document.getElementById("hint").classList.remove("show");
+ document.getElementById("choices").classList.remove("show");
+ document.getElementById("choices").style.display="none";
+ document.getElementById("hint1Btn").style.display="inline-block";
+ document.getElementById("hint2Btn").style.display="none";
+ document.getElementById("hint").innerHTML="";
+ // Hint 2: exactly four choices with only one semantically correct answer.
+ const stored=d[5];
+ let correct=stored[0];
+ let distractors=[stored[2],stored[3],stored[4]];
+ let opts=[correct,...distractors];
+ // deterministic rotation so the correct answer is not always in the same position
+ let shift=idx%4; opts=opts.slice(shift).concat(opts.slice(0,shift));
+ document.getElementById("choices").innerHTML=opts.map((x,j)=>`<button type="button" class="choice" onclick="chooseReason(this,${x===correct})">${j+1}. ${x}</button>`).join("");
+ document.querySelectorAll("#choices .choice").forEach(b=>{b.disabled=false;b.classList.remove("correct","incorrect");});
+}
+function checkReasonTyped(){
+ let d=items[idx],v=document.getElementById("reasonInput").value,ok=containsKeys(v,d[4]);
+ let r=results.reason[idx]||{hints:0,choice:false};
+ r.typed=v;
+ if(ok){r.ok=true;r.level=r.hints===0?"독립 타이핑":(r.hints===1?"힌트 1 후 타이핑":"힌트 2 후 타이핑");}
+ else if(!r.ok){r.level=r.level||"미해결";}
+ results.reason[idx]=r;tone(ok);
+ document.getElementById("reasonFb").innerHTML=ok?'<span class="good">정답이에요! 혼자 문장에서 이유를 찾았습니다.</span>':'<span class="wrong">아직 달라요. 필요하면 힌트를 하나씩 사용해 보세요.</span>';
+}
+function showHint1(){
+ let d=items[idx],r=results.reason[idx]||{hints:0,choice:false};
+ r.hints=Math.max(r.hints||0,1);results.reason[idx]=r;
+ document.getElementById("hint").classList.add("show");
+ document.getElementById("hint").innerHTML=`<b>💡 힌트 1</b><br>긴 문장을 두 문장으로 나누어 보세요.<br><br><b>① ${d[1]}</b><br><b>② ${d[2]}</b><br><br>“왜?”의 답은 어느 문장에 있을까요?`;
+ document.getElementById("hint2Btn").style.display="inline-block";
+ tone(true);
+}
+function showHint2(){
+ let d=items[idx],r=results.reason[idx]||{hints:0,choice:false};
+ r.hints=2;results.reason[idx]=r;
+ document.getElementById("hint").classList.add("show");
+ document.getElementById("hint").innerHTML=`<b>💡 힌트 2</b><br>화살표의 <b>앞쪽 문장</b>을 다시 보세요.<br><br><b>${d[1]}</b><br><br>그래도 어렵다면 아래 네 개 중 하나를 골라 보세요.`;
+ const choiceBox=document.getElementById("choices");
+ choiceBox.classList.add("show");
+ choiceBox.style.display="grid";
+ setTimeout(()=>choiceBox.scrollIntoView({behavior:"smooth",block:"nearest"}),80);
+ tone(true);
+}
+function chooseReason(el,ok){
+ let r=results.reason[idx]||{hints:2};
+ r.choice=true;
+ if(ok){r.ok=true;r.level="4지선다";}
+ else {r.choiceErrors=(r.choiceErrors||0)+1;if(!r.ok)r.level="4지선다 시도";}
+ results.reason[idx]=r;
+ if(ok){
+   [...document.querySelectorAll(".choice")].forEach(x=>x.disabled=true);
+   el.classList.add("correct");tone(true);
+   document.getElementById("reasonFb").innerHTML='<span class="good">정답이에요! 네 개의 보기에서 이유를 찾았습니다.</span>';
+ }else{
+   el.classList.add("incorrect");tone(false);
+   document.getElementById("reasonFb").innerHTML='<span class="wrong">아니에요. 다시 골라 보세요.</span>';
+   setTimeout(()=>el.classList.remove("incorrect"),650);
+ }
+}
+function tone(ok){
+ try{
+  const A=window.AudioContext||window.webkitAudioContext,a=new A();
+  const notes=ok?[660,880]:[190,145];
+  notes.forEach((f,j)=>{
+   let o=a.createOscillator(),g=a.createGain();o.type=ok?"sine":"square";o.connect(g);g.connect(a.destination);
+   let st=a.currentTime+j*.12;o.frequency.setValueAtTime(f,st);g.gain.setValueAtTime(ok?.09:.055,st);
+   g.gain.exponentialRampToValueAtTime(.001,st+.18);o.start(st);o.stop(st+.19);
+  });
+ }catch(e){}
+ document.body.animate(ok?[{background:"#eaffef"},{background:"var(--bg)"}]:[{background:"#ffe5e5"},{background:"var(--bg)"}],{duration:500});
+}
+function renderReport(){let sOk=results.split.filter(x=>x?.ok).length,rOk=results.reason.filter(x=>x?.ok).length,ind=results.reason.filter(x=>x?.level==="독립 타이핑").length,h1=results.reason.filter(x=>x?.level==="힌트 1 후 타이핑").length,h2=results.reason.filter(x=>x?.level==="힌트 2 후 타이핑").length,choice=results.reason.filter(x=>x?.level==="4지선다"&&x.ok).length;
+document.getElementById("metrics").innerHTML=`<div class="metric"><b>문장 나누기</b><strong>${sOk}/9</strong></div><div class="metric"><b>왜? 정답</b><strong>${rOk}/9</strong></div><div class="metric"><b>독립 수행</b><strong>${ind}/9</strong></div><div class="metric"><b>도움 후 수행</b><strong>${h1+h2+choice}/9</strong></div>`;
+document.getElementById("summary").innerHTML=`<b>종합 수행 기록</b><p>문장을 두 사건으로 나누고 원인→결과를 연결한 뒤, 같은 관계를 “왜?” 질문에서 다시 인출하도록 구성했습니다. 독립 타이핑 ${ind}개, 힌트 1 후 타이핑 ${h1}개, 힌트 2 후 타이핑 ${h2}개, 4지선다로 해결 ${choice}개입니다. 타이핑한 원문은 아래에 그대로 기록됩니다.</p>`;
+let rows="";for(let i=0;i<9;i++){let rr=results.reason[i]||{},sr=results.split[i]||{};rows+=`<tr><td>${i+1}</td><td>문장 나누기 / 이유 인출</td><td>${(rr.typed||"—").replace(/</g,"&lt;")}</td><td>${rr.level||"미수행"} · 문장시도 ${sr.attempts||0}회</td><td>${rr.ok?"정답":"미해결"}</td></tr>`}document.getElementById("logBody").innerHTML=rows}
+async function saveReportImage(){alert("이 브라우저에서는 결과표를 이미지로 직접 저장하는 기능이 제한될 수 있습니다. 인쇄 버튼에서 PDF로 저장하거나 화면 캡처를 이용해 주세요.");}
+renderStage();
+</script></body></html>
