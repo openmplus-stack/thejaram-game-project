@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<rect width="1200" height="675" fill="#f4f6fb"/>
+<rect x="55" y="50" width="1090" height="575" rx="28" fill="#fff" stroke="#d9e0eb"/>
+<rect x="90" y="85" width="230" height="55" rx="14" fill="#3658d8"/><text x="205" y="120" text-anchor="middle" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="#fff">🔊 음성과 함께 읽기</text>
+<rect x="335" y="85" width="130" height="55" rx="14" fill="#edf1f7"/><text x="400" y="120" text-anchor="middle" font-family="system-ui,sans-serif" font-size="20" font-weight="800" fill="#202a3a">■ 멈추기</text>
+<rect x="90" y="160" width="1020" height="102" rx="18" fill="#eef3ff" stroke="#cdd9ff"/>
+<text x="115" y="198" font-family="system-ui,sans-serif" font-size="23" font-weight="900" fill="#202a3a">오늘의 연습 — 원인과 결과 찾기</text>
+<text x="115" y="234" font-family="system-ui,sans-serif" font-size="20" fill="#202a3a">어떤 일이 왜 일어났는지, 그리고 그 뒤에 어떤 결과가 생겼는지 찾아봅니다.</text>
+<text x="95" y="325" font-family="system-ui,sans-serif" font-size="25" fill="#202a3a">옛날, 어느 마을에 마음씨가 착한 흥부와 욕심이 많은 놀부가 살았습니다.</text>
+<text x="95" y="372" font-family="system-ui,sans-serif" font-size="25" font-weight="900" fill="#265bd6">놀부가 흥부네 가족을 내쫓아서 흥부는 가족과 초가에서 살았습니다.</text>
+<text x="95" y="419" font-family="system-ui,sans-serif" font-size="25" fill="#202a3a">너무 춥고 배가 고팠습니다.</text>
+<text x="95" y="466" font-family="system-ui,sans-serif" font-size="25" font-weight="900" fill="#265bd6">배고픔을 견딜 수 없었기에 흥부는 놀부를 찾아갔습니다.</text>
+<text x="95" y="525" font-family="system-ui,sans-serif" font-size="19" font-weight="700" fill="#4f5b6c">파란색 굵은 문장은 오늘 연습할 핵심 문장입니다.</text>
+</svg>
