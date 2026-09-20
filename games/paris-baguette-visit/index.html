@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>독서인지 | 파리바게트에 갔어요</title>
+<meta name="description" content="빵집 이용 순서, 상품 선택, 수량, 주문, 포인트 적립, 결제, 상황판단을 단계적으로 연습하고 수행 결과를 분석하는 독서인지 생활적응 앱입니다.">
+<style>
+:root{--bg:#f7f7fb;--card:#fff;--ink:#263238;--muted:#667085;--blue:#335cff;--green:#258a54;--red:#d84a4a;--line:#d9dfeb;--soft:#eef3ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+button,input,textarea,select{font:inherit}.app{max-width:1180px;margin:auto;padding:20px 18px 60px}
+header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+h1{margin:0;font-size:clamp(24px,4vw,36px)}.sub{color:var(--muted);font-weight:700;margin-top:5px}.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.nav button,.pill{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 13px;font-weight:800}
+.progress{height:10px;background:#e3e7ef;border-radius:999px;overflow:hidden;margin:14px 0 20px}.progress>div{height:100%;background:var(--blue);transition:.25s}
+.screen{display:none}.screen.active{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 10px 26px rgba(42,54,77,.06)}
+.center{max-width:940px;margin:auto}.hero{text-align:center;padding:62px 26px}.hero .emoji{font-size:72px}.hero h2{font-size:clamp(34px,6vw,52px);margin:10px 0}.hero p{font-size:20px;color:var(--muted)}
+.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:850;cursor:pointer}.primary{background:var(--blue);color:#fff}.soft{background:#edf1f7;color:var(--ink)}.outline{background:#fff;border:1px solid var(--line)}.green{background:var(--green);color:#fff}
+h2{margin-top:0}.guide{background:var(--soft);border:1px solid #cad7ff;padding:18px;border-radius:18px;line-height:1.6;margin-bottom:20px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.choice{border:2px solid var(--line);background:#fff;border-radius:18px;padding:18px;min-height:108px;font-weight:850;font-size:18px;cursor:pointer}.choice.selected{border-color:var(--blue);background:#eef3ff}.choice.correct{border-color:#62b982;background:#eefaf2}.choice.incorrect{border-color:#e79494;background:#fff1f1}
+.bigicon{font-size:42px;display:block;margin-bottom:7px}.feedback{min-height:32px;font-size:18px;font-weight:800;margin:14px 0}.good{color:var(--green)}.bad{color:var(--red)}
+.sequence{display:grid;gap:12px}.seqItem{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.seqItem select{margin-left:auto;padding:10px;border-radius:10px;border:1px solid var(--line)}
+.qtyRow{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:16px;padding:16px;margin:10px 0}.qtyControls{display:flex;gap:8px;align-items:center}.qtyControls button{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:22px;font-weight:900}.qtyNum{min-width:36px;text-align:center;font-size:22px;font-weight:900}
+.dialogue{background:#fff8df;border:1px solid #f0d88a;border-radius:18px;padding:20px;margin-bottom:16px;font-size:21px;font-weight:800}.hint{display:none;background:#f7f8fb;border:1px dashed #aeb7c5;border-radius:14px;padding:14px;margin:10px 0}.hint.show{display:block}
+textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:14px;padding:14px;font-size:18px}
+.reportGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric{background:#f1f4f9;border-radius:16px;padding:18px}.metric b{display:block;margin-bottom:8px}.metric strong{font-size:26px}
+.analysis{margin-top:18px;border-left:5px solid var(--blue);background:#f3f6ff;border-radius:14px;padding:18px;line-height:1.65}.next{margin-top:14px;border-left:5px solid var(--green);background:#effaf3;border-radius:14px;padding:18px;line-height:1.65}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}
+@media(max-width:760px){.app{padding:14px}.card{padding:20px}.reportGrid{grid-template-columns:1fr 1fr}.seqItem{align-items:flex-start;flex-direction:column}.seqItem select{margin-left:0;width:100%}}
+@media print{header,.progress,.reportBtns{display:none!important}.screen{display:none!important}#report.screen{display:block!important}.card{border:0;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div><h1>독서인지 · 파리바게트에 갔어요</h1><div class="sub">가게 이용 순서 · 수량 · 주문 · 계산 · 상황판단</div></div>
+<div class="nav"><button id="prev" onclick="goPrev()">← 이전</button><span class="pill" id="pageNo">1 / 10</span><button id="next" onclick="goNext()">다음 →</button></div></header>
+<div class="progress"><div id="prog"></div></div>
+
+<section id="start" class="screen active"><div class="card center hero"><div class="emoji">🥐🧺🥛</div><h2>파리바게트에 갔어요</h2><p>빵을 고르고, 주문하고, 계산하는 순서를 연습해 보아요.</p><button class="btn primary" onclick="startApp()">빵을 사러 가요 →</button></div></section>
+
+<section id="observe" class="screen"><div class="card center"><h2>1. 빵집에는 무엇이 있을까요?</h2><div class="guide">빵을 고르고 계산할 때 사용하는 <b>물건과 장소</b>를 골라 보세요.</div><div class="grid" id="observeGrid"></div><div class="feedback" id="observeFb"></div><button class="btn primary" onclick="checkObserve()">확인하기</button></div></section>
+
+<section id="choose" class="screen"><div class="card center"><h2>2. 무엇을 살까요?</h2><div class="guide">“크루아상과 우유를 사요.” 필요한 상품을 골라 보세요.</div><div class="grid" id="productGrid"></div><div class="feedback" id="chooseFb"></div><button class="btn primary" onclick="checkProducts()">정답 확인</button></div></section>
+
+<section id="quantity" class="screen"><div class="card center"><h2>3. 몇 개 살까요?</h2><div class="guide"><b>크루아상 2개, 우유 1개</b>가 필요합니다.</div><div id="qtyBox"></div><div class="feedback" id="qtyFb"></div><button class="btn primary" onclick="checkQty()">정답 확인</button></div></section>
+
+<section id="sequence" class="screen"><div class="card center"><h2>4. 어떤 순서로 할까요?</h2><div class="guide">빵집에서 하는 행동을 순서대로 정해 보세요.</div><div id="seqBox" class="sequence"></div><div class="feedback" id="seqFb"></div><button class="btn outline" onclick="showSeqHint()">💡 힌트</button><div class="hint" id="seqHint">처음에는 <b>쟁반과 집게</b>를 준비하고, 마지막에는 <b>계산하고 상품을 받아요.</b></div> <button class="btn primary" onclick="checkSequence()">정답 확인</button></div></section>
+
+<section id="order" class="screen"><div class="card center"><h2>5. 주문해요</h2><div class="dialogue">직원: “어떤 상품을 계산해 드릴까요?”</div><textarea id="orderInput" placeholder="예: 크루아상 2개와 우유 1개 주세요."></textarea><div class="feedback" id="orderFb"></div><button class="btn outline" onclick="showOrderHint()">💡 말하기 힌트</button><div class="hint" id="orderHint">상품 이름 + 수량 + “주세요”를 넣어 보세요.</div> <button class="btn primary" onclick="checkOrder()">정답 확인</button></div></section>
+
+<section id="point" class="screen"><div class="card center"><h2>6. 포인트 적립 질문</h2><div class="dialogue">직원: “포인트 적립하시겠어요?”</div><div class="grid" id="pointGrid"></div><div class="feedback" id="pointFb"></div><div id="pointFollow" style="display:none;margin-top:16px"></div></div></section>
+
+<section id="checkout" class="screen"><div class="card center"><h2>7. 계산을 마쳐요</h2><div class="guide">직원이 묻는 질문에 알맞게 대답해 보세요.</div><div id="checkoutQs"></div></div></section>
+
+<section id="judgment" class="screen"><div class="card center"><h2>8. 이런 일이 생기면 어떻게 할까요?</h2><div class="guide">예상하지 못한 상황에서 알맞은 행동을 골라 보세요.</div><div id="judgmentBox"></div></div></section>
+
+<section id="report" class="screen"><div class="card"><h2>📋 파리바게트 생활적응 수행 결과</h2><p>이 결과는 표준화된 진단검사가 아니라 이번 앱 수행에서 나타난 반응을 정리한 기록입니다.</p><div class="reportGrid" id="metrics"></div><div class="analysis" id="analysis"></div><div class="next" id="nextPlan"></div><table><thead><tr><th>영역</th><th>결과</th><th>도움 수준</th><th>관찰</th></tr></thead><tbody id="logBody"></tbody></table><div class="reportBtns" style="margin-top:18px"><button class="btn primary" onclick="window.print()">🖨 결과표 인쇄</button> <button class="btn soft" onclick="location.reload()">처음부터</button></div></div></section>
+</div>
+
+<script>
+const stages=["start","observe","choose","quantity","sequence","order","point","checkout","judgment","report"];
+let stage=0;
+const results={observe:null,choose:null,quantity:null,sequence:null,order:null,point:null,checkout:[],judgment:[]};
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active")}
+function render(){show(stages[stage]);pageNo.textContent=`${stage+1} / ${stages.length}`;prog.style.width=`${(stage+1)/stages.length*100}%`;prev.disabled=stage===0;next.disabled=stage===stages.length-1;if(stages[stage]==="report")renderReport()}
+function goNext(){if(stage<stages.length-1){stage++;render()}}function goPrev(){if(stage>0){stage--;render()}}function startApp(){stage=1;render()}
+function tone(ok){document.body.animate(ok?[{background:"#eaffef"},{background:"var(--bg)"}]:[{background:"#ffe8e8"},{background:"var(--bg)"}],{duration:450})}
+
+const observeItems=[["🧺","쟁반","빵을 담아요"],["🍴","집게","빵을 집어요"],["🍰","케이크 냉장고","케이크를 골라요"],["🥤","음료 냉장고","음료를 골라요"],["💳","계산대","계산해요"],["🪑","의자","앉아요"]];
+observeItems.forEach((x,i)=>{let b=document.createElement("button");b.className="choice";b.innerHTML=`<span class="bigicon">${x[0]}</span>${x[1]}<small style="display:block;color:var(--muted);margin-top:5px">${x[2]}</small>`;b.onclick=()=>b.classList.toggle("selected");observeGrid.appendChild(b)});
+function checkObserve(){const sel=[...observeGrid.children].map((b,i)=>b.classList.contains("selected")?i:-1).filter(i=>i>=0),target=[0,1,2,3,4];const ok=target.every(i=>sel.includes(i))&&!sel.includes(5);results.observe={ok,level:"독립 수행",note:ok?"매장 도구·장소 기능을 구분함":"도구·장소 기능 구분에서 혼동"};observeFb.innerHTML=ok?'<span class="good">잘했어요!</span>':'<span class="bad">빵을 고르고 계산할 때 필요한 것을 다시 찾아보세요.</span>';tone(ok)}
+
+const products=[["🥐","크루아상"],["🥯","소보루빵"],["🍞","식빵"],["🥪","샌드위치"],["🎂","케이크"],["🥛","우유"],["🧃","주스"],["🍪","쿠키"]];
+products.forEach((x,i)=>{let b=document.createElement("button");b.className="choice";b.innerHTML=`<span class="bigicon">${x[0]}</span>${x[1]}`;b.onclick=()=>b.classList.toggle("selected");productGrid.appendChild(b)});
+function checkProducts(){let sel=[...productGrid.children].map((b,i)=>b.classList.contains("selected")?i:-1).filter(i=>i>=0);let ok=sel.includes(0)&&sel.includes(5)&&sel.length===2;results.choose={ok,level:"독립 수행",note:ok?"언어 지시에 맞는 상품 선택 가능":"상품 선택 또는 언어 지시 이해에서 오류"};chooseFb.innerHTML=ok?'<span class="good">정답이에요!</span>':'<span class="bad">크루아상과 우유를 찾아보세요.</span>';tone(ok)}
+
+let qty={croissant:0,milk:0};
+function qtyRow(icon,label,key){return `<div class="qtyRow"><div><span style="font-size:36px">${icon}</span> <b>${label}</b></div><div class="qtyControls"><button onclick="chgQty('${key}',-1)">−</button><span class="qtyNum" id="q_${key}">0</span><button onclick="chgQty('${key}',1)">+</button></div></div>`}
+qtyBox.innerHTML=qtyRow("🥐","크루아상","croissant")+qtyRow("🥛","우유","milk");
+function chgQty(k,d){qty[k]=Math.max(0,Math.min(5,qty[k]+d));document.getElementById("q_"+k).textContent=qty[k]}
+function checkQty(){let ok=qty.croissant===2&&qty.milk===1;results.quantity={ok,level:"독립 수행",note:ok?"수량 2개·1개를 정확히 대응함":`수량 대응 오류(크루아상 ${qty.croissant}, 우유 ${qty.milk})`};qtyFb.innerHTML=ok?'<span class="good">수량을 정확히 골랐어요!</span>':'<span class="bad">주문을 다시 보고 개수를 맞춰 보세요.</span>';tone(ok)}
+
+const seqSteps=["쟁반과 집게를 든다","빵과 음료를 고른다","계산대로 간다","포인트 질문에 대답한다","결제한다","상품을 받는다"];
+seqSteps.forEach((s,i)=>{let d=document.createElement("div");d.className="seqItem";d.innerHTML=`<b>${s}</b><select id="seq${i}"><option value="">순서 선택</option>${seqSteps.map((_,n)=>`<option value="${n+1}">${n+1}</option>`).join("")}</select>`;seqBox.appendChild(d)});
+let seqHintUsed=false;function showSeqHint(){seqHintUsed=true;seqHint.classList.add("show")}
+function checkSequence(){let vals=seqSteps.map((_,i)=>Number(document.getElementById("seq"+i).value));let ok=vals.every((v,i)=>v===i+1);results.sequence={ok,level:seqHintUsed?"힌트 후 수행":"독립 수행",note:ok?"매장 이용 순서를 정확히 조직함":"여러 행동을 시간 순서로 조직하는 데 오류"};seqFb.innerHTML=ok?'<span class="good">순서가 맞아요!</span>':'<span class="bad">처음과 마지막 행동부터 다시 생각해 보세요.</span>';tone(ok)}
+
+let orderHintUsed=false;function showOrderHint(){orderHintUsed=true;orderHint.classList.add("show")}
+function checkOrder(){let v=orderInput.value.replace(/\s/g,"");let hasProduct=v.includes("크루아상")&&v.includes("우유"),hasQty=(v.includes("2")||v.includes("두"))&&(v.includes("1")||v.includes("한")||v.includes("하나")),hasReq=v.includes("주세요")||v.includes("주세");let ok=hasProduct&&hasQty&&hasReq;let missing=[];if(!hasProduct)missing.push("상품명");if(!hasQty)missing.push("수량");if(!hasReq)missing.push("요청 표현");results.order={ok,level:orderHintUsed?"힌트 후 수행":"독립 수행",note:ok?"상품명·수량·요청 표현을 포함해 주문함":`${missing.join(", ")} 누락`};orderFb.innerHTML=ok?'<span class="good">주문 문장이 잘 완성됐어요!</span>':`<span class="bad">${missing.join(", ")}을 다시 넣어 보세요.</span>`;tone(ok)}
+
+const pointOptions=[["네","적립 방법을 알고 있어요."],["아니요","적립하지 않고 계산할게요."],["잘 모르겠어요","보호자에게 물어볼게요."]];
+pointOptions.forEach((x,i)=>{let b=document.createElement("button");b.className="choice";b.innerHTML=`<b>${x[0]}</b><small style="display:block;color:var(--muted);margin-top:6px">${x[1]}</small>`;b.onclick=()=>choosePoint(i,b);pointGrid.appendChild(b)});
+function choosePoint(i,b){[...pointGrid.children].forEach(x=>x.classList.remove("selected"));b.classList.add("selected");pointFollow.style.display="block";if(i===0){pointFollow.innerHTML=`<div class="dialogue">직원: “전화번호를 입력하거나 바코드를 보여 주세요.”</div><div class="grid"><button class="choice" onclick="finishPoint('독립 수행','포인트 적립 후속 행동 선택 가능',true)">📱 바코드를 보여준다</button><button class="choice" onclick="finishPoint('독립 수행','포인트 후속 절차에서 오류',false)">아무 말도 하지 않는다</button></div>`}else if(i===1){finishPoint("독립 수행","포인트 적립을 거절하고 계산을 계속함",true)}else{pointFollow.innerHTML=`<div class="dialogue">“잘 모르겠어요. 보호자에게 물어볼게요.”</div><button class="btn green" onclick="finishPoint('독립 수행','모르는 상황에서 적절히 도움 요청함',true)">이렇게 말할게요</button>`}}
+function finishPoint(level,note,ok){results.point={ok,level,note};pointFb.innerHTML=ok?'<span class="good">좋아요. 실제 매장에서 사용할 수 있는 대답이에요.</span>':'<span class="bad">모를 때는 도움을 요청하거나 적립하지 않는다고 말할 수 있어요.</span>';tone(ok)}
+
+const checkoutData=[
+{q:"직원: “봉투 필요하세요?”",answers:["네, 주세요.","아니요, 괜찮아요.","모르겠어요."],ok:[0,1],skill:"추가 질문 대응"},
+{q:"직원: “결제는 어떻게 하시겠어요?”",answers:["카드로 할게요.","현금으로 할게요.","아무 말도 안 해요."],ok:[0,1],skill:"결제 방식 선택"},
+{q:"직원: “영수증 드릴까요?”",answers:["네, 주세요.","아니요, 괜찮아요.","계산대를 떠나요."],ok:[0,1],skill:"마무리 질문 대응"}];
+checkoutData.forEach((q,qi)=>{let wrap=document.createElement("div");wrap.style.marginBottom="22px";wrap.innerHTML=`<div class="dialogue">${q.q}</div><div class="grid">${q.answers.map((a,ai)=>`<button class="choice" onclick="answerCheckout(${qi},${ai},this)">${a}</button>`).join("")}</div>`;checkoutQs.appendChild(wrap)});
+function answerCheckout(qi,ai,el){if(results.checkout[qi])return;let q=checkoutData[qi],ok=q.ok.includes(ai);results.checkout[qi]={ok,level:"독립 수행",note:ok?`${q.skill} 가능`:`${q.skill}에서 부적절한 반응`};el.classList.add(ok?"correct":"incorrect");tone(ok)}
+
+const judgmentData=[
+{q:"원하는 빵이 다 팔렸어요. 어떻게 할까요?",answers:["다른 빵을 고르거나 직원에게 물어본다.","그 자리에서 계속 기다린다.","계산하지 않고 나간다."],ok:0,skill:"대안 선택"},
+{q:"계산대에 사람이 많아요. 어떻게 할까요?",answers:["줄의 맨 뒤에서 기다린다.","앞사람보다 먼저 계산한다.","빵을 계산대에 두고 간다."],ok:0,skill:"사회적 순서"},
+{q:"카드 결제가 안 돼요. 어떻게 할까요?",answers:["직원에게 다시 확인하거나 보호자에게 도움을 요청한다.","계속 같은 카드만 반복해서 댄다.","아무 말 없이 나간다."],ok:0,skill:"문제해결·도움 요청"},
+{q:"받은 상품이 내가 고른 것과 달라요. 어떻게 할까요?",answers:["직원에게 상품을 확인해 달라고 말한다.","그냥 가져간다.","바닥에 둔다."],ok:0,skill:"오류 확인·의사표현"}];
+judgmentData.forEach((q,qi)=>{let w=document.createElement("div");w.style.marginBottom="22px";w.innerHTML=`<div class="dialogue">${q.q}</div><div class="grid">${q.answers.map((a,ai)=>`<button class="choice" onclick="answerJudgment(${qi},${ai},this)">${a}</button>`).join("")}</div>`;judgmentBox.appendChild(w)});
+function answerJudgment(qi,ai,el){if(results.judgment[qi])return;let q=judgmentData[qi],ok=ai===q.ok;results.judgment[qi]={ok,level:"독립 수행",note:ok?`${q.skill} 가능`:`${q.skill} 미숙`};el.classList.add(ok?"correct":"incorrect");tone(ok)}
+
+function score(arr){let valid=arr.filter(Boolean);return{ok:valid.filter(x=>x.ok).length,total:valid.length}}
+function renderReport(){
+const rows=[];const add=(name,r,area)=>{if(!r)return;rows.push({name,ok:r.ok,level:r.level||"독립 수행",note:r.note||"",area})};
+add("도구·장소 기능",results.observe,"기능 이해");add("상품 선택",results.choose,"지시 이해");add("수량 파악",results.quantity,"수 개념");add("매장 이용 순서",results.sequence,"순서 조합");add("주문 문장",results.order,"의사소통");add("포인트 적립 질문",results.point,"상황판단");
+results.checkout.forEach((r,i)=>add(checkoutData[i].skill,r,"실제 계산"));results.judgment.forEach((r,i)=>add(judgmentData[i].skill,r,"상황판단"));
+const total=rows.length,ok=rows.filter(r=>r.ok).length,ind=rows.filter(r=>r.ok&&r.level==="독립 수행").length,hint=rows.filter(r=>r.ok&&r.level.includes("힌트")).length;
+metrics.innerHTML=[["전체 수행",`${ok}/${total}`],["독립 수행",`${ind}/${total}`],["힌트 후 성공",`${hint}`],["상황판단",`${score(results.judgment).ok}/${score(results.judgment).total}`]].map(x=>`<div class="metric"><b>${x[0]}</b><strong>${x[1]}</strong></div>`).join("");
+const failed=rows.filter(r=>!r.ok),notes=[];
+if(results.sequence&&!results.sequence.ok)notes.push("여러 행동을 시간 순서로 조직하는 능력");
+if(results.quantity&&!results.quantity.ok)notes.push("숫자와 실제 개수를 대응하는 수량 파악");
+if(results.order&&!results.order.ok)notes.push("상품명·수량·요청 표현을 함께 넣는 주문 표현");
+if(results.point&&!results.point.ok)notes.push("포인트 적립 질문에 대응하는 능력");
+const checkoutFail=results.checkout.filter(x=>x&&!x.ok).length;if(checkoutFail)notes.push("봉투·결제 방식·영수증 등 계산대 추가 질문 처리");
+const judgeFail=results.judgment.filter(x=>x&&!x.ok).length;if(judgeFail)notes.push("문제가 생겼을 때 대안을 선택하는 상황판단");
+if(results.observe&&!results.observe.ok)notes.push("매장 도구와 장소의 기능 이해");
+if(results.choose&&!results.choose.ok)notes.push("말로 들은 조건에 맞춰 상품을 선택하는 지시 이해");
+analysis.innerHTML="<b>종합 분석</b><br>"+(!failed.length?"이번 앱의 주요 매장 이용 과제를 모두 수행했습니다. 실제 매장에서는 사람, 소음, 대기와 시간 압박이 추가되므로 실물 환경에서 같은 수행이 유지되는지 확인하는 단계가 필요합니다.":`이번 수행에서는 <b>${notes.join(", ")}</b>${notes.length?"에서 어려움이 나타났습니다.":" 일부 단계에서 어려움이 나타났습니다."} 개별 행동을 알고 있어도 여러 단계를 연속해서 수행하는 능력과 예상하지 못한 질문에 반응하는 능력은 서로 다르므로 영역별로 나누어 연습하는 것이 좋습니다.`);
+const plans=[];
+if(results.sequence&&!results.sequence.ok)plans.push("그림카드 3단계부터 순서를 맞춘 뒤 4단계, 6단계로 늘립니다.");
+if(results.quantity&&!results.quantity.ok)plans.push("1개→2개→두 종류 상품 순서로 수량 기억 부담을 천천히 높입니다.");
+if(results.order&&!results.order.ok)plans.push("‘상품명 + 수량 + 주세요’ 틀을 고정해 말한 뒤 상품 종류만 바꿔 일반화합니다.");
+if(results.point&&!results.point.ok)plans.push("‘포인트 적립하시겠어요?’에 네/아니요/잘 모르겠어요 중 하나를 말하는 역할놀이를 반복합니다.");
+if(checkoutFail)plans.push("봉투·결제·영수증 질문의 순서를 바꿔 제시해도 대답하도록 연습합니다.");
+if(judgeFail)plans.push("품절, 긴 줄, 결제 오류, 상품 오류 같은 변형 상황을 한 번에 하나씩 추가합니다.");
+if(results.observe&&!results.observe.ok)plans.push("쟁반·집게·계산대·냉장고를 실제 사진과 기능 문장으로 다시 연결합니다.");
+if(!plans.length)plans.push("다음에는 실제 매장과 비슷하게 질문 순서 변화와 대기 상황을 추가하고 보호자의 도움을 점차 줄여 일반화를 확인합니다.");
+nextPlan.innerHTML="<b>다음 수업 제안</b><br>"+plans.map(x=>"• "+x).join("<br>");
+logBody.innerHTML=rows.map(r=>`<tr><td>${r.name}</td><td>${r.ok?"성공":"어려움"}</td><td>${r.level}</td><td>${r.note}</td></tr>`).join("");
+}
+render();
+</script>
+</body>
+</html>
