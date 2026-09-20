@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<rect width="1200" height="675" fill="#f7f7fb"/><rect x="55" y="45" width="1090" height="585" rx="28" fill="#fff" stroke="#d9dfeb"/>
+<text x="95" y="105" font-family="system-ui,sans-serif" font-size="32" font-weight="900" fill="#263238">📋 파리바게트 생활적응 수행 결과</text>
+<g font-family="system-ui,sans-serif"><rect x="95" y="145" width="230" height="105" rx="16" fill="#f1f4f9"/><text x="120" y="185" font-size="19" font-weight="800" fill="#263238">전체 수행</text><text x="120" y="225" font-size="30" font-weight="900" fill="#263238">영역별 기록</text>
+<rect x="345" y="145" width="230" height="105" rx="16" fill="#f1f4f9"/><text x="370" y="185" font-size="19" font-weight="800" fill="#263238">독립 수행</text><text x="370" y="225" font-size="30" font-weight="900" fill="#263238">도움 없이</text>
+<rect x="595" y="145" width="230" height="105" rx="16" fill="#f1f4f9"/><text x="620" y="185" font-size="19" font-weight="800" fill="#263238">힌트 후 성공</text><text x="620" y="225" font-size="30" font-weight="900" fill="#263238">도움 수준</text>
+<rect x="845" y="145" width="230" height="105" rx="16" fill="#f1f4f9"/><text x="870" y="185" font-size="19" font-weight="800" fill="#263238">상황판단</text><text x="870" y="225" font-size="30" font-weight="900" fill="#263238">문제해결</text></g>
+<rect x="95" y="285" width="980" height="125" rx="16" fill="#f3f6ff"/><text x="125" y="325" font-family="system-ui,sans-serif" font-size="22" font-weight="900" fill="#263238">종합 분석</text><text x="125" y="365" font-family="system-ui,sans-serif" font-size="19" fill="#263238">순서 조합, 수량 파악, 주문 표현, 포인트 질문, 계산대 추가 질문, 상황판단을 나누어 분석합니다.</text>
+<rect x="95" y="440" width="980" height="125" rx="16" fill="#effaf3"/><text x="125" y="480" font-family="system-ui,sans-serif" font-size="22" font-weight="900" fill="#263238">다음 수업 제안</text><text x="125" y="520" font-family="system-ui,sans-serif" font-size="19" fill="#263238">어려움이 나타난 영역에 따라 순서 카드, 수량 단계, 역할놀이, 변형 상황 연습을 자동 제안합니다.</text>
+</svg>
