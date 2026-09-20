@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<rect width="1200" height="675" fill="#f7f7fb"/><rect x="55" y="45" width="1090" height="585" rx="28" fill="#fff" stroke="#d9dfeb"/>
+<text x="90" y="105" font-family="system-ui,sans-serif" font-size="32" font-weight="900" fill="#263238">몇 개 살까요?</text>
+<rect x="90" y="135" width="1020" height="80" rx="18" fill="#eef3ff" stroke="#cad7ff"/>
+<text x="120" y="185" font-family="system-ui,sans-serif" font-size="24" font-weight="800" fill="#263238">크루아상 2개, 우유 1개가 필요합니다.</text>
+<rect x="90" y="245" width="480" height="105" rx="18" fill="#fff" stroke="#d9dfeb"/><text x="125" y="310" font-size="42">🥐</text><text x="185" y="306" font-family="system-ui,sans-serif" font-size="25" font-weight="800" fill="#263238">크루아상</text><text x="500" y="306" font-family="system-ui,sans-serif" font-size="28" font-weight="900" fill="#263238">2</text>
+<rect x="630" y="245" width="480" height="105" rx="18" fill="#fff" stroke="#d9dfeb"/><text x="665" y="310" font-size="42">🥛</text><text x="725" y="306" font-family="system-ui,sans-serif" font-size="25" font-weight="800" fill="#263238">우유</text><text x="1040" y="306" font-family="system-ui,sans-serif" font-size="28" font-weight="900" fill="#263238">1</text>
+<text x="90" y="415" font-family="system-ui,sans-serif" font-size="30" font-weight="900" fill="#263238">어떤 순서로 할까요?</text>
+<text x="95" y="475" font-family="system-ui,sans-serif" font-size="21" fill="#263238">1. 쟁반과 집게를 든다 → 2. 빵과 음료를 고른다 → 3. 계산대로 간다</text>
+<text x="95" y="520" font-family="system-ui,sans-serif" font-size="21" fill="#263238">4. 포인트 질문에 대답한다 → 5. 결제한다 → 6. 상품을 받는다</text>
+</svg>
