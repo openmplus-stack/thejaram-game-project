@@ -19,6 +19,12 @@
       "title": "흥부와 제비 독서인지",
       "description": "긴문장에서 원인과 결과를 나누고 ‘왜?’의 답을 찾는 독서인지 학습 앱",
       "status": "published"
+    },
+    {
+      "slug": "paris-baguette-visit",
+      "title": "파리바게트에 갔어요",
+      "description": "빵집 이용 순서·수량·주문·포인트 적립·결제·상황판단을 연습하고 수행 결과를 분석하는 생활적응 독서인지 앱",
+      "status": "published"
     }
   ]
 }
