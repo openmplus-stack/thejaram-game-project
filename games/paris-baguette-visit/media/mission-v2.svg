@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
+<rect width="1200" height="675" fill="#f7f7fb"/><rect x="80" y="70" width="1040" height="535" rx="28" fill="#fff" stroke="#d9dfeb"/>
+<text x="120" y="135" font-family="system-ui,sans-serif" font-size="36" font-weight="900" fill="#25313a">오늘의 미션</text>
+<rect x="120" y="175" width="960" height="320" rx="24" fill="#fff9df" stroke="#f0d989" stroke-width="2"/>
+<text x="155" y="225" font-family="system-ui,sans-serif" font-size="25" font-weight="900" fill="#8a5b00">미션</text>
+<text x="155" y="285" font-family="system-ui,sans-serif" font-size="27" font-weight="800" fill="#25313a">1. 샌드위치 2개, 흰우유 1개를 구매하세요.</text>
+<text x="155" y="345" font-family="system-ui,sans-serif" font-size="27" font-weight="800" fill="#25313a">2. 포인트를 적립하세요. 번호는 475-9284 입니다.</text>
+<text x="155" y="405" font-family="system-ui,sans-serif" font-size="27" font-weight="800" fill="#25313a">3. 봉투를 구매하세요.</text>
+<rect x="470" y="525" width="260" height="58" rx="16" fill="#315cff"/><text x="600" y="562" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" font-weight="900" fill="#fff">미션 시작 →</text>
+</svg>
