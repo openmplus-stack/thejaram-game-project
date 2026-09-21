@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>말씀루트 (Bible Root) - 성경 암송 플랫폼</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .scratch-box { user-select: none; cursor: pointer; transition: all 0.2s ease; }
+        .scratch-box.revealed { background-color: #eff6ff !important; color: #2563eb !important; border-color: #bfdbfe !important; }
+        @keyframes gemPulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5)); }
+        }
+        .gem-glow { animation: gemPulse 2s infinite ease-in-out; }
+        @keyframes spin-slow { 100% { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spin-slow 10s linear infinite; }
+        
+        /* 타이핑 인풋 스타일 복구 */
+        .typing-input {
+            border: none; border-bottom: 2px solid #cbd5e1; background: transparent;
+            text-align: center; font-size: 1.125rem; font-weight: 700; color: #1e293b;
+            padding: 0 2px; margin: 0 4px; outline: none; transition: all 0.2s; max-width: 100%;
+        }
+        .typing-input:focus { border-bottom-color: #3b82f6; }
+        .typing-input.correct { border-bottom-color: #10b981; color: #10b981; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .hp-bar-fill { transition: width 0.3s ease, background-color 0.3s ease; }
+    </style>
+</head>
+<body class="max-w-md mx-auto min-h-screen bg-slate-50 flex flex-col shadow-2xl relative overflow-x-hidden">
+
+    <!-- Top Header -->
+    <header class="bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center sticky top-0 z-50 shadow-sm">
+        <div class="flex items-center gap-2">
+            <span class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shadow-md shadow-blue-200">말</span>
+            <div>
+                <h1 class="font-bold text-lg tracking-tight text-slate-800 leading-tight">말씀루트</h1>
+                <div class="flex items-center gap-1.5 mt-0.5" title="말씀을 암송할 때마다 경험치가 오릅니다!">
+                    <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-1 rounded-sm">Lv.<span id="headerLevel">1</span></span>
+                    <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="headerExpBar" class="h-full bg-gradient-to-r from-blue-400 to-blue-600 w-0 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- 재화 표시 영역 (보석 & 건초) -->
+            <div class="flex flex-col gap-1 items-end">
+                <div class="flex items-center gap-1 bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold border border-blue-200">
+                    <i class="fa-solid fa-gem text-blue-500"></i> <span id="gemCount">0</span>
+                </div>
+                <div class="flex items-center gap-1 bg-amber-50 text-amber-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold border border-amber-200">
+                    <i class="fa-solid fa-wheat-awn"></i> <span id="hayCount">0</span>
+                </div>
+            </div>
+            <div id="headerAvatar" class="w-9 h-9 rounded-full bg-slate-50 overflow-hidden border-2 border-slate-200 flex items-center justify-center text-lg shadow-inner cursor-pointer ml-1" onclick="switchTab('my')">
+                🐑
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pb-24 overflow-y-auto">
+
+        <!-- 1. HOME TAB -->
+        <section id="tab-home" class="tab-content active p-5 space-y-6">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-white/20 text-blue-50 text-xs px-3 py-1 rounded-full font-medium">오늘의 암송 구절</span>
+                    <span class="text-xs text-blue-100"><i class="fa-solid fa-book-bible mr-1"></i> 시편 23:1</span>
+                </div>
+                <p class="text-xl font-bold leading-relaxed mb-6 break-keep">"여호와는 나의 목자시니 내게 부족함이 없으리로다"</p>
+                <button onclick="startTheme(0, 0)" class="w-full bg-white text-blue-700 py-3.5 rounded-xl font-bold text-center shadow-lg hover:bg-blue-50 transition active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play text-blue-600"></i> 오늘의 말씀 암송 시작
+                </button>
+            </div>
+
+            <div>
+                <h2 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-heart-pulse text-rose-500"></i> 상황별 AI 추천 묵상
+                </h2>
+                <div class="grid grid-cols-2 gap-3" id="aiThemeContainer">
+                    <!-- JS Rendering -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. STUDY / MEMORIZATION TAB (7 STAGES RESTORED) -->
+        <section id="tab-study" class="tab-content p-5 space-y-6">
+            <div class="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <select id="translationSelect" onchange="changeTranslation(this.value)" class="bg-blue-600 text-white shadow-sm text-xs font-bold px-3 py-1.5 rounded-lg border-none focus:outline-none cursor-pointer">
+                            <option value="KRV">개역개정</option>
+                            <option value="NKRV">새번역</option>
+                            <option value="NIV">NIV</option>
+                            <option value="KJV">KJV</option>
+                        </select>
+                        <select id="packSelect" onchange="changePack(this.value)" class="bg-slate-50 text-slate-700 text-xs font-semibold px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none truncate max-w-[120px]">
+                        </select>
+                    </div>
+                    <h2 class="font-bold text-slate-800 text-base" id="studyStageTitle">1단계</h2>
+                </div>
+                <div class="flex gap-1" id="stageDots">
+                    <!-- JS Rendering -->
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-md text-center space-y-6 relative overflow-hidden">
+                <!-- 보상 연출 화면 (보석 + 건초) -->
+                <div id="stageCelebration" class="absolute inset-0 bg-white/95 backdrop-blur-sm z-20 flex flex-col items-center justify-center space-y-4 hidden transition-opacity duration-500">
+                    <div class="relative flex justify-center gap-4">
+                        <div class="relative w-20 h-20 flex items-center justify-center gem-glow">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-2xl shadow-xl flex items-center justify-center text-white text-3xl rotate-12">
+                                <i class="fa-solid fa-gem"></i>
+                            </div>
+                        </div>
+                        <div class="relative w-20 h-20 flex items-center justify-center gem-glow" style="animation-delay: 0.5s">
+                            <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-orange-500 rounded-2xl shadow-xl flex items-center justify-center text-white text-3xl -rotate-12">
+                                <i class="fa-solid fa-wheat-awn"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 id="celebrationTitle" class="text-lg font-bold text-slate-800">암송 완료 보상 획득! 🎉</h3>
+                        <p id="celebrationDesc" class="text-xs text-slate-500 mt-1 mx-auto">보석 10개, 양들의 양식(건초) 10개 획득</p>
+                    </div>
+                </div>
+
+                <div class="inline-block bg-blue-50 text-blue-600 font-bold text-xs px-3 py-1 rounded-full" id="activeVerseRefBadge">
+                </div>
+
+                <div id="studyCardContent" class="min-h-[140px] flex flex-col items-center justify-center">
+                    <p class="text-xl font-bold text-slate-800 leading-relaxed break-keep"></p>
+                </div>
+
+                <button onclick="nextStudyStage()" id="nextStageBtn" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+                    다음 단계
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. MEDITATE TAB -->
+        <section id="tab-meditate" class="tab-content p-5 space-y-6">
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-xl">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fa-solid fa-robot text-emerald-200"></i>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-100">AI 묵상 코치</span>
+                </div>
+                <h2 class="text-lg font-bold mb-1">오늘 외운 말씀 적용하기</h2>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm">
+                    <i class="fa-solid fa-comment-dots"></i> 오늘의 성찰 질문
+                </div>
+                <p class="text-slate-700 text-sm font-medium">"오늘 내 삶 가운데 '부족함이 없다'고 고백하기 가장 어려웠던 순간은 언제였나요?"</p>
+                <textarea class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 resize-none" rows="3" placeholder="묵상 내용을 기록해보세요..."></textarea>
+                <button onclick="alertBox('묵상 일지가 안전하게 저장되었습니다!')" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-sm shadow-md hover:bg-emerald-700 transition">
+                    저장하기
+                </button>
+            </div>
+        </section>
+
+        <!-- 4. COMMUNITY TAB -->
+        <section id="tab-community" class="tab-content p-5 space-y-6">
+            <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="bg-white/20 text-xs px-3 py-1 rounded-full font-medium">청년부 사랑셀</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">이번 주 공동 암송 챌린지</h2>
+                <p class="text-xs text-violet-100 mb-4">시편 23편 1-3절 완주하기</p>
+            </div>
+        </section>
+
+        <!-- 5. MY PAGE TAB -->
+        <section id="tab-my" class="tab-content p-5 space-y-6">
+            <!-- Avatar Preview -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center space-y-3 relative overflow-hidden">
+                <h2 class="font-bold text-slate-800 text-sm mb-4 flex justify-center items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> 나만의 목장 아바타</h2>
+                <div id="mainAvatarDisplay" class="w-28 h-28 mx-auto rounded-full flex items-center justify-center text-5xl shadow-lg border-4 border-slate-200 bg-slate-50 transition-all duration-300 relative">
+                    🐑
+                    <div id="mainAvatarItem" class="absolute -bottom-2 -right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-slate-100 text-base"></div>
+                </div>
+                <div>
+                    <h2 class="font-bold text-slate-800 text-lg mt-2" id="mainAvatarName">순수한 어린 양</h2>
+                    <p class="text-xs font-bold mt-1 text-slate-500" id="mainAvatarRarity">COMMON</p>
+                    <p class="text-[10px] text-slate-400 mt-1" id="mainAvatarRetention"><i class="fa-solid fa-infinity"></i> 영구 보존</p>
+                </div>
+            </div>
+
+            <!-- Gacha Section -->
+            <div class="bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500 rounded-2xl p-5 text-white shadow-xl flex flex-col relative overflow-hidden space-y-4">
+                <div class="absolute -right-4 -top-4 opacity-20 text-6xl transform rotate-12 pointer-events-none">🎁</div>
+                <div class="relative z-10">
+                    <h3 class="font-bold text-base mb-1">새로운 양 입양하기 (100종)</h3>
+                    <p class="text-xs text-indigo-100">기간제 양은 건초(🌾)를 먹여야 떠나지 않아요!</p>
+                </div>
+                <div class="flex gap-2 relative z-10">
+                    <button onclick="drawGacha(1)" class="flex-1 bg-white text-purple-600 font-bold py-3 rounded-xl text-sm shadow-lg hover:bg-indigo-50 active:scale-95 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-gem text-blue-500"></i> 1회 (120)
+                    </button>
+                    <button onclick="drawGacha(10)" class="flex-1 bg-gradient-to-r from-yellow-300 to-amber-400 text-amber-900 font-bold py-3 rounded-xl text-sm shadow-lg hover:brightness-105 active:scale-95 transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-gem text-white drop-shadow-md"></i> 10회 (1200)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pasture (Inventory) Section -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-emerald-50/50">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-leaf text-emerald-500"></i> 푸른 초장 (내 목장)
+                    </h3>
+                    <span class="text-[10px] text-slate-500 font-medium">양을 눌러 먹이를 주고 관리하세요</span>
+                </div>
+                <div id="pastureArea" class="h-72 w-full relative bg-gradient-to-b from-emerald-100 to-emerald-200 overflow-hidden shadow-inner">
+                    <!-- JS Rendering -->
+                </div>
+            </div>
+
+            <!-- Sheep Management (Pasture Toggle) -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-slate-800 text-sm">보유한 양 (목장 배치)</h3>
+                    <span class="text-[10px] text-slate-400 font-medium">👁️ 아이콘을 눌러 온/오프</span>
+                </div>
+                <div id="sheepManagementList" class="flex overflow-x-auto gap-3 pb-2 snap-x custom-scrollbar">
+                    <!-- JS Rendering -->
+                </div>
+            </div>
+
+            <!-- Item Collection -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-rose-50/50">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-rose-500"></i> 영적 무기 도감 (100종)
+                    </h3>
+                    <span class="text-[10px] bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full font-bold shadow-sm" id="itemCollectionCount">0 / 100</span>
+                </div>
+                <div class="p-4 max-h-72 overflow-y-auto custom-scrollbar">
+                    <div id="itemCollectionGrid" class="grid grid-cols-5 gap-2">
+                        <!-- JS Rendering -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings List -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm divide-y divide-slate-100 overflow-hidden text-sm mt-6">
+                <div class="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition" onclick="confirmResetData()">
+                    <span class="text-rose-500 font-bold"><i class="fa-solid fa-trash-can mr-2"></i> 모든 데이터 초기화</span>
+                    <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 px-4 py-2 flex justify-around items-center z-50 shadow-lg">
+        <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-blue-600" data-target="home">
+            <i class="fa-solid fa-house text-lg"></i><span class="text-[10px] font-bold">홈</span>
+        </button>
+        <button onclick="switchTab('study')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600" data-target="study">
+            <i class="fa-solid fa-book-open text-lg"></i><span class="text-[10px] font-medium">암송</span>
+        </button>
+        <button onclick="switchTab('meditate')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600" data-target="meditate">
+            <i class="fa-solid fa-pen-nib text-lg"></i><span class="text-[10px] font-medium">묵상</span>
+        </button>
+        <button onclick="switchTab('community')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600" data-target="community">
+            <i class="fa-solid fa-user-group text-lg"></i><span class="text-[10px] font-medium">공동체</span>
+        </button>
+        <button onclick="switchTab('my')" class="nav-btn flex flex-col items-center gap-1 text-slate-400 hover:text-blue-600" data-target="my">
+            <i class="fa-solid fa-gear text-lg"></i><span class="text-[10px] font-medium">마이</span>
+        </button>
+    </nav>
+
+    <!-- Modals -->
+    <!-- 기본 알림 모달 -->
+    <div id="customModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-[70] p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center space-y-4 shadow-2xl animate-in fade-in zoom-in duration-200">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl"><i class="fa-solid fa-circle-info"></i></div>
+            <p id="modalMessage" class="text-sm font-bold text-slate-800 leading-relaxed whitespace-pre-wrap"></p>
+            <button onclick="closeModal()" class="w-full bg-blue-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-blue-700 transition">확인</button>
+        </div>
+    </div>
+
+    <!-- 데이터 초기화 확인 모달 -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-[70] p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center space-y-4 shadow-2xl">
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <p id="confirmMessage" class="text-sm font-bold text-slate-800 leading-relaxed">모든 데이터가 초기화됩니다.<br>계속하시겠습니까?</p>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal()" class="w-1/2 bg-slate-100 text-slate-600 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-200 transition">취소</button>
+                <button onclick="executeDataReset()" class="w-1/2 bg-rose-600 text-white py-2.5 rounded-xl font-bold text-sm hover:bg-rose-700 transition">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 가챠 결과 모달 -->
+    <div id="gachaModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center z-[60] p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center space-y-6 shadow-2xl relative overflow-hidden animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div id="gachaBgEffect" class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-yellow-200/60 via-white to-white animate-spin-slow opacity-60 pointer-events-none hidden"></div>
+            <h3 class="font-bold text-xl text-slate-800 relative z-10" id="gachaModalTitle">새로운 양 획득! 🎉</h3>
+            <div id="gachaResultContainer" class="flex flex-wrap justify-center gap-3 relative z-10 py-4"></div>
+            <button onclick="closeGachaModal()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm shadow-lg relative z-10 hover:bg-indigo-700">목장에 배치하기</button>
+        </div>
+    </div>
+
+    <!-- 양 상세 관리 및 전도대상자 연결 모달 -->
+    <div id="sheepDetailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-[60] p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-xs text-center space-y-5 shadow-2xl relative animate-in zoom-in duration-200">
+            <button onclick="closeSheepDetail()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            
+            <!-- 프로필 아바타 영역 -->
+            <div class="relative w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl shadow-md border-4 bg-slate-50" id="sdAvatar">
+                🐑
+                <div class="absolute -bottom-2 -right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-slate-100 text-sm" id="sdItem"></div>
+            </div>
+            
+            <div>
+                <!-- 사용자 정의 이름 입력 -->
+                <div class="flex items-center justify-center gap-2 mb-1">
+                    <input type="text" id="sdCustomName" class="text-xl font-black text-slate-800 text-center bg-transparent border-b-2 border-slate-200 focus:border-blue-500 focus:outline-none w-3/4 pb-1" placeholder="전도대상자 이름">
+                    <button onclick="saveSheepName()" class="text-blue-500 text-sm"><i class="fa-solid fa-pen"></i></button>
+                </div>
+                <p class="text-[10px] font-bold text-slate-500 mt-1" id="sdOriginalName">원본: 순수한 어린 양 (COMMON)</p>
+            </div>
+
+            <!-- 체력 및 기간 정보 -->
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-left">
+                <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-heart-pulse text-rose-500"></i> 생명력 (남은 시간)</span>
+                    <span class="text-[10px] font-bold" id="sdTimeLeft">영구 보존</span>
+                </div>
+                <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden" id="sdHpBarContainer">
+                    <div id="sdHpBar" class="h-full bg-emerald-500 hp-bar-fill w-full"></div>
+                </div>
+            </div>
+
+            <!-- 액션 버튼 -->
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="feedHayFromModal()" class="flex flex-col items-center justify-center bg-amber-50 text-amber-700 py-3 rounded-xl hover:bg-amber-100 active:scale-95 transition gap-1 border border-amber-200">
+                    <i class="fa-solid fa-wheat-awn text-lg"></i>
+                    <span class="text-[10px] font-bold">건초 먹이기 (-10)</span>
+                </button>
+                <button onclick="sendGiftFromModal()" class="flex flex-col items-center justify-center bg-blue-50 text-blue-700 py-3 rounded-xl hover:bg-blue-100 active:scale-95 transition gap-1 border border-blue-200">
+                    <i class="fa-solid fa-gift text-lg"></i>
+                    <span class="text-[10px] font-bold">말씀 선물/연락</span>
+                </button>
+            </div>
+            <button onclick="equipSheepFromModal()" id="sdEquipBtn" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold text-sm shadow-md hover:bg-slate-900 transition">
+                메인 프로필로 설정
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. 상태 변수 및 기본 데이터 ---
+        let userGems = 3000; 
+        let userHay = 50; 
+        let equippedSheepId = 1;
+        let userExp = 0;
+        let userLevel = 1;
+        
+        let currentPackIndex = 0;
+        let currentVerseIndex = 0;
+        let currentTranslation = "KRV";
+        let currentStage = 1;
+
+        let activeDetailSheepId = null; 
+
+        // 100종 영적 아이템 (FontAwesome)
+        const itemTemplates = [
+            { name: "진리의 허리띠", icon: "fa-link", color: "text-amber-600", desc: "에베소서 6:14" },
+            { name: "의의 호심경", icon: "fa-shield-halved", color: "text-blue-500", desc: "에베소서 6:14" },
+            { name: "평안의 신", icon: "fa-shoe-prints", color: "text-emerald-600", desc: "에베소서 6:15" },
+            { name: "믿음의 방패", icon: "fa-shield", color: "text-teal-500", desc: "에베소서 6:16" },
+            { name: "구원의 투구", icon: "fa-helmet-safety", color: "text-slate-500", desc: "에베소서 6:17" },
+            { name: "성령의 검", icon: "fa-khanda", color: "text-red-500", desc: "에베소서 6:17" },
+            { name: "사랑의 열매", icon: "fa-heart", color: "text-rose-500", desc: "갈라디아서 5:22" },
+            { name: "희락의 열매", icon: "fa-face-laugh-beam", color: "text-yellow-400", desc: "갈라디아서 5:22" },
+            { name: "화평의 열매", icon: "fa-handshake", color: "text-sky-400", desc: "갈라디아서 5:22" },
+            { name: "오래참음 열매", icon: "fa-hourglass", color: "text-amber-700", desc: "갈라디아서 5:22" },
+            { name: "자비의 열매", icon: "fa-hand-holding-heart", color: "text-pink-400", desc: "갈라디아서 5:22" },
+            { name: "양선의 열매", icon: "fa-thumbs-up", color: "text-blue-400", desc: "갈라디아서 5:22" },
+            { name: "충성의 열매", icon: "fa-medal", color: "text-yellow-600", desc: "갈라디아서 5:22" },
+            { name: "온유의 열매", icon: "fa-leaf", color: "text-emerald-400", desc: "갈라디아서 5:23" },
+            { name: "절제의 열매", icon: "fa-lock", color: "text-slate-600", desc: "갈라디아서 5:23" },
+            { name: "노아의 방주", icon: "fa-ship", color: "text-amber-800", desc: "창세기 6:14" },
+            { name: "언약의 무지개", icon: "fa-rainbow", color: "text-purple-500", desc: "창세기 9:13" },
+            { name: "다윗의 물매", icon: "fa-bullseye", color: "text-orange-500", desc: "사무엘상 17:40" },
+            { name: "모세의 지팡이", icon: "fa-wand-magic", color: "text-stone-600", desc: "출애굽기 4:2" },
+            { name: "만나 항아리", icon: "fa-jar", color: "text-yellow-200", desc: "출애굽기 16:33" }
+        ];
+
+        let all100Items = [];
+        for (let i = 0; i < 100; i++) {
+            let base = itemTemplates[i % itemTemplates.length];
+            let suffix = i >= itemTemplates.length ? ` (초월 ${Math.floor(i/itemTemplates.length)})` : "";
+            all100Items.push({ 
+                name: base.name + suffix, 
+                icon: `<i class="fa-solid ${base.icon} ${base.color}"></i>`, 
+                desc: base.desc 
+            });
+        }
+
+        // 100종 양 데이터 생성
+        const retentionConfig = [
+            { hours: 0, label: "영구 보존", textClass: "text-emerald-500", icon: "fa-infinity" },
+            { hours: 24, label: "24시간", textClass: "text-rose-400", icon: "fa-hourglass-start" },
+            { hours: 48, label: "48시간", textClass: "text-rose-500", icon: "fa-hourglass-half" },
+            { hours: 72, label: "3일", textClass: "text-rose-600", icon: "fa-hourglass-end" },
+            { hours: 96, label: "4일", textClass: "text-rose-700", icon: "fa-hourglass" }
+        ];
+        const prefixes = ["순수한", "거룩한", "지혜로운", "기도하는", "찬양하는", "기뻐하는", "온유한", "용감한", "빛나는", "신실한"];
+        const nouns = [
+            { name: "어린 양", emoji: "🐑" }, { name: "숫양", emoji: "🐏" }, { name: "천사 양", emoji: "👼🐑" },
+            { name: "왕관 양", emoji: "👑🐑" }, { name: "날개 양", emoji: "🕊️🐑" }, { name: "무지개 양", emoji: "🌈🐑" },
+            { name: "구름 양", emoji: "☁️🐑" }, { name: "별빛 양", emoji: "⭐🐑" }, { name: "불꽃 양", emoji: "🔥🐑" },
+            { name: "황금 양", emoji: "✨🐑" }
+        ];
+        const rarityConfig = [
+            { rarity: "common", class: "border-slate-200 bg-white", textClass: "text-slate-500", prob: 50 },
+            { rarity: "rare", class: "border-blue-300 bg-blue-50 shadow-blue-200", textClass: "text-blue-500", prob: 30 },
+            { rarity: "epic", class: "border-purple-400 bg-purple-50 shadow-[0_0_15px_rgba(168,85,247,0.4)]", textClass: "text-purple-500", prob: 12 },
+            { rarity: "legendary", class: "border-amber-400 bg-amber-50 shadow-[0_0_20px_rgba(251,191,36,0.6)]", textClass: "text-amber-500", prob: 6 },
+            { rarity: "mythic", class: "border-rose-500 bg-rose-100 shadow-[0_0_30px_rgba(225,29,72,0.8)] animate-pulse", textClass: "text-rose-600 font-black", prob: 2 }
+        ];
+
+        let sheepDatabase = [];
+        let indexCount = 0;
+        for (let prefix of prefixes) {
+            for (let noun of nouns) {
+                let rConf = rarityConfig[0];
+                if(indexCount >= 50 && indexCount < 80) rConf = rarityConfig[1];
+                else if(indexCount >= 80 && indexCount < 92) rConf = rarityConfig[2];
+                else if(indexCount >= 92 && indexCount < 98) rConf = rarityConfig[3];
+                else if(indexCount >= 98) rConf = rarityConfig[4];
+
+                let retConf = retentionConfig[indexCount % 5];
+                sheepDatabase.push({
+                    baseName: `${prefix} ${noun.name}`,
+                    customName: `${prefix} ${noun.name}`,
+                    emoji: noun.emoji,
+                    rarity: rConf.rarity,
+                    class: rConf.class,
+                    textClass: rConf.textClass,
+                    prob: rConf.prob,
+                    item: all100Items[indexCount],
+                    retentionHours: retConf.hours,
+                    retentionLabel: retConf.label,
+                    retentionIcon: retConf.icon,
+                    retentionTextClass: retConf.textClass
+                });
+                indexCount++;
+            }
+        }
+
+        let ownedSheep = [
+            { ...sheepDatabase[0], id: 1, inPasture: true, expiresAt: null }
+        ];
+
+        // 성경 패키지 방대한 10개 완벽 복원
+        const biblePacks = [
+            {
+                title: "초급 패키지 1: 평안과 위로",
+                verses: [
+                    { ref: "시편 23:1", text: { KRV: "여호와는 나의 목자시니 내게 부족함이 없으리로다", NKRV: "주님은 나의 목자시니, 내게 부족한 것 없어라", NIV: "The LORD is my shepherd, I shall not be in want.", KJV: "The LORD is my shepherd; I shall not want." } },
+                    { ref: "요한복음 14:27", text: { KRV: "평안을 너희에게 끼치노니 곧 나의 평안을 너희에게 주노라", NKRV: "나는 너희에게 평안을 남겨 준다. 내 평안을 너희에게 준다", NIV: "Peace I leave with you; my peace I give you.", KJV: "Peace I leave with you, my peace I give unto you." } },
+                    { ref: "빌립보서 4:6", text: { KRV: "아무것도 염려하지 말고 다만 모든 일에 기도와 간구로", NKRV: "아무것도 염려하지 말고, 모든 일을 오직 기도와 간구로", NIV: "Do not be anxious about anything, but in everything...", KJV: "Be careful for nothing; but in every thing by prayer..." } },
+                    { ref: "마태복음 11:28", text: { KRV: "수고하고 무거운 짐 진 자들아 다 내게로 오라", NKRV: "고생하며 무거운 짐을 진 사람은 모두 내게로 오너라", NIV: "Come to me, all you who are weary and burdened...", KJV: "Come unto me, all ye that labour and are heavy laden..." } },
+                    { ref: "이사야 41:10", text: { KRV: "두려워하지 말라 내가 너와 함께 함이라", NKRV: "내가 너와 함께 하니 두려워하지 말라", NIV: "So do not fear, for I am with you...", KJV: "Fear thou not; for I am with thee..." } }
+                ]
+            },
+            {
+                title: "초급 패키지 2: 주기도문과 십계명",
+                verses: [
+                    { ref: "마태복음 6:9", text: { KRV: "그러므로 너희는 이렇게 기도하라 하늘에 계신 우리 아버지여 이름이 거룩히 여김을 받으시오며", NKRV: "그러므로 너희는 이렇게 기도하여라. 하늘에 계신 우리 아버지, 아버지의 이름을 거룩하게 하시고", NIV: "This, then, is how you should pray: 'Our Father in heaven, hallowed be your name,", KJV: "After this manner therefore pray ye: Our Father which art in heaven, Hallowed be thy name." } },
+                    { ref: "마태복음 6:10", text: { KRV: "나라가 임하시오며 뜻이 하늘에서 이루어진 것 같이 땅에서도 이루어지이다", NKRV: "아버지의 나라를 오게 하시고, 아버지의 뜻이 하늘에서와 같이 땅에서도 이루어지게 하소서.", NIV: "your kingdom come, your will be done on earth as it is in heaven.", KJV: "Thy kingdom come. Thy will be done in earth, as it is in heaven." } },
+                    { ref: "마태복음 6:11", text: { KRV: "오늘 우리에게 일용할 양식을 주시옵고", NKRV: "오늘 우리에게 필요한 일용할 양식을 주시고", NIV: "Give us today our daily bread.", KJV: "Give us this day our daily bread." } },
+                    { ref: "출애굽기 20:3", text: { KRV: "너는 나 외에는 다른 신들을 네게 두지 말라", NKRV: "너는 내 앞에서 다른 신들을 섬기지 못한다.", NIV: "You shall have no other gods before me.", KJV: "Thou shalt have no other gods before me." } },
+                    { ref: "출애굽기 20:12", text: { KRV: "네 부모를 공경하라", NKRV: "너는 네 부모를 공경하여라.", NIV: "Honor your father and your mother...", KJV: "Honour thy father and thy mother..." } }
+                ]
+            },
+            {
+                title: "중급 패키지 1: 로마서 핵심 구절",
+                verses: [
+                    { ref: "로마서 1:16", text: { KRV: "내가 복음을 부끄러워하지 아니하노니 이 복음은 모든 믿는 자에게 구원을 주시는 하나님의 능력이 됨이라", NKRV: "나는 복음을 부끄러워하지 않습니다. 이 복음은 유대 사람을 비롯하여...", NIV: "I am not ashamed of the gospel, because it is the power of God...", KJV: "For I am not ashamed of the gospel of Christ: for it is the power of God..." } },
+                    { ref: "로마서 3:23", text: { KRV: "모든 사람이 죄를 범하였으매 하나님의 영광에 이르지 못하더니", NKRV: "모든 사람이 죄를 범하였으므로, 하나님의 영광에 이르지 못합니다.", NIV: "for all have sinned and fall short of the glory of God,", KJV: "For all have sinned, and come short of the glory of God;" } },
+                    { ref: "로마서 6:23", text: { KRV: "죄의 삯은 사망이요 하나님의 은사는 그리스도 예수 우리 주 안에 있는 영생이니라", NKRV: "죄의 삯은 사망이요, 하나님의 은사는 우리 주 그리스도 예수 안에서 누리는 영생입니다.", NIV: "For the wages of sin is death, but the gift of God is eternal life...", KJV: "For the wages of sin is death; but the gift of God is eternal life..." } }
+                ]
+            },
+            {
+                title: "중급 패키지 2: 산상수훈 핵심 (마태복음)",
+                verses: [
+                    { ref: "마태복음 5:3", text: { KRV: "심령이 가난한 자는 복이 있나니 천국이 그들의 것임이요", NKRV: "마음이 가난한 사람은 복이 있다. 하늘나라가 그들의 것이다.", NIV: "Blessed are the poor in spirit, for theirs is the kingdom of heaven.", KJV: "Blessed are the poor in spirit: for theirs is the kingdom of heaven." } },
+                    { ref: "마태복음 5:4", text: { KRV: "애통하는 자는 복이 있나니 그들이 위로를 받을 것임이요", NKRV: "슬퍼하는 사람은 복이 있다. 그들이 위로를 받을 것이다.", NIV: "Blessed are those who mourn, for they will be comforted.", KJV: "Blessed are they that mourn: for they shall be comforted." } },
+                    { ref: "마태복음 6:33", text: { KRV: "그런즉 너희는 먼저 그의 나라와 그의 의를 구하라 그리하면 이 모든 것을 너희에게 더하시리라", NKRV: "너희는 먼저 하나님의 나라와 하나님의 의를 구하여라. 그리하면 이 모든 것을 너희에게 더하여 주실 것이다.", NIV: "But seek first his kingdom and his righteousness...", KJV: "But seek ye first the kingdom of God, and his righteousness..." } }
+                ]
+            },
+            {
+                title: "고급 패키지 1: 빌립보서 전권 요약",
+                verses: [
+                    { ref: "빌립보서 4:4", text: { KRV: "주 안에서 항상 기뻐하라 내가 다시 말하노니 기뻐하라", NKRV: "주 안에서 항상 기뻐하십시오. 다시 말합니다. 기뻐하십시오.", NIV: "Rejoice in the Lord always. I will say it again: Rejoice!", KJV: "Rejoice in the Lord alway: and again I say, Rejoice." } },
+                    { ref: "빌립보서 4:13", text: { KRV: "내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라", NKRV: "나에게 능력을 주시는 분 안에서, 나는 모든 것을 할 수 있습니다.", NIV: "I can do all things through Christ who strengthens me.", KJV: "I can do all things through Christ which strengtheneth me." } }
+                ]
+            },
+            {
+                title: "고급 패키지 2: 야고보서 실천의 말씀",
+                verses: [
+                    { ref: "야고보서 1:5", text: { KRV: "너희 중에 누구든지 지혜가 부족하거든 모든 사람에게 후히 주시고 꾸짖지 아니하시는 하나님께 구하라", NKRV: "너희 가운데 누구든지 지혜가 부족하거든, 모든 사람에게 아낌없이 주시고...", NIV: "If any of you lacks wisdom, you should ask God...", KJV: "If any of you lack wisdom, let him ask of God, that giveth to all men liberally..." } },
+                    { ref: "야고보서 2:17", text: { KRV: "이와 같이 행함이 없는 믿음은 그 자체로 죽은 것이라", NKRV: "이와 같이, 행함이 따르지 않는 믿음은 그 자체로 죽은 것입니다.", NIV: "In the same way, faith by itself, if it is not accompanied by action, is dead.", KJV: "Even so faith, if it hath not works, is dead, being alone." } }
+                ]
+            },
+            {
+                title: "주제별 패키지 1: 사랑과 관계",
+                verses: [
+                    { ref: "고린도전서 13:4", text: { KRV: "사랑은 오래 참고 사랑은 온유하며 시기하지 아니하며 사랑은 자랑하지 아니하며...", NKRV: "사랑은 오래 참고, 사랑은 친절하며, 시기하지 않으며, 자랑하지 않으며...", NIV: "Love is patient, love is kind. It does not envy, it does not boast...", KJV: "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself..." } },
+                    { ref: "요한일서 4:7", text: { KRV: "사랑하는 자들아 우리가 서로 사랑하자 사랑은 하나님께 속한 것이니...", NKRV: "사랑하는 여러분, 서로 사랑합시다. 사랑은 하나님에게서 난 것입니다.", NIV: "Dear friends, let us love one another, for love comes from God...", KJV: "Beloved, let us love one another: for love is of God; and every one that loveth..." } }
+                ]
+            },
+            {
+                title: "주제별 패키지 2: 지혜와 인도하심",
+                verses: [
+                    { ref: "잠언 3:5", text: { KRV: "너는 마음을 다하여 여호와를 신뢰하고 네 명철을 의지하지 말라", NKRV: "너는 마음을 다하여 주님을 신뢰하고, 명철을 의지하지 말라", NIV: "Trust in the LORD with all your heart and lean not on your own understanding;", KJV: "Trust in the LORD with all thine heart; and lean not unto thine own understanding." } },
+                    { ref: "시편 119:105", text: { KRV: "주의 말씀은 내 발에 등요 내 길에 빛이니이다", NKRV: "주님의 말씀은 내 발의 등불이요, 내 길의 빛입니다.", NIV: "Your word is a lamp for my feet, a light on my path.", KJV: "Thy word is a lamp unto my feet, and a light unto my path." } }
+                ]
+            },
+            {
+                title: "새신자 필수 암송 10구절",
+                verses: [
+                    { ref: "요한복음 3:16", text: { KRV: "하나님이 세상을 이처럼 사랑하사 독생자를 주셨으니 이는 그를 믿는 자마다...", NKRV: "하나님께서 세상을 이처럼 사랑하셔서 외아들을 주셨으니, 누구든지 그를 믿는 사람은...", NIV: "For God so loved the world that he gave his one and only Son...", KJV: "For God so loved the world, that he gave his only begotten Son..." } },
+                    { ref: "고린도후서 5:17", text: { KRV: "그런즉 누구든지 그리스도 안에 있으면 새로운 피조물이라 이전 것은 지나갔으니 보라 새것이 되었도다", NKRV: "누구든지 그리스도 안에 있으면, 그는 새로운 피조물입니다. 옛것은 지나갔습니다.", NIV: "Therefore, if anyone is in Christ, the new creation has come...", KJV: "Therefore if any man be in Christ, he is a new creature: old things are passed away..." } }
+                ]
+            },
+            {
+                title: "소망과 확신의 구절",
+                verses: [
+                    { ref: "예레미야 29:11", text: { KRV: "여호와의 말씀이니라 너희를 향한 나의 생각을 내가 아나니 평안이요 재앙이 아니니라", NKRV: "나 주가 말한다. 내가 너희를 향하여 품고 있는 생각을 나는 잘 알고 있다...", NIV: "'For I know the plans I have for you,' declares the LORD...", KJV: "For I know the thoughts that I think toward you, saith the LORD..." } },
+                    { ref: "이사야 40:31", text: { KRV: "오직 여호와를 앙망하는 자는 새 힘을 얻으리니 독수리가 날개치며 올라감 같을 것이요", NKRV: "오직 주님을 바라는 사람은 새 힘을 얻고, 독수리처럼 날개를 치며 올라갈 것이다.", NIV: "but those who hope in the LORD will renew their strength...", KJV: "But they that wait upon the LORD shall renew strength..." } }
+                ]
+            }
+        ];
+
+        const aiThemes = [
+            { title: "마음의 평안이 필요할 때", ref: "요한복음 14:27", icon: "fa-shield-halved", color: "text-rose-500", pack: 0, verse: 1 },
+            { title: "지치고 무거운 짐을 느낄 때", ref: "마태복음 11:28", icon: "fa-battery-quarter", color: "text-amber-500", pack: 0, verse: 3 },
+            { title: "두려움과 걱정이 앞설 때", ref: "이사야 41:10", icon: "fa-person-praying", color: "text-blue-500", pack: 0, verse: 4 },
+            { title: "위로가 절실히 필요할 때", ref: "시편 23:1", icon: "fa-hand-holding-heart", color: "text-emerald-500", pack: 0, verse: 0 },
+            { title: "관계 속에서 상처 받았을 때", ref: "고린도전서 13:4", icon: "fa-heart-crack", color: "text-purple-500", pack: 6, verse: 0 },
+            { title: "결정의 순간, 지혜를 구할 때", ref: "잠언 3:5", icon: "fa-compass", color: "text-teal-500", pack: 7, verse: 0 },
+            { title: "새로운 시작을 앞두었을 때", ref: "고린도후서 5:17", icon: "fa-seedling", color: "text-green-600", pack: 8, verse: 1 },
+            { title: "미래가 불안하고 막막할 때", ref: "예레미야 29:11", icon: "fa-anchor", color: "text-sky-500", pack: 9, verse: 0 },
+            { title: "자신감이 떨어지고 무기력할 때", ref: "빌립보서 4:13", icon: "fa-bolt", color: "text-yellow-500", pack: 4, verse: 1 }
+        ];
+
+        // --- 2. 코어 유틸리티 및 데이터 처리 ---
+        function calculateHP(sheep) {
+            if (sheep.retentionHours === 0 || !sheep.expiresAt) return 100;
+            let now = Date.now();
+            let timeLeft = sheep.expiresAt - now;
+            let totalTime = sheep.retentionHours * 3600000;
+            let hp = (timeLeft / totalTime) * 100;
+            return Math.max(0, Math.min(100, hp));
+        }
+
+        function getHpColor(hp) {
+            if (hp > 50) return 'bg-emerald-500';
+            if (hp > 20) return 'bg-blue-500';
+            return 'bg-rose-500 animate-pulse';
+        }
+
+        function formatTimeLeft(ms) {
+            if(ms <= 0) return "만료됨";
+            let h = Math.floor(ms / 3600000);
+            let m = Math.floor((ms % 3600000) / 60000);
+            return `${h}시간 ${m}분 남음`;
+        }
+
+        function checkRetention() {
+            let now = Date.now();
+            let initialCount = ownedSheep.length;
+            ownedSheep = ownedSheep.filter(sheep => {
+                if (sheep.retentionHours === 0) return true; 
+                return sheep.expiresAt > now; 
+            });
+            if (ownedSheep.length < initialCount) {
+                alertBox(`건초를 주지 않아 배고픈 양 ${initialCount - ownedSheep.length}마리가 초장을 떠났습니다. 😢`);
+                if (!ownedSheep.find(s => s.id === equippedSheepId) && ownedSheep.length > 0) {
+                    equippedSheepId = ownedSheep[0].id;
+                }
+                saveData();
+            }
+        }
+
+        function saveData() {
+            const data = { gems: userGems, hay: userHay, equippedId: equippedSheepId, inventory: ownedSheep, pack: currentPackIndex, verse: currentVerseIndex, stage: currentStage, translation: currentTranslation, exp: userExp };
+            localStorage.setItem('bibleRootDataV4', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const stored = localStorage.getItem('bibleRootDataV4');
+            if (stored) {
+                try {
+                    const data = JSON.parse(stored);
+                    if (data.gems !== undefined) userGems = data.gems;
+                    if (data.hay !== undefined) userHay = data.hay;
+                    if (data.equippedId !== undefined) equippedSheepId = data.equippedId;
+                    if (data.inventory !== undefined) ownedSheep = data.inventory;
+                    if (data.pack !== undefined) currentPackIndex = data.pack;
+                    if (data.verse !== undefined) currentVerseIndex = data.verse;
+                    if (data.stage !== undefined) currentStage = data.stage;
+                    if (data.translation !== undefined) currentTranslation = data.translation;
+                    if (data.exp !== undefined) userExp = data.exp;
+                } catch(e) { console.error(e); }
+            }
+            ownedSheep.forEach(s => { if(!s.customName) s.customName = s.baseName; });
+        }
+
+        function updateResourceUI() {
+            document.getElementById('gemCount').innerText = userGems;
+            document.getElementById('hayCount').innerText = userHay;
+            updateLevelUI();
+        }
+
+        function updateLevelUI() {
+            userLevel = Math.floor(userExp / 100) + 1;
+            document.getElementById('headerLevel').innerText = userLevel;
+            const expBar = document.getElementById('headerExpBar');
+            if(expBar) expBar.style.width = `${userExp % 100}%`;
+        }
+
+        // --- 3. 타이핑 및 7단계 암송 완벽 복원 로직 ---
+        function cleanWord(str) { return str.replace(/[.,?!;:"'“”‘’()[\]{}]/g, ''); }
+
+        function handleTyping(event) {
+            const input = event.target;
+            const targetWordFull = input.dataset.answer;
+            const targetWordClean = cleanWord(targetWordFull);
+            let userWord = input.value.trim();
+
+            if (cleanWord(userWord) === targetWordClean) {
+                input.classList.add('correct');
+                input.value = targetWordFull; 
+                input.disabled = true;
+
+                const nextInput = Array.from(document.querySelectorAll('.typing-input:not([disabled])')).find(el => el.value.trim() === '');
+                if (nextInput) {
+                    nextInput.focus();
+                } else {
+                    const nextBtn = document.getElementById('nextStageBtn');
+                    nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    nextBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600', 'animate-pulse');
+                }
+            } else {
+                input.classList.remove('correct');
+            }
+        }
+
+        function renderTypingBlanks(words, ratio) {
+            let html = '<div class="flex flex-wrap justify-center items-end text-lg leading-loose mt-2 gap-y-4">';
+            words.forEach((w) => {
+                if (Math.random() < ratio && cleanWord(w).length > 0) {
+                    let wLength = cleanWord(w).length;
+                    let width = Math.max(wLength * 1.2, 2.5) + 'em';
+                    html += `<input type="text" class="typing-input" style="width: ${width};" data-answer="${w}" oninput="handleTyping(event)" autocomplete="off">`;
+                } else {
+                    html += `<span class="px-1 font-bold text-slate-800">${w}</span>`;
+                }
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderFullTyping(words) {
+            let html = '<div class="flex flex-wrap justify-center items-end text-lg leading-loose mt-2 gap-y-4">';
+            words.forEach((w) => {
+                let wLength = cleanWord(w).length;
+                if (wLength > 0) {
+                    let width = Math.max(wLength * 1.2, 2.5) + 'em';
+                    html += `<input type="text" class="typing-input" style="width: ${width};" data-answer="${w}" oninput="handleTyping(event)" autocomplete="off">`;
+                } else {
+                    html += `<span class="px-1 font-bold text-slate-800">${w}</span>`;
+                }
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function getInitialHint(text) {
+            if (currentTranslation === 'NIV' || currentTranslation === 'KJV') {
+                return text.split(' ').map(w => {
+                    if(w.length === 0) return '';
+                    let firstChar = w.charAt(0);
+                    let rest = w.substring(1).replace(/[a-zA-Z]/g, '_');
+                    return firstChar + rest;
+                }).join(' ');
+            } else {
+                const cho = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+                let result = "";
+                for(let i=0; i<text.length; i++) {
+                    let code = text.charCodeAt(i) - 44032;
+                    if(code > -1 && code < 11172) {
+                        result += cho[Math.floor(code/588)];
+                    } else {
+                        result += text.charAt(i);
+                    }
+                }
+                return result;
+            }
+        }
+
+        function renderTapWords(words) {
+            let res = words.map(w => {
+                return `<span class="scratch-box inline-block bg-slate-200 text-transparent rounded-lg px-3 py-1 m-1 border-b-2 border-slate-300 font-bold" onclick="this.classList.add('revealed'); this.classList.remove('text-transparent', 'bg-slate-200', 'border-slate-300')">${w}</span>`;
+            });
+            return `<div class="flex flex-wrap justify-center text-lg leading-relaxed mt-2">"${res.join('')}"</div>`;
+        }
+
+        // --- TTS (음성 지원 API) ---
+        function playTTS(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                let msg = new SpeechSynthesisUtterance(text);
+                msg.lang = (currentTranslation === 'NIV' || currentTranslation === 'KJV') ? 'en-US' : 'ko-KR';
+                msg.rate = 0.85; // 천천히 또렷하게
+                window.speechSynthesis.speak(msg);
+            } else {
+                alertBox("이 브라우저에서는 음성 듣기를 지원하지 않습니다.");
+            }
+        }
+
+        // --- 4. UI 및 탭/스테이지 관리 ---
+        function initPacks() {
+            const packSelect = document.getElementById('packSelect');
+            packSelect.innerHTML = '';
+            biblePacks.forEach((pack, index) => {
+                const opt = document.createElement('option');
+                opt.value = index; opt.innerText = pack.title;
+                if(index === currentPackIndex) opt.selected = true;
+                packSelect.appendChild(opt);
+            });
+            document.getElementById('translationSelect').value = currentTranslation;
+        }
+
+        function renderRandomThemes() {
+            const container = document.getElementById('aiThemeContainer');
+            if(!container) return;
+            const shuffled = [...aiThemes].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 2);
+            container.innerHTML = selected.map(theme => `
+                <div onclick="startTheme(${theme.pack}, ${theme.verse})" class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm cursor-pointer hover:bg-slate-50 transition active:scale-95">
+                    <div class="${theme.color} text-lg mb-2"><i class="fa-solid ${theme.icon}"></i></div>
+                    <h3 class="font-bold text-sm text-slate-800 mb-0.5">${theme.title}</h3>
+                    <p class="text-xs text-slate-400">${theme.ref}</p>
+                </div>
+            `).join('');
+        }
+
+        function startTheme(packIdx, verseIdx) { currentPackIndex = packIdx; currentVerseIndex = verseIdx; currentStage = 1; saveData(); switchTab('study'); updateStudyContent(); }
+        function changePack(val) { currentPackIndex = parseInt(val); currentVerseIndex = 0; currentStage = 1; saveData(); updateStudyContent(); }
+        function changeTranslation(val) { currentTranslation = val; saveData(); updateStudyContent(); }
+        function getCurrentVerse() { return biblePacks[currentPackIndex].verses[currentVerseIndex]; }
+
+        function updateStudyContent() {
+            const verse = getCurrentVerse(); const text = verse.text[currentTranslation] || verse.text['KRV'];
+            let transName = { "KRV": "개역개정", "NKRV": "새번역", "NIV": "NIV", "KJV": "KJV" }[currentTranslation];
+            document.getElementById('activeVerseRefBadge').innerText = `${verse.ref} (${transName})`;
+            
+            const dotsContainer = document.getElementById('stageDots');
+            dotsContainer.innerHTML = '';
+            for(let i=0; i<7; i++) {
+                dotsContainer.innerHTML += `<span class="w-2 h-2 rounded-full ${i < currentStage ? 'bg-blue-600' : 'bg-slate-200'} transition-colors duration-300"></span>`;
+            }
+            
+            const contentBox = document.getElementById('studyCardContent');
+            const stageTitle = document.getElementById('studyStageTitle');
+            const nextBtn = document.getElementById('nextStageBtn');
+            document.getElementById('stageCelebration').classList.add('hidden');
+            let words = text.split(' ');
+            
+            // 완벽 복원된 7단계 로직 + 음성 지원
+            if (currentStage === 1) {
+                stageTitle.innerText = "1단계: 눈으로 읽기"; 
+                contentBox.innerHTML = `<p class="text-xl font-bold text-slate-800 leading-relaxed break-keep">"${text}"</p>`;
+                nextBtn.innerText = "다음 단계 (말씀 듣기)"; 
+                nextBtn.className = "w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition";
+            } else if (currentStage === 2) {
+                stageTitle.innerText = "2단계: 음성으로 듣기"; 
+                contentBox.innerHTML = `
+                    <p class="text-xl font-bold text-blue-700 leading-relaxed break-keep">"${text}"</p>
+                    <button onclick="playTTS('${text.replace(/'/g, "\\'")}')" class="mt-5 bg-blue-50 text-blue-600 px-4 py-2 rounded-full text-sm font-bold shadow-sm hover:bg-blue-100 border border-blue-200"><i class="fa-solid fa-volume-high"></i> 다시 듣기</button>
+                `;
+                nextBtn.innerText = "다음 단계 (빈칸 채우기)"; 
+                nextBtn.className = "w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition";
+                playTTS(text); // 자동 재생
+            } else if (currentStage === 3) {
+                stageTitle.innerText = "3단계: 빈칸 채우기 (초급)";
+                contentBox.innerHTML = renderTypingBlanks(words, 0.3);
+                nextBtn.innerText = "다음 단계 (초성 힌트)";
+                nextBtn.className = "w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition";
+            } else if (currentStage === 4) {
+                stageTitle.innerText = "4단계: 첫 글자 연상 (초성)";
+                contentBox.innerHTML = `<p class="text-xl font-bold text-blue-700 leading-relaxed tracking-widest break-keep">"${getInitialHint(text)}"</p>`;
+                nextBtn.innerText = "다음 단계 (단어 탭하기)";
+                nextBtn.className = "w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition";
+            } else if (currentStage === 5) {
+                stageTitle.innerText = "5단계: 단어 탭하여 열기";
+                contentBox.innerHTML = renderTapWords(words);
+                nextBtn.innerText = "다음 단계 (전체 타이핑 암송)";
+                nextBtn.className = "w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition";
+            } else if (currentStage === 6) {
+                stageTitle.innerText = "6단계: 전체 타이핑 암송";
+                contentBox.innerHTML = renderFullTyping(words);
+                nextBtn.innerText = "암송 완료! 🎉";
+                nextBtn.className = "w-full bg-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition";
+            } else if (currentStage === 7) {
+                stageTitle.innerText = "7단계: 암송 완료 🎉"; 
+                showCelebration();
+                contentBox.innerHTML = `<p class="text-xl font-bold text-slate-800 leading-relaxed">"${text}"</p>`;
+                
+                if (currentVerseIndex < biblePacks[currentPackIndex].verses.length - 1) {
+                    nextBtn.innerText = "다음 구절 시작하기";
+                    nextBtn.className = "w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition";
+                } else {
+                    nextBtn.innerText = "패키지 완주 축하합니다! (홈으로)";
+                    nextBtn.className = "w-full bg-amber-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-amber-200 hover:bg-amber-600 transition";
+                }
+            }
+        }
+
+        function nextStudyStage() {
+            if('speechSynthesis' in window) window.speechSynthesis.cancel(); // 다음 단계 넘어갈 때 음성 정지
+
+            if (currentStage < 7) {
+                currentStage++; userExp += 15;
+                if (currentStage === 7) { 
+                    userGems += 10; userHay += 10; userExp += 50; 
+                    updateResourceUI(); 
+                }
+                saveData(); updateStudyContent();
+            } else {
+                if (currentVerseIndex < biblePacks[currentPackIndex].verses.length - 1) {
+                    currentVerseIndex++; currentStage = 1; saveData(); updateStudyContent();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    currentVerseIndex = 0; currentStage = 1; saveData(); switchTab('home');
+                }
+            }
+        }
+
+        function showCelebration() {
+            const celebration = document.getElementById('stageCelebration');
+            celebration.classList.remove('hidden');
+            setTimeout(() => { celebration.classList.add('opacity-0'); setTimeout(() => { celebration.classList.add('hidden'); celebration.classList.remove('opacity-0'); }, 500); }, 2500);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === tabId) {
+                    btn.classList.remove('text-slate-400'); btn.classList.add('text-blue-600');
+                    btn.querySelector('span').classList.replace('font-medium', 'font-bold');
+                } else {
+                    btn.classList.add('text-slate-400'); btn.classList.remove('text-blue-600');
+                    btn.querySelector('span').classList.replace('font-bold', 'font-medium');
+                }
+            });
+            if(tabId === 'study' && document.getElementById('packSelect').options.length === 0) initPacks();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 5. 목장, 양 관리, 가챠 및 모달 로직 ---
+        function alertBox(msg) { document.getElementById('modalMessage').innerText = msg; document.getElementById('customModal').classList.remove('hidden'); document.getElementById('customModal').classList.add('flex'); }
+        function closeModal() { document.getElementById('customModal').classList.add('hidden'); document.getElementById('customModal').classList.remove('flex'); }
+        function confirmResetData() { document.getElementById('confirmModal').classList.remove('hidden'); document.getElementById('confirmModal').classList.add('flex'); }
+        function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); document.getElementById('confirmModal').classList.remove('flex'); }
+        function executeDataReset() { localStorage.removeItem('bibleRootDataV4'); location.reload(); }
+
+        let wanderingSheep = [];
+        let pastureInterval;
+
+        function renderInventory() {
+            const pasture = document.getElementById('pastureArea');
+            if(!pasture) return;
+            pasture.innerHTML = `
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 pointer-events-none drop-shadow-md">
+                    <div class="w-16 h-16 bg-white/40 backdrop-blur-md rounded-full flex items-center justify-center text-4xl shadow-[0_0_40px_rgba(255,255,255,1)] border border-white/60">🧔🏽‍♂️</div>
+                    <div class="bg-white/90 text-[10px] font-bold px-2.5 py-0.5 rounded-full mt-1.5 text-emerald-800 shadow-sm border border-emerald-100">선한 목자</div>
+                </div>
+            `;
+            wanderingSheep = [];
+            const pastureSheep = ownedSheep.filter(s => s.inPasture);
+
+            pastureSheep.forEach(sheep => {
+                const isEquipped = sheep.id === equippedSheepId;
+                const hp = calculateHP(sheep);
+                const border = isEquipped ? 'border-blue-500 border-2 ring-4 ring-blue-300 ring-opacity-60' : sheep.class.split(' ')[0];
+                const el = document.createElement('div');
+                el.className = `absolute cursor-pointer flex flex-col items-center transition-transform hover:scale-125 active:scale-95 z-20 group`;
+                
+                let itemBadge = sheep.item ? `<div class="absolute -bottom-1 -left-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md border border-slate-200 text-[10px] z-30">${sheep.item.icon}</div>` : '';
+                let retentionBadge = sheep.retentionHours > 0 ? `<div class="absolute -top-1 -right-1 text-[8px] bg-white rounded-full ${sheep.retentionTextClass} shadow-sm w-4 h-4 flex items-center justify-center z-30 border border-slate-200"><i class="fa-solid ${sheep.retentionIcon}"></i></div>` : '';
+                let hpBar = sheep.retentionHours > 0 ? `<div class="w-10 h-1.5 bg-slate-200 rounded-full mt-1 overflow-hidden border border-slate-300 shadow-sm"><div class="h-full ${getHpColor(hp)} hp-bar-fill" style="width: ${hp}%"></div></div>` : '';
+
+                el.innerHTML = `
+                    <div class="relative w-12 h-12 rounded-full flex items-center justify-center text-2xl border-2 shadow-md bg-white ${border} ${sheep.class.replace(sheep.class.split(' ')[0], '')}">
+                        ${sheep.emoji}
+                        ${itemBadge}
+                        ${retentionBadge}
+                    </div>
+                    ${hpBar}
+                    ${isEquipped ? '<div class="absolute -top-2 -left-2 text-sm drop-shadow-md animate-bounce z-40">👑</div>' : ''}
+                    <div class="absolute -top-6 bg-black/70 text-white text-[9px] px-2 py-0.5 rounded font-bold opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-50">${sheep.customName}</div>
+                `;
+                
+                let x = Math.random() * 80 + 10; let y = Math.random() * 80 + 10;
+                let vx = (Math.random() - 0.5) * 0.15; let vy = (Math.random() - 0.5) * 0.15;
+                el.style.left = `${x}%`; el.style.top = `${y}%`;
+                el.onclick = () => openSheepDetail(sheep.id);
+                pasture.appendChild(el);
+                wanderingSheep.push({ el, x, y, vx, vy, id: sheep.id });
+            });
+
+            if(!pastureInterval) pastureInterval = setInterval(updatePasture, 50);
+        }
+
+        function updatePasture() {
+            wanderingSheep.forEach(s => {
+                s.x += s.vx; s.y += s.vy;
+                if(s.x < 5 || s.x > 90) s.vx *= -1;
+                if(s.y < 5 || s.y > 85) s.vy *= -1;
+                if(Math.random() < 0.02) { s.vx = (Math.random() - 0.5) * 0.15; s.vy = (Math.random() - 0.5) * 0.15; }
+                const visualEl = s.el.querySelector('div');
+                visualEl.style.transform = s.vx > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+                s.el.style.left = `${s.x}%`; s.el.style.top = `${s.y}%`;
+            });
+        }
+
+        function renderSheepManagement() {
+            const container = document.getElementById('sheepManagementList');
+            if(!container) return;
+            container.innerHTML = '';
+            [...ownedSheep].reverse().forEach(sheep => {
+                const isEquipped = sheep.id === equippedSheepId;
+                const hp = calculateHP(sheep);
+                const border = isEquipped ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100';
+                const toggleIcon = sheep.inPasture ? '<i class="fa-solid fa-eye text-emerald-500"></i>' : '<i class="fa-solid fa-eye-slash text-slate-300"></i>';
+                const clockIcon = sheep.retentionHours > 0 ? `<div class="absolute bottom-1 right-1 text-[8px] bg-white rounded-full ${sheep.retentionTextClass} w-3.5 h-3.5 flex items-center justify-center border border-slate-200 shadow-sm"><i class="fa-solid ${sheep.retentionIcon}"></i></div>` : '';
+                const hpBar = sheep.retentionHours > 0 ? `<div class="w-14 h-1 bg-slate-200 rounded-full overflow-hidden mt-1"><div class="h-full ${getHpColor(hp)} hp-bar-fill" style="width: ${hp}%"></div></div>` : '';
+                
+                container.innerHTML += `
+                    <div class="flex-none w-20 flex flex-col items-center gap-1 snap-center relative">
+                        <button onclick="togglePasture(${sheep.id})" class="absolute -top-1 -right-1 w-6 h-6 bg-white rounded-full border border-slate-200 flex items-center justify-center shadow-sm text-xs z-10 transition active:scale-90">${toggleIcon}</button>
+                        <div onclick="openSheepDetail(${sheep.id})" class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl border-2 ${border} cursor-pointer transition active:scale-95 shadow-sm relative">
+                            ${sheep.emoji}
+                            ${clockIcon}
+                        </div>
+                        ${hpBar}
+                        <p class="text-[9px] font-bold text-slate-600 truncate w-full text-center mt-0.5">${sheep.customName}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function togglePasture(id) {
+            const idx = ownedSheep.findIndex(s => s.id === id);
+            if(idx > -1) {
+                ownedSheep[idx].inPasture = !ownedSheep[idx].inPasture;
+                saveData(); renderInventory(); renderSheepManagement();
+            }
+        }
+
+        function updateAvatarDisplay() {
+            const current = ownedSheep.find(s => s.id === equippedSheepId);
+            if(!current) return;
+            const headerAvatar = document.getElementById('headerAvatar');
+            if(headerAvatar) {
+                headerAvatar.innerHTML = current.emoji;
+                headerAvatar.className = `w-9 h-9 rounded-full overflow-hidden border-2 flex items-center justify-center text-lg shadow-inner cursor-pointer ml-1 ${current.class}`;
+            }
+            const mainDisplay = document.getElementById('mainAvatarDisplay');
+            if(mainDisplay) {
+                mainDisplay.innerHTML = `${current.emoji}<div class="absolute -bottom-2 -right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-slate-100 text-sm z-30">${current.item.icon}</div>`;
+                mainDisplay.className = `w-28 h-28 mx-auto rounded-full flex items-center justify-center text-5xl shadow-lg border-4 relative transition-all duration-300 ${current.class}`;
+                document.getElementById('mainAvatarName').innerText = current.customName;
+                document.getElementById('mainAvatarRarity').innerText = current.rarity.toUpperCase();
+                document.getElementById('mainAvatarRarity').className = `text-xs font-bold mt-1 ${current.textClass}`;
+                
+                const retDisplay = document.getElementById('mainAvatarRetention');
+                let hpStr = current.retentionHours > 0 ? ` (${Math.round(calculateHP(current))}%)` : '';
+                retDisplay.innerHTML = `<i class="fa-solid ${current.retentionIcon}"></i> ${current.retentionHours === 0 ? '영구 보존' : current.retentionLabel + ' 미접속 시 가출'}${hpStr}`;
+                retDisplay.className = `text-[10px] font-bold mt-1 ${current.retentionTextClass}`;
+            }
+        }
+
+        function openSheepDetail(id) {
+            activeDetailSheepId = id;
+            const sheep = ownedSheep.find(s => s.id === id);
+            if(!sheep) return;
+
+            document.getElementById('sdAvatar').className = `relative w-24 h-24 mx-auto rounded-full flex items-center justify-center text-5xl shadow-md border-4 ${sheep.class}`;
+            document.getElementById('sdAvatar').innerHTML = `${sheep.emoji}<div class="absolute -bottom-2 -right-2 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-slate-100 text-sm z-30">${sheep.item.icon}</div>`;
+            
+            document.getElementById('sdCustomName').value = sheep.customName;
+            document.getElementById('sdOriginalName').innerText = `원본: ${sheep.baseName} (${sheep.rarity.toUpperCase()})`;
+
+            const hpContainer = document.getElementById('sdHpBarContainer');
+            const timeText = document.getElementById('sdTimeLeft');
+            
+            if (sheep.retentionHours === 0) {
+                hpContainer.classList.add('hidden');
+                timeText.innerText = "영구 보존 양 (HP 무한)";
+                timeText.className = "text-[10px] font-bold text-emerald-500";
+            } else {
+                hpContainer.classList.remove('hidden');
+                const hp = calculateHP(sheep);
+                const bar = document.getElementById('sdHpBar');
+                bar.style.width = `${hp}%`;
+                bar.className = `h-full hp-bar-fill ${getHpColor(hp)}`;
+                timeText.innerText = formatTimeLeft(sheep.expiresAt - Date.now());
+                timeText.className = `text-[10px] font-bold ${sheep.textClass}`;
+            }
+
+            const equipBtn = document.getElementById('sdEquipBtn');
+            if (sheep.id === equippedSheepId) {
+                equipBtn.innerText = "현재 장착 중";
+                equipBtn.className = "w-full bg-slate-300 text-slate-500 py-3 rounded-xl font-bold text-sm shadow-md cursor-not-allowed";
+                equipBtn.disabled = true;
+            } else {
+                equipBtn.innerText = "메인 프로필로 설정";
+                equipBtn.className = "w-full bg-slate-800 text-white py-3 rounded-xl font-bold text-sm shadow-md hover:bg-slate-900 transition";
+                equipBtn.disabled = false;
+            }
+
+            document.getElementById('sheepDetailModal').classList.remove('hidden');
+            document.getElementById('sheepDetailModal').classList.add('flex');
+        }
+
+        function closeSheepDetail() {
+            document.getElementById('sheepDetailModal').classList.add('hidden');
+            document.getElementById('sheepDetailModal').classList.remove('flex');
+            activeDetailSheepId = null;
+            renderInventory(); renderSheepManagement(); updateAvatarDisplay();
+        }
+
+        function saveSheepName() {
+            if(!activeDetailSheepId) return;
+            const newName = document.getElementById('sdCustomName').value.trim();
+            if(!newName) { alertBox("이름을 입력해주세요!"); return; }
+            const idx = ownedSheep.findIndex(s => s.id === activeDetailSheepId);
+            if(idx > -1) {
+                ownedSheep[idx].customName = newName;
+                saveData();
+                alertBox(`양의 이름이 '${newName}'(으)로 변경되었습니다!`);
+            }
+        }
+
+        function feedHayFromModal() {
+            if(!activeDetailSheepId) return;
+            const sheep = ownedSheep.find(s => s.id === activeDetailSheepId);
+            if (sheep.retentionHours === 0) { alertBox("영구 보존 양은 건초를 먹지 않아도 배부릅니다!"); return; }
+            if (userHay < 10) { alertBox("건초가 부족합니다! 암송을 통해 건초를 획득하세요."); return; }
+            
+            userHay -= 10;
+            const addMs = 12 * 3600000; // 건초 10개당 12시간 연장
+            const maxMs = sheep.retentionHours * 3600000;
+            
+            sheep.expiresAt += addMs;
+            if ((sheep.expiresAt - Date.now()) > maxMs) {
+                sheep.expiresAt = Date.now() + maxMs; // 최대치 초과 방지
+            }
+            
+            saveData(); updateResourceUI(); openSheepDetail(activeDetailSheepId);
+            alertBox(`${sheep.customName}에게 건초를 먹였습니다! 🌾\n기운을 차리고 초장을 뛰어다닙니다.`);
+        }
+
+        function sendGiftFromModal() {
+            if(!activeDetailSheepId) return;
+            const sheep = ownedSheep.find(s => s.id === activeDetailSheepId);
+            alertBox(`카카오톡 API 연동 시뮬레이션:\n'${sheep.customName}' 님에게 오늘의 은혜 말씀 카드와 안부 메시지가 전송됩니다! 💌`);
+        }
+
+        function equipSheepFromModal() {
+            if(!activeDetailSheepId) return;
+            equippedSheepId = activeDetailSheepId;
+            saveData(); closeSheepDetail();
+        }
+
+        function drawGacha(times) {
+            const cost = times * 120;
+            if (userGems < cost) { alertBox(`보석이 부족합니다! (${cost}개 필요)`); return; }
+            userGems -= cost; updateResourceUI();
+            
+            let drawnResults = [];
+            for(let i=0; i<times; i++) {
+                let rand = Math.random() * 100;
+                let cumulative = 0;
+                let drawnSheep = sheepDatabase[0];
+                for (let sheep of sheepDatabase) {
+                    cumulative += sheep.prob;
+                    if (rand <= cumulative) { drawnSheep = sheep; break; }
+                }
+                
+                let expiresAt = drawnSheep.retentionHours === 0 ? null : Date.now() + (drawnSheep.retentionHours * 3600000);
+                let newSheep = { ...drawnSheep, id: Date.now() + i, inPasture: true, expiresAt: expiresAt };
+                ownedSheep.push(newSheep);
+                drawnResults.push(newSheep);
+            }
+            saveData(); showGachaModal(drawnResults); renderInventory(); renderSheepManagement(); renderItemCollection();
+        }
+
+        function showGachaModal(results) {
+            const modal = document.getElementById('gachaModal');
+            const container = document.getElementById('gachaResultContainer');
+            const bgEffect = document.getElementById('gachaBgEffect');
+            const title = document.getElementById('gachaModalTitle');
+            container.innerHTML = '';
+            let hasHighRarity = false;
+            
+            if(results.length === 1) {
+                title.innerText = "새로운 양 획득! 🎉";
+                const sheep = results[0];
+                if (['epic', 'legendary', 'mythic'].includes(sheep.rarity)) hasHighRarity = true;
+                let retentionHtml = sheep.retentionHours === 0 ? `<span class="${sheep.retentionTextClass}"><i class="fa-solid ${sheep.retentionIcon}"></i> 영구 보존</span>` : `<span class="${sheep.retentionTextClass}"><i class="fa-solid ${sheep.retentionIcon}"></i> ${sheep.retentionLabel} 유지 (건초 필요)</span>`;
+                container.innerHTML = `
+                    <div class="flex flex-col items-center animate-bounce">
+                        <div class="w-32 h-32 rounded-full flex items-center justify-center text-6xl shadow-xl border-4 ${sheep.class}">
+                            ${sheep.emoji}
+                        </div>
+                        <p class="text-xs font-bold mt-4 mb-1 ${sheep.textClass}">${sheep.rarity.toUpperCase()}</p>
+                        <h4 class="text-xl font-black text-slate-800">${sheep.baseName}</h4>
+                        <p class="text-[10px] font-bold mt-1 bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">${retentionHtml}</p>
+                        <div class="mt-3 inline-flex items-center gap-1.5 bg-slate-100 px-3 py-1.5 rounded-full text-xs shadow-inner border border-slate-200">
+                            ${sheep.item.icon} <span class="font-bold text-slate-700">${sheep.item.name}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                title.innerText = "10연속 뽑기 결과! 🎁";
+                results.forEach(sheep => {
+                    if (['epic', 'legendary', 'mythic'].includes(sheep.rarity)) hasHighRarity = true;
+                    let clockIcon = sheep.retentionHours > 0 ? `<div class="absolute -top-1 -right-1 text-[8px] bg-white rounded-full ${sheep.retentionTextClass} shadow-sm w-4 h-4 flex items-center justify-center border border-slate-100"><i class="fa-solid ${sheep.retentionIcon}"></i></div>` : '';
+                    container.innerHTML += `
+                        <div class="flex flex-col items-center bg-slate-50 p-2 rounded-2xl border border-slate-100 shadow-sm w-[30%] animate-in zoom-in relative">
+                            ${clockIcon}
+                            <div class="w-14 h-14 rounded-full flex items-center justify-center text-3xl border-2 ${sheep.class}">
+                                ${sheep.emoji}
+                            </div>
+                            <p class="text-[8px] font-bold mt-1 truncate w-full text-center ${sheep.textClass}">${sheep.rarity.toUpperCase()}</p>
+                        </div>
+                    `;
+                });
+            }
+            if (hasHighRarity) bgEffect.classList.remove('hidden'); else bgEffect.classList.add('hidden');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+
+        function closeGachaModal() { document.getElementById('gachaModal').classList.add('hidden'); document.getElementById('gachaModal').classList.remove('flex'); }
+
+        function renderItemCollection() {
+            const container = document.getElementById('itemCollectionGrid');
+            if(!container) return;
+            const ownedItems = new Set(ownedSheep.filter(s => s.item).map(s => s.item.name));
+            document.getElementById('itemCollectionCount').innerText = `${ownedItems.size} / 100`;
+            container.innerHTML = '';
+            all100Items.forEach(item => {
+                const hasItem = ownedItems.has(item.name);
+                const opacityClass = hasItem ? 'opacity-100' : 'opacity-20 grayscale';
+                const bgClass = hasItem ? 'bg-white border-slate-200 shadow-sm' : 'bg-slate-50 border-slate-100';
+                container.innerHTML += `
+                    <div class="flex flex-col items-center p-3 rounded-xl border ${bgClass} ${opacityClass} transition-all group relative cursor-help hover:bg-slate-100">
+                        <div class="text-xl mb-1 flex items-center justify-center w-8 h-8">${item.icon}</div>
+                        <div class="absolute -top-14 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2.5 py-1.5 rounded-lg w-max max-w-[100px] opacity-0 group-hover:opacity-100 pointer-events-none z-50 text-center leading-tight shadow-lg transition-opacity">
+                            <p class="font-bold text-blue-100 mb-0.5 break-keep">${item.name}</p>
+                            <p class="text-slate-300 text-[8px]">${item.desc}</p>
+                            <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-slate-800 rotate-45"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 초기화 실행
+        window.onload = () => {
+            loadData();
+            checkRetention(); 
+            initPacks();
+            renderRandomThemes();
+            updateStudyContent();
+            updateResourceUI();
+            renderInventory();
+            renderSheepManagement();
+            renderItemCollection();
+            updateAvatarDisplay();
+        };
+    </script>
+</body>
+</html>
