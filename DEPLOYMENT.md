@@ -1,6 +1,6 @@
 # THE JARAM 자동 배포 운영 규칙
 
-이 문서는 ChatGPT와 연결된 GitHub 도구를 이용해 THE JARAM 게임을 반복 배포하기 위한 표준 절차를 정의합니다.
+이 문서는 ChatGPT와 연결된 GitHub 도구 또는 `incoming/` 직접 접수를 이용해 THE JARAM 게임을 반복 배포하기 위한 표준 절차를 정의합니다.
 
 ## 기본 구조
 
@@ -24,6 +24,16 @@
 8. Cloudflare Pages 배포 후 실제 주소를 열어 정상 응답을 확인합니다.
 9. 모바일과 데스크톱에서 기본 성능 및 접근성 검사를 수행합니다.
 10. 배포가 확인된 실제 URL을 사용해 THEJARAM WordPress 소개글 초안을 작성합니다.
+
+## GitHub 직접 접수 절차
+
+다른 AI에서 만든 게임은 `GAME_SUBMISSION.md` 형식에 맞춰 `incoming/<slug>/`에 직접 업로드할 수 있습니다.
+
+1. GitHub Actions가 `game.json`, `index.html`, 메타데이터, 내부 자산과 파일 크기를 검사합니다.
+2. 통과하면 `games/<slug>/`와 `games/registry.json`을 갱신하는 Pull Request를 만듭니다.
+3. 운영자가 Pull Request를 확인하고 병합합니다.
+4. 병합 후 Cloudflare Pages 배포를 확인합니다.
+5. WordPress 글은 별도 Actions에서 초안으로 생성하며 자동 공개하지 않습니다.
 
 ## 파일 크기 원칙
 
