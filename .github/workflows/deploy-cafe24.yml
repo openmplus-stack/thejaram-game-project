@@ -1,9 +1,6 @@
 name: Deploy to Cafe24
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
