@@ -1,0 +1,26 @@
+name: Create WordPress draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: '배포된 게임의 slug'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create WordPress draft
+        env:
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USERNAME: ${{ secrets.WP_USERNAME }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+        run: node scripts/create-wordpress-draft.mjs "${{ inputs.slug }}"
