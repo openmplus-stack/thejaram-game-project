@@ -9,6 +9,8 @@ THEJARAM 독서인지·인지학습 웹앱 배포 저장소입니다.
 - `games/registry.json` : 게임 목록과 메타데이터
 - `games/<slug>/index.html` : 각 게임의 실행 파일
 - `DEPLOYMENT.md` : ChatGPT 기반 자동 배포 표준 절차
+- `GAME_SUBMISSION.md` : 다른 AI에서 만든 게임의 GitHub 직접 접수 규칙
+- `incoming/` : 자동 검사 전 새 게임 접수함
 - 예: `games/kfc/index.html` → `https://games.thejaram.quest/kfc/`
 
 ## 기본 배포 규칙
@@ -33,6 +35,10 @@ THEJARAM 독서인지·인지학습 웹앱 배포 저장소입니다.
 현재 게임 서비스는 Cloudflare Pages를 기준으로 운영합니다. GitHub `main` 브랜치의 `games/` 디렉터리가 배포 루트이며, 저장소 변경 사항은 Cloudflare Pages가 자동으로 반영합니다.
 
 기존 Cafe24 GitHub Actions 워크플로는 비활성화되어 있습니다.
+
+## 다른 AI에서 만든 게임 직접 접수
+
+Gemini, Claude 등에서 만든 게임도 `incoming/<slug>/`에 `index.html`, `game.json`, 관련 자산을 올리면 GitHub Actions가 검사합니다. 통과하면 게임 폴더와 목록을 갱신하는 Pull Request가 자동 생성됩니다. 자세한 방법은 `GAME_SUBMISSION.md`를 따릅니다.
 
 ## 표준 자동 배포 흐름
 
