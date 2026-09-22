@@ -1,0 +1,69 @@
+name: Process incoming games
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'incoming/**'
+      - '!incoming/README.md'
+  workflow_dispatch:
+    inputs:
+      slug:
+        description: '처리할 incoming 폴더 이름(비우면 전체)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: process-incoming
+  cancel-in-progress: false
+
+jobs:
+  validate-and-prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Process and validate submission
+        id: process
+        env:
+          REQUESTED_SLUG: ${{ inputs.slug }}
+        run: |
+          if [ -n "$REQUESTED_SLUG" ]; then
+            node scripts/process-incoming.mjs "$REQUESTED_SLUG"
+          else
+            node scripts/process-incoming.mjs
+          fi
+
+      - name: Create review branch
+        id: branch
+        if: steps.process.outputs.slugs != ''
+        env:
+          SLUGS: ${{ steps.process.outputs.slugs }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          branch="automation/incoming-${RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add games incoming
+          git commit -m "Deploy incoming game: ${SLUGS}"
+          git push origin "$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        if: steps.process.outputs.slugs != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          SLUGS: ${{ steps.process.outputs.slugs }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Deploy incoming game: ${SLUGS}" \
+            --body "자동 검사를 통과한 접수 게임입니다. 변경 파일과 게임 정보를 확인한 뒤 병합해 주세요. 병합하면 Cloudflare Pages 배포가 시작됩니다."
