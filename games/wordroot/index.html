@@ -128,21 +128,34 @@ const seed={verses:[
 {ref:'빌립보서 4장 13절',text:'내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라',reviews:4}
 ],active:0};
 const defaultBiblePacks=[
-{name:'초급 1 · 평안과 위로',refs:['시편 23편 1절','요한복음 14장 27절','빌립보서 4장 6절','마태복음 11장 28절','이사야 41장 10절']},
-{name:'초급 2 · 주기도문과 십계명',refs:['마태복음 6장 9절','마태복음 6장 10절','마태복음 6장 11절','출애굽기 20장 3절','출애굽기 20장 12절']},
-{name:'중급 1 · 로마서 핵심',refs:['로마서 1장 16절','로마서 3장 23절','로마서 6장 23절']},
-{name:'중급 2 · 산상수훈',refs:['마태복음 5장 3절','마태복음 5장 4절','마태복음 6장 33절']},
-{name:'고급 1 · 빌립보서',refs:['빌립보서 4장 4절','빌립보서 4장 13절']},
-{name:'고급 2 · 야고보서',refs:['야고보서 1장 5절','야고보서 2장 17절']},
-{name:'주제별 · 사랑과 관계',refs:['요한복음 3장 16절','고린도전서 13장 4절','요한일서 4장 7절']},
-{name:'주제별 · 믿음과 용기',refs:['잠언 3장 5절','여호수아 1장 9절','히브리서 11장 1절']},
-{name:'주제별 · 감사와 기쁨',refs:['데살로니가전서 5장 16절','데살로니가전서 5장 18절','시편 100편 4절']},
-{name:'주제별 · 지혜와 말씀',refs:['시편 119편 105절','잠언 1장 7절','야고보서 1장 5절']}
-];
+{name:'❤️ 사랑 · 구원',refs:['요한복음 3:16','로마서 5:8','로마서 3:23-24','로마서 6:23','로마서 10:9-10','에베소서 2:8-9','사도행전 4:12','요한복음 1:12','누가복음 19:10','이사야 53:5']},
+{name:'🌱 믿음 · 의지',refs:['잠언 3:5-6','시편 37:5','히브리서 11:1','마가복음 10:27','누가복음 1:37','요한복음 15:5','요한복음 15:7','빌립보서 4:13','히브리서 12:2','고린도후서 12:9']},
+{name:'🛡️ 용기 · 평안 · 위로',refs:['이사야 41:10','여호수아 1:9','시편 23:1','시편 27:1','시편 46:1','시편 91:1-2','시편 121:1-2','마태복음 11:28','요한복음 14:1','요한복음 14:27']},
+{name:'🙏 기도 · 감사 · 찬양',refs:['빌립보서 4:6-7','데살로니가전서 5:16-18','마태복음 6:9-13','마태복음 7:7','예레미야 33:3','시편 100:4','시편 103:1-2','시편 19:14','시편 139:14','베드로전서 5:7']},
+{name:'📖 말씀 · 지혜',refs:['시편 119:105','시편 1:1-2','잠언 9:10','디모데후서 3:16-17','야고보서 1:5','야고보서 1:22','요한복음 1:1','요한복음 8:32','잠언 4:23','빌립보서 4:8']},
+{name:'🤝 사랑 · 관계 · 가정',refs:['고린도전서 13:4-7','고린도전서 13:13','요한복음 13:34-35','요한일서 4:19','마태복음 22:37-39','누가복음 6:31','잠언 17:17','에베소서 4:32','에베소서 6:1-3','잠언 22:6']},
+{name:'🧭 하나님의 인도 · 계획',refs:['예레미야 29:11','로마서 8:28','잠언 16:9','잠언 16:3','마태복음 6:33','마태복음 6:34','전도서 3:1','이사야 40:31','이사야 43:1','로마서 8:38-39']},
+{name:'🍇 그리스도인의 삶 · 성품',refs:['로마서 12:2','로마서 12:1','갈라디아서 2:20','고린도후서 5:17','갈라디아서 5:22-23','빌립보서 2:3-4','골로새서 3:23','고린도전서 10:31','고린도전서 10:13','미가 6:8']},
+{name:'✝️ 예수님 · 복음 · 사명',refs:['요한복음 14:6','요한복음 10:11','요한복음 10:10','요한복음 11:25-26','로마서 1:16','사도행전 1:8','마태복음 28:19-20','마태복음 5:14','마태복음 5:16','마태복음 18:20']},
+{name:'👑 하나님 · 창조 · 거룩한 삶',refs:['창세기 1:1','창세기 1:27','출애굽기 20:3','신명기 6:5','여호수아 24:15','시편 34:8','시편 51:10','요한일서 1:9','로마서 8:1','에베소서 6:10-11']}
+]
 const packTexts={
 '시편 23편 1절':'여호와는 나의 목자시니 내게 부족함이 없으리로다',
 '빌립보서 4장 13절':'내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라'
 };
+const versePreviews={
+'요한복음 3:16':'하나님이 세상을 이처럼 사랑하사…','로마서 5:8':'우리가 아직 죄인 되었을 때에…','로마서 3:23-24':'모든 사람이 죄를 범하였으매…','로마서 6:23':'죄의 삯은 사망이요…','로마서 10:9-10':'네가 만일 네 입으로…','에베소서 2:8-9':'너희는 그 은혜에 의하여…','사도행전 4:12':'다른 이로써는 구원을 받을 수 없나니…','요한복음 1:12':'영접하는 자 곧 그 이름을 믿는 자들에게는…','누가복음 19:10':'인자가 온 것은 잃어버린 자를…','이사야 53:5':'그가 찔림은 우리의 허물 때문이요…',
+'잠언 3:5-6':'너는 마음을 다하여 여호와를 신뢰하고…','시편 37:5':'네 길을 여호와께 맡기라…','히브리서 11:1':'믿음은 바라는 것들의 실상이요…','마가복음 10:27':'사람으로는 할 수 없으되…','누가복음 1:37':'대저 하나님의 모든 말씀은…','요한복음 15:5':'나는 포도나무요 너희는 가지라…','요한복음 15:7':'너희가 내 안에 거하고…','빌립보서 4:13':'내게 능력 주시는 자 안에서…','히브리서 12:2':'믿음의 주요 또 온전하게 하시는 이인…','고린도후서 12:9':'나에게 이르시기를 내 은혜가 네게 족하도다…',
+'이사야 41:10':'두려워하지 말라 내가 너와 함께 함이라…','여호수아 1:9':'내가 네게 명령한 것이 아니냐…','시편 23:1':'여호와는 나의 목자시니…','시편 27:1':'여호와는 나의 빛이요 나의 구원이시니…','시편 46:1':'하나님은 우리의 피난처시요 힘이시니…','시편 91:1-2':'지존자의 은밀한 곳에 거주하며…','시편 121:1-2':'내가 산을 향하여 눈을 들리라…','마태복음 11:28':'수고하고 무거운 짐 진 자들아…','요한복음 14:1':'너희는 마음에 근심하지 말라…','요한복음 14:27':'평안을 너희에게 끼치노니…',
+'빌립보서 4:6-7':'아무 것도 염려하지 말고…','데살로니가전서 5:16-18':'항상 기뻐하라 쉬지 말고 기도하라…','마태복음 6:9-13':'그러므로 너희는 이렇게 기도하라…','마태복음 7:7':'구하라 그리하면 너희에게 주실 것이요…','예레미야 33:3':'너는 내게 부르짖으라…','시편 100:4':'감사함으로 그의 문에 들어가며…','시편 103:1-2':'내 영혼아 여호와를 송축하라…','시편 19:14':'나의 반석이시요 나의 구속자이신…','시편 139:14':'내가 주께 감사하옴은…','베드로전서 5:7':'너희 염려를 다 주께 맡기라…',
+'시편 119:105':'주의 말씀은 내 발에 등이요…','시편 1:1-2':'복 있는 사람은 악인들의 꾀를…','잠언 9:10':'여호와를 경외하는 것이 지혜의 근본이요…','디모데후서 3:16-17':'모든 성경은 하나님의 감동으로 된 것으로…','야고보서 1:5':'너희 중에 누구든지 지혜가 부족하거든…','야고보서 1:22':'너희는 말씀을 행하는 자가 되고…','요한복음 1:1':'태초에 말씀이 계시니라…','요한복음 8:32':'진리를 알지니 진리가 너희를…','잠언 4:23':'모든 지킬 만한 것 중에…','빌립보서 4:8':'끝으로 형제들아 무엇에든지 참되며…',
+'고린도전서 13:4-7':'사랑은 오래 참고 사랑은 온유하며…','고린도전서 13:13':'그런즉 믿음, 소망, 사랑…','요한복음 13:34-35':'새 계명을 너희에게 주노니…','요한일서 4:19':'우리가 사랑함은 그가 먼저…','마태복음 22:37-39':'네 마음을 다하고 목숨을 다하고…','누가복음 6:31':'남에게 대접을 받고자 하는 대로…','잠언 17:17':'친구는 사랑이 끊어지지 아니하고…','에베소서 4:32':'서로 친절하게 하며 불쌍히 여기며…','에베소서 6:1-3':'자녀들아 주 안에서 너희 부모에게 순종하라…','잠언 22:6':'마땅히 행할 길을 아이에게 가르치라…',
+'예레미야 29:11':'여호와의 말씀이니라…','로마서 8:28':'우리가 알거니와 하나님을 사랑하는 자…','잠언 16:9':'사람이 마음으로 자기의 길을 계획할지라도…','잠언 16:3':'너의 행사를 여호와께 맡기라…','마태복음 6:33':'그런즉 너희는 먼저 그의 나라와…','마태복음 6:34':'그러므로 내일 일을 위하여 염려하지 말라…','전도서 3:1':'범사에 기한이 있고…','이사야 40:31':'오직 여호와를 앙망하는 자는…','이사야 43:1':'야곱아 너를 창조하신 여호와께서…','로마서 8:38-39':'내가 확신하노니 사망이나 생명이나…',
+'로마서 12:2':'너희는 이 세대를 본받지 말고…','로마서 12:1':'그러므로 형제들아 내가 하나님의 모든 자비하심으로…','갈라디아서 2:20':'내가 그리스도와 함께 십자가에 못 박혔나니…','고린도후서 5:17':'그런즉 누구든지 그리스도 안에 있으면…','갈라디아서 5:22-23':'오직 성령의 열매는 사랑과 희락과…','빌립보서 2:3-4':'아무 일에든지 다툼이나 허영으로 하지 말고…','골로새서 3:23':'무슨 일을 하든지 마음을 다하여…','고린도전서 10:31':'그런즉 너희가 먹든지 마시든지…','고린도전서 10:13':'사람이 감당할 시험 밖에는…','미가 6:8':'사람아 주께서 선한 것이 무엇임을…',
+'요한복음 14:6':'예수께서 이르시되 내가 곧 길이요…','요한복음 10:11':'나는 선한 목자라…','요한복음 10:10':'도둑이 오는 것은 도둑질하고…','요한복음 11:25-26':'나는 부활이요 생명이니…','로마서 1:16':'내가 복음을 부끄러워하지 아니하노니…','사도행전 1:8':'오직 성령이 너희에게 임하시면…','마태복음 28:19-20':'그러므로 너희는 가서 모든 민족을…','마태복음 5:14':'너희는 세상의 빛이라…','마태복음 5:16':'이같이 너희 빛이 사람 앞에…','마태복음 18:20':'두세 사람이 내 이름으로 모인 곳에는…',
+'창세기 1:1':'태초에 하나님이 천지를 창조하시니라','창세기 1:27':'하나님이 자기 형상 곧…','출애굽기 20:3':'너는 나 외에는 다른 신들을…','신명기 6:5':'너는 마음을 다하고 뜻을 다하고…','여호수아 24:15':'만일 여호와를 섬기는 것이…','시편 34:8':'너희는 여호와의 선하심을 맛보아 알지어다…','시편 51:10':'하나님이여 내 속에 정한 마음을…','요한일서 1:9':'만일 우리가 우리 죄를 자백하면…','로마서 8:1':'그러므로 이제 그리스도 예수 안에 있는…','에베소서 6:10-11':'끝으로 너희가 주 안에서와…'
+};
+
 let data=JSON.parse(localStorage.getItem(KEY)||'null')||seed, biblePacks=[], stage=0, reciteStep=0, speech=null, currentPackIndex=0, currentPackVerseIndex=0, feedMode=false;
 const stages=[
 {label:'1단계 · 말씀 읽기',title:'천천히 말씀을 읽어 보세요.',img:'assets/sheep/sheep-read.webp',btn:'다 읽었어요'},
@@ -156,7 +169,7 @@ const spiritualWeapons=[
 {id:'righteousness',icon:'🦺',name:'의의 흉배',desc:'바른 마음을 지켜요',cost:50},
 {id:'peace',icon:'👟',name:'평안의 신',desc:'평안의 길을 걸어요',cost:40}
 ];
-function migrateData(){if(!Array.isArray(data.biblePacks))data.biblePacks=JSON.parse(JSON.stringify(defaultBiblePacks));if(!data.packTexts||typeof data.packTexts!=='object')data.packTexts={...packTexts};biblePacks=data.biblePacks;if(typeof data.hay!=='number')data.hay=0;if(typeof data.gems!=='number')data.gems=0;if(!Array.isArray(data.weapons))data.weapons=[];data.verses.forEach(v=>{if(typeof v.fed!=='number')v.fed=0});persist()}
+function migrateData(){if(!Array.isArray(data.biblePacks)||data.biblePacks.length!==10||data.biblePacks.some(p=>!Array.isArray(p.refs)||p.refs.length!==10))data.biblePacks=JSON.parse(JSON.stringify(defaultBiblePacks));if(!data.packTexts||typeof data.packTexts!=='object')data.packTexts={...packTexts};biblePacks=data.biblePacks;if(typeof data.hay!=='number')data.hay=0;if(typeof data.gems!=='number')data.gems=0;if(!Array.isArray(data.weapons))data.weapons=[];data.verses.forEach(v=>{if(typeof v.fed!=='number')v.fed=0});persist()}
 function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
 function current(){return data.verses[data.active]||data.verses[0]}
 function ensurePackVerse(ref){let i=data.verses.findIndex(v=>v.ref===ref);if(i>=0)return i;const text=data.packTexts[ref]||packTexts[ref]||'본문 준비 중인 말씀입니다.';data.verses.push({ref,text,reviews:0,provided:true});persist();return data.verses.length-1}
@@ -168,8 +181,8 @@ function cancelPackEdit(doRender=true){adminRef.value='';adminText.value='';admi
 function deletePackVerse(pi,ri){const ref=biblePacks[pi].refs[ri];if(!confirm(ref+'을(를) 이 패키지에서 삭제할까요?'))return;biblePacks[pi].refs.splice(ri,1);data.biblePacks=biblePacks;persist();render();toast('패키지에서 성구를 삭제했어요.')}
 function deletePack(pi){if(biblePacks.length<=1){toast('패키지는 하나 이상 남겨 주세요.');return}if(!confirm(biblePacks[pi].name+' 패키지를 삭제할까요?'))return;biblePacks.splice(pi,1);data.biblePacks=biblePacks;currentPackIndex=Math.min(currentPackIndex,biblePacks.length-1);currentPackVerseIndex=0;persist();render();toast('패키지를 삭제했어요.')}
 function renderTodayPicker(){if(!window.todayPackSelect||!window.todayChoiceList)return;todayPackSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}">${escapeHtml(p.name)}</option>`).join('');renderTodayChoices(Number(todayPackSelect.value)||0)}
-function renderTodayChoices(pi){if(!window.todayChoiceList)return;const p=biblePacks[pi];if(!p){todayChoiceList.innerHTML='';return}todayChoiceList.innerHTML=p.refs.map((ref,i)=>{const text=data.packTexts[ref]||packTexts[ref]||'';const active=current()?.ref===ref;return `<button type="button" class="today-item ${active?'on':''}" onclick="chooseTodayVerse(${pi},${i})"><strong>${escapeHtml(ref)}</strong><span>${text?escapeHtml(text):'말씀 본문 준비 중'}</span></button>`}).join('')}
-function chooseTodayVerse(pi,ri){const ref=biblePacks[pi].refs[ri];const text=data.packTexts[ref]||packTexts[ref];if(!text){toast('이 말씀은 본문을 준비 중이에요.');return}let i=data.verses.findIndex(v=>v.ref===ref);if(i<0){data.verses.push({ref,text,reviews:0,provided:true});i=data.verses.length-1}else data.verses[i].text=text;data.active=i;currentPackIndex=pi;currentPackVerseIndex=ri;persist();render();toast('오늘 암송할 말씀을 선택했어요.')}
+function renderTodayChoices(pi){if(!window.todayChoiceList)return;const p=biblePacks[pi];if(!p){todayChoiceList.innerHTML='';return}todayChoiceList.innerHTML=p.refs.map((ref,i)=>{const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref]||'';const active=current()?.ref===ref;return `<button type="button" class="today-item ${active?'on':''}" onclick="chooseTodayVerse(${pi},${i})"><strong>${escapeHtml(ref)}</strong><span>${text?escapeHtml(text):'말씀 본문 준비 중'}</span></button>`}).join('')}
+function chooseTodayVerse(pi,ri){const ref=biblePacks[pi].refs[ri];const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref];if(!text){toast('이 말씀은 본문을 준비 중이에요.');return}let i=data.verses.findIndex(v=>v.ref===ref);if(i<0){data.verses.push({ref,text,reviews:0,provided:true});i=data.verses.length-1}else data.verses[i].text=text;data.active=i;currentPackIndex=pi;currentPackVerseIndex=ri;persist();render();toast('오늘 암송할 말씀을 선택했어요.')}
 function renderPackUI(){if(!window.packSelect||!window.packVerses)return;packSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}" ${i===currentPackIndex?'selected':''}>${p.name}</option>`).join('');const p=biblePacks[currentPackIndex];if(!p){packVerses.innerHTML='';return}packVerses.innerHTML=p.refs.map((ref,i)=>`<button type="button" class="pack-verse ${i===currentPackVerseIndex?'on':''}" onclick="selectPackVerse(${i})"><strong>${ref}</strong><span>${i===currentPackVerseIndex?'현재 암송 말씀':'이 말씀 암송하기'}</span></button>`).join('')}
 function selectPack(value){currentPackIndex=Number(value)||0;currentPackVerseIndex=0;if(biblePacks[currentPackIndex]?.refs.length)selectPackVerse(0);else renderPackUI()}
 function selectPackVerse(i){currentPackVerseIndex=i;const ref=biblePacks[currentPackIndex].refs[i];data.active=ensurePackVerse(ref);stage=2;reciteStep=0;stopSpeech();renderStage();renderPackUI()}
