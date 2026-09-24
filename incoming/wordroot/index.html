@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>말씀루트</title>
+<meta name="description" content="말씀을 읽고 생각하고 암송하며 나만의 목장을 키우는 말씀 기억 앱">
+<style>
+:root{--green:#3d7b4c;--deep:#285a37;--cream:#fffaf0;--card:rgba(255,255,255,.9);--shadow:0 10px 30px rgba(46,74,43,.15)}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#314033;background:#eef5df}
+button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin:auto;background:#f7f5e9;position:relative;padding-bottom:84px;overflow:hidden}
+.screen{display:none;min-height:calc(100dvh - 84px)}.screen.active{display:block}
+.home{background:url('assets/backgrounds/bg-home-01.webp') center top/cover no-repeat;padding:18px 18px 36px}
+.logo{display:block;width:min(72%,360px);margin:0 auto 4px}.card{background:var(--card);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.eyebrow{font-size:13px;font-weight:800;color:var(--green)}h1,h2,p{margin-top:0}.verse{font-size:21px;line-height:1.65;font-weight:750;margin:12px 0}.ref{font-size:14px;color:#657064}
+.primary,.secondary{width:100%;border:0;border-radius:16px;padding:15px 16px;font-weight:800;margin-top:10px}.primary{background:var(--green);color:white}.secondary{background:#edf4e8;color:var(--deep)}
+.hero-sheep{display:block;width:46%;margin:8px auto -4px}.section-title{margin:22px 4px 10px;font-size:18px}
+.memory{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini{background:rgba(255,255,255,.88);border:0;border-radius:18px;padding:14px;text-align:left;box-shadow:var(--shadow)}.mini strong{display:block;margin-bottom:5px}
+.flow{padding:20px;background:linear-gradient(#f5f1df,#e7f1d9)}.flow img{display:block;width:min(72%,340px);margin:6px auto 10px}.step{display:flex;gap:8px;justify-content:center;margin-bottom:14px}.dot{width:10px;height:10px;border-radius:50%;background:#c7d3bf}.dot.on{background:var(--green)}
+.answer{width:100%;min-height:110px;border:1px solid #d9dfd4;border-radius:16px;padding:14px;background:white}.hint{font-size:14px;color:#657064;line-height:1.6}
+.pasture{min-height:calc(100dvh - 84px);background:url('assets/backgrounds/bg-pasture.webp') center/cover no-repeat;position:relative;padding:18px}.nameplate{position:relative;width:76%;margin:4px auto}.nameplate img{width:100%;display:block}.nameplate span{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#684a2e;font-size:20px}
+.pasture-sheep{position:absolute;width:34%;left:33%;top:45%;filter:drop-shadow(0 8px 8px rgba(55,70,38,.18));cursor:pointer}.pasture-tip{position:absolute;left:18px;right:18px;bottom:24px;background:rgba(255,255,255,.9);border-radius:18px;padding:12px 14px;text-align:center;font-size:14px}
+.form{padding:20px;background:#f7f5e9}.field{margin:12px 0}.field label{display:block;font-weight:800;margin-bottom:6px}.field input,.field textarea{width:100%;border:1px solid #d9dfd4;border-radius:14px;padding:13px;background:white}
+.nav{position:fixed;z-index:10;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);border-top:1px solid #e4e8df;padding:8px 6px calc(8px + env(safe-area-inset-bottom))}
+.nav button{border:0;background:transparent;padding:8px 2px;font-size:12px;color:#687266}.nav button.active{color:var(--green);font-weight:900}.nav b{display:block;font-size:20px;margin-bottom:2px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:#2f4434;color:white;padding:10px 15px;border-radius:99px;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%)}
+
+.pasture-world{position:absolute;inset:0;overflow:hidden;pointer-events:none}.pasture-world img{position:absolute;object-fit:contain;filter:drop-shadow(0 5px 6px rgba(55,70,38,.12))}
+.world-tree{width:31%;right:-4%;top:23%}.world-tree.left{width:25%;left:-6%;right:auto;top:29%}.world-pond{width:40%;right:-6%;bottom:12%}.world-bridge{width:28%;right:5%;bottom:23%}.world-bench{width:23%;left:5%;bottom:19%}.world-fence{width:42%;left:-7%;top:35%}.world-lamp{width:10%;right:9%;top:40%}.world-grass{width:19%;left:6%;bottom:9%}.world-bush{width:21%;right:9%;bottom:5%}
+.sheep-layer{position:absolute;inset:0;z-index:3}.verse-sheep{position:absolute;border:0;background:transparent;padding:0;cursor:pointer;filter:drop-shadow(0 7px 7px rgba(55,70,38,.18));animation:bob 3.8s ease-in-out infinite}.verse-sheep img{display:block;width:100%;height:auto}.verse-sheep .badge{position:absolute;left:50%;bottom:-2px;transform:translate(-50%,100%);white-space:nowrap;background:rgba(255,255,255,.9);padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;color:#53634f;box-shadow:0 3px 10px rgba(0,0,0,.08)}
+@keyframes bob{50%{transform:translateY(-5px)}}.verse-sheep:nth-child(2n){animation-delay:-1.4s}.verse-sheep:nth-child(3n){animation-delay:-2.1s}
+.growth-fx{position:fixed;z-index:50;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,252,235,.68);backdrop-filter:blur(3px)}.growth-fx.show{display:flex}.growth-wrap{position:relative;width:min(86vw,430px);aspect-ratio:1/1}.growth-wrap .spark{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;animation:pop .7s ease both}.growth-wrap .reward{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}.growth-copy{position:absolute;inset:29% 17% 24%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.growth-copy img{width:50%;max-height:55%;object-fit:contain}.growth-copy h2{margin:5px 0;color:#35643f}.growth-copy p{font-size:14px}.growth-copy button{width:auto;padding:11px 24px}
+@keyframes pop{0%{opacity:0;transform:scale(.65) rotate(-8deg)}70%{opacity:1;transform:scale(1.08)}100%{transform:scale(1)}}
+</style>
+</head>
+<body><main class="app">
+<section id="home" class="screen home active">
+<img class="logo" src="assets/ui/logo-main.webp" alt="말씀루트">
+<div class="card">
+<div class="eyebrow">오늘의 말씀</div>
+<div class="verse" id="todayVerse">내가 너와 함께 있어 네가 어디로 가든지 너를 지키며</div>
+<div class="ref" id="todayRef">창세기 28장 15절</div>
+<button class="primary" onclick="startFlow(0)">오늘의 말씀 시작하기</button>
+<button class="secondary" onclick="showScreen('register')">＋ 나의 말씀 등록</button>
+</div>
+<img class="hero-sheep" src="assets/sheep/sheep-basic.webp" alt="">
+<h2 class="section-title">나의 말씀기억</h2><div class="memory" id="memoryList"></div>
+</section>
+
+<section id="learn" class="screen flow">
+<div class="step"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
+<div class="card"><div class="eyebrow" id="stageLabel">1단계 · 말씀 읽기</div>
+<img id="stageSheep" src="assets/sheep/sheep-read.webp" alt="">
+<h2 id="stageTitle">천천히 말씀을 읽어 보세요.</h2><p class="verse" id="learnVerse"></p><p class="ref" id="learnRef"></p>
+<div id="thinkBox" hidden><textarea id="thought" class="answer" placeholder="이 말씀에서 기억하고 싶은 것을 적어 보세요."></textarea></div>
+<div id="reciteBox" hidden><p class="hint">말씀을 가리고 기억나는 만큼 말해 보세요. 준비되면 확인합니다.</p></div>
+<button class="primary" id="nextBtn" onclick="nextStage()">다 읽었어요</button>
+</div></section>
+
+<section id="pasture" class="screen pasture">
+<div class="pasture-world" id="pastureWorld" aria-hidden="true">
+<img class="world-tree left" id="treeLeft"><img class="world-tree" id="treeRight">
+<img class="world-fence" src="assets/pasture/fence-02.webp">
+<img class="world-bench" src="assets/pasture/bench-01.webp">
+<img class="world-pond" id="worldPond"><img class="world-bridge" src="assets/pasture/bridge-01.webp">
+<img class="world-lamp" src="assets/pasture/lamp-01.webp">
+<img class="world-grass" id="worldGrass"><img class="world-bush" id="worldBush">
+</div>
+<div class="nameplate" style="z-index:5"><img src="assets/ui/pasture-nameplate.webp" alt=""><span>나의 목장</span></div>
+<div class="sheep-layer" id="sheepLayer"></div>
+<div class="pasture-tip" style="z-index:5">양 한 마리가 말씀 하나를 기억해요. 양을 누르면 그 말씀을 다시 복습합니다.</div>
+</section>
+
+<section id="register" class="screen form"><div class="card">
+<div class="eyebrow">나의 말씀 등록</div><h2>기억하고 싶은 말씀을 적어 주세요.</h2>
+<div class="field"><label for="reference">성경 구절</label><input id="reference" placeholder="예: 시편 23편 1절"></div>
+<div class="field"><label for="verseText">말씀</label><textarea id="verseText" class="answer" placeholder="말씀 내용을 입력하세요."></textarea></div>
+<button class="primary" onclick="saveVerse()">말씀 저장하기</button>
+</div></section>
+
+<section id="community" class="screen form"><div class="card"><div class="eyebrow">공동체</div><h2>함께 기억하는 말씀</h2><p>공동체 기능은 다음 버전에서 연결합니다.</p></div></section>
+<section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
+
+<div class="growth-fx" id="growthFx"><div class="growth-wrap">
+<img class="spark" src="assets/ui/sparkle-01.webp" alt=""><img class="reward" src="assets/ui/reward-frame.webp" alt="">
+<div class="growth-copy"><img id="grownSheep" src="assets/sheep/sheep-basic.webp" alt=""><h2>말씀 성장!</h2><p id="growthText">복습으로 양이 자랐어요.</p><button class="primary" onclick="closeGrowth()">목장으로 가기</button></div>
+</div></div>
+<nav class="nav">
+<button class="active" data-screen="home" onclick="showScreen('home',this)"><b>⌂</b>홈</button>
+<button data-screen="learn" onclick="startFlow(0,this)"><b>▣</b>암송</button>
+<button data-screen="register" onclick="showScreen('register',this)"><b>✎</b>묵상</button>
+<button data-screen="community" onclick="showScreen('community',this)"><b>♡</b>공동체</button>
+<button data-screen="mypage" onclick="showScreen('mypage',this)"><b>●</b>마이</button>
+</nav><div id="toast" class="toast"></div>
+</main>
+<script>
+const KEY='wordroot-v2';
+const seed={verses:[
+{ref:'창세기 28장 15절',text:'내가 너와 함께 있어 네가 어디로 가든지 너를 지키며',reviews:0},
+{ref:'시편 23편 1절',text:'여호와는 나의 목자시니 내게 부족함이 없으리로다',reviews:2},
+{ref:'빌립보서 4장 13절',text:'내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라',reviews:4}
+],active:0};
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||seed, stage=0;
+const stages=[
+{label:'1단계 · 말씀 읽기',title:'천천히 말씀을 읽어 보세요.',img:'assets/sheep/sheep-read.webp',btn:'다 읽었어요'},
+{label:'2단계 · 말씀 생각하기',title:'말씀을 생각해 보세요.',img:'assets/sheep/sheep-think.webp',btn:'생각했어요'},
+{label:'3단계 · 말씀 암송하기',title:'이제 말씀을 기억해서 말해 보세요.',img:'assets/sheep/sheep-recite.webp',btn:'암송 완료'}
+];
+function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+function current(){return data.verses[data.active]||data.verses[0]}
+function showScreen(id,btn){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(btn)btn.classList.add('active');render()}
+function render(){let v=current();if(v){todayVerse.textContent=v.text;todayRef.textContent=v.ref}memoryList.innerHTML=data.verses.slice(0,6).map((v,i)=>`<button class="mini" onclick="startFlow(${i})"><strong>${v.ref}</strong><span>${v.text.slice(0,28)}${v.text.length>28?'…':''}</span></button>`).join('');stats.textContent=`기억 중인 말씀 ${data.verses.length}개 · 총 복습 ${data.verses.reduce((a,v)=>a+(v.reviews||0),0)}회`;renderPasture()}
+function pastureLevel(){return Math.min(3,Math.floor(data.verses.reduce((a,v)=>a+(v.reviews||0),0)/4))}
+function renderPasture(){const level=pastureLevel();treeLeft.src=`assets/plants/tree-${Math.min(4,level+1).toString().padStart(2,'0')}.webp`;treeRight.src=`assets/plants/tree-${Math.min(4,level+1).toString().padStart(2,'0')}.webp`;worldGrass.src=`assets/plants/grass-${Math.min(3,level+1).toString().padStart(2,'0')}.webp`;worldBush.src=`assets/plants/bush-${level>1?'02':'01'}.webp`;worldPond.src=`assets/pasture/pond-${level>1?'02':'01'}.webp`;const pos=[[13,51],[43,43],[62,57],[25,67],[53,69],[72,37],[7,38],[37,58]];sheepLayer.innerHTML=data.verses.map((v,i)=>{const [x,y]=pos[i%pos.length];const size=26-(i%3)*2;return `<button class="verse-sheep" style="left:${x}%;top:${y}%;width:${size}%;" onclick="startFlow(${i})" aria-label="${v.ref} 복습"><img src="${growthImage(v.reviews||0)}" alt=""><span class="badge">${v.ref}</span></button>`}).join('')}
+function growthImage(n){return ['assets/sheep/sheep-basic.webp','assets/sheep/sheep-sprout.webp','assets/sheep/sheep-scarf.webp','assets/sheep/sheep-flower.webp','assets/sheep/sheep-crown.webp','assets/sheep/sheep-explorer.webp'][Math.min(5,Math.floor(n/2))]}
+function startFlow(i=0,btn){data.active=Math.min(i,data.verses.length-1);persist();stage=0;showScreen('learn',btn);renderStage()}
+function renderStage(){let s=stages[stage],v=current();stageLabel.textContent=s.label;stageTitle.textContent=s.title;stageSheep.src=s.img;learnVerse.textContent=stage===2?'•••• •••• ••••':v.text;learnRef.textContent=v.ref;nextBtn.textContent=s.btn;thinkBox.hidden=stage!==1;reciteBox.hidden=stage!==2;document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i<=stage))}
+function nextStage(){if(stage<2){stage++;renderStage();return}let v=current(),before=Math.min(5,Math.floor((v.reviews||0)/2));v.reviews=(v.reviews||0)+1;persist();let after=Math.min(5,Math.floor(v.reviews/2));render();if(after>before){grownSheep.src=growthImage(v.reviews);growthText.textContent=`${v.ref}을 ${v.reviews}번 복습했어요. 양이 새로운 모습으로 성장했습니다.`;growthFx.classList.add('show')}else{toast('복습 완료! 말씀 기억이 더 단단해졌어요.');showScreen('pasture')}}
+function closeGrowth(){growthFx.classList.remove('show');showScreen('pasture')}
+function saveVerse(){let ref=reference.value.trim(),text=verseText.value.trim();if(!ref||!text){toast('성경 구절과 말씀을 모두 입력해 주세요.');return}data.verses.unshift({ref,text,reviews:0});data.active=0;persist();reference.value='';verseText.value='';toast('말씀이 저장되었어요. 새로운 양이 생겼어요.');showScreen('home')}
+function reviewFirst(){if(data.verses.length)startFlow(data.active)}
+function resetData(){if(confirm('연습 데이터를 초기화할까요?')){data=JSON.parse(JSON.stringify(seed));persist();render();toast('초기화했어요.')}}
+function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+render();
+</script></body></html>
