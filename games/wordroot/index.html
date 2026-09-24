@@ -49,6 +49,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 .pasture .sheep-layer{margin-top:6px}
 .memory .memory-sheep{display:flex;align-items:center;gap:10px;text-align:left}.memory .memory-sheep>img{width:58px;height:58px;flex:0 0 58px;object-fit:contain}.memory-copy{display:block;min-width:0}.memory-copy>span{display:block;margin-top:4px}.memory-copy small{display:block;margin-top:7px;color:#71806f;font-size:11px;font-weight:750}
 .weapon-scroll{max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px}.owned-weapon-box{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 14px;min-height:88px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}.owned-weapon-box::-webkit-scrollbar{display:none}.owned-weapon-item{flex:0 0 92px;scroll-snap-align:start;text-align:center;background:#fffaf0;border:1px solid rgba(111,139,92,.18);border-radius:16px;padding:10px 7px}.owned-weapon-item .weapon-icon{font-size:30px}.owned-weapon-item strong{display:block;font-size:11px;line-height:1.3;margin-top:5px}.owned-empty{width:100%;padding:18px;text-align:center;color:#71806f;background:#f7f4e9;border-radius:16px;font-size:13px}
+.weapon-modal{position:fixed;inset:0;z-index:90;background:rgba(37,47,36,.42);display:none;align-items:flex-end;justify-content:center}.weapon-modal.show{display:flex}.weapon-sheet{width:min(100%,560px);height:88vh;background:#fbfcf7;border-radius:26px 26px 0 0;padding:18px 18px 24px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 -12px 40px rgba(0,0,0,.16)}.weapon-sheet h3{margin:14px 0 4px;color:#35643f}.weapon-balance{align-self:flex-end;background:#fff7d9;border-radius:999px;padding:7px 11px;font-weight:900}.weapon-modal-list{flex:1;min-height:0;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 3px 28px}.weapon-modal-list .weapon-card{flex:none}.weapon-sheet .owned-weapon-box{flex:0 0 auto;min-height:92px;max-height:112px}
 @media (prefers-reduced-motion:reduce){.verse-sheep,.growth-wrap .spark{animation:none}}
 </style>
 </head>
@@ -98,7 +99,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 </div>
 <div class="nameplate" style="z-index:5"><img src="assets/ui/pasture-nameplate.webp" alt=""><span>나의 목장</span></div>
 <div class="wallet"><span id="hayWallet">🌾 건초 0</span><span id="gemWallet">💎 보석 0</span></div>
-<div class="pasture-actions"><button id="feedModeBtn" type="button" onclick="toggleFeedMode()">🌾 양 먹이주기</button><button type="button" onclick="showScreen('mypage')">⚔️ 영적 무기</button></div>
+<div class="pasture-actions"><button id="feedModeBtn" type="button" onclick="toggleFeedMode()">🌾 양 먹이주기</button><button type="button" onclick="openWeapons()">⚔️ 영적 무기</button></div>
 <div class="sheep-layer" id="sheepLayer"></div>
 <div class="pasture-tip" style="z-index:5">양을 누르면 양우리로 이동해요.</div>
 </section>
@@ -121,7 +122,13 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><h2 class="section-title">나의 영적무기 상자</h2><p class="hint">내가 구입한 영적 무기를 모아 볼 수 있어요.</p><div id="ownedWeaponBox" class="owned-weapon-box"></div><h2 class="section-title">영적 무기 50개</h2><p class="hint">아래로 스크롤하며 암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list weapon-scroll"></div>
 <button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
 
-<div class="picker-modal" id="versePicker" onclick="pickerBackdrop(event)"><div class="picker-sheet">
+<div class="weapon-modal" id="weaponModal" onclick="weaponBackdrop(event)"><div class="weapon-sheet">
+<div class="picker-head"><h2>⚔️ 영적 무기</h2><button class="picker-close" type="button" onclick="closeWeapons()">×</button></div>
+<div class="weapon-balance" id="weaponBalance">💎 보석 0</div>
+<h3>나의 영적무기 상자</h3><div id="ownedWeaponModal" class="owned-weapon-box"></div>
+<h3>영적 무기 50개</h3><p class="hint">아래로 밀어서 50개를 모두 볼 수 있어요.</p>
+<div id="weaponModalList" class="weapon-list weapon-modal-list"></div>
+</div></div><div class="picker-modal" id="versePicker" onclick="pickerBackdrop(event)"><div class="picker-sheet">
 <div class="picker-head"><h2 id="pickerTitle">오늘의 말씀 주제</h2><button class="picker-close" type="button" onclick="closeVersePicker()">×</button></div>
 <div id="pickerBody"></div>
 </div></div>
@@ -210,7 +217,10 @@ function releaseSheep(i){if(!data.verses[i])return;data.verses[i].inPasture=true
 function renderWallet(){if(window.hayWallet)hayWallet.textContent='🌾 건초 '+data.hay;if(window.gemWallet)gemWallet.textContent='💎 보석 '+data.gems;if(window.myHay)myHay.textContent='🌾 건초 '+data.hay;if(window.myGems)myGems.textContent='💎 보석 '+data.gems}
 function toggleFeedMode(){feedMode=!feedMode;if(window.feedModeBtn){feedModeBtn.classList.toggle('on',feedMode);feedModeBtn.textContent=feedMode?'🌾 먹일 양을 선택':'🌾 양 먹이주기'}toast(feedMode?'건초를 먹일 양을 눌러 주세요.':'먹이주기를 종료했어요.')}
 function pastureSheepAction(i){if(!feedMode){moveSheepToPen(i);return}if(data.hay<1){toast('건초가 부족해요. 암송을 완료해 건초를 모아 주세요.');return}data.hay--;data.verses[i].fed=(data.verses[i].fed||0)+1;persist();renderWallet();const sheep=[...document.querySelectorAll('.verse-sheep')].find(b=>b.getAttribute('onclick')===`pastureSheepAction(${i})`);if(sheep){const img=sheep.querySelector('img');img.src='assets/sheep/sheep-eat.webp';setTimeout(()=>{img.src=growthImage(data.verses[i].reviews||0)},1200)}toast('냠냠! 양에게 건초 1개를 먹였어요.')}
-function renderWeapons(){if(!window.weaponList)return;weaponList.innerHTML=spiritualWeapons.map(w=>{const owned=data.weapons.includes(w.id);return `<div class="weapon-card ${owned?'owned':''}"><div class="weapon-icon">${w.icon}</div><div><strong>${w.name}</strong><small>${w.desc} · 💎 ${w.cost}</small></div><button type="button" onclick="buyWeapon('${w.id}')">${owned?'보유중':'구매'}</button></div>`}).join('');if(window.ownedWeaponBox){const owned=spiritualWeapons.filter(w=>data.weapons.includes(w.id));ownedWeaponBox.innerHTML=owned.length?owned.map(w=>`<div class="owned-weapon-item"><div class="weapon-icon">${w.icon}</div><strong>${w.name}</strong></div>`).join(''):'<div class="owned-empty">아직 모은 영적 무기가 없어요.</div>'}}
+function openWeapons(){renderWeapons();weaponModal.classList.add('show')}
+function closeWeapons(){weaponModal.classList.remove('show')}
+function weaponBackdrop(e){if(e.target===weaponModal)closeWeapons()}
+function renderWeapons(){if(!window.weaponList)return;weaponList.innerHTML=spiritualWeapons.map(w=>{const owned=data.weapons.includes(w.id);return `<div class="weapon-card ${owned?'owned':''}"><div class="weapon-icon">${w.icon}</div><div><strong>${w.name}</strong><small>${w.desc} · 💎 ${w.cost}</small></div><button type="button" onclick="buyWeapon('${w.id}')">${owned?'보유중':'구매'}</button></div>`}).join('');if(window.ownedWeaponBox){const owned=spiritualWeapons.filter(w=>data.weapons.includes(w.id));const ownedHtml=owned.length?owned.map(w=>`<div class="owned-weapon-item"><div class="weapon-icon">${w.icon}</div><strong>${w.name}</strong></div>`).join(''):'<div class="owned-empty">아직 모은 영적 무기가 없어요.</div>';ownedWeaponBox.innerHTML=ownedHtml;if(window.ownedWeaponModal)ownedWeaponModal.innerHTML=ownedHtml}if(window.weaponModalList)weaponModalList.innerHTML=weaponList.innerHTML;if(window.weaponBalance)weaponBalance.textContent='💎 보석 '+data.gems}
 function buyWeapon(id){const w=spiritualWeapons.find(x=>x.id===id);if(!w||data.weapons.includes(id))return;if(data.gems<w.cost){toast('보석이 부족해요.');return}data.gems-=w.cost;data.weapons.push(id);persist();renderWallet();renderWeapons();toast(w.name+'을(를) 얻었어요!')}
 function grantCompletionReward(){data.hay+=10;data.gems+=10;persist();renderWallet()}
 function growthImage(n){return ['assets/sheep/sheep-basic.webp','assets/sheep/sheep-sprout.webp','assets/sheep/sheep-scarf.webp','assets/sheep/sheep-flower.webp','assets/sheep/sheep-crown.webp','assets/sheep/sheep-explorer.webp'][Math.min(5,Math.floor(n/2))]}
