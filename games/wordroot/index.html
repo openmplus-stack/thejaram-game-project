@@ -116,7 +116,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <button class="primary" onclick="saveVerse()">말씀 저장하기</button>
 </div></section>
 
-<section id="community" class="screen form"><div class="card"><div class="eyebrow">공동체</div><h2>함께 기억하는 말씀</h2><p>공동체 기능은 다음 버전에서 연결합니다.</p></div></section>
+
 <section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><h2 class="section-title">영적 무기</h2><p class="hint">암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list"></div>
 <button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
 
@@ -132,7 +132,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <button class="active" data-screen="home" onclick="showScreen('home',this)"><b>⌂</b>홈</button>
 <button data-screen="learn" onclick="startFlow(0,this)"><b>▣</b>암송</button>
 <button data-screen="home" onclick="showScreen('home',this)"><b>✎</b>말씀</button>
-<button data-screen="community" onclick="showScreen('community',this)"><b>♡</b>공동체</button>
+<button data-screen="pasture" onclick="showScreen('pasture',this)"><b>♧</b>목장</button>
 <button data-screen="mypage" onclick="showScreen('mypage',this)"><b>●</b>마이</button>
 </nav><div id="toast" class="toast"></div>
 </main>
