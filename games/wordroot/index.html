@@ -42,6 +42,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 .reward-pop{font-weight:900;color:#8b6a25;margin:6px 0}.weapon-list{display:grid;gap:10px;margin-top:12px}.weapon-card{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;border:1px solid #dfe5da;border-radius:16px;padding:11px;background:#fff}.weapon-icon{font-size:30px;text-align:center}.weapon-card strong{display:block}.weapon-card small{color:#6d786b}.weapon-card button{border:0;border-radius:11px;padding:9px 10px;background:#edf4e8;color:var(--deep);font-weight:850}.weapon-card.owned{background:#f1f7ed}.weapon-card.owned button{background:#dbe9d5}
 .admin-box{margin-top:22px;padding-top:18px;border-top:1px solid #e1e6dc}.admin-row{display:flex;gap:8px}.admin-row>*{flex:1}.admin-list{display:grid;gap:8px;margin-top:12px}.admin-item{border:1px solid #e0e6dc;border-radius:14px;padding:11px;background:#fff}.admin-item-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.admin-item button{border:0;border-radius:9px;padding:6px 8px;background:#edf4e8;color:var(--deep);font-weight:800;font-size:12px}.danger{color:#9b493f!important;background:#fff0ed!important}.tiny{font-size:12px;color:#71806f;margin-top:4px}
 .today-picker{margin-top:12px}.today-picker-title{font-size:13px;font-weight:850;color:var(--green);margin-bottom:8px}.today-pack{width:100%;border:1px solid #d8e2d3;border-radius:13px;padding:10px 12px;background:#fff;color:#314033;font-weight:750}.today-list{display:grid;gap:7px;margin-top:9px;max-height:230px;overflow:auto}.today-item{border:1px solid #e1e6dc;border-radius:13px;background:#fff;padding:10px 11px;text-align:left;color:#425141}.today-item.on{border-color:var(--green);background:#edf6e9}.today-item strong{display:block;font-size:13px}.today-item span{display:block;margin-top:3px;font-size:12px;color:#6d786b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.picker-trigger{width:100%;border:1px solid #d8e2d3;border-radius:14px;padding:13px 14px;background:#fff;text-align:left;font-weight:850;color:var(--deep);display:flex;justify-content:space-between;align-items:center}.picker-trigger span{color:#71806f;font-size:12px}.picker-modal{position:fixed;z-index:80;inset:0;background:rgba(34,48,35,.34);display:none;align-items:flex-end;justify-content:center}.picker-modal.show{display:flex}.picker-sheet{width:min(560px,100%);max-height:78dvh;overflow:auto;background:#fffdf7;border-radius:24px 24px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -12px 36px rgba(0,0,0,.14)}.picker-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.picker-head h2{margin:0;font-size:19px}.picker-close{border:0;background:#edf4e8;border-radius:999px;width:36px;height:36px;font-size:20px}.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.topic-btn{border:1px solid #e0e6dc;border-radius:15px;background:#fff;padding:13px 10px;text-align:left;font-weight:850;color:#40513f}.topic-btn small{display:block;color:#778375;font-weight:650;margin-top:3px}.verse-choice-list{display:grid;gap:8px}.verse-choice-btn{border:1px solid #e0e6dc;border-radius:14px;background:#fff;padding:12px;text-align:left;color:#40513f}.verse-choice-btn strong{display:block}.verse-choice-btn span{display:block;margin-top:4px;font-size:12px;color:#71806f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.back-btn{border:0;background:#edf4e8;border-radius:11px;padding:8px 11px;color:var(--deep);font-weight:800;margin-bottom:10px}
 @media (prefers-reduced-motion:reduce){.verse-sheep,.growth-wrap .spark{animation:none}}
 </style>
 </head>
@@ -54,9 +55,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <div class="ref" id="todayRef">창세기 28장 15절</div>
 <button class="primary" onclick="startFlow(data.active)">선택한 말씀 암송하기</button>
 <div class="today-picker">
-<div class="today-picker-title">오늘의 말씀에서 선택하기</div>
-<select id="todayPackSelect" class="today-pack" onchange="renderTodayChoices(Number(this.value))"></select>
-<div id="todayChoiceList" class="today-list"></div>
+<button class="picker-trigger" type="button" onclick="openVersePicker()"><b>📖 오늘의 말씀 선택</b><span>주제 선택 ›</span></button>
 </div>
 </div>
 <img class="hero-sheep" src="assets/sheep/sheep-basic.webp" alt="">
@@ -64,11 +63,6 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 </section>
 
 <section id="learn" class="screen flow">
-<div class="pack-panel">
-<label for="packSelect">오늘의 말씀 패키지</label>
-<select id="packSelect" class="pack-select" onchange="selectPack(this.value)"></select>
-<div id="packVerses" class="pack-verses"></div>
-</div>
 <div class="step"><i class="dot on"></i><i class="dot"></i><i class="dot"></i></div>
 <div class="card"><div class="eyebrow" id="stageLabel">1단계 · 말씀 읽기</div>
 <img id="stageSheep" src="assets/sheep/sheep-read.webp" alt="">
@@ -108,6 +102,10 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><h2 class="section-title">영적 무기</h2><p class="hint">암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list"></div>
 <button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
 
+<div class="picker-modal" id="versePicker" onclick="pickerBackdrop(event)"><div class="picker-sheet">
+<div class="picker-head"><h2 id="pickerTitle">오늘의 말씀 주제</h2><button class="picker-close" type="button" onclick="closeVersePicker()">×</button></div>
+<div id="pickerBody"></div>
+</div></div>
 <div class="growth-fx" id="growthFx"><div class="growth-wrap">
 <img class="spark" src="assets/ui/sparkle-01.webp" alt=""><img class="reward" src="assets/ui/reward-frame.webp" alt="">
 <div class="growth-copy"><img id="grownSheep" src="assets/sheep/sheep-basic.webp" alt=""><h2>말씀 성장!</h2><p id="growthText">복습으로 양이 자랐어요.</p><div class="reward-pop" id="rewardText">🌾 +10 &nbsp; 💎 +10</div><button class="primary" onclick="closeGrowth()">목장으로 가기</button></div>
@@ -180,9 +178,12 @@ function editPackVerse(pi,ri){const ref=biblePacks[pi].refs[ri];adminPackSelect.
 function cancelPackEdit(doRender=true){adminRef.value='';adminText.value='';adminEditRef.value='';if(doRender)renderPackAdmin()}
 function deletePackVerse(pi,ri){const ref=biblePacks[pi].refs[ri];if(!confirm(ref+'을(를) 이 패키지에서 삭제할까요?'))return;biblePacks[pi].refs.splice(ri,1);data.biblePacks=biblePacks;persist();render();toast('패키지에서 성구를 삭제했어요.')}
 function deletePack(pi){if(biblePacks.length<=1){toast('패키지는 하나 이상 남겨 주세요.');return}if(!confirm(biblePacks[pi].name+' 패키지를 삭제할까요?'))return;biblePacks.splice(pi,1);data.biblePacks=biblePacks;currentPackIndex=Math.min(currentPackIndex,biblePacks.length-1);currentPackVerseIndex=0;persist();render();toast('패키지를 삭제했어요.')}
-function renderTodayPicker(){if(!window.todayPackSelect||!window.todayChoiceList)return;todayPackSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}">${escapeHtml(p.name)}</option>`).join('');renderTodayChoices(Number(todayPackSelect.value)||0)}
-function renderTodayChoices(pi){if(!window.todayChoiceList)return;const p=biblePacks[pi];if(!p){todayChoiceList.innerHTML='';return}todayChoiceList.innerHTML=p.refs.map((ref,i)=>{const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref]||'';const active=current()?.ref===ref;return `<button type="button" class="today-item ${active?'on':''}" onclick="chooseTodayVerse(${pi},${i})"><strong>${escapeHtml(ref)}</strong><span>${text?escapeHtml(text):'말씀 본문 준비 중'}</span></button>`}).join('')}
-function chooseTodayVerse(pi,ri){const ref=biblePacks[pi].refs[ri];const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref];if(!text){toast('이 말씀은 본문을 준비 중이에요.');return}let i=data.verses.findIndex(v=>v.ref===ref);if(i<0){data.verses.push({ref,text,reviews:0,provided:true});i=data.verses.length-1}else data.verses[i].text=text;data.active=i;currentPackIndex=pi;currentPackVerseIndex=ri;persist();render();toast('오늘 암송할 말씀을 선택했어요.')}
+function renderTodayPicker(){}
+function openVersePicker(){pickerTitle.textContent='오늘의 말씀 주제';pickerBody.innerHTML='<div class="topic-grid">'+biblePacks.map((p,i)=>`<button type="button" class="topic-btn" onclick="showTopicVerses(${i})">${escapeHtml(p.name)}<small>말씀 10개</small></button>`).join('')+'</div>';versePicker.classList.add('show')}
+function showTopicVerses(pi){const p=biblePacks[pi];pickerTitle.textContent=p.name;pickerBody.innerHTML=`<button type="button" class="back-btn" onclick="openVersePicker()">‹ 주제로 돌아가기</button><div class="verse-choice-list">${p.refs.map((ref,ri)=>{const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref]||'';return `<button type="button" class="verse-choice-btn" onclick="chooseTodayVerse(${pi},${ri})"><strong>${escapeHtml(ref)}</strong><span>${escapeHtml(text)}</span></button>`}).join('')}</div>`}
+function closeVersePicker(){versePicker.classList.remove('show')}
+function pickerBackdrop(e){if(e.target===versePicker)closeVersePicker()}
+function chooseTodayVerse(pi,ri){const ref=biblePacks[pi].refs[ri];const text=data.packTexts[ref]||packTexts[ref]||versePreviews[ref];if(!text){toast('이 말씀은 본문을 준비 중이에요.');return}let i=data.verses.findIndex(v=>v.ref===ref);if(i<0){data.verses.push({ref,text,reviews:0,provided:true});i=data.verses.length-1}else data.verses[i].text=text;data.active=i;currentPackIndex=pi;currentPackVerseIndex=ri;persist();closeVersePicker();render();toast('오늘 암송할 말씀을 선택했어요.')}
 function renderPackUI(){if(!window.packSelect||!window.packVerses)return;packSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}" ${i===currentPackIndex?'selected':''}>${p.name}</option>`).join('');const p=biblePacks[currentPackIndex];if(!p){packVerses.innerHTML='';return}packVerses.innerHTML=p.refs.map((ref,i)=>`<button type="button" class="pack-verse ${i===currentPackVerseIndex?'on':''}" onclick="selectPackVerse(${i})"><strong>${ref}</strong><span>${i===currentPackVerseIndex?'현재 암송 말씀':'이 말씀 암송하기'}</span></button>`).join('')}
 function selectPack(value){currentPackIndex=Number(value)||0;currentPackVerseIndex=0;if(biblePacks[currentPackIndex]?.refs.length)selectPackVerse(0);else renderPackUI()}
 function selectPackVerse(i){currentPackVerseIndex=i;const ref=biblePacks[currentPackIndex].refs[i];data.active=ensurePackVerse(ref);stage=2;reciteStep=0;stopSpeech();renderStage();renderPackUI()}
