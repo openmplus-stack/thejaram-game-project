@@ -40,6 +40,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 .wallet{position:relative;z-index:6;display:flex;gap:8px;justify-content:center;margin:8px auto 0}.wallet span{background:rgba(255,255,255,.92);border-radius:999px;padding:7px 11px;font-size:13px;font-weight:850;box-shadow:0 3px 10px rgba(0,0,0,.08)}.pasture-actions{position:absolute;z-index:6;left:18px;right:18px;top:100px;display:flex;gap:8px}.pasture-actions button{flex:1;border:0;border-radius:13px;padding:10px;background:rgba(255,255,255,.92);font-weight:850;color:var(--deep)}.pasture-actions button.on{background:var(--green);color:white}
 .verse-sheep{--dx:22px;--dy:10px;animation:roam 8s ease-in-out infinite alternate}.verse-sheep:nth-child(2n){--dx:-26px;--dy:14px;animation-duration:10s}.verse-sheep:nth-child(3n){--dx:18px;--dy:-13px;animation-duration:12s}.verse-sheep:nth-child(4n){--dx:-18px;--dy:-9px;animation-duration:9s}@keyframes roam{0%{transform:translate(0,0)}35%{transform:translate(var(--dx),4px)}70%{transform:translate(calc(var(--dx)*.45),var(--dy))}100%{transform:translate(0,calc(var(--dy)*.35))}}
 .reward-pop{font-weight:900;color:#8b6a25;margin:6px 0}.weapon-list{display:grid;gap:10px;margin-top:12px}.weapon-card{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;border:1px solid #dfe5da;border-radius:16px;padding:11px;background:#fff}.weapon-icon{font-size:30px;text-align:center}.weapon-card strong{display:block}.weapon-card small{color:#6d786b}.weapon-card button{border:0;border-radius:11px;padding:9px 10px;background:#edf4e8;color:var(--deep);font-weight:850}.weapon-card.owned{background:#f1f7ed}.weapon-card.owned button{background:#dbe9d5}
+.admin-box{margin-top:22px;padding-top:18px;border-top:1px solid #e1e6dc}.admin-row{display:flex;gap:8px}.admin-row>*{flex:1}.admin-list{display:grid;gap:8px;margin-top:12px}.admin-item{border:1px solid #e0e6dc;border-radius:14px;padding:11px;background:#fff}.admin-item-head{display:flex;justify-content:space-between;gap:8px;align-items:center}.admin-item button{border:0;border-radius:9px;padding:6px 8px;background:#edf4e8;color:var(--deep);font-weight:800;font-size:12px}.danger{color:#9b493f!important;background:#fff0ed!important}.tiny{font-size:12px;color:#71806f;margin-top:4px}
 @media (prefers-reduced-motion:reduce){.verse-sheep,.growth-wrap .spark{animation:none}}
 </style>
 </head>
@@ -99,7 +100,20 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 </div></section>
 
 <section id="community" class="screen form"><div class="card"><div class="eyebrow">공동체</div><h2>함께 기억하는 말씀</h2><p>공동체 기능은 다음 버전에서 연결합니다.</p></div></section>
-<section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><h2 class="section-title">영적 무기</h2><p class="hint">암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list"></div><button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
+<section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><h2 class="section-title">영적 무기</h2><p class="hint">암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list"></div>
+<div class="admin-box">
+<div class="eyebrow">말씀 패키지 관리</div><h2>패키지와 성구 등록</h2>
+<p class="hint">여기에서 등록한 말씀은 암송 메뉴의 제공 말씀 패키지에 바로 나타납니다.</p>
+<div class="field"><label for="adminPackName">새 패키지 이름</label><div class="admin-row"><input id="adminPackName" placeholder="예: 감사 말씀"><button class="secondary" type="button" onclick="addPack()" style="margin:0">패키지 추가</button></div></div>
+<div class="field"><label for="adminPackSelect">성구를 넣을 패키지</label><select id="adminPackSelect" class="pack-select"></select></div>
+<div class="field"><label for="adminRef">성경 구절</label><input id="adminRef" placeholder="예: 시편 23편 1절"></div>
+<div class="field"><label for="adminText">말씀 본문</label><textarea id="adminText" class="answer" placeholder="정확한 성경 본문을 입력하세요."></textarea></div>
+<input type="hidden" id="adminEditRef">
+<button class="primary" type="button" onclick="savePackVerse()">성구 저장</button>
+<button class="secondary" type="button" onclick="cancelPackEdit()">입력 초기화</button>
+<div id="adminPackList" class="admin-list"></div>
+</div>
+<button class="secondary" onclick="resetData()">연습 데이터 초기화</button></div></section>
 
 <div class="growth-fx" id="growthFx"><div class="growth-wrap">
 <img class="spark" src="assets/ui/sparkle-01.webp" alt=""><img class="reward" src="assets/ui/reward-frame.webp" alt="">
@@ -120,7 +134,7 @@ const seed={verses:[
 {ref:'시편 23편 1절',text:'여호와는 나의 목자시니 내게 부족함이 없으리로다',reviews:2},
 {ref:'빌립보서 4장 13절',text:'내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라',reviews:4}
 ],active:0};
-const biblePacks=[
+const defaultBiblePacks=[
 {name:'초급 1 · 평안과 위로',refs:['시편 23편 1절','요한복음 14장 27절','빌립보서 4장 6절','마태복음 11장 28절','이사야 41장 10절']},
 {name:'초급 2 · 주기도문과 십계명',refs:['마태복음 6장 9절','마태복음 6장 10절','마태복음 6장 11절','출애굽기 20장 3절','출애굽기 20장 12절']},
 {name:'중급 1 · 로마서 핵심',refs:['로마서 1장 16절','로마서 3장 23절','로마서 6장 23절']},
@@ -136,7 +150,7 @@ const packTexts={
 '시편 23편 1절':'여호와는 나의 목자시니 내게 부족함이 없으리로다',
 '빌립보서 4장 13절':'내게 능력 주시는 자 안에서 내가 모든 것을 할 수 있느니라'
 };
-let data=JSON.parse(localStorage.getItem(KEY)||'null')||seed, stage=0, reciteStep=0, speech=null, currentPackIndex=0, currentPackVerseIndex=0, feedMode=false;
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||seed, biblePacks=[], stage=0, reciteStep=0, speech=null, currentPackIndex=0, currentPackVerseIndex=0, feedMode=false;
 const stages=[
 {label:'1단계 · 말씀 읽기',title:'천천히 말씀을 읽어 보세요.',img:'assets/sheep/sheep-read.webp',btn:'다 읽었어요'},
 {label:'2단계 · 말씀 생각하기',title:'말씀을 생각해 보세요.',img:'assets/sheep/sheep-think.webp',btn:'생각했어요'},
@@ -149,15 +163,22 @@ const spiritualWeapons=[
 {id:'righteousness',icon:'🦺',name:'의의 흉배',desc:'바른 마음을 지켜요',cost:50},
 {id:'peace',icon:'👟',name:'평안의 신',desc:'평안의 길을 걸어요',cost:40}
 ];
-function migrateData(){if(typeof data.hay!=='number')data.hay=0;if(typeof data.gems!=='number')data.gems=0;if(!Array.isArray(data.weapons))data.weapons=[];data.verses.forEach(v=>{if(typeof v.fed!=='number')v.fed=0});persist()}
+function migrateData(){if(!Array.isArray(data.biblePacks))data.biblePacks=JSON.parse(JSON.stringify(defaultBiblePacks));if(!data.packTexts||typeof data.packTexts!=='object')data.packTexts={...packTexts};biblePacks=data.biblePacks;if(typeof data.hay!=='number')data.hay=0;if(typeof data.gems!=='number')data.gems=0;if(!Array.isArray(data.weapons))data.weapons=[];data.verses.forEach(v=>{if(typeof v.fed!=='number')v.fed=0});persist()}
 function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
 function current(){return data.verses[data.active]||data.verses[0]}
-function ensurePackVerse(ref){let i=data.verses.findIndex(v=>v.ref===ref);if(i>=0)return i;const text=packTexts[ref]||'이 구절의 본문을 말씀 등록에서 입력해 주세요.';data.verses.push({ref,text,reviews:0,provided:true});persist();return data.verses.length-1}
-function renderPackUI(){if(!window.packSelect||!window.packVerses)return;packSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}" ${i===currentPackIndex?'selected':''}>${p.name}</option>`).join('');const p=biblePacks[currentPackIndex];packVerses.innerHTML=p.refs.map((ref,i)=>`<button type="button" class="pack-verse ${i===currentPackVerseIndex?'on':''}" onclick="selectPackVerse(${i})"><strong>${ref}</strong><span>${i===currentPackVerseIndex?'현재 암송 말씀':'이 말씀 암송하기'}</span></button>`).join('')}
-function selectPack(value){currentPackIndex=Number(value)||0;currentPackVerseIndex=0;selectPackVerse(0)}
+function ensurePackVerse(ref){let i=data.verses.findIndex(v=>v.ref===ref);if(i>=0)return i;const text=data.packTexts[ref]||packTexts[ref]||'이 구절의 본문을 말씀 패키지 관리에서 입력해 주세요.';data.verses.push({ref,text,reviews:0,provided:true});persist();return data.verses.length-1}
+function renderPackAdmin(){if(!window.adminPackSelect||!window.adminPackList)return;adminPackSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}">${escapeHtml(p.name)}</option>`).join('');adminPackList.innerHTML=biblePacks.map((p,pi)=>`<div class="admin-item"><div class="admin-item-head"><strong>${escapeHtml(p.name)}</strong><button type="button" class="danger" onclick="deletePack(${pi})">패키지 삭제</button></div>${p.refs.length?p.refs.map((ref,ri)=>`<div class="admin-item-head tiny"><span>${escapeHtml(ref)}</span><span><button type="button" onclick="editPackVerse(${pi},${ri})">수정</button> <button type="button" class="danger" onclick="deletePackVerse(${pi},${ri})">삭제</button></span></div>`).join(''):'<div class="tiny">등록된 성구가 없습니다.</div>'}</div>`).join('')}
+function addPack(){const name=adminPackName.value.trim();if(!name){toast('패키지 이름을 입력해 주세요.');return}if(biblePacks.some(p=>p.name===name)){toast('같은 이름의 패키지가 있어요.');return}biblePacks.push({name,refs:[]});data.biblePacks=biblePacks;persist();adminPackName.value='';renderPackUI();renderPackAdmin();toast('새 패키지를 만들었어요.')}
+function savePackVerse(){const pi=Number(adminPackSelect.value),ref=adminRef.value.trim(),text=adminText.value.trim(),old=adminEditRef.value;if(!biblePacks[pi]){toast('패키지를 먼저 만들어 주세요.');return}if(!ref||!text){toast('성경 구절과 말씀 본문을 모두 입력해 주세요.');return}if(old&&old!==ref){biblePacks.forEach(p=>{const x=p.refs.indexOf(old);if(x>=0)p.refs[x]=ref});delete data.packTexts[old];const vi=data.verses.findIndex(v=>v.ref===old);if(vi>=0){data.verses[vi].ref=ref;data.verses[vi].text=text}}if(!biblePacks[pi].refs.includes(ref))biblePacks[pi].refs.push(ref);data.packTexts[ref]=text;const vi=data.verses.findIndex(v=>v.ref===ref);if(vi>=0)data.verses[vi].text=text;data.biblePacks=biblePacks;persist();cancelPackEdit(false);render();toast('성구를 패키지에 저장했어요.')}
+function editPackVerse(pi,ri){const ref=biblePacks[pi].refs[ri];adminPackSelect.value=pi;adminRef.value=ref;adminText.value=data.packTexts[ref]||packTexts[ref]||'';adminEditRef.value=ref;adminRef.focus()}
+function cancelPackEdit(doRender=true){adminRef.value='';adminText.value='';adminEditRef.value='';if(doRender)renderPackAdmin()}
+function deletePackVerse(pi,ri){const ref=biblePacks[pi].refs[ri];if(!confirm(ref+'을(를) 이 패키지에서 삭제할까요?'))return;biblePacks[pi].refs.splice(ri,1);data.biblePacks=biblePacks;persist();render();toast('패키지에서 성구를 삭제했어요.')}
+function deletePack(pi){if(biblePacks.length<=1){toast('패키지는 하나 이상 남겨 주세요.');return}if(!confirm(biblePacks[pi].name+' 패키지를 삭제할까요?'))return;biblePacks.splice(pi,1);data.biblePacks=biblePacks;currentPackIndex=Math.min(currentPackIndex,biblePacks.length-1);currentPackVerseIndex=0;persist();render();toast('패키지를 삭제했어요.')}
+function renderPackUI(){if(!window.packSelect||!window.packVerses)return;packSelect.innerHTML=biblePacks.map((p,i)=>`<option value="${i}" ${i===currentPackIndex?'selected':''}>${p.name}</option>`).join('');const p=biblePacks[currentPackIndex];if(!p){packVerses.innerHTML='';return}packVerses.innerHTML=p.refs.map((ref,i)=>`<button type="button" class="pack-verse ${i===currentPackVerseIndex?'on':''}" onclick="selectPackVerse(${i})"><strong>${ref}</strong><span>${i===currentPackVerseIndex?'현재 암송 말씀':'이 말씀 암송하기'}</span></button>`).join('')}
+function selectPack(value){currentPackIndex=Number(value)||0;currentPackVerseIndex=0;if(biblePacks[currentPackIndex]?.refs.length)selectPackVerse(0);else renderPackUI()}
 function selectPackVerse(i){currentPackVerseIndex=i;const ref=biblePacks[currentPackIndex].refs[i];data.active=ensurePackVerse(ref);stage=2;reciteStep=0;stopSpeech();renderStage();renderPackUI()}
 function showScreen(id,btn){if(id!=='learn')stopSpeech();document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(btn)btn.classList.add('active');render()}
-function render(){let v=current();if(v){todayVerse.textContent=v.text;todayRef.textContent=v.ref}memoryList.innerHTML=data.verses.slice(0,6).map((v,i)=>`<button class="mini" onclick="startFlow(${i})"><strong>${v.ref}</strong><span>${v.text.slice(0,28)}${v.text.length>28?'…':''}</span></button>`).join('');stats.textContent=`기억 중인 말씀 ${data.verses.length}개 · 총 복습 ${data.verses.reduce((a,v)=>a+(v.reviews||0),0)}회`;renderPasture();renderPackUI();renderWallet();renderWeapons()}
+function render(){let v=current();if(v){todayVerse.textContent=v.text;todayRef.textContent=v.ref}memoryList.innerHTML=data.verses.slice(0,6).map((v,i)=>`<button class="mini" onclick="startFlow(${i})"><strong>${v.ref}</strong><span>${v.text.slice(0,28)}${v.text.length>28?'…':''}</span></button>`).join('');stats.textContent=`기억 중인 말씀 ${data.verses.length}개 · 총 복습 ${data.verses.reduce((a,v)=>a+(v.reviews||0),0)}회`;renderPasture();renderPackUI();renderWallet();renderWeapons();renderPackAdmin()}
 function pastureLevel(){return Math.min(3,Math.floor(data.verses.reduce((a,v)=>a+(v.reviews||0),0)/4))}
 function renderPasture(){const level=pastureLevel();treeLeft.src=`assets/plants/tree-${Math.min(4,level+1).toString().padStart(2,'0')}.webp`;treeRight.src=`assets/plants/tree-${Math.min(4,level+1).toString().padStart(2,'0')}.webp`;worldGrass.src=`assets/plants/grass-${Math.min(3,level+1).toString().padStart(2,'0')}.webp`;worldBush.src=`assets/plants/bush-${level>1?'02':'01'}.webp`;worldPond.src=`assets/pasture/pond-${level>1?'02':'01'}.webp`;const pos=[[13,51],[43,43],[62,57],[25,67],[53,69],[72,37],[7,38],[37,58]];sheepLayer.innerHTML=data.verses.map((v,i)=>{const [x,y]=pos[i%pos.length];const size=26-(i%3)*2;return `<button class="verse-sheep" style="left:${x}%;top:${y}%;width:${size}%;" onclick="pastureSheepAction(${i})" aria-label="${v.ref} 양"><img data-growth-sheep="${i}" alt=""><span class="badge">${v.ref}</span></button>`}).join('');sheepLayer.querySelectorAll('[data-growth-sheep]').forEach((img,i)=>img.src=growthImage(data.verses[i].reviews||0));renderWallet()}
 function renderWallet(){if(window.hayWallet)hayWallet.textContent='🌾 건초 '+data.hay;if(window.gemWallet)gemWallet.textContent='💎 보석 '+data.gems;if(window.myHay)myHay.textContent='🌾 건초 '+data.hay;if(window.myGems)myGems.textContent='💎 보석 '+data.gems}
@@ -186,7 +207,7 @@ function nextStage(){if(stage<2){stage++;renderStage();return}if(reciteStep<4){r
 function closeGrowth(){growthFx.classList.remove('show');showScreen('pasture')}
 function saveVerse(){let ref=reference.value.trim(),text=verseText.value.trim();if(!ref||!text){toast('성경 구절과 말씀을 모두 입력해 주세요.');return}data.verses.unshift({ref,text,reviews:0});data.active=0;persist();reference.value='';verseText.value='';toast('말씀이 저장되었어요. 새로운 양이 생겼어요.');showScreen('home')}
 function reviewFirst(){if(data.verses.length)startFlow(data.active)}
-function resetData(){if(confirm('연습 데이터를 초기화할까요?')){data=JSON.parse(JSON.stringify(seed));persist();render();toast('초기화했어요.')}}
+function resetData(){if(confirm('연습 데이터를 초기화할까요?')){data=JSON.parse(JSON.stringify(seed));biblePacks=[];migrateData();render();toast('초기화했어요.')}}
 function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 migrateData();render();
 </script></body></html>
