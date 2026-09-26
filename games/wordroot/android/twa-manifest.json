@@ -1,0 +1,49 @@
+{
+  "packageId": "quest.thejaram.wordroot",
+  "host": "games.thejaram.quest",
+  "name": "말씀루트",
+  "launcherName": "말씀루트",
+  "display": "standalone",
+  "themeColor": "#3d7b4c",
+  "themeColorDark": "#315f3d",
+  "navigationColor": "#f7f5e9",
+  "navigationColorDark": "#1f3325",
+  "navigationDividerColor": "#f7f5e9",
+  "navigationDividerColorDark": "#1f3325",
+  "backgroundColor": "#f7f5e9",
+  "enableNotifications": false,
+  "startUrl": "/wordroot/",
+  "iconUrl": "https://games.thejaram.quest/wordroot/assets/ui/logo-main.webp",
+  "maskableIconUrl": "https://games.thejaram.quest/wordroot/assets/sheep/sheep-basic.webp",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "wordroot"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://games.thejaram.quest/wordroot/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": false,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://games.thejaram.quest/wordroot/",
+  "minSdkVersion": 23,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [
+    "standalone"
+  ],
+  "appVersion": "1.0.0"
+}
