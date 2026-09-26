@@ -156,6 +156,28 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <script>
 const KEY='wordroot-v2';
 const seed={verses:[],active:0,hay:0,gems:0,weapons:[],unlockedGrowthSheep:[],unlockedSpecialSheep:[]};
+const pastureItemCatalog=[
+{id:'tree-01',name:'어린 나무',category:'tree',categoryName:'나무',image:'assets/plants/tree-01.webp',price:50,defaultScale:1},
+{id:'tree-02',name:'푸른 나무',category:'tree',categoryName:'나무',image:'assets/plants/tree-02.webp',price:70,defaultScale:1},
+{id:'tree-03',name:'큰 나무',category:'tree',categoryName:'나무',image:'assets/plants/tree-03.webp',price:90,defaultScale:1},
+{id:'tree-04',name:'풍성한 나무',category:'tree',categoryName:'나무',image:'assets/plants/tree-04.webp',price:110,defaultScale:1},
+{id:'grass-01',name:'작은 풀',category:'grass',categoryName:'풀',image:'assets/plants/grass-01.webp',price:20,defaultScale:1},
+{id:'grass-02',name:'싱그러운 풀',category:'grass',categoryName:'풀',image:'assets/plants/grass-02.webp',price:25,defaultScale:1},
+{id:'grass-03',name:'풍성한 풀',category:'grass',categoryName:'풀',image:'assets/plants/grass-03.webp',price:30,defaultScale:1},
+{id:'bush-01',name:'작은 덤불',category:'bush',categoryName:'덤불',image:'assets/plants/bush-01.webp',price:30,defaultScale:1},
+{id:'bush-02',name:'꽃덤불',category:'bush',categoryName:'덤불',image:'assets/plants/bush-02.webp',price:40,defaultScale:1},
+{id:'bench-01',name:'나무 벤치',category:'bench',categoryName:'벤치',image:'assets/pasture/bench-01.webp',price:80,defaultScale:1},
+{id:'pond-01',name:'작은 연못',category:'pond',categoryName:'연못',image:'assets/pasture/pond-01.webp',price:130,defaultScale:1},
+{id:'pond-02',name:'연꽃 연못',category:'pond',categoryName:'연못',image:'assets/pasture/pond-02.webp',price:160,defaultScale:1},
+{id:'bridge-01',name:'나무 다리',category:'bridge',categoryName:'다리',image:'assets/pasture/bridge-01.webp',price:120,defaultScale:1},
+{id:'lamp-01',name:'목장 램프',category:'lamp',categoryName:'램프',image:'assets/pasture/lamp-01.webp',price:100,defaultScale:1},
+{id:'fence-01',name:'작은 울타리',category:'fence',categoryName:'울타리',image:'assets/pasture/fence-01.webp',price:35,defaultScale:1},
+{id:'fence-02',name:'긴 울타리',category:'fence',categoryName:'울타리',image:'assets/pasture/fence-02.webp',price:45,defaultScale:1},
+{id:'path-01',name:'목장 길',category:'path',categoryName:'길',image:'assets/pasture/path-01.webp',price:30,defaultScale:1},
+{id:'path-02',name:'디딤 길',category:'path',categoryName:'길',image:'assets/pasture/path-02.webp',price:30,defaultScale:1},
+{id:'sign-01',name:'목장 표지판',category:'sign',categoryName:'표지판',image:'assets/pasture/sign-01.webp',price:60,defaultScale:1}
+];
+const pastureDecorStateVersion=1;
 const specialSheepCatalog=[
 {id:'love',theme:'사랑',emoji:'❤️',name:'사랑의 양',image:'assets/sheep/sheep-special-love.webp',unlock:{type:'topic-verses',required:5,total:10}},
 {id:'faith',theme:'믿음',emoji:'🌱',name:'믿음의 양',image:'assets/sheep/sheep-special-faith.webp',unlock:{type:'topic-verses',required:5,total:10}},
