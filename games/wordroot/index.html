@@ -2,6 +2,12 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3d7b4c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="말씀루트">
+<link rel="manifest" href="manifest.webmanifest">
 <title>말씀루트</title>
 <meta name="description" content="말씀을 읽고 생각하고 암송하며 나만의 목장을 키우는 말씀 기억 앱">
 <style>
@@ -701,4 +707,5 @@ function checkAttendance(){const today=attendanceDateKey();if(data.attendance.da
 function resetData(){if(confirm('모든 기록을 초기화할까요?\n\n모은 양, 말씀기억, 복습 기록, 건초, 보석, 영적 무기와 목장 기록이 모두 사라집니다.')){const key=accountDataKey();if(key)localStorage.removeItem(key);data=cloneSeed();biblePacks=[];stage=0;reciteStep=0;feedMode=false;flowMode='recite';stopSpeech();migrateData();render();showScreen('home');openAttendance();toast('모든 사용자 기록을 초기화했어요.')}}
 function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 migrateAccountOnboarding();if(localSession()){migrateLegacyDataToAccount(localSession());data=loadAccountData(localSession())}else data=cloneSeed();migrateData();render();if(currentLocalAccount())openAttendance();document.getElementById('loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loginLocalAccount()}});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./service-worker.js').catch(err=>console.warn('Service worker registration failed',err))})}
 </script></body></html>
