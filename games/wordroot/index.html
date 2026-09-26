@@ -419,9 +419,11 @@ const splitVerseTexts={
 "마태복음 28:19":"그러므로 너희는 가서 모든 민족을 제자로 삼아 아버지와 아들과 성령의 이름으로 세례를 베풀고","마태복음 28:20":"내가 너희에게 분부한 모든 것을 가르쳐 지키게 하라 볼지어다 내가 세상 끝날까지 너희와 항상 함께 있으리라 하시니라",
 "에베소서 6:10":"끝으로 너희가 주 안에서와 그 힘의 능력으로 강건하여지고","에베소서 6:11":"마귀의 간계를 능히 대적하기 위하여 하나님의 전신 갑주를 입으라"
 };
-function packVerseUnits(ref){const m=ref.match(/^(.+\s\d+):(\d+)-(\d+)$/);if(!m)return[{ref,text:data?.packTexts?.[ref]||packTexts?.[ref]||''}];const units=[];for(let n=Number(m[2]);n<=Number(m[3]);n++){const child=m[1]+':'+n;if(splitVerseTexts[child])units.push({ref:child,text:splitVerseTexts[child],parentRef:ref})}return units.length?units:[{ref,text:data?.packTexts?.[ref]||packTexts?.[ref]||''}]}
+function packVerseUnits(ref){const m=ref.match(/^(.+\s\d+):(\d+)-(\d+)$/);if(!m)return[{ref,text:data?.packTexts?.[ref]||packTexts?.[ref]||suppliedVerseTexts?.[ref]||''}];const child=m[1]+':'+m[2],text=splitVerseTexts[child]||'';return text?[{ref:child,text,parentRef:ref}]:[{ref,text:data?.packTexts?.[ref]||packTexts?.[ref]||suppliedVerseTexts?.[ref]||''}]}
 
 let data=JSON.parse(localStorage.getItem(KEY)||'null')||seed, biblePacks=[], stage=0, reciteStep=0, speech=null, currentPackIndex=0, currentPackVerseIndex=0, feedMode=false;
+function migrateRangeVersesToSingle(){if(!Array.isArray(data.verses))return;let changed=false;data.verses.forEach(v=>{const m=String(v.ref||'').match(/^(.+\s\d+):(\d+)-(\d+)$/);if(!m)return;const single=m[1]+':'+m[2],text=splitVerseTexts[single];if(!text)return;v.ref=single;v.text=text;changed=true});const seen=new Map();data.verses=data.verses.filter(v=>{if(!seen.has(v.ref)){seen.set(v.ref,v);return true}const keep=seen.get(v.ref);keep.reviews=Math.max(Number(keep.reviews)||0,Number(v.reviews)||0);keep.lastReviewedAt=Math.max(Number(keep.lastReviewedAt)||0,Number(v.lastReviewedAt)||0)||null;keep.nextReviewAt=Math.max(Number(keep.nextReviewAt)||0,Number(v.nextReviewAt)||0)||null;changed=true;return false});if(data.active>=data.verses.length)data.active=Math.max(0,data.verses.length-1);if(changed)localStorage.setItem(KEY,JSON.stringify(data))}
+migrateRangeVersesToSingle();
 const RECITE_MODES=[{id:'listen',label:'1 듣기'},{id:'scratch',label:'2 스크래치'},{id:'initials',label:'3 초성'},{id:'words',label:'4 단어 이동'},{id:'blanks',label:'5 빈 칸'},{id:'write',label:'6 써보기'}];
 let selectedReciteModes=[],wordBuildOrder=[],wordBuildPlaced=[];
 const stages=[
