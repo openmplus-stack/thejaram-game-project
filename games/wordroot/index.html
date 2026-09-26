@@ -13,7 +13,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 .logo{display:block;width:min(72%,360px);margin:0 auto 4px}.card{background:var(--card);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
 .eyebrow{font-size:13px;font-weight:800;color:var(--green)}h1,h2,p{margin-top:0}.verse{font-size:21px;line-height:1.65;font-weight:750;margin:12px 0}.ref{font-size:14px;color:#657064}
 .primary,.secondary{width:100%;border:0;border-radius:16px;padding:15px 16px;font-weight:800;margin-top:10px}.primary{background:var(--green);color:white}.secondary{background:#edf4e8;color:var(--deep)}
-.hero-sheep{display:block;width:46%;margin:8px auto -4px}.section-title{margin:22px 4px 10px;font-size:18px}
+.home-pasture-showcase{position:relative;height:340px;margin:18px -18px 28px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}.home-pasture-showcase::after{content:"";position:absolute;left:8%;right:8%;bottom:18px;height:34px;border-radius:50%;background:rgba(74,105,53,.10);filter:blur(12px)}.hero-sheep{position:relative;z-index:1;display:block;width:min(72%,380px);max-height:310px;object-fit:contain;margin:0 auto 8px;filter:drop-shadow(0 12px 12px rgba(55,70,38,.16))}.section-title{margin:22px 4px 10px;font-size:18px}
 .memory{display:grid;grid-template-columns:1fr 1fr;gap:10px}.mini{background:rgba(255,255,255,.88);border:0;border-radius:18px;padding:14px;text-align:left;box-shadow:var(--shadow)}.mini strong{display:block;margin-bottom:5px}
 .flow{padding:20px;background:linear-gradient(#f5f1df,#e7f1d9)}.flow img{display:block;width:min(72%,340px);margin:6px auto 10px}.step{display:flex;gap:8px;justify-content:center;margin-bottom:14px}.dot{width:10px;height:10px;border-radius:50%;background:#c7d3bf}.dot.on{background:var(--green)}
 .answer{width:100%;min-height:110px;border:1px solid #d9dfd4;border-radius:16px;padding:14px;background:white}.hint{font-size:14px;color:#657064;line-height:1.6}
@@ -81,8 +81,8 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <div id="myWeaponContent" class="home-weapon-strip"></div>
 </div>
 
-<img class="hero-sheep" src="assets/sheep/sheep-basic.webp" alt="">
-<div class="card" style="margin-top:14px">
+<div class="home-pasture-showcase" aria-label="나의 양과 목장"><img class="hero-sheep" src="assets/sheep/sheep-basic.webp" alt=""></div>
+<div class="card">
 <div class="eyebrow">내가 외우고 싶은 성구</div>
 <div class="field"><label for="homeReference">성경 구절</label><input id="homeReference" placeholder="예: 시편 23편 1절"></div>
 <div class="field"><label for="homeVerseText">말씀 본문</label><textarea id="homeVerseText" class="answer" placeholder="외우고 싶은 말씀을 입력하세요."></textarea></div>
