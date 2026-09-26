@@ -1,4 +1,4 @@
-const CACHE='wordroot-shell-v1';
+const CACHE='wordroot-shell-v2';
 const PRECACHE=[
   './',
   './index.html',
@@ -6,6 +6,13 @@ const PRECACHE=[
   './assets/backgrounds/bg-home-01.webp',
   './assets/backgrounds/bg-pasture.webp',
   './assets/ui/logo-main.webp',
+  './assets/icons/icon-48.png',
+  './assets/icons/icon-72.png',
+  './assets/icons/icon-96.png',
+  './assets/icons/icon-144.png',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/icon-maskable-512.png',
   './assets/sheep/sheep-basic.webp',
   './assets/sheep/sheep-read.webp',
   './assets/sheep/sheep-think.webp',
