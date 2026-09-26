@@ -31,6 +31,12 @@
       "title": "말씀루트",
       "description": "말씀을 읽고 생각하고 암송하며, 말씀 한 구절마다 양을 키우고 나만의 목장을 성장시키는 말씀 기억 앱",
       "status": "published"
+    },
+    {
+      "slug": "summary-detective",
+      "title": "요약 탐정 사무소",
+      "description": "핵심정보를 찾고 세부정보를 줄인 뒤 사건 관계를 연결해 한 문장으로 요약하고 수행 결과를 분석하는 독서인지 학습 앱",
+      "status": "published"
     }
   ]
 }
