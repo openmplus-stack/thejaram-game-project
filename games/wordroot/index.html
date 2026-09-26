@@ -9,7 +9,7 @@
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#314033;background:#eef5df}
 button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin:auto;background:#f7f5e9;position:relative;padding-bottom:84px;overflow:hidden}
 .screen{display:none;min-height:calc(100dvh - 84px)}.screen.active{display:block}
-.home{background:url('assets/backgrounds/bg-home-01.webp') center top/cover no-repeat;padding:18px 18px 36px}
+.home{background:url('assets/backgrounds/bg-home-01.webp') center top/cover no-repeat;padding:18px 18px 36px}.mission-screen{padding:20px;background:linear-gradient(#f5f1df,#e7f1d9)}.mission-screen>.card+ .card{margin-top:14px}
 .logo{display:block;width:min(72%,360px);margin:0 auto 4px}.card{background:var(--card);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
 .eyebrow{font-size:13px;font-weight:800;color:var(--green)}h1,h2,p{margin-top:0}.verse{font-size:21px;line-height:1.65;font-weight:750;margin:12px 0}.ref{font-size:14px;color:#657064}
 .primary,.secondary{width:100%;border:0;border-radius:16px;padding:15px 16px;font-weight:800;margin-top:10px}.primary{background:var(--green);color:white}.secondary{background:#edf4e8;color:var(--deep)}
@@ -81,15 +81,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <div class="my-weapon-head"><strong>⚔️ 나의 영적 무기</strong><button type="button" onclick="openWeapons()">무기 선택</button></div>
 <div id="myWeaponContent"></div>
 </div>
-<div class="card review-today" id="todayReviewCard">
-<div class="review-today-head"><strong>🔔 오늘 복습할 말씀</strong><span class="review-count" id="todayReviewCount">0</span></div>
-<div class="review-list" id="todayReviewList"></div>
-</div>
-<div class="card weekly-mission-card" id="weeklyMissionCard">
-<div class="weekly-mission-head"><strong>🎯 이번 주 미션</strong><span id="weeklyMissionWeek"></span></div>
-<div class="weekly-mission-list" id="weeklyMissionList"></div>
-<div class="weekly-mission-all" id="weeklyMissionAll"></div>
-</div>
+
 <img class="hero-sheep" src="assets/sheep/sheep-basic.webp" alt="">
 <div class="card" style="margin-top:14px">
 <div class="eyebrow">내가 외우고 싶은 성구</div>
@@ -158,6 +150,23 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <button class="primary" onclick="saveVerse()">말씀 저장하기</button>
 </div></section>
 
+
+<section id="mission" class="screen form mission-screen">
+<div class="card">
+<div class="eyebrow">말씀루트 · 미션</div>
+<h2>오늘의 미션</h2>
+<p class="hint">복습할 말씀과 이번 주 목표를 한곳에서 확인해 보세요.</p>
+</div>
+<div class="card review-today" id="todayReviewCard">
+<div class="review-today-head"><strong>🔔 오늘 복습할 말씀</strong><span class="review-count" id="todayReviewCount">0</span></div>
+<div class="review-list" id="todayReviewList"></div>
+</div>
+<div class="card weekly-mission-card" id="weeklyMissionCard">
+<div class="weekly-mission-head"><strong>🎯 이번 주 미션</strong><span id="weeklyMissionWeek"></span></div>
+<div class="weekly-mission-list" id="weeklyMissionList"></div>
+<div class="weekly-mission-all" id="weeklyMissionAll"></div>
+</div>
+</section>
 
 <section id="mypage" class="screen form"><div class="card"><div class="eyebrow">마이</div><h2>나의 말씀 성장</h2><p id="stats"></p><div class="wallet"><span id="myHay">🌾 건초 0</span><span id="myGems">💎 보석 0</span></div><button type="button" class="sheep-book-entry" onclick="showScreen('sheepbook')"><span class="sheep-book-entry-icon"><img src="assets/sheep/sheep-basic.webp" alt="" aria-hidden="true"></span><span><strong>나의 양 도감</strong><small id="sheepBookSummary">0 / 16 수집</small></span><b>›</b></button><h2 class="section-title">나의 영적무기 상자</h2><p class="hint">내가 구입한 영적 무기를 모아 볼 수 있어요.</p><div id="ownedWeaponBox" class="owned-weapon-box"></div><h2 class="section-title">영적 무기 50개</h2><p class="hint">아래로 스크롤하며 암송으로 모은 보석으로 영적 무기를 모아 보세요.</p><div id="weaponList" class="weapon-list weapon-scroll"></div>
 <div style="margin-top:18px;padding-top:16px;border-top:1px solid #e3e9df">
@@ -266,7 +275,7 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 <nav class="nav">
 <button class="active" data-screen="home" onclick="showScreen('home',this)"><b>⌂</b>홈</button>
 <button data-screen="learn" onclick="startFlow(0,this)"><b>▣</b>암송</button>
-<button data-screen="verse-picker" onclick="openVersePicker(this)"><b>✎</b>말씀</button>
+<button data-screen="mission" onclick="showScreen('mission',this)"><b>✓</b>미션</button>
 <button data-screen="pasture" onclick="showScreen('pasture',this)"><b>♧</b>목장</button>
 <button data-screen="mypage" onclick="showScreen('mypage',this)"><b>●</b>마이</button>
 </nav><div id="toast" class="toast"></div>
