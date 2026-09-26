@@ -1,0 +1,9 @@
+android.keystore
+*.keystore
+*.jks
+app-release-*.apk
+app-release-*.aab
+.gradle/
+build/
+app/build/
+local.properties
