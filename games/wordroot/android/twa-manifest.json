@@ -13,8 +13,8 @@
   "backgroundColor": "#f7f5e9",
   "enableNotifications": false,
   "startUrl": "/wordroot/",
-  "iconUrl": "https://games.thejaram.quest/wordroot/assets/ui/logo-main.webp",
-  "maskableIconUrl": "https://games.thejaram.quest/wordroot/assets/sheep/sheep-basic.webp",
+  "iconUrl": "https://games.thejaram.quest/wordroot/assets/icons/icon-512.png",
+  "maskableIconUrl": "https://games.thejaram.quest/wordroot/assets/icons/icon-maskable-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
