@@ -1,0 +1,26 @@
+{
+  "name": "말씀루트",
+  "short_name": "말씀루트",
+  "description": "말씀을 읽고 생각하고 암송하며 나만의 목장을 키우는 말씀 기억 앱",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f5e9",
+  "theme_color": "#3d7b4c",
+  "icons": [
+    {
+      "src": "assets/ui/logo-main.webp",
+      "sizes": "any",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/sheep/sheep-basic.webp",
+      "sizes": "any",
+      "type": "image/webp",
+      "purpose": "maskable"
+    }
+  ]
+}
