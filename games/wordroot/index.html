@@ -739,5 +739,18 @@ function checkAttendance(){const today=attendanceDateKey();if(data.attendance.da
 function resetData(){if(confirm('모든 기록을 초기화할까요?\n\n모은 양, 말씀기억, 복습 기록, 건초, 보석, 영적 무기와 목장 기록이 모두 사라집니다.')){const key=accountDataKey();if(key)localStorage.removeItem(key);data=cloneSeed();biblePacks=[];stage=0;reciteStep=0;feedMode=false;flowMode='recite';stopSpeech();migrateData();render();showScreen('home');openAttendance();toast('모든 사용자 기록을 초기화했어요.')}}
 function toast(t){let x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
 migrateAccountOnboarding();if(localSession()){migrateLegacyDataToAccount(localSession());data=loadAccountData(localSession())}else data=cloneSeed();migrateData();render();if(currentLocalAccount())openAttendance();document.getElementById('loginPassword')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loginLocalAccount()}});
-if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('./service-worker.js').catch(err=>console.warn('Service worker registration failed',err))})}
+if('serviceWorker' in navigator){
+  let swReloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(swReloading)return;swReloading=true;window.location.reload()});
+  window.addEventListener('load',async()=>{
+    try{
+      const reg=await navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'});
+      const activate=worker=>{if(worker&&worker.state==='installed'&&navigator.serviceWorker.controller)worker.postMessage({type:'SKIP_WAITING'})};
+      if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('updatefound',()=>{const worker=reg.installing;if(worker)worker.addEventListener('statechange',()=>activate(worker))});
+      await reg.update();
+      setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+    }catch(err){console.warn('Service worker registration failed',err)}
+  });
+}
 </script></body></html>
