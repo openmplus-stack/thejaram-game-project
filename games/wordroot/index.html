@@ -2,7 +2,9 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#3d7b4c">
+<meta name="theme-color" content="#3d7b4c" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#3d7b4c" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -11,8 +13,9 @@
 <title>말씀루트</title>
 <meta name="description" content="말씀을 읽고 생각하고 암송하며 나만의 목장을 키우는 말씀 기억 앱">
 <style>
-:root{--green:#3d7b4c;--deep:#285a37;--cream:#fffaf0;--card:rgba(255,255,255,.9);--shadow:0 10px 30px rgba(46,74,43,.15)}
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#314033;background:#eef5df}
+:root{color-scheme:only light;--green:#3d7b4c;--deep:#285a37;--cream:#fffaf0;--card:rgba(255,255,255,.9);--shadow:0 10px 30px rgba(46,74,43,.15)}
+html{color-scheme:only light;background:#eef5df}html,body{forced-color-adjust:none}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#314033;background:#eef5df}button,input,textarea,select{color-scheme:light}
 button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin:auto;background:#f7f5e9;position:relative;padding-bottom:84px;overflow:hidden}
 .screen{display:none;min-height:calc(100dvh - 84px)}.screen.active{display:block}
 .home{background:url('assets/backgrounds/bg-home-01.webp') center top/cover no-repeat;padding:18px 18px 36px}.mission-screen{padding:20px;background:linear-gradient(#f5f1df,#e7f1d9)}.mission-screen>.card+ .card{margin-top:14px}
