@@ -73,6 +73,18 @@ button,input,textarea{font:inherit}.app{max-width:560px;min-height:100dvh;margin
 .weekly-review-guide{margin:-2px 0 12px;padding:10px 11px;border-radius:14px;background:#f5f8f2;border:1px solid #e2e9de;color:#566653;line-height:1.45}.weekly-review-guide b{display:block;font-size:13px;color:#405743;margin-bottom:3px}.weekly-review-guide span,.weekly-review-guide small{display:block;font-size:11px}.weekly-review-guide small{margin-top:4px;color:#758172}
 .settings-panel{margin-top:18px;padding:16px;border:1px solid #e0e7dc;border-radius:18px;background:#fbfcf8}.settings-panel h3{margin:0 0 8px;font-size:16px;color:#38533b}.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}.settings-row label{font-size:14px;font-weight:800;color:#4d5d4c}.settings-row select,.settings-row input[type="time"]{border:1px solid #d5ded0;border-radius:12px;padding:9px;background:#fff;color:#344434}.settings-help{font-size:12px;line-height:1.55;color:#748071}.notice-item{padding:12px 0;border-bottom:1px solid #e5e9e1}.notice-item:last-child{border-bottom:0}.notice-item strong{display:block;margin-bottom:4px}.notice-item small{color:#7b8578}.verse-count{display:inline-flex;align-items:center;justify-content:center;min-width:44px;margin-right:7px;padding:3px 7px;border-radius:999px;background:#edf4e8;color:#476246;font-size:11px;font-weight:900}.verse-count.zero{background:#f2f2ef;color:#8b9188}.ref-memory{display:block;margin-top:13px;padding-top:11px;border-top:1px dashed #d7dfd2;color:#456047;font-size:15px;font-weight:900}
 .settings-fold{padding:0;overflow:hidden}.settings-fold summary{cursor:pointer;list-style:none;padding:16px;font-size:16px;font-weight:900;color:#38533b;display:flex;align-items:center;justify-content:space-between}.settings-fold summary::-webkit-details-marker{display:none}.settings-fold summary::after{content:'⌄';font-size:20px;color:#7b8b77;transition:transform .18s}.settings-fold[open] summary::after{transform:rotate(180deg)}.settings-fold[open] summary{border-bottom:1px solid #e5e9e1}.settings-fold-body{padding:2px 16px 16px}
+
+/* Galaxy/TWA forced-dark compatibility: keep WordRoot surfaces in the designed light palette. */
+html,body,.app,.screen{color-scheme:only light!important}
+.home .card{background:#fffdf8!important;color:#314033!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.home .card h1,.home .card h2,.home .card p,.home .card .verse{color:#314033!important}
+.home .card .eyebrow{color:#3d7b4c!important}.home .card .ref{color:#657064!important}
+.home-weapon-view{background:#fffdf6!important;color:#314033!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.home-weapon-view-head strong{color:#3f6044!important}.home-weapon-view-head small{color:#82907d!important}
+.home-weapon-strip,.home-weapon-image-btn{color-scheme:only light!important}
+.home-weapon-image-btn{background:#fff!important;color:#314033!important}
+.home-weapon-empty-btn{background:#f7faf5!important;color:#71806e!important}
+@media (prefers-color-scheme:dark){html,body,.app{color:#314033!important}.home .card{background:#fffdf8!important}.home-weapon-view{background:#fffdf6!important}}
 </style>
 </head>
 <body><main class="app">
