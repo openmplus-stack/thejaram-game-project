@@ -37,6 +37,12 @@
       "title": "요약 탐정 사무소",
       "description": "핵심정보를 찾고 세부정보를 줄인 뒤 사건 관계를 연결해 한 문장으로 요약하고 수행 결과를 분석하는 독서인지 학습 앱",
       "status": "published"
+    },
+    {
+      "slug": "munjang-talktalk",
+      "title": "문장 톡톡",
+      "description": "단어와 짧은 표현에서 시작해 자신의 생각과 의도를 문장으로 확장하도록 돕는 독서인지 표현 지원 앱",
+      "status": "published"
     }
   ]
 }
