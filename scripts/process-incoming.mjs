@@ -31,7 +31,8 @@ function assertLocalAssets(html, sourceDir) {
   const missing = [];
   for (const match of html.matchAll(textAssetPattern)) {
     const asset = match[1].trim();
-    if (!asset || asset.startsWith('/') || /^[a-z][a-z0-9+.-]*:/i.test(asset)) continue;
+    // Runtime-generated template paths are validated by the app at runtime, not as static assets.
+    if (!asset || asset.includes('${') || asset.startsWith('/') || /^[a-z][a-z0-9+.-]*:/i.test(asset)) continue;
     const resolved = path.resolve(sourceDir, asset);
     if (!resolved.startsWith(`${sourceDir}${path.sep}`) && resolved !== sourceDir) {
       throw new Error(`접수 폴더 밖을 가리키는 경로가 있습니다: ${asset}`);
