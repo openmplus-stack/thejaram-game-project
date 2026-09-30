@@ -1,0 +1,891 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>문장 톡톡 | 통합본 v1</title>
+<style>
+:root{--bg:#f6fbff;--card:#fff;--ink:#263746;--sub:#6b7c89;--line:#dce8f0;--blue:#4f7fb7;--soft:#eaf3fb;--green:#edf8f1;--yellow:#fff8df;--scale:1}*{box-sizing:border-box}html{font-size:calc(16px*var(--scale))}body{margin:0;background:var(--bg);color:var(--ink);font-family:Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.55}button,input,textarea,select{font:inherit}button{cursor:pointer;min-height:48px}.app{max-width:1000px;margin:auto;padding:16px clamp(15px,4vw,36px) 44px}header{display:flex;justify-content:space-between;align-items:center;gap:10px}.brand{display:flex;align-items:center;gap:10px}.logo{width:48px;height:48px;border-radius:16px;background:var(--soft);display:grid;place-items:center;font-size:25px}h1{font-size:1.35rem;margin:0}.btn{border:1px solid var(--line);background:#fff;border-radius:14px;padding:9px 14px;font-weight:750}.primary{background:var(--blue);border-color:var(--blue);color:#fff}.danger{color:#a34b4b}.progress{height:10px;background:#e4edf3;border-radius:999px;overflow:hidden;margin:18px 0}.bar{height:100%;background:var(--blue);width:0;transition:.25s}.shell{background:#fff;border:1px solid var(--line);border-radius:25px;padding:clamp(20px,5vw,38px);box-shadow:0 12px 32px rgba(55,82,105,.08)}.guide{display:flex;gap:12px;align-items:center;margin-bottom:18px}.penguin{font-size:48px}.guide small{color:var(--blue);font-weight:850}.guide p{margin:2px 0;color:var(--sub)}.screen{display:none}.screen.active{display:block}.eyebrow{color:var(--blue);font-weight:850}.q{font-size:clamp(1.4rem,4vw,1.9rem);margin:5px 0}.help{color:var(--sub);margin:0 0 16px}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.choice{border:2px solid var(--line);background:#fff;border-radius:16px;padding:13px;text-align:left}.choice.selected{border-color:var(--blue);background:var(--soft)}textarea,input,select{width:100%;border:1px solid var(--line);border-radius:13px;padding:11px;background:#fff}textarea{min-height:100px;resize:vertical}.box{border:1px solid var(--line);border-radius:16px;padding:14px;margin:12px 0}.soft{background:var(--soft)}.green{background:var(--green)}.yellow{background:var(--yellow)}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px}.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}.homeGrid{display:grid;grid-template-columns:1.3fr 1fr;gap:12px}.homeCard{border:1px solid var(--line);border-radius:20px;padding:18px}.big{font-size:1.12rem}.candidate{display:block;width:100%;margin:8px 0}.sentenceList{display:grid;gap:8px}.sentence{padding:10px;border-radius:12px;background:#fff;border:1px solid var(--line)}.library{display:grid;gap:9px;max-height:360px;overflow:auto}.book{border:1px solid var(--line);border-radius:15px;padding:12px}.meter{height:15px;background:#e4edf3;border-radius:999px;overflow:hidden}.meter>div{height:100%;background:var(--blue)}.status{color:var(--sub);font-size:.9rem;margin-top:10px}.hidden{display:none!important}
+@media(max-width:700px){.choices,.homeGrid{grid-template-columns:1fr}.nav{flex-direction:column}.nav .btn{width:100%}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.mediaTabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.mediaPane{display:none}.mediaPane.active{display:block}.preview{max-width:100%;max-height:280px;border-radius:16px;border:1px solid var(--line);object-fit:contain;background:#f3f7fa}.voiceState{padding:12px;border-radius:14px;background:var(--soft);margin:10px 0}.observation{display:flex;gap:9px;border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0}.observation input{width:auto}.confirmedFact{background:var(--green);border-radius:999px;padding:6px 10px}.warning{background:var(--yellow);border-radius:14px;padding:11px;margin:10px 0}
+
+/* 28단계 UI/UX 통합 디자인 시스템 */
+:root{
+ --space-1:8px;--space-2:12px;--space-3:18px;--space-4:26px;--space-5:36px;
+ --radius-s:12px;--radius-m:18px;--radius-l:26px;--touch:52px;
+ --content:900px;--reading:720px;
+}
+body{letter-spacing:-.01em}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:4px solid rgba(79,127,183,.30);outline-offset:3px}
+.app{max-width:1080px;padding-top:20px}
+header{min-height:64px;padding:2px 2px 0}
+.brand h1{font-weight:850;letter-spacing:-.035em}
+.logo{background:#eaf3fb;border:1px solid #d8e7f1}
+.progress{max-width:900px;margin:20px auto 14px;height:8px}
+.shell{max-width:900px;margin:0 auto;padding:clamp(24px,5vw,44px);border-radius:28px}
+.guide{max-width:760px;margin:0 auto 28px;padding:14px 16px;border-radius:18px;background:#f7fafc;border:1px solid #e4edf3}
+.guide .penguin{font-size:40px;flex:0 0 48px;text-align:center}
+.guide small{font-size:.8rem;letter-spacing:.01em}
+.guide p{font-size:.93rem}
+.screen{max-width:760px;margin:0 auto}
+.eyebrow{font-size:.86rem;letter-spacing:.02em;margin-bottom:6px}
+.q{max-width:680px;font-size:clamp(1.45rem,3.2vw,2rem);line-height:1.35;letter-spacing:-.035em;margin:4px 0 10px}
+.help{max-width:680px;font-size:.96rem;line-height:1.65;margin-bottom:22px}
+.btn,.choice,.chip{min-height:var(--touch)}
+.btn{display:inline-flex;align-items:center;justify-content:center}
+.choice{padding:15px 16px;line-height:1.45}
+.choices{gap:11px}
+textarea,input,select{min-height:52px;font-size:1rem}
+textarea{padding:14px 15px;line-height:1.65}
+.box{padding:16px 17px;margin:14px 0;border-radius:17px}
+.nav{padding-top:8px;margin-top:26px;border-top:1px solid #eef3f6}
+.nav>.btn:first-child:not(:only-child){margin-right:auto}
+.nav>.btn:last-child:not(:only-child){margin-left:auto}
+.homeGrid{gap:14px}.homeCard{padding:20px;border-radius:20px}.homeCard h3{margin-top:0}
+.mediaTabs{margin:14px 0 18px}.mediaTabs .btn{min-width:118px}
+.preview{display:block;margin:12px auto 16px}
+.candidate{padding:16px 17px;margin:10px 0}
+.sentenceList{gap:10px}.sentence{padding:13px 15px}
+.library{max-height:430px;padding-right:3px}.book{padding:15px}
+.status{min-height:24px;margin-top:16px}
+#skipLink:focus{display:block!important;position:fixed;z-index:9999;left:12px;top:12px;background:#fff;color:var(--ink);padding:10px 14px;border:2px solid var(--blue);border-radius:10px}
+#intentChoices .choice{min-height:64px}
+#expandChoices .choice,#evalChoices .choice{min-height:60px}
+#aiStatus{font-weight:700}
+@media (min-width:760px) and (max-width:1180px){
+ .app{padding-left:28px;padding-right:28px}.shell{max-width:940px}.screen{max-width:800px}
+ .choice,.btn{min-height:56px}
+}
+@media (orientation:landscape) and (max-height:700px){
+ .app{padding-top:10px}.progress{margin:10px auto}.shell{padding-top:22px;padding-bottom:22px}
+ .guide{margin-bottom:16px;padding:9px 13px}.guide .penguin{font-size:32px}.q{font-size:1.45rem}
+ .help{margin-bottom:14px}.nav{margin-top:16px}
+}
+@media(max-width:700px){
+ header{align-items:flex-start}.brand{min-width:0}.brand h1{font-size:1.2rem}
+ header>div:last-child{display:flex;gap:5px}header .btn{padding:8px 10px;min-height:44px}
+ .shell{padding:22px 17px;border-radius:22px}.guide{align-items:flex-start;margin-bottom:22px}
+ .guide .penguin{font-size:34px;flex-basis:40px}.guide p{font-size:.88rem}
+ .q{font-size:1.45rem}.choices{grid-template-columns:1fr}
+ .nav{flex-direction:row;flex-wrap:wrap}.nav .btn{width:auto;flex:1 1 140px}
+ .mediaTabs{display:grid;grid-template-columns:repeat(3,1fr)}.mediaTabs .btn{min-width:0;padding:8px 5px}
+}
+@media(max-width:430px){
+ .app{padding-left:10px;padding-right:10px}.shell{padding-left:14px;padding-right:14px}
+ .logo{width:42px;height:42px}.progress{margin-left:4px;margin-right:4px}
+ .mediaTabs{grid-template-columns:1fr}.nav{flex-direction:column}.nav .btn{width:100%}
+}
+@media print{header,.progress,.guide,.nav,.mediaTabs,#status{display:none!important}.shell{box-shadow:none;border:0;max-width:none}.screen{display:none!important}.screen[data-s="report"],.screen[data-s="teacher"]{display:block!important;max-width:none}}
+
+/* 29단계 실제 펭귄 성장 이미지 */
+.penguin-img{display:block;object-fit:contain;object-position:center;background:transparent;user-select:none;-webkit-user-drag:none}
+.guide .penguin{width:58px;height:58px;flex:0 0 58px;display:grid;place-items:center}
+.guide .penguin-img{width:58px;height:58px}
+.home-growth{display:flex;align-items:center;gap:14px}
+.home-growth .penguin-img{width:88px;height:88px;flex:0 0 88px}
+.growth-stage{display:grid;place-items:center;min-height:300px;margin:4px 0 10px;background:linear-gradient(180deg,#fbfdff,#f5f9fc);border:1px solid var(--line);border-radius:24px;overflow:hidden}
+.growth-stage .penguin-img{width:min(82vw,340px);height:min(82vw,340px)}
+.level-caption{text-align:center;color:var(--sub);margin:4px 0 14px}
+@keyframes levelReveal{0%{transform:scale(.94);opacity:.35}65%{transform:scale(1.025);opacity:1}100%{transform:scale(1)}}
+.level-reveal{animation:levelReveal .55s ease-out}
+@media(max-width:700px){.guide .penguin,.guide .penguin-img{width:50px;height:50px;flex-basis:50px}.home-growth .penguin-img{width:74px;height:74px}.growth-stage{min-height:240px}}
+@media(prefers-reduced-motion:reduce){.level-reveal{animation:none!important}}
+
+/* 30단계: 나의 문장사전 포트폴리오 */
+.dictionary-tools{display:grid;grid-template-columns:1fr auto;gap:10px;margin:14px 0}.dictionary-filters{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}.dictionary-filters .chip.active{background:#e7f0fb;border-color:#8eb2d8;font-weight:800}.library-summary{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}.library-summary span{background:#f5f8fa;border:1px solid var(--line);padding:7px 10px;border-radius:999px;font-size:.88rem}.book{position:relative}.book-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.book-actions{display:flex;gap:6px;flex-wrap:wrap}.icon-btn{min-width:44px;min-height:44px;border:1px solid var(--line);background:white;border-radius:12px;font-size:1.05rem}.book-final{font-size:1.05rem;line-height:1.7;margin:12px 0}.portfolio-detail{margin-top:12px;border-top:1px solid var(--line);padding-top:12px}.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.portfolio-item{background:#f8fafc;border:1px solid #edf1f4;border-radius:14px;padding:12px}.portfolio-item b{display:block;font-size:.82rem;color:#667887;margin-bottom:5px}.portfolio-item p{margin:0;line-height:1.55}.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.empty-state{text-align:center;padding:34px 16px}.favorite-on{background:#fff6cf!important}.reuse-box{background:#eef7ff;border:1px solid #d4e7f6;border-radius:15px;padding:12px;margin-top:12px}@media(max-width:700px){.dictionary-tools{grid-template-columns:1fr}.portfolio-grid{grid-template-columns:1fr}.book-top{flex-direction:column}.book-actions{width:100%}}
+
+/* 31단계 교사용 누적 분석 */
+.teacher-dashboard{display:grid;gap:16px}.teacher-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px}.kpi b{display:block;font-size:1.35rem;margin-top:4px}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.analysis-card{background:white;border:1px solid var(--line);border-radius:18px;padding:16px}
+.bar-row{display:grid;grid-template-columns:92px 1fr 42px;gap:8px;align-items:center;margin:9px 0}.mini-track{height:10px;background:#edf2f5;border-radius:999px;overflow:hidden}.mini-fill{height:100%;background:#6f98c2;border-radius:999px}
+.analysis-table{width:100%;border-collapse:collapse;font-size:.9rem}.analysis-table th,.analysis-table td{border-bottom:1px solid #edf1f4;padding:9px 7px;text-align:left;vertical-align:top}.analysis-table th{color:#607281;font-size:.8rem}
+.note{background:#fff9e8;border:1px solid #f2dfaa;border-radius:14px;padding:12px;line-height:1.6}.teacher-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:700px){.teacher-kpis{grid-template-columns:1fr 1fr}.analysis-grid{grid-template-columns:1fr}.bar-row{grid-template-columns:82px 1fr 34px}.analysis-table{font-size:.82rem}}
+
+/* 32단계 실제 학습자 사용성 테스트 */
+.usability-fab{position:fixed;right:18px;bottom:18px;z-index:30;border:1px solid #b9cddd;background:#fff;border-radius:999px;padding:11px 15px;font-weight:800;box-shadow:0 5px 18px rgba(31,55,75,.14)}
+.usability-fab.active{background:#e8f4ff;border-color:#76a8d0}
+.test-panel{position:fixed;right:18px;bottom:72px;z-index:31;width:min(390px,calc(100vw - 28px));max-height:72vh;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 14px 40px rgba(28,50,68,.2);display:none}
+.test-panel.open{display:block}.test-panel h3{margin:0 0 6px}.test-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.test-grid button{min-height:48px}
+.test-panel textarea{min-height:72px}.test-badge{display:inline-block;background:#eef6fb;border-radius:999px;padding:5px 9px;font-size:.82rem;font-weight:800;margin:2px}
+.usability-summary{display:grid;gap:14px}.support4{background:#fff4ef;border-color:#f1c9b9}
+@media print{.usability-fab,.test-panel{display:none!important}}
+
+/* 33단계 적응형 지원 수준 */
+.adaptive-card{background:#f7fbfe;border:1px solid #cfe0ec;border-radius:18px;padding:15px;margin:12px 0}
+.adaptive-level{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.adaptive-level strong{font-size:1.05rem}
+.support-pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#e9f3fa;font-weight:800}
+.adaptive-settings{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.adaptive-settings button.selected{background:#2f6f9f;color:#fff;border-color:#2f6f9f}
+.adaptive-hint{background:#fff;border:1px dashed #b9d1e2;border-radius:14px;padding:12px;margin-top:10px;line-height:1.55}
+@media(max-width:700px){.adaptive-settings{grid-template-columns:1fr 1fr}}
+
+/* 34단계 PWA */
+.install-banner{display:none;align-items:center;justify-content:space-between;gap:12px;background:#eef7fd;border:1px solid #c8ddeb;border-radius:16px;padding:12px 14px;margin:10px 0}
+.install-banner.show{display:flex}.offline-badge{position:fixed;left:14px;bottom:14px;z-index:35;background:#fff3d8;border:1px solid #e7cc8d;border-radius:999px;padding:7px 11px;font-size:.82rem;font-weight:800;display:none}.offline-badge.show{display:block}
+@media(display-mode:standalone){.install-banner{display:none!important}}
+
+/* 23-8 이야기 보물 도감 */
+.treasure-summary{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 16px}.treasure-summary span{background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-weight:750}.treasure-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.treasure-filters .active{background:var(--blue);color:#fff;border-color:var(--blue)}.treasure-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.treasure-card{position:relative;border:1px solid var(--line);background:#fff;border-radius:18px;padding:10px;text-align:center;min-height:172px;overflow:hidden}.treasure-card.unlocked{background:linear-gradient(180deg,#fff,#fffaf0)}.treasure-card.locked{background:#f5f7f9;color:#71808b}.treasure-art{height:100px;display:grid;place-items:center;margin-bottom:6px}.treasure-art img{width:96px;height:96px;object-fit:contain;background:transparent}.treasure-placeholder{width:84px;height:84px;border-radius:45% 55% 50% 50%;background:#c9d1d7;filter:grayscale(1);opacity:.72;display:grid;place-items:center;font-size:30px;color:#fff}.treasure-no{position:absolute;top:8px;left:8px;font-size:.75rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 7px}.treasure-card b{display:block;font-size:.95rem}.treasure-card small{display:block;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.treasure-lock{font-size:.78rem;margin-top:4px}.treasure-modal{position:fixed;inset:0;background:rgba(30,45,58,.48);z-index:80;display:grid;place-items:center;padding:18px}.treasure-dialog{width:min(620px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;padding:22px;box-shadow:0 24px 70px rgba(0,0,0,.22)}.treasure-detail-art{display:grid;place-items:center;min-height:220px}.treasure-detail-art img{width:min(280px,70vw);height:min(280px,70vw);object-fit:contain}.treasure-detail-art .treasure-placeholder{width:180px;height:180px;font-size:56px}.treasure-story{display:grid;gap:8px;margin:14px 0}.treasure-story p{margin:0;padding:10px 12px;background:var(--soft);border-radius:12px}.treasure-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px}.treasure-meta>div{border:1px solid var(--line);border-radius:14px;padding:12px}.treasure-progress{height:12px;background:#e4edf3;border-radius:999px;overflow:hidden}.treasure-progress>div{height:100%;background:var(--blue)}
+
+/* 23-9 보물 획득 연출 */
+.treasure-reveal{position:fixed;inset:0;background:rgba(26,40,52,.58);z-index:120;display:grid;place-items:center;padding:18px}.treasure-reveal-card{width:min(520px,100%);background:#fff;border-radius:28px;padding:24px;text-align:center;box-shadow:0 28px 80px rgba(0,0,0,.28);animation:treasurePop .32s ease-out}.treasure-reveal-art{min-height:300px;display:grid;place-items:center;margin:8px 0}.treasure-reveal-art img{width:min(340px,72vw);height:min(340px,72vw);object-fit:contain}.treasure-reveal-art .treasure-placeholder{width:220px;height:220px;font-size:68px}.treasure-reveal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}.treasure-reveal-badge{display:inline-block;background:#fff5d8;border:1px solid #f0d58d;border-radius:999px;padding:7px 12px;font-weight:800}.treasure-reveal-card h2{font-size:clamp(1.65rem,5vw,2.25rem);margin:10px 0 4px}.treasure-reveal-card .work{font-weight:750;color:var(--sub);margin:0 0 8px}@keyframes treasurePop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}@media(prefers-reduced-motion:reduce){.treasure-reveal-card{animation:none}}
+@media(max-width:800px){.treasure-grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:520px){.treasure-grid{grid-template-columns:repeat(2,1fr)}.treasure-meta{grid-template-columns:1fr}}
+
+.treasure-card.just-unlocked{outline:4px solid #f2c94c;outline-offset:3px;box-shadow:0 0 0 8px rgba(242,201,76,.18),0 14px 32px rgba(41,65,82,.14)}
+.treasure-new{position:absolute;top:8px;right:8px;background:#e84f63;color:#fff;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:900;letter-spacing:.04em}
+.treasure-reveal-note{margin:10px auto 0;max-width:390px;padding:10px 12px;background:#f3f8fb;border-radius:12px;color:var(--sub)}
+@media(prefers-reduced-motion:no-preference){.treasure-card.just-unlocked{animation:treasureGlow 1.2s ease-out 2}@keyframes treasureGlow{50%{transform:translateY(-3px);box-shadow:0 0 0 10px rgba(242,201,76,.24),0 16px 36px rgba(41,65,82,.16)}}}
+
+.treasure-learning{display:grid;gap:12px;margin-top:14px;text-align:left}
+.treasure-learning .learning-block{padding:13px 14px;border:1px solid var(--line);border-radius:14px;background:#fbfdff}
+.treasure-learning h4{margin:0 0 7px;font-size:.95rem;color:var(--ink)}
+.treasure-learning p{margin:0;line-height:1.65}
+.treasure-tags{display:flex;flex-wrap:wrap;gap:7px}
+.treasure-tag{display:inline-flex;padding:6px 10px;border-radius:999px;background:#eef6fa;color:#31576b;font-weight:800;font-size:.82rem}
+.treasure-category-label{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;background:#f4f7f9;color:var(--sub);font-size:.78rem;font-weight:800;margin-bottom:6px}
+.treasure-locked-hint{padding:15px;border-radius:14px;background:#f7f8fa;border:1px dashed #b9c4cc;text-align:left}
+.treasure-locked-hint b{display:block;margin-bottom:5px}
+
+.story-missions{margin-top:12px;padding:14px;border-radius:16px;background:#f8fbfd;border:1px solid var(--line)}
+.story-missions h4{margin:0 0 5px}.story-mission-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+.story-mission{min-height:76px;text-align:left;padding:11px 12px;border:1px solid #cddde6;border-radius:14px;background:#fff;color:var(--ink);font:inherit;cursor:pointer}
+.story-mission:hover,.story-mission:focus-visible{border-color:#76a9c4;box-shadow:0 0 0 3px rgba(88,151,183,.12)}
+.story-mission b{display:block;margin-bottom:4px;color:#31576b}.story-mission small{display:block;line-height:1.45;color:var(--sub)}
+.story-mission.selected{border:2px solid #4e96b8;background:#eef8fc}.story-mission-tip{margin-top:9px;font-size:.84rem;color:var(--sub)}
+@media(max-width:620px){.story-mission-grid{grid-template-columns:1fr}}
+
+.story-level-box{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.story-level-box label{font-weight:900}.story-level-box select{min-height:44px;width:auto;min-width:150px}
+.story-level-goal{font-size:.83rem;color:var(--sub);font-weight:700}
+
+.adaptive-box{margin-top:12px;padding:13px 14px;border:1px solid #cfe0e8;border-radius:15px;background:#f5fafc}
+.adaptive-box b{display:block;margin-bottom:5px}.adaptive-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.adaptive-actions button{min-height:44px}.adaptive-evidence{font-size:.82rem;color:var(--sub);line-height:1.55;margin-top:5px}
+
+.teacher-dashboard{display:grid;gap:14px}.teacher-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.teacher-kpi{padding:14px;border:1px solid var(--line);border-radius:15px;background:#fff}.teacher-kpi b{display:block;font-size:1.45rem;margin-top:4px}.teacher-kpi small{color:var(--sub);font-weight:800}
+.teacher-section{padding:15px;border:1px solid var(--line);border-radius:16px;background:#fff}.teacher-section h3{margin:0 0 10px}.teacher-bars{display:grid;gap:8px}
+.teacher-bar-row{display:grid;grid-template-columns:105px 1fr 38px;gap:8px;align-items:center;font-size:.86rem}.teacher-bar{height:10px;background:#edf2f5;border-radius:999px;overflow:hidden}.teacher-bar i{display:block;height:100%;background:#77a9bf;border-radius:999px}
+.teacher-history{display:grid;gap:8px}.teacher-history-row{padding:10px 12px;border-radius:12px;background:#f7fafb;border:1px solid #e4ecef}.teacher-history-row b{display:block}.teacher-note{padding:12px 14px;border-radius:13px;background:#f4f9fb;line-height:1.6}
+@media(max-width:700px){.teacher-kpis{grid-template-columns:repeat(2,1fr)}.teacher-bar-row{grid-template-columns:88px 1fr 32px}}@media print{.teacher-dashboard .btn{display:none!important}.teacher-section{break-inside:avoid}}
+
+.usability-fab{position:fixed;right:14px;bottom:14px;z-index:80;min-height:48px;border-radius:999px;padding:0 16px;border:1px solid #9db9c7;background:#fff;font-weight:900;box-shadow:0 5px 20px rgba(0,0,0,.12)}
+.usability-panel{position:fixed;right:14px;bottom:72px;z-index:90;width:min(360px,calc(100vw - 28px));padding:14px;border:1px solid #b9cdd7;border-radius:17px;background:#fff;box-shadow:0 10px 34px rgba(0,0,0,.18)}
+.usability-buttons{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.usability-buttons button{min-height:46px}.usability-note{width:100%;min-height:64px;margin-top:8px}.usability-row{padding:10px 12px;margin-top:8px;border-radius:12px;background:#f7fafb;border:1px solid #e3ecef}@media print{.usability-fab,.usability-panel{display:none!important}}
+
+.protocol-grid{display:grid;gap:9px}.protocol-item{padding:12px;border:1px solid #dce8ed;border-radius:13px;background:#fff}.protocol-item b{display:block;margin-bottom:4px}.protocol-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.protocol-actions button{min-height:40px;font-size:.82rem}.protocol-status{font-size:.8rem;font-weight:900}.protocol-summary{padding:13px;border-radius:14px;background:#f5fafc;border:1px solid #d8e8ef}.priority-high{border-left:5px solid #555}.priority-mid{border-left:5px solid #999}.priority-low{border-left:5px solid #ccc}
+
+.adaptive-global{margin:12px 0;padding:12px 14px;border:1px solid #d4e4eb;border-radius:14px;background:#f7fbfc}.adaptive-global b{display:block;margin-bottom:5px}.adaptive-level-chip{display:inline-block;padding:4px 9px;border-radius:999px;background:#e8f3f7;font-size:.8rem;font-weight:900}
+</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#2f6f9f"><link rel="apple-touch-icon" href="./assets/icons/icon-192.png"><link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#edf7fb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="문장톡톡">
+<link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png">
+<meta name="app-version" content="15.0-deploy-ready">
+</head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><div class="guide"><div class="penguin"><img id="guidePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div><div><small>문장 톡톡 안내</small><p id="guide">생각은 네가 만들고, 문장 톡톡은 문장이 되도록 도와줘요.</p></div></div>
+<div id="aiStatusCard" class="box soft"><b>AI 연결 상태</b> <span id="aiStatus">확인 중…</span><br><small>AI가 연결되지 않아도 로컬 지원 엔진으로 계속 사용할 수 있습니다. API 키는 이 HTML에 저장하지 않습니다.</small></div><section class="screen active" data-s="home"><div class="eyebrow">통합본 v1</div><h2 class="q">오늘은 어떤 말을 만들어 볼까요?</h2><div class="box" style="margin-bottom:14px"><b>교사용 AI 연결 설정</b><p class="help">실제 운영에서는 같은 서버의 <code>/api/talktalk-ai</code>를 권장합니다. 브라우저에 비밀 API 키를 입력하지 않습니다.</p><input id="aiEndpoint" placeholder="/api/talktalk-ai"><div class="chips" style="margin-top:8px"><button class="chip" id="saveEndpoint">연결 주소 저장</button><button class="chip" id="testAI">AI 연결 확인</button></div></div><div class="box yellow" id="storyActivityBox"><b>📖 이야기 활동 선택</b><p class="help">이야기 수업을 할 때 작품을 먼저 선택하세요. 작품을 고르면 이야기와 연결된 문장 과제가 나타납니다. 과제를 골라도 되고 내 생각을 직접 시작해도 됩니다. 문장 활동을 마치고 문장사전에 저장하면 해당 작품의 보물을 한 번만 획득합니다.</p><select id="storyActivitySelect" aria-label="이야기 활동 선택"><option value="">일반 문장 활동 · 보물 없음</option></select><p class="status" id="storyActivityStatus">현재: 일반 문장 활동</p><div id="storyMissionArea" class="story-missions" hidden><h4>이 이야기로 어떤 말을 만들어 볼까요?</h4><div class="story-level-box"><label for="storyLevelSelect">이야기 난이도</label><select id="storyLevelSelect"><option value="12">1–2학년</option><option value="34">3–4학년</option><option value="56">5–6학년</option></select><span class="story-level-goal" id="storyLevelGoal"></span></div><p class="help" id="storyMissionIntro">아래에서 하나를 골라도 되고, 내 생각을 직접 말해도 됩니다.</p><div id="storyMissionGrid" class="story-mission-grid"></div><p class="story-mission-tip">과제는 출발점일 뿐이에요. 고른 뒤에도 「내가 말하려는 문장이 없어요」를 선택해 다른 방향으로 바꿀 수 있습니다.</p><div id="adaptiveStoryBox" class="adaptive-box" hidden><b id="adaptiveStoryTitle">최근 수행에 맞는 난이도 제안</b><p id="adaptiveStoryText" class="help"></p><p id="adaptiveStoryEvidence" class="adaptive-evidence"></p><div class="adaptive-actions" id="adaptiveStoryActions"></div></div></div></div><div class="homeCard" style="margin:12px 0"><h3>📊 교사용 학습 분석</h3><p>표현의 독립성, 문장 확장, 표현 목적, 이야기 활동과 난이도 변화를 확인합니다.</p><button class="btn secondary" type="button" onclick="showTeacherDashboard()">분석 보기</button></div><div class="adaptive-global"><b>🧭 문장 지원 수준</b><span class="adaptive-level-chip" id="globalAdaptiveChip">기본 수준</span><p class="help" id="globalAdaptiveText">최근 수행을 바탕으로 후보 문장·질문·힌트·직접 표현 목표를 조절합니다.</p><div class="row"><button class="btn ghost" type="button" onclick="cycleGlobalLevel()">지원 수준 바꾸기</button><button class="btn ghost" type="button" onclick="applyGlobalRecommendation()">추천 수준 적용</button></div></div><div class="homeGrid"><div class="homeCard green"><h3>새 문장 만들기</h3><p>단어·짧은 말에서 시작해 내 생각을 문장으로 발전시켜요.</p><button class="btn primary" id="newActivity" data-go="input">시작하기</button></div><div class="homeCard"><h3>이어하기</h3><p id="resumeText">저장된 활동을 확인하고 있어요.</p><button class="btn" id="resume">최근 활동 이어하기</button></div><div class="homeCard"><h3>📚 나의 문장사전</h3><p><b id="bookCount">0</b>개의 문장이 저장되어 있어요.</p><button class="btn" data-go="dictionary">열기</button></div><div class="homeCard"><h3>교사용 누적 분석</h3><p>문장 기록에서 표현 목적·지원·자기수정·확장 변화를 확인합니다.</p><button class="btn" data-go="teacher">분석 보기</button></div><div class="homeCard"><h3>사용성 테스트</h3><p>실제 수업에서 멈춤·이해·지원 수준·입력 방식을 기록합니다.</p><button class="btn" data-go="usability">테스트 결과 보기</button></div><div class="homeCard"><h3>맞춤 도움 설정</h3><p>최근 수행을 바탕으로 화면별 도움의 양을 조절합니다.</p><button class="btn" data-go="adaptive">설정 보기</button></div><div class="homeCard"><h3>🧰 이야기 보물 도감</h3><p>한국 전래 이야기 10편, 이솝우화 10편, 세계 옛이야기 10편을 만나며 작품마다 하나의 보물을 발견해요.</p><p><b id="treasureHomeCount">0</b>/30 보물</p><button class="btn" data-go="treasures">도감 열기</button></div><div class="homeCard"><div class="home-growth"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 펭귄"><div><h3>나의 성장</h3><p id="homeLevelName">Lv.1 아기 펭귄</p><p>생각별 ⭐ <b id="starCount">0</b> · EXP <b id="xpCount">0</b></p></div></div><button class="btn" data-go="growth">성장 보기</button></div></div></section>
+<section class="screen" data-s="input"><div class="eyebrow">1. 생각 입력</div><h2 class="q">무슨 말을 하고 싶어요?</h2><p class="help">글자, 목소리, 사진 중 편한 방법으로 시작할 수 있어요.</p><div class="mediaTabs"><button class="btn primary" data-media="text">⌨️ 글자로</button><button class="btn" data-media="voice">🎤 말하기</button><button class="btn" data-media="photo">📷 사진</button></div><div class="mediaPane active" data-pane="text"><textarea id="thought" placeholder="예: 공룡 / 오늘 병원에 갔어요"></textarea></div><div class="mediaPane" data-pane="voice"><div class="voiceState" id="voiceState">마이크 버튼을 누르고 천천히 말해 주세요.</div><button class="btn primary" id="startVoice">🎤 말하기 시작</button> <button class="btn" id="stopVoice">■ 멈추기</button><div class="box"><b>인식된 말</b><textarea id="voiceTranscript" placeholder="인식 결과를 확인하고 잘못 들은 부분은 직접 고치세요."></textarea><button class="btn" id="listenTranscript">🔊 다시 듣기</button> <button class="btn primary" id="confirmVoice">이 말로 입력하기</button></div><p class="help">음성 인식이 지원되지 않으면 글자로 직접 입력할 수 있습니다.</p></div><div class="mediaPane" data-pane="photo"><input id="photoInput" type="file" accept="image/*" capture="environment"><div id="photoPreviewWrap" class="hidden"><img id="photoPreview" class="preview" alt="선택한 사진 미리보기"><div class="warning"><b>사진 속 내용은 아직 사실로 확정되지 않았어요.</b><br>AI의 관찰 후보는 내가 확인한 뒤에만 문장에 사용할 수 있습니다.</div><button class="btn" id="analyzePhoto">사진에서 보이는 것 찾기</button><div id="photoObservations"></div><div class="chips" id="confirmedPhotoFacts"></div></div></div><div class="nav"><button class="btn" data-go="home">이전</button><button class="btn primary" id="toIntent">다음</button></div></section>
+<section class="screen" data-s="intent"><div class="eyebrow">2. 표현 목적</div><h2 class="q">어떤 말을 하고 싶은가요?</h2><div class="choices" id="intentChoices"></div><div class="nav"><button class="btn" data-go="input">이전</button><button class="btn primary" id="toCandidates">문장 후보 보기</button></div></section>
+<section class="screen" data-s="candidates"><div class="eyebrow">3. 의도 탐색</div><h2 class="q">내가 하려던 말과 가까운 문장이 있나요?</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="intent">목적 바꾸기</button></div></section>
+<section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
+<section class="screen" data-s="question"><div class="eyebrow">5. 한 가지 더 알려주세요</div><h2 class="q" id="adaptiveQ">왜 그렇게 생각하나요?</h2><textarea id="extra" placeholder="짧게 대답해도 괜찮아요."></textarea><div class="chips"><button class="chip" id="unknown">잘 모르겠어요</button><button class="chip" id="private">말하고 싶지 않아요</button></div><div class="nav"><button class="btn" data-go="candidates">후보 다시 보기</button><button class="btn primary" id="applyExtra">새 후보 만들기</button></div></section>
+<section class="screen" data-s="expand"><div class="eyebrow">6. 문장 확장</div><h2 class="q">한 걸음 더 말해 볼까요?</h2><div class="box soft" id="workingSentence"></div><div class="choices" id="expandChoices"></div><textarea id="expansion" placeholder="추가하고 싶은 내용을 적어 보세요."></textarea><div class="nav"><button class="btn" id="stopExpand">여기서 끝낼래요</button><button class="btn primary" id="applyExpand">문장에 더하기</button></div></section>
+<section class="screen" data-s="direct"><div class="eyebrow">7. 내 말로 표현하기</div><h2 class="q">이제 문장을 보지 않고 네 말로 한번 말해볼래요?</h2><textarea id="directText" placeholder="내 말로 직접 적어 보세요."></textarea><div class="chips"><button class="chip" id="hint">힌트 보기</button><button class="chip" id="difficult">아직 어려워요</button></div><div class="box yellow hidden" id="hintBox"></div><div class="nav"><button class="btn primary" id="toCorrection">내 표현 저장</button></div></section>
+<section class="screen" data-s="correction"><div class="eyebrow">8. 최소 교정</div><h2 class="q">내 말의 뜻은 그대로 두고 필요한 부분만 살펴볼게요.</h2><div class="box"><b>내 원문</b><p id="originalDirect"></p></div><div class="box green"><b>최소 교정 제안</b><p id="corrected"></p></div><div class="choices"><button class="choice" id="acceptCorrection">이렇게 고칠래요</button><button class="choice" id="keepOriginal">원래 말이 좋아요</button></div></section>
+<section class="screen" data-s="aiRequest"><div class="eyebrow">9. AI에게 요구하기</div><h2 class="q">AI에게 무엇을 부탁하고 싶어요?</h2><select id="requestAction"><option>알려줘</option><option>설명해줘</option><option>추천해줘</option><option>비교해줘</option><option>정리해줘</option><option>요약해줘</option><option>만들어줘</option><option>그려줘</option><option>고쳐줘</option><option>문제 내줘</option></select><input id="requestContent" placeholder="무엇에 대해?"><select id="requestLevel"><option value="">수준 정하지 않기</option><option>초등학교 3~4학년이 이해할 수 있게</option><option>초등학교 5~6학년이 이해할 수 있게</option><option>쉬운 말로</option></select><div class="box green"><b>완성 요구문</b><p id="assembledRequest"></p></div><div class="nav"><button class="btn" id="skipAI">AI 요구 연습 건너뛰기</button><button class="btn primary" id="toEvaluate">요구문 저장</button></div></section>
+<section class="screen" data-s="evaluate"><div class="eyebrow">10. AI 결과 평가</div><h2 class="q">AI의 답이 내가 원했던 답인가요?</h2><textarea id="aiAnswer" placeholder="AI 답을 붙여 넣거나 적어 보세요."></textarea><div class="choices" id="evalChoices"></div><div class="box yellow"><b>다시 요구할 문장</b><p id="reask"></p></div><div class="nav"><button class="btn primary" id="toDiscourse">다음으로</button></div></section>
+<section class="screen" data-s="discourse"><div class="eyebrow">11. 짧은 담화</div><h2 class="q">다음 문장을 이어 말해 볼까요?</h2><div class="sentenceList" id="discourseList"></div><select id="relation"><option>시간 순서</option><option>원인→결과</option><option>주장→근거</option><option>설명→예시</option><option>비교→결론</option><option>감정→이유</option><option>문제→해결</option></select><textarea id="nextSentence" placeholder="다음 문장을 적어 보세요."></textarea><div class="nav"><button class="btn" id="addSentence">+ 문장 추가</button><button class="btn primary" id="saveSentence">문장사전에 저장</button></div></section>
+<section class="screen" data-s="dictionary"><div class="eyebrow">12. 나의 문장사전</div><h2 class="q">내 생각이 쌓여 나만의 문장 도서관이 됩니다.</h2><p class="help">완성한 문장뿐 아니라 처음 생각과 도움받은 과정도 함께 남아요. 다시 말하고, 다시 쓰고, 비슷한 상황에 활용할 수 있어요.</p><div class="library-summary"><span>전체 <b id="dictTotal">0</b></span><span>즐겨찾기 <b id="dictFav">0</b></span><span>표현 목적 <b id="dictIntentCount">0</b>종</span></div><div class="dictionary-tools"><input id="dictSearch" type="search" placeholder="주제나 문장 검색"><select id="dictSort" aria-label="문장사전 정렬"><option value="new">최근 저장순</option><option value="old">오래된 순</option><option value="favorite">즐겨찾기 먼저</option></select></div><div class="dictionary-filters" id="dictFilters"></div><div class="library" id="library"></div><div class="nav"><button class="btn" data-go="home">홈으로</button><button class="btn" data-go="teacher">교사용 분석</button><button class="btn" data-go="growth">펭귄 성장 보기</button></div></section>
+<section class="screen" data-s="teacher"><div class="eyebrow">13. 교사용 누적 분석</div><h2 class="q">문장 만들기 과정의 변화를 살펴봅니다.</h2><p class="help">진단이나 등급 판정이 아니라 수업 지원을 조정하기 위한 관찰 자료입니다. 기록 수가 적을 때는 변화 추세를 단정하지 않습니다.</p><div class="teacher-actions"><select id="analysisWindow" aria-label="분석 기간"><option value="all">전체 기록</option><option value="10">최근 10개</option><option value="5">최근 5개</option></select><button class="btn" id="exportAnalysis">분석 CSV 저장</button><button class="btn" id="printAnalysis">인쇄</button></div><div id="teacherDashboard" class="teacher-dashboard"></div><div class="teacher-section"><h3>학습자 사용성 테스트 프로토콜</h3><p class="help">실제 학습자가 수행할 때 아래 과업을 관찰합니다. 기록이 없으면 결과를 통과로 판정하지 않습니다.</p><div class="row"><button class="btn secondary" onclick="startUsabilitySession()">테스트 시작</button><button class="btn ghost" onclick="finishUsabilitySession()">테스트 종료</button></div><div id="protocolSummary" class="protocol-summary"></div><div id="protocolGrid" class="protocol-grid"></div></div><div class="teacher-section"><h3>사용성 테스트</h3><div id="teacherUsability"></div><div class="row"><button class="btn ghost" onclick="downloadUsabilityLog()">관찰 기록 저장</button></div></div><div class="nav"><button class="btn" data-go="dictionary">문장사전</button><button class="btn primary" data-go="growth">성장 보기</button></div></section><section class="screen" data-s="usability"><div class="eyebrow">14. 실제 학습자 사용성 테스트</div><h2 class="q">어디에서 도움이 필요했는지 확인합니다.</h2><p class="help">정답률이 아니라 실제 사용 과정의 접근성과 독립성을 기록합니다. 기록은 이 기기에만 저장됩니다.</p><div class="teacher-actions"><button class="btn primary" id="startTestSession">새 테스트 시작</button><button class="btn" id="finishTestSession">현재 테스트 종료</button><button class="btn" id="exportUsability">CSV 저장</button></div><div id="usabilitySummary" class="usability-summary"></div><div class="nav"><button class="btn" data-go="home">홈으로</button><button class="btn" data-go="teacher">교사용 분석</button></div></section><section class="screen" data-s="adaptive"><div class="eyebrow">15. 지원 수준 자동조절</div><h2 class="q">필요한 만큼만 도움을 제공합니다.</h2><p class="help">자동 모드는 최근 수행을 참고하지만, 언제든 교사·학습자가 직접 도움 수준을 바꿀 수 있습니다. 지원 수준은 능력 등급이 아닙니다.</p><div class="adaptive-card"><div class="adaptive-level"><strong>현재 설정</strong><span class="support-pill" id="adaptiveModeLabel">자동</span></div><div class="adaptive-settings" id="adaptiveModeBtns"><button class="btn" data-mode="auto">자동</button><button class="btn" data-mode="low">도움 적게</button><button class="btn" data-mode="standard">기본</button><button class="btn" data-mode="high">도움 많이</button></div><div class="adaptive-hint" id="adaptiveReason"></div></div><div id="adaptiveDetails"></div><div class="nav"><button class="btn" data-go="home">홈으로</button><button class="btn primary" data-go="input">문장 만들기</button></div></section><section class="screen" data-s="treasures"><div class="eyebrow">23-12. 이야기 보물 도감</div><h2 class="q">이야기 속 보물을 하나씩 발견해요.</h2><p class="help">선택한 이야기로 문장 활동을 끝내고 문장사전에 저장하면 그 작품의 보물이 열립니다. 도움을 받아도 불이익이 없고, 같은 보물은 한 번만 획득합니다.</p><div class="treasure-summary"><span>내 보물 <b id="treasureCount">0</b>/30</span><span>한국 전래 <b id="treasureKoreanCount">0</b>/10</span><span>이솝우화 <b id="treasureAesopCount">0</b>/10</span><span>세계 이야기 <b id="treasureWorldCount">0</b>/10</span></div><div class="treasure-progress"><div id="treasureProgressBar" style="width:0%"></div></div><div class="treasure-filters" id="treasureFilters" style="margin-top:16px"></div><div class="treasure-grid" id="treasureGrid"></div><div class="box soft" style="margin-top:16px"><b>교사용 이미지 자산 점검</b><p class="help">완성한 PNG를 <code>assets/treasures/</code> 폴더에 정해진 파일명으로 넣으면 자동 적용됩니다.</p><button class="btn" id="auditTreasureAssets">30개 이미지 확인</button><div id="treasureAssetAudit" class="help" style="margin-top:8px"></div></div><div class="nav"><button class="btn" data-go="home">홈으로</button><button class="btn" data-go="dictionary">문장사전</button><button class="btn primary" data-go="growth">펭귄 성장 보기</button></div></section><section class="screen" data-s="growth"><div class="eyebrow">13. 나의 성장</div><h2 class="q" id="growthName">Lv.1 아기 펭귄</h2><p class="level-caption" id="growthMeaning">생각을 표현하기 시작했어요.</p><div class="growth-stage"><img id="growthPenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="1단계 아기 펭귄"></div><div class="meter"><div id="growthBar"></div></div><p style="text-align:center">EXP <b id="growthXp"></b> · 다음 성장까지 <b id="growthNextXp"></b> EXP</p><p class="help" style="text-align:center">EXP는 펭귄 성장에만 사용하고, 이야기 보물은 표현 경험으로 별도 수집합니다.</p><p class="help">정답률이나 속도가 아니라 생각 표현·수정·재시도·저장 같은 참여로 성장합니다. `없어요`에는 불이익이 없습니다.</p><div class="nav"><button class="btn" data-go="dictionary">문장사전</button><button class="btn primary" data-go="report">결과지 보기</button></div></section>
+<section class="screen" data-s="report"><div class="eyebrow">14. 학습 결과</div><h2 class="q">이번에 내 생각이 이렇게 자랐어요.</h2><div class="box"><b>처음 표현</b><p id="reportInitial"></p></div><div class="box green"><b>최종 표현</b><p id="reportFinal"></p></div><div class="box"><b>표현 목적·지원</b><p id="reportMeta"></p></div><div class="nav"><button class="btn" data-go="home">홈으로</button><button class="btn primary" onclick="window.print()">결과지 인쇄</button></div></section>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+<section class="screen" data-s="teacher">
+ <div class="topline"><button class="btn ghost" type="button" onclick="go('home')">← 홈</button><span class="eyebrow">교사용 결과 분석</span></div>
+ <div class="hero"><h2>학습 과정 분석</h2><p>정답률이 아니라 표현 과정과 지원 수준의 변화를 봅니다.</p></div>
+ <div id="teacherDashboard" class="teacher-dashboard"></div>
+ <div class="row"><button class="btn secondary" type="button" onclick="window.print()">결과 인쇄</button><button class="btn ghost" type="button" onclick="downloadTeacherReport()">분석 JSON 저장</button></div>
+</section>
+</main><button class="usability-fab" id="testFab" aria-expanded="false">관찰 기록</button><aside class="test-panel" id="testPanel" aria-label="사용성 관찰 기록"><h3>현재 화면 관찰</h3><p class="help"><b id="testScreenName">-</b> · <span id="testElapsed">0초</span></p><label>수행 지원 수준</label><div class="test-grid" id="supportBtns"><button class="btn" data-support="0">독립 수행</button><button class="btn" data-support="1">말로 안내</button><button class="btn" data-support="2">시범·선택 도움</button><button class="btn support4" data-support="3">직접 도움</button></div><label>질문·과제 이해</label><select id="understanding"><option value="understood">이해함</option><option value="repeat">반복 설명 필요</option><option value="simplify">더 쉬운 표현 필요</option><option value="not_understood">이해 어려움</option></select><label>관찰된 어려움</label><select id="friction"><option value="none">특별한 어려움 없음</option><option value="stopped">진행이 멈춤</option><option value="too_many">선택지가 많음</option><option value="reading">글 읽기 부담</option><option value="touch">버튼/터치 어려움</option><option value="voice">음성 입력 어려움</option><option value="photo">사진 입력 어려움</option><option value="navigation">다음 단계 찾기 어려움</option></select><label>교사 메모</label><textarea id="testNote" placeholder="관찰한 행동만 짧게 기록"></textarea><div class="teacher-actions"><button class="btn primary" id="saveObservation">이 화면 기록</button><button class="btn" id="closeTestPanel">닫기</button></div></aside></div>
+<script>
+(()=>{const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let large=false;
+const intents=["경험","설명","생각","감정","질문","요구","주장","비교","예측·가정","문제해결","이야기"],stageOrder=["home","input","intent","candidates","confirm","question","expand","direct","correction","aiRequest","evaluate","discourse","dictionary","teacher","usability","adaptive","treasures","growth","report"];
+const defaults={current:"home",originalInput:"",intent:"생각",candidate:null,rejected:[],confirmed:[],working:"",direct:"",support:"A",final:"",request:"",evaluation:"",discourse:[],stars:0,xp:0,lastSaved:null,storyId:null};
+let st;try{st=Object.assign({},defaults,JSON.parse(localStorage.getItem("talktalk_integrated_v1")||"{}"))}catch(e){st={...defaults}}
+function save(){st.lastSaved=new Date().toISOString();try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(e){if(st.media?.photo?.dataUrl){st.media.photo.dataUrl=null;try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(_){}}}$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요."}
+const screenLabels={home:"홈",input:"생각 입력",intent:"표현 목적",candidates:"문장 후보",confirm:"의도 확인",question:"추가 질문",expand:"문장 확장",direct:"직접 표현",correction:"최소 교정",aiRequest:"AI 요구",evaluate:"AI 결과 평가",discourse:"짧은 담화",dictionary:"문장사전",teacher:"교사용 누적 분석",usability:"사용성 테스트",adaptive:"맞춤 도움 설정",treasures:"이야기 보물 도감",growth:"펭귄 성장",report:"학습 결과"};
+function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=name;save();$$(".screen").forEach(x=>x.classList.toggle("active",x.dataset.s===name));const i=stageOrder.indexOf(name);const pct=Math.round(i/(stageOrder.length-1)*100);$("#bar").style.width=pct+"%";$(".progress").setAttribute("aria-valuenow",pct);$(".progress").setAttribute("aria-valuemin","0");$(".progress").setAttribute("aria-valuemax","100");$(".progress").setAttribute("aria-label",`${screenLabels[name]||name} 진행 ${pct}%`);$("#guide").textContent=name==="home"?"생각은 네가 만들고, 문장 톡톡은 그 생각이 문장이 되도록 도와줘요.":`${screenLabels[name]||""} · 한 번에 한 가지씩 진행합니다.`;if(name==="dictionary")renderLibrary();if(name==="teacher")renderTeacherAnalysis();if(name==="usability")renderUsability();if(name==="adaptive")renderAdaptive();if(name==="treasures")renderTreasureAtlas();applyAdaptiveToScreen(name);if(name==="growth")renderGrowth();if(name==="report")renderReport();window.scrollTo({top:0,behavior:"smooth"})}
+$$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
+$("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
+$("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어나 짧은 말을 먼저 적어 주세요.");st.originalInput=v;st.working=v;reward("input");save();go("intent")};
+$("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
+$$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
+function candidates(){let t=st.originalInput||"내 생각",m={경험:[`${t}에 있었던 일을 말하고 싶어요.`,`${t}에서 기억나는 일이 있어요.`,`${t}에 대해 내가 겪은 일을 이야기하고 싶어요.`],설명:[`${t}이 무엇인지 설명하고 싶어요.`,`${t}의 특징을 알려 주고 싶어요.`,`${t}에 대해 중요한 점을 설명하고 싶어요.`],생각:[`나는 ${t}이 흥미롭다고 생각해요.`,`나는 ${t}에 대해 더 알고 싶어요.`,`나는 ${t}에 대해 궁금한 점이 있어요.`],감정:[`${t} 때문에 기분이 달라졌어요.`,`나는 ${t}에 대해 기분을 말하고 싶어요.`,`나는 ${t}을 생각하면 특별한 느낌이 들어요.`],질문:[`${t}은 무엇인가요?`,`${t}은 왜 그런가요?`,`${t}에 대해 더 알려 줄 수 있나요?`],요구:[`${t}에 대해 알려 주세요.`,`${t}을 쉽게 설명해 주세요.`,`${t}에 필요한 것을 도와주세요.`],주장:[`나는 ${t}이 중요하다고 생각해요.`,`나는 ${t}에 대해 내 의견을 말하고 싶어요.`,`나는 ${t}에 대해 이유와 함께 말하고 싶어요.`],비교:[`${t}을 다른 것과 비교하고 싶어요.`,`${t}의 같은 점과 다른 점을 알고 싶어요.`,`${t}의 특징을 비교해서 말하고 싶어요.`],"예측·가정":[`만약 ${t}이라면 어떻게 될지 궁금해요.`,`${t}이 앞으로 어떻게 될지 예상해 보고 싶어요.`,`${t}에 대해 가정해서 생각해 보고 싶어요.`],문제해결:[`${t}의 문제를 해결하고 싶어요.`,`${t}에서 어려운 점과 해결 방법을 말하고 싶어요.`,`${t}을 더 좋게 만드는 방법을 생각하고 싶어요.`],이야기:[`${t}에 대한 이야기를 만들고 싶어요.`,`${t}에서 일어난 일을 차례대로 말하고 싶어요.`,`${t}을 주제로 짧은 이야기를 하고 싶어요.`]};let a=m[st.intent]||m.생각;return [...a,`${t}에 대해 내가 직접 다른 말을 하고 싶어요.`,`내가 말하려는 문장이 없어요.`]}
+$("#toCandidates").onclick=()=>{renderCandidates();go("candidates")};
+function renderCandidates(){let box=$("#candidateList");box.innerHTML=candidates().map((x,i)=>`<button class="choice candidate" data-c="${i}">${i+1}. ${x}</button>`).join("");box.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{let s=candidates()[+b.dataset.c];if(s==="내가 말하려는 문장이 없어요."){st.rejected.push(...candidates().slice(0,-1));reward("reselect_none");save();prepareQuestion();go("question");return}st.candidate=s;reward("candidate");$("#selectedSentence").textContent=s;save();go("confirm")})}
+$$("[data-confirm]").forEach(b=>b.onclick=()=>{if(b.dataset.confirm==="yes"){st.working=st.candidate;st.confirmed.push(st.candidate);save();prepareExpand();go("expand")}else{if(st.candidate)st.rejected.push(st.candidate);reward("reselect_none");save();prepareQuestion();go("question")}});
+function prepareQuestion(){const q={경험:"그때 어떤 일이 있었나요?",설명:"어떤 점을 가장 설명하고 싶나요?",생각:"왜 그렇게 생각하나요?",감정:"어떤 기분인지 말해 줄 수 있나요?",질문:"무엇이 가장 궁금한가요?",요구:"AI나 다른 사람이 무엇을 해 주면 좋겠나요?",주장:"그렇게 생각하는 이유는 무엇인가요?",비교:"무엇과 비교하고 싶나요?","예측·가정":"어떤 상황을 가정해 보고 싶나요?",문제해결:"가장 해결하고 싶은 문제는 무엇인가요?",이야기:"먼저 어떤 일이 일어났나요?"};$("#adaptiveQ").textContent=q[st.intent]||"조금 더 알려 줄 수 있나요?"}
+$("#unknown").onclick=()=>{$("#extra").value="잘 모르겠어요"};$("#private").onclick=()=>{$("#extra").value="말하고 싶지 않아요"};$("#applyExtra").onclick=()=>{let v=$("#extra").value.trim();if(v&&!["잘 모르겠어요","말하고 싶지 않아요"].includes(v)){st.confirmed.push(v);reward("question")}save();renderCandidates();go("candidates")};
+const expands=["왜?","그래서?","어떤 점?","예를 들면?","무엇과 달라?","어떤 기분?","만약?","어떻게 해결할까?","나는 어떻게 생각해?","무엇을 원해?"];
+function prepareExpand(){$("#workingSentence").textContent=st.working;$("#expandChoices").innerHTML=expands.slice(0,5).map(x=>`<button class="choice">${x}</button>`).join("")}
+$("#applyExpand").onclick=()=>{let e=$("#expansion").value.trim();if(e)st.working=(st.working.replace(/[.!?]$/,"")+", "+e.replace(/^[, ]+/,""));reward("expand");save();go("direct")};$("#stopExpand").onclick=()=>go("direct");
+$("#hint").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent="핵심 단어: "+st.originalInput+" · "+st.intent;st.support="C";save()};$("#difficult").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent=st.working;st.support="E";save()};
+$("#toCorrection").onclick=()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=minCorrect(v);save();go("correction")};
+function minCorrect(s){let t=s.trim().replace(/\s+/g," ");if(t&&!/[.!?]$/.test(t))t+=".";return t}
+$("#acceptCorrection").onclick=()=>{st.final=$("#corrected").textContent;reward("self_correct");save();prepareRequest();go("aiRequest")};$("#keepOriginal").onclick=()=>{st.final=st.direct;save();prepareRequest();go("aiRequest")};
+function polite(a){return({"알려줘":"알려 주세요","설명해줘":"설명해 주세요","추천해줘":"추천해 주세요","비교해줘":"비교해 주세요","정리해줘":"정리해 주세요","요약해줘":"요약해 주세요","만들어줘":"만들어 주세요","그려줘":"그려 주세요","고쳐줘":"고쳐 주세요","문제 내줘":"문제를 내 주세요"})[a]||a}
+function prepareRequest(){$("#requestContent").value=st.originalInput;buildRequest()}function buildRequest(){let c=$("#requestContent").value.trim(),a=polite($("#requestAction").value),l=$("#requestLevel").value;$("#assembledRequest").textContent=`${c}에 대해 ${a}${l?" "+l:""}.`.replace("..",".")}["requestAction","requestContent","requestLevel"].forEach(id=>$("#"+id).oninput=buildRequest);
+$("#toEvaluate").onclick=()=>{st.request=$("#assembledRequest").textContent;reward("ai_request");save();renderEval();go("evaluate")};$("#skipAI").onclick=()=>{st.request="";go("discourse");prepareDiscourse()};
+function renderEval(){const vals=["원하는 답이에요","너무 어려워요","너무 길어요","너무 짧아요","원하는 내용이 아니에요"];$("#evalChoices").innerHTML=vals.map(x=>`<button class="choice" data-e="${x}">${x}</button>`).join("");$$("[data-e]").forEach(b=>b.onclick=()=>{st.evaluation=b.dataset.e;reward("ai_evaluate");if(b.dataset.e!=="원하는 답이에요")reward("ai_reask");let m={"너무 어려워요":"더 쉽게 설명해 주세요.","너무 길어요":"핵심만 짧게 말해 주세요.","너무 짧아요":"더 자세하게 설명해 주세요.","원하는 내용이 아니에요":"내가 물어본 내용에 맞춰 다시 답해 주세요."};$("#reask").textContent=b.dataset.e==="원하는 답이에요"?"이 답은 내가 원했던 답이에요.":`${st.request} ${m[b.dataset.e]}`;save()})}
+$("#toDiscourse").onclick=()=>{prepareDiscourse();go("discourse")};function prepareDiscourse(){if(!st.discourse.length)st.discourse=[st.final||st.working||st.originalInput];renderDiscourse()}
+function renderDiscourse(){$("#discourseList").innerHTML=st.discourse.map((x,i)=>`<div class="sentence"><b>${i+1}문장</b> ${x}</div>`).join("")}
+$("#addSentence").onclick=()=>{if(st.discourse.length>=3)return msg("짧은 글은 최대 3문장까지 만들어요.");let v=$("#nextSentence").value.trim();if(!v)return msg("이어질 문장을 적어 주세요.");if(!/[.!?]$/.test(v))v+=".";st.discourse.push(v);reward("discourse");$("#nextSentence").value="";renderDiscourse();save()};
+$("#saveSentence").onclick=()=>{let dict=getDict(),now=new Date().toISOString(),entry={schemaVersion:2,id:"b"+Date.now(),date:now,updatedAt:now,topic:st.originalInput||"내 문장",intent:st.intent||"생각",initial:st.originalInput||"",candidate:st.candidate||"",confirmedFacts:[...(st.confirmed||[])],rejectedCount:(st.rejected||[]).length,working:st.working||"",direct:st.direct||"",corrected:st.final||"",final:st.discourse.join(" ")||st.final||st.working||st.originalInput,sentences:[...(st.discourse||[])],support:st.support||"A",request:st.request||"",evaluation:st.evaluation||"",metrics:{confirmedCount:(st.confirmed||[]).length,rejectedCount:(st.rejected||[]).length,expanded:!!(st.working&&st.originalInput&&st.working.length>st.originalInput.length),directAttempt:!!st.direct,selfCorrection:!!(st.direct&&st.final&&st.direct!==st.final),aiRequest:!!st.request,discourseCount:(st.discourse||[]).length},favorite:false,tags:makeTags(st.originalInput,st.intent),reuseCount:0};dict.unshift(entry);setDict(dict);reward("complete");reward("dictionary_save");st.final=entry.final;save();updateHome();let newly=completeSelectedStoryTreasure(entry);if(newly.length)showTreasureRevealQueue(newly,()=>go("dictionary"));else go("dictionary")};
+function makeTags(topic,intent){let a=[intent];String(topic||"").split(/[\s,./]+/).filter(x=>x.length>=2).slice(0,3).forEach(x=>a.push(x));return [...new Set(a.filter(Boolean))]}
+function normalizeEntry(x){return {schemaVersion:x.schemaVersion||1,id:x.id||("legacy-"+Math.random().toString(36).slice(2)),date:x.date||new Date().toISOString(),updatedAt:x.updatedAt||x.date||new Date().toISOString(),topic:x.topic||x.initial||"내 문장",intent:x.intent||"생각",initial:x.initial||x.topic||"",candidate:x.candidate||"",confirmedFacts:Array.isArray(x.confirmedFacts)?x.confirmedFacts:[],rejectedCount:Number(x.rejectedCount)||0,working:x.working||"",direct:x.direct||"",corrected:x.corrected||"",final:x.final||"",sentences:Array.isArray(x.sentences)?x.sentences:(x.final?[x.final]:[]),support:x.support||"기록 없음",request:x.request||"",evaluation:x.evaluation||"",favorite:!!x.favorite,tags:Array.isArray(x.tags)?x.tags:makeTags(x.topic,x.intent),reuseCount:Number(x.reuseCount)||0}}
+function getDict(){try{return JSON.parse(localStorage.getItem("talktalk_sentence_dictionary")||"[]").map(normalizeEntry)}catch(e){return[]}}
+function setDict(d){localStorage.setItem("talktalk_sentence_dictionary",JSON.stringify(d))}
+let dictView={query:"",intent:"전체",sort:"new",open:null};
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function renderLibrary(){let all=getDict(),intentsUsed=[...new Set(all.map(x=>x.intent).filter(Boolean))];$("#dictTotal").textContent=all.length;$("#dictFav").textContent=all.filter(x=>x.favorite).length;$("#dictIntentCount").textContent=intentsUsed.length;$("#dictFilters").innerHTML=["전체","즐겨찾기",...intentsUsed].map(x=>`<button class="chip ${dictView.intent===x?'active':''}" data-df="${esc(x)}">${esc(x)}</button>`).join("");$$('[data-df]').forEach(b=>b.onclick=()=>{dictView.intent=b.dataset.df;renderLibrary()});let q=dictView.query.trim().toLowerCase(),d=all.filter(x=>{let ok=dictView.intent==="전체"?true:dictView.intent==="즐겨찾기"?x.favorite:x.intent===dictView.intent;if(!ok)return false;if(!q)return true;return [x.topic,x.intent,x.initial,x.direct,x.final,...x.tags].join(" ").toLowerCase().includes(q)});if(dictView.sort==="old")d.sort((a,b)=>new Date(a.date)-new Date(b.date));else if(dictView.sort==="favorite")d.sort((a,b)=>(b.favorite-a.favorite)||(new Date(b.date)-new Date(a.date)));else d.sort((a,b)=>new Date(b.date)-new Date(a.date));$("#library").innerHTML=d.length?d.map(renderBook).join(""):'<div class="empty-state box">조건에 맞는 문장이 없어요.<br><small>검색어나 분류를 바꿔 보세요.</small></div>';bindBookActions()}
+function renderBook(x){let open=dictView.open===x.id;return `<article class="book" data-book="${esc(x.id)}"><div class="book-top"><div><b>${esc(x.topic)}</b> <span class="chip">${esc(x.intent)}</span><div class="tag-row">${x.tags.map(t=>`<span class="chip">#${esc(t)}</span>`).join("")}</div></div><div class="book-actions"><button class="icon-btn ${x.favorite?'favorite-on':''}" data-fav="${esc(x.id)}" aria-label="즐겨찾기">${x.favorite?'★':'☆'}</button><button class="btn" data-detail="${esc(x.id)}">${open?'접기':'과정 보기'}</button></div></div><p class="book-final">${esc(x.final)}</p><small>${new Date(x.date).toLocaleDateString("ko-KR")} · 지원 ${esc(x.support)} · 다시 사용 ${x.reuseCount}회</small>${open?renderPortfolio(x):''}</article>`}
+function renderPortfolio(x){return `<div class="portfolio-detail"><div class="portfolio-grid"><div class="portfolio-item"><b>처음 표현</b><p>${esc(x.initial)||"기록 없음"}</p></div><div class="portfolio-item"><b>선택한 표현</b><p>${esc(x.candidate)||"기록 없음"}</p></div><div class="portfolio-item"><b>추가로 확인한 정보</b><p>${x.confirmedFacts.length?x.confirmedFacts.map(esc).join(" · "):"기록 없음"}</p></div><div class="portfolio-item"><b>확장한 문장</b><p>${esc(x.working)||"기록 없음"}</p></div><div class="portfolio-item"><b>내가 직접 표현한 문장</b><p>${esc(x.direct)||"기록 없음"}</p></div><div class="portfolio-item"><b>최종 표현</b><p>${esc(x.final)||"기록 없음"}</p></div></div>${x.request?`<div class="reuse-box"><b>AI에게 했던 요구</b><p>${esc(x.request)}</p></div>`:""}<div class="reuse-box"><b>이 문장을 다시 연습해 볼까요?</b><p class="help">같은 문장을 다시 말하거나 써 보고, 비슷한 상황에서는 내용을 바꾸어 새 문장을 만들 수 있어요.</p><div class="book-actions"><button class="btn" data-speak="${esc(x.id)}">🔊 다시 듣기</button><button class="btn" data-rewrite="${esc(x.id)}">✍️ 다시 쓰기</button><button class="btn primary" data-similar="${esc(x.id)}">↗ 비슷한 상황에 사용</button></div></div></div>`}
+function bindBookActions(){$$('[data-fav]').forEach(b=>b.onclick=()=>{let d=getDict(),x=d.find(v=>v.id===b.dataset.fav);if(x)x.favorite=!x.favorite;setDict(d);renderLibrary();updateHome()});$$('[data-detail]').forEach(b=>b.onclick=()=>{dictView.open=dictView.open===b.dataset.detail?null:b.dataset.detail;renderLibrary()});$$('[data-speak]').forEach(b=>b.onclick=()=>{let x=getDict().find(v=>v.id===b.dataset.speak);if(!x)return;if(!('speechSynthesis'in window))return msg('이 기기에서는 음성 읽기를 지원하지 않아요.');speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(x.final);u.lang='ko-KR';u.rate=.92;speechSynthesis.speak(u)});$$('[data-rewrite]').forEach(b=>b.onclick=()=>reuseEntry(b.dataset.rewrite,false));$$('[data-similar]').forEach(b=>b.onclick=()=>reuseEntry(b.dataset.similar,true))}
+function reuseEntry(id,similar){let d=getDict(),x=d.find(v=>v.id===id);if(!x)return;x.reuseCount=(x.reuseCount||0)+1;x.updatedAt=new Date().toISOString();setDict(d);st.activityId=`reuse-${Date.now()}`;st.originalInput=x.topic;st.intent=x.intent;st.candidate=null;st.rejected=[];st.confirmed=[];st.working=similar?x.topic:x.final;st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";$("#thought").value=similar?x.topic:x.final;save();msg(similar?"이 문장을 바탕으로 비슷한 상황의 새 문장을 만들어 봅니다.":"저장한 문장을 다시 내 말로 표현해 봅니다.");go(similar?"input":"direct")}
+$("#dictSearch").oninput=e=>{dictView.query=e.target.value;renderLibrary()};$("#dictSort").onchange=e=>{dictView.sort=e.target.value;renderLibrary()};
+
+const TREASURE_STORAGE_KEY="talktalk_story_treasures_v1";
+const TREASURE_CATEGORIES={all:"전체 30",korean:"한국 전래이야기",aesop:"이솝우화",world:"세계 옛이야기·명작"};
+const TREASURES=[
+[1,"korean","흥부와 놀부","보물 박","treasure-01-gourd.webp",["흥부는 다친 제비의 다리를 정성껏 치료해 주었어요.","이듬해 제비가 가져온 박씨를 심자 커다란 박이 열렸어요.","박을 타자 그 안에서 흥부의 가족을 도와줄 보물이 나왔어요."],["흥부","놀부","제비"],["제비","박씨","보물"],"제비가 가져온 씨앗에서 자란 커다란 열매예요."],
+[2,"korean","해와 달이 된 오누이","동아줄","treasure-02-rope.webp",["호랑이를 피해 오누이는 하늘에 살려 달라고 빌었어요.","하늘에서 튼튼한 동아줄이 내려왔고 오누이는 줄을 타고 올라갔어요.","오누이는 하늘에서 해와 달이 되었다고 전해져요."],["오빠","누이","호랑이"],["호랑이","동아줄","해와 달"],"오누이가 하늘로 올라갈 때 붙잡았어요."],
+[3,"korean","팥죽할멈과 호랑이","팥죽 그릇","treasure-03-red-bean-porridge.webp",["호랑이는 할머니에게 찾아와 잡아먹겠다고 위협했어요.","할머니가 슬퍼하며 팥죽을 쑤자 여러 친구가 팥죽을 얻어먹고 도와주었어요.","친구들은 힘을 모아 호랑이를 물리쳤어요."],["할머니","호랑이","친구들"],["팥죽","호랑이","도움"],"여러 친구가 이것을 얻어먹고 할머니를 도와주었어요."],
+[4,"korean","금도끼 은도끼","금도끼","treasure-04-golden-axe.webp",["나무꾼은 일을 하다가 연못에 쇠도끼를 빠뜨렸어요.","신령은 금도끼와 은도끼를 보여 주었지만 나무꾼은 자기 것이 아니라고 말했어요.","정직한 나무꾼은 자신의 쇠도끼와 함께 큰 보상을 받았어요."],["나무꾼","신령"],["도끼","연못","정직"],"신령이 연못에서 처음 보여 준 반짝이는 도끼예요."],
+[5,"korean","선녀와 나무꾼","날개옷","treasure-05-feather-robe.webp",["나무꾼은 사슴에게서 선녀들이 내려오는 곳에 대한 이야기를 들었어요.","선녀들은 날개옷을 벗어 두고 연못에서 목욕했어요.","날개옷은 선녀가 다시 하늘로 올라가는 데 필요한 특별한 옷이었어요."],["나무꾼","선녀","사슴"],["선녀","날개옷","하늘"],"선녀가 하늘로 돌아갈 때 필요한 특별한 옷이에요."],
+[6,"korean","혹부리 영감","도깨비 방망이","treasure-06-goblin-club.webp",["혹부리 영감은 산속에서 도깨비들을 만나 노래를 부르게 되었어요.","도깨비들은 영감의 노래가 혹에서 나오는 줄 알고 혹을 가져갔어요.","옛이야기 속 도깨비는 신기한 방망이와 함께 자주 등장해요."],["혹부리 영감","도깨비"],["혹","노래","도깨비"],"도깨비 하면 떠오르는 신기한 물건이에요."],
+[7,"korean","토끼의 간","용왕의 왕관","treasure-07-dragon-king-crown.webp",["병이 난 용왕은 토끼의 간이 필요하다는 말을 들었어요.","자라는 토끼를 용궁으로 데려왔지만 토끼는 꾀를 내어 위기를 피했어요.","토끼는 자신의 지혜를 이용해 다시 육지로 돌아왔어요."],["토끼","자라","용왕"],["용궁","토끼의 간","지혜"],"바닷속 용궁의 왕이 쓰는 물건이에요."],
+[8,"korean","콩쥐팥쥐","꽃신","treasure-08-flower-shoe.webp",["콩쥐는 어려운 일을 하면서도 여러 존재의 도움을 받았어요.","잔치에 가던 콩쥐는 길에서 꽃신 한 짝을 잃어버렸어요.","그 꽃신은 콩쥐를 다시 찾게 해 주는 중요한 단서가 되었어요."],["콩쥐","팥쥐","계모"],["콩쥐","잔치","꽃신"],"콩쥐가 잔치에 갔다가 잃어버린 물건이에요."],
+[9,"korean","견우와 직녀","까치","treasure-09-magpie.webp",["견우와 직녀는 서로 떨어져 지내게 되었어요.","두 사람은 일 년에 한 번 칠월 칠석에만 만날 수 있었어요.","까치와 까마귀가 다리를 만들어 두 사람이 만나도록 도와주었다고 전해져요."],["견우","직녀","까치와 까마귀"],["칠석","오작교","만남"],"견우와 직녀가 만날 수 있도록 다리를 만들어 준 새예요."],
+[10,"korean","효녀 심청","연꽃","treasure-10-lotus.webp",["심청은 아버지를 생각하는 마음이 깊은 딸이었어요.","심청은 인당수에 몸을 던진 뒤 신비한 도움을 받아 다시 세상으로 돌아왔어요.","이야기에서는 심청이 커다란 연꽃을 통해 다시 나타나요."],["심청","심 봉사"],["아버지","인당수","연꽃"],"심청이 다시 세상에 나타날 때 함께 등장하는 꽃이에요."],
+[11,"aesop","토끼와 거북이","거북이","treasure-11-tortoise.webp",["토끼와 거북이는 달리기 경주를 시작했어요.","빠른 토끼는 방심하여 중간에 쉬었지만 거북이는 천천히 계속 걸었어요.","멈추지 않은 거북이는 마침내 결승선에 먼저 도착했어요."],["토끼","거북이"],["경주","꾸준함","결승선"],"느리지만 끝까지 걸어간 동물이에요."],
+[12,"aesop","여우와 포도","포도송이","treasure-12-grapes.webp",["여우는 높은 곳에 달린 포도를 발견했어요.","여러 번 뛰어올랐지만 포도에 닿지 못했어요.","여우는 결국 포도가 시어서 필요 없다고 말하며 돌아갔어요."],["여우"],["포도","실패","핑계"],"여우가 여러 번 뛰어도 따지 못한 과일이에요."],
+[13,"aesop","개미와 베짱이","바이올린","treasure-13-violin.webp",["개미는 추운 계절을 준비하며 부지런히 먹을 것을 모았어요.","베짱이는 따뜻한 계절 동안 노래하며 시간을 보냈어요.","겨울이 오자 미리 준비하는 것이 중요하다는 사실이 드러났어요."],["개미","베짱이"],["여름","준비","겨울"],"베짱이의 즐거운 음악을 상징하는 악기예요."],
+[14,"aesop","양치기 소년","양","treasure-14-sheep.webp",["양치기 소년은 장난으로 늑대가 나타났다고 여러 번 거짓말했어요.","사람들은 소년의 말을 믿고 달려왔지만 늑대는 없었어요.","정말 늑대가 나타났을 때에는 사람들이 소년의 말을 믿지 않았어요."],["양치기 소년","마을 사람들","늑대"],["거짓말","늑대","믿음"],"소년이 들판에서 돌보던 동물이에요."],
+[15,"aesop","사자와 생쥐","생쥐","treasure-15-mouse.webp",["사자는 작은 생쥐를 잡았다가 놓아주었어요.","나중에 사자가 그물에 잡히자 생쥐가 찾아왔어요.","생쥐는 날카로운 이로 그물을 끊어 사자를 구해 주었어요."],["사자","생쥐"],["도움","그물","보답"],"작은 몸으로 커다란 사자를 구해 준 동물이에요."],
+[16,"aesop","까마귀와 여우","치즈","treasure-16-cheese.webp",["까마귀는 먹을 것을 입에 물고 나무 위에 앉아 있었어요.","여우는 까마귀를 칭찬하며 노래를 들려 달라고 했어요.","까마귀가 입을 여는 순간 먹을 것이 아래로 떨어졌어요."],["까마귀","여우"],["칭찬","노래","속임수"],"까마귀가 입을 여는 순간 떨어뜨린 먹을거리예요."],
+[17,"aesop","개와 그림자","고기 한 조각","treasure-17-meat.webp",["개는 고기를 물고 물가를 지나가고 있었어요.","물에 비친 자신의 모습을 다른 개라고 생각했어요.","더 큰 고기를 빼앗으려 입을 여는 순간 가지고 있던 고기를 놓쳤어요."],["개"],["고기","그림자","욕심"],"개가 입에 물고 가던 먹을거리예요."],
+[18,"aesop","황금알을 낳는 거위","황금알","treasure-18-golden-egg.webp",["한 거위가 날마다 황금알 하나를 낳았어요.","주인은 한꺼번에 더 많은 황금을 얻고 싶어 욕심을 냈어요.","지나친 욕심 때문에 매일 얻을 수 있었던 황금알마저 잃게 되었어요."],["거위","주인"],["황금알","욕심","기다림"],"거위가 날마다 하나씩 낳던 특별한 알이에요."],
+[19,"aesop","도시 쥐와 시골 쥐","치즈 바구니","treasure-19-cheese-basket.webp",["시골 쥐와 도시 쥐는 서로 다른 곳에서 살아가는 모습을 경험했어요.","도시에는 맛있는 음식이 많았지만 위험도 많았어요.","두 쥐의 이야기는 풍족함과 편안함 중 무엇을 중요하게 생각하는지 보여 줘요."],["도시 쥐","시골 쥐"],["도시","시골","선택"],"도시의 풍성한 먹을거리를 상징하는 바구니예요."],
+[20,"aesop","북풍과 태양","태양","treasure-20-sun.webp",["북풍과 태양은 누가 더 힘이 센지 겨루었어요.","북풍이 세게 불수록 나그네는 옷을 더욱 단단히 여몄어요.","태양이 따뜻하게 비추자 나그네는 스스로 겉옷을 벗었어요."],["북풍","태양","나그네"],["바람","햇빛","따뜻함"],"따뜻한 빛으로 나그네가 스스로 옷을 벗게 했어요."],
+[21,"world","알라딘과 요술램프","요술램프","treasure-21-magic-lamp.webp",["알라딘은 신비한 램프를 손에 넣게 되었어요.","램프에는 평범한 물건과 다른 놀라운 힘이 숨겨져 있었어요.","알라딘의 선택과 모험은 램프를 중심으로 계속 이어져요."],["알라딘","지니"],["램프","지니","소원"],"문지르면 놀라운 일이 시작되는 오래된 램프예요."],
+[22,"world","신드바드의 모험","범선","treasure-22-sailing-ship.webp",["신드바드는 배를 타고 먼바다로 여러 차례 모험을 떠났어요.","항해 중에는 낯선 섬과 신기한 존재, 예상하지 못한 위험을 만났어요.","신드바드는 어려움을 헤쳐 나가며 다시 고향으로 돌아왔어요."],["신드바드","선원들"],["항해","바다","모험"],"신드바드를 먼바다의 모험으로 데려간 탈것이에요."],
+[23,"world","신데렐라","유리구두","treasure-23-glass-slipper.webp",["신데렐라는 특별한 도움을 받아 무도회에 갈 수 있었어요.","정해진 시간이 다가오자 급히 돌아가다가 구두 한 짝을 남겼어요.","남겨진 구두는 신데렐라를 다시 찾는 중요한 단서가 되었어요."],["신데렐라","왕자","요정"],["무도회","자정","유리구두"],"신데렐라가 급히 돌아가다가 남긴 구두예요."],
+[24,"world","빨간 모자","빨간 두건","treasure-24-red-hood.webp",["빨간 모자를 쓴 아이는 할머니를 만나러 숲길을 걸어갔어요.","숲에서 만난 늑대는 아이보다 먼저 할머니의 집으로 향했어요.","빨간 모자의 여정은 숲에서 예상하지 못한 위험과 마주하게 되었어요."],["빨간 모자","할머니","늑대"],["숲","할머니","늑대"],"이야기의 주인공이 항상 쓰고 다니는 빨간 물건이에요."],
+[25,"world","잭과 콩나무","마법 콩","treasure-25-magic-beans.webp",["잭은 소를 팔러 갔다가 신기한 콩을 가지고 돌아왔어요.","콩에서는 하늘까지 닿을 만큼 거대한 콩나무가 자랐어요.","잭은 콩나무를 타고 올라가 새로운 모험을 시작했어요."],["잭","어머니","거인"],["마법 콩","콩나무","거인"],"하룻밤 사이 거대한 콩나무를 자라게 한 작은 씨앗이에요."],
+[26,"world","헨젤과 그레텔","과자집","treasure-26-candy-house.webp",["헨젤과 그레텔은 숲에서 길을 잃었어요.","두 아이는 과자와 빵처럼 먹을 수 있는 집을 발견했어요.","하지만 달콤해 보이는 집 안에는 예상하지 못한 위험이 기다리고 있었어요."],["헨젤","그레텔","마녀"],["숲","과자집","마녀"],"벽과 지붕까지 달콤한 먹을거리로 만들어진 집이에요."],
+[27,"world","아기 돼지 삼형제","빨간 벽돌","treasure-27-red-brick.webp",["아기 돼지 삼형제는 각자 자신의 집을 지었어요.","늑대는 짚집과 나무집을 무너뜨렸지만 튼튼한 집은 쉽게 무너지지 않았어요.","단단하게 지은 집은 돼지들을 위험으로부터 지켜 주었어요."],["아기 돼지 삼형제","늑대"],["집","늑대","벽돌"],"가장 튼튼한 집을 만드는 데 사용한 재료예요."],
+[28,"world","브레멘 음악대","당나귀","treasure-28-donkey.webp",["나이가 든 당나귀는 새로운 곳을 찾아 길을 떠났어요.","길에서 개와 고양이와 수탉을 만나 함께 움직이게 되었어요.","네 동물은 서로 힘을 합쳐 새로운 삶을 찾아갔어요."],["당나귀","개","고양이","수탉"],["동물","음악대","함께"],"브레멘을 향해 가장 먼저 길을 떠난 동물이에요."],
+[29,"world","장화 신은 고양이","장화","treasure-29-boots.webp",["영리한 고양이는 주인에게 장화를 준비해 달라고 했어요.","고양이는 장화를 신고 여러 가지 계획을 세워 행동했어요.","고양이의 재치 있는 행동은 주인의 삶을 크게 바꾸었어요."],["고양이","주인","왕"],["장화","재치","계획"],"영리한 고양이를 특별하게 만들어 주는 신발이에요."],
+[30,"world","벌거벗은 임금님","왕관","treasure-30-king-crown.webp",["임금님은 멋진 옷을 매우 좋아했어요.","두 사람은 특별한 사람에게만 보이는 옷을 만들 수 있다고 임금님을 속였어요.","사람들이 사실을 말하지 못할 때 한 아이가 자신이 본 것을 그대로 말했어요."],["임금님","사기꾼들","아이"],["임금님","새 옷","진실"],"이 이야기의 임금님을 나타내는 대표적인 물건이에요."]
+].map(x=>({id:x[0],category:x[1],workTitle:x[2],treasureName:x[3],filename:x[4],storyIntro:x[5],characters:x[6],keywords:x[7],clue:x[8]}));
+let treasureView={category:"all",open:null};
+// 23-10: 보물 저장·복구 스키마. 기존 23-8/23-9 데이터는 읽는 순간 자동 마이그레이션합니다.
+const TREASURE_SCHEMA_VERSION=2,TREASURE_BACKUP_KEY=TREASURE_STORAGE_KEY+"_backup";
+function emptyTreasureState(){return{schemaVersion:TREASURE_SCHEMA_VERSION,unlocked:{},progress:{count:0,percent:0,korean:0,aesop:0,world:0},updatedAt:null,lastRecoveredAt:null}}
+function normalizeTreasureRecord(id,raw){
+ let r=(raw&&typeof raw==='object')?raw:{};
+ return{treasureId:Number(id),unlockedAt:r.unlockedAt||r.date||new Date().toISOString(),reason:r.reason||"기존 획득 기록",activityId:r.activityId||null,ruleType:r.ruleType||((r.reason||'').includes('누적 활동')?'fallback':'primary'),firstSeenAt:r.firstSeenAt||r.unlockedAt||r.date||new Date().toISOString()};
+}
+function computeTreasureProgress(state){let ids=Object.keys(state.unlocked||{}).filter(id=>TREASURES.some(t=>t.id===Number(id))),cats={korean:0,aesop:0,world:0};ids.forEach(id=>{let t=TREASURES.find(x=>x.id===Number(id));if(t)cats[t.category]++});return{count:ids.length,percent:Math.round(ids.length/30*100),...cats}}
+function migrateTreasureState(raw){let base=emptyTreasureState(),src=(raw&&typeof raw==='object')?raw:{},unlocked={};Object.entries(src.unlocked||{}).forEach(([id,val])=>{if(TREASURES.some(t=>t.id===Number(id)))unlocked[id]=normalizeTreasureRecord(id,val)});base.unlocked=unlocked;base.progress=computeTreasureProgress(base);base.updatedAt=src.updatedAt||new Date().toISOString();base.lastRecoveredAt=src.lastRecoveredAt||null;return base}
+function readTreasureJSON(key){let raw=localStorage.getItem(key);if(!raw)return null;let parsed=JSON.parse(raw);if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error('invalid treasure state');return parsed}
+function getTreasureState(){
+ try{let state=migrateTreasureState(readTreasureJSON(TREASURE_STORAGE_KEY));if(JSON.stringify(state)!==localStorage.getItem(TREASURE_STORAGE_KEY))try{localStorage.setItem(TREASURE_STORAGE_KEY,JSON.stringify(state))}catch(_){}return state}
+ catch(e){
+  try{let state=migrateTreasureState(readTreasureJSON(TREASURE_BACKUP_KEY));state.lastRecoveredAt=new Date().toISOString();state.updatedAt=state.lastRecoveredAt;localStorage.setItem(TREASURE_STORAGE_KEY,JSON.stringify(state));return state}
+  catch(_){return emptyTreasureState()}
+ }
+}
+function setTreasureState(v){
+ let state=migrateTreasureState(v);state.progress=computeTreasureProgress(state);state.updatedAt=new Date().toISOString();
+ try{let current=localStorage.getItem(TREASURE_STORAGE_KEY);if(current){try{JSON.parse(current);localStorage.setItem(TREASURE_BACKUP_KEY,current)}catch(_){}}localStorage.setItem(TREASURE_STORAGE_KEY,JSON.stringify(state));return true}
+ catch(e){try{localStorage.setItem(TREASURE_STORAGE_KEY,JSON.stringify(state));return true}catch(_){msg('보물 기록을 저장하지 못했습니다. 기기 저장 공간을 확인해 주세요.');return false}}
+}
+function treasureUnlocked(id){return !!getTreasureState().unlocked?.[id]}
+const TREASURE_ASSET_BASE="assets/treasures/";
+const TREASURE_ASSET_MANIFEST=Object.freeze(Object.fromEntries(TREASURES.map(t=>[t.id,t.filename])));
+function treasureImgPath(t){return `${TREASURE_ASSET_BASE}${TREASURE_ASSET_MANIFEST[t.id]||t.filename}`}
+function treasureFallback(t,locked=false){return `<div class="treasure-placeholder" ${locked?'':'style="display:none"'} aria-label="${locked?'잠긴 보물':'보물 이미지 준비 중'}">${locked?'?':'✦'}</div>`}
+function treasureArt(t,large=false){if(!treasureUnlocked(t.id))return treasureFallback(t,true);return `<img src="${treasureImgPath(t)}" alt="${esc(t.treasureName)}" loading="lazy" decoding="async" data-treasure-image="${t.id}" onerror="this.hidden=true;this.nextElementSibling.style.display='grid'">${treasureFallback(t,false)}`}
+async function auditTreasureAssets(){let rows=[];for(const t of TREASURES){let status=await new Promise(resolve=>{let im=new Image();im.onload=()=>resolve('준비됨');im.onerror=()=>resolve('미등록');im.src=treasureImgPath(t)+'?assetAudit=1'});rows.push({id:t.id,filename:t.filename,status})}return rows}
+window.TALKTALK_TREASURE_ASSETS={base:TREASURE_ASSET_BASE,manifest:TREASURE_ASSET_MANIFEST,path:id=>{let t=TREASURES.find(x=>x.id===Number(id));return t?treasureImgPath(t):null},audit:auditTreasureAssets};
+function renderTreasureAtlas(){let state=getTreasureState(),unlocked=TREASURES.filter(t=>!!state.unlocked?.[t.id]);let count=c=>unlocked.filter(t=>t.category===c).length;$("#treasureCount").textContent=unlocked.length;$("#treasureKoreanCount").textContent=count("korean");$("#treasureAesopCount").textContent=count("aesop");$("#treasureWorldCount").textContent=count("world");$("#treasureProgressBar").style.width=`${unlocked.length/30*100}%`;$("#treasureFilters").innerHTML=Object.entries(TREASURE_CATEGORIES).map(([k,v])=>`<button class="chip ${treasureView.category===k?'active':''}" data-tcat="${k}">${v}</button>`).join("");$$('[data-tcat]').forEach(b=>b.onclick=()=>{treasureView.category=b.dataset.tcat;renderTreasureAtlas()});let list=TREASURES.filter(t=>treasureView.category==="all"||t.category===treasureView.category);$("#treasureGrid").innerHTML=list.map(t=>{let u=!!state.unlocked?.[t.id];let fresh=Number(sessionStorage.getItem('talktalk_new_treasure')||0)===t.id;return `<button class="treasure-card ${u?'unlocked':'locked'} ${fresh?'just-unlocked':''}" data-treasure="${t.id}" aria-label="${u?esc(t.treasureName):`잠긴 보물 ${t.id}`} 상세 보기"><span class="treasure-no">${String(t.id).padStart(2,'0')}</span>${fresh?'<span class="treasure-new">NEW</span>':''}<div class="treasure-art">${treasureArt(t)}</div><b>${u?esc(t.treasureName):'???'}</b><small>${u?`${esc(TREASURE_CATEGORIES[t.category].replace(' 10',''))} · ${esc(t.workTitle)}`:esc(t.clue)}</small><div class="treasure-lock">${u?'발견한 보물':'🔒 아직 발견 전'}</div></button>`}).join("");$$('[data-treasure]').forEach(b=>b.onclick=()=>openTreasure(+b.dataset.treasure))}
+function openTreasure(id){
+ let t=TREASURES.find(x=>x.id===id),u=treasureUnlocked(id);if(!t)return;
+ if(Number(sessionStorage.getItem('talktalk_new_treasure')||0)===id){sessionStorage.removeItem('talktalk_new_treasure');setTimeout(()=>renderTreasureAtlas(),0)}
+ let modal=document.createElement('div');modal.className='treasure-reveal';modal.setAttribute('role','dialog');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label',u?`${t.treasureName} 보물 정보`:`잠긴 보물 ${t.id} 힌트`);
+ let cat=TREASURE_CATEGORIES[t.category].replace(' 10','');
+ if(!u){
+   modal.innerHTML=`<div class="treasure-reveal-card"><div class="treasure-reveal-close"><button class="iconBtn" data-close aria-label="닫기">×</button></div><div class="treasure-reveal-badge">🔒 아직 만나지 못한 보물</div><div class="treasure-reveal-img"><div class="treasure-placeholder">?</div></div><h2>보물 ${String(t.id).padStart(2,'0')}</h2><div class="treasure-locked-hint"><b>💡 보물 힌트</b><p>${esc(t.clue)}</p></div><p class="help">이 보물은 이야기 활동을 마치고 문장을 저장하면 발견할 수 있어요.</p><div class="treasure-reveal-actions"><button class="btn secondary" data-close>도감으로 돌아가기</button></div></div>`;
+ }else{
+   modal.innerHTML=`<div class="treasure-reveal-card"><div class="treasure-reveal-close"><button class="iconBtn" data-close aria-label="닫기">×</button></div><div class="treasure-reveal-badge">✨ 발견한 이야기 보물</div><div class="treasure-reveal-img">${treasureArt(t,true)}</div><span class="treasure-category-label">${esc(cat)}</span><h2>${esc(t.treasureName)}</h2><p class="treasure-reveal-story">《${esc(t.workTitle)}》</p><div class="treasure-learning"><div class="learning-block"><h4>📖 이야기 다시 떠올리기</h4>${t.storyIntro.map(s=>`<p>• ${esc(s)}</p>`).join('')}</div><div class="learning-block"><h4>👥 등장인물</h4><div class="treasure-tags">${t.characters.map(x=>`<span class="treasure-tag">${esc(x)}</span>`).join('')}</div></div><div class="learning-block"><h4>🔑 핵심어</h4><div class="treasure-tags">${t.keywords.map(x=>`<span class="treasure-tag">${esc(x)}</span>`).join('')}</div></div></div><div class="treasure-reveal-actions"><button class="btn primary" data-replay>이 이야기로 다시 문장 만들기</button><button class="btn secondary" data-close>도감으로 돌아가기</button></div></div>`;
+ }
+ document.body.appendChild(modal);let close=()=>modal.remove();modal.querySelectorAll('[data-close]').forEach(b=>b.onclick=close);modal.onclick=e=>{if(e.target===modal)close()};
+ let replay=modal.querySelector('[data-replay]');if(replay)replay.onclick=()=>{st.storyId=t.id;st.seed="";st.intent="";st.current="home";save();modal.remove();go("home");setTimeout(()=>{initStoryActivitySelector();let box=$("#storyActivityBox");if(box){box.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});box.setAttribute('tabindex','-1');box.focus({preventScroll:true})}},100)};
+ let first=modal.querySelector('[data-close]');if(first)first.focus()
+}
+
+
+
+
+const GLOBAL_ADAPTIVE_KEY="talktalk_global_adaptive_v1";
+const GLOBAL_LEVELS={
+ low:{label:"기초 지원",candidate:"짧은 한 문장 후보",question:"한 가지 정보만 묻기",hint:"선택지·예시를 먼저 제공",direct:"단어·짧은 문장으로 직접 표현"},
+ mid:{label:"기본 지원",candidate:"이유·순서를 포함한 1–2문장 후보",question:"이유·순서·감정 중 필요한 한 가지 질문",hint:"핵심어 힌트 후 선택지",direct:"이유가 들어간 한 문장 직접 표현"},
+ high:{label:"확장 지원",candidate:"근거·비교·조건을 포함한 2–3문장 후보",question:"근거·비교·가정 중 가장 필요한 한 가지 질문",hint:"먼저 스스로 생각한 뒤 최소 힌트",direct:"근거 또는 조건을 넣어 1–2문장 직접 표현"}
+};
+function getGlobalAdaptive(){try{return JSON.parse(localStorage.getItem(GLOBAL_ADAPTIVE_KEY)||'{"level":"mid","manual":false}')}catch(e){return {level:"mid",manual:false}}}
+function saveGlobalAdaptive(x){localStorage.setItem(GLOBAL_ADAPTIVE_KEY,JSON.stringify(x))}
+function globalPerformance(){
+ let hist=getAdaptiveHistory(),u=getUsabilityLog?getUsabilityLog().filter(x=>x.type==="observation").slice(-8):[];
+ let recent=hist.slice(-5),direct=recent.filter(x=>x.direct).length,expanded=recent.filter(x=>x.structure>=1).length;
+ let support=u.filter(x=>["verbal","visual","direct","stuck"].includes(x.kind)).length,ind=u.filter(x=>x.kind==="independent").length;
+ return {samples:recent.length,direct,expanded,support,independent:ind};
+}
+function globalRecommendation(){
+ let p=globalPerformance(),current=getGlobalAdaptive().level;
+ if(p.samples<2&&p.independent+p.support<3)return {level:current,kind:"observe",reason:"수행 기록을 조금 더 모은 뒤 조절합니다."};
+ if(p.support>=3&&p.support>p.independent)return {level:"low",kind:"support",reason:"최근 활동에서 지원 사용이 반복되어 문장 부담을 낮춘 시작 수준을 제안합니다."};
+ if(p.direct>=3&&p.expanded>=3&&p.independent>=p.support)return {level:"high",kind:"expand",reason:"직접 표현과 문장 확장이 여러 활동에서 안정적으로 나타나 확장 수준을 제안합니다."};
+ return {level:"mid",kind:"keep",reason:"현재는 기본 수준에서 다양한 표현 목적을 더 관찰하는 것이 적절합니다."};
+}
+function globalLevel(){return getGlobalAdaptive().level||"mid"}
+function renderGlobalAdaptive(){
+ let chip=$("#globalAdaptiveChip"),txt=$("#globalAdaptiveText");if(!chip||!txt)return;let x=getGlobalAdaptive(),r=globalRecommendation(),L=GLOBAL_LEVELS[x.level];
+ chip.textContent=L.label;txt.textContent=`${L.candidate} · ${L.question} · ${L.hint}. ${r.reason}`;
+}
+function cycleGlobalLevel(){let x=getGlobalAdaptive(),order=["low","mid","high"],i=(order.indexOf(x.level)+1)%3;x.level=order[i];x.manual=true;saveGlobalAdaptive(x);renderGlobalAdaptive();msg(`${GLOBAL_LEVELS[x.level].label}으로 설정했어요.`)}
+function applyGlobalRecommendation(){let r=globalRecommendation(),x=getGlobalAdaptive();x.level=r.level;x.manual=false;saveGlobalAdaptive(x);renderGlobalAdaptive();msg(`${GLOBAL_LEVELS[x.level].label}을 적용했어요.`)}
+function adaptiveCandidateInstruction(){
+ let l=globalLevel(),L=GLOBAL_LEVELS[l];
+ return {level:l,maxCandidates:5,candidateStructure:L.candidate,oneQuestionOnly:true,noInventedFacts:true,rejectedMeaningsMustNotRepeat:true};
+}
+function adaptiveQuestionInstruction(){let l=globalLevel();return {level:l,instruction:GLOBAL_LEVELS[l].question,oneQuestionOnly:true}}
+function adaptiveHintInstruction(){let l=globalLevel();return {level:l,instruction:GLOBAL_LEVELS[l].hint,noneIsFailure:false}}
+function adaptiveDirectGoal(){let l=globalLevel();return {level:l,goal:GLOBAL_LEVELS[l].direct}}
+window.TALKTALK_GLOBAL_ADAPTIVE={levels:GLOBAL_LEVELS,get:getGlobalAdaptive,recommendation:globalRecommendation,candidate:adaptiveCandidateInstruction,question:adaptiveQuestionInstruction,hint:adaptiveHintInstruction,directGoal:adaptiveDirectGoal,apply:applyGlobalRecommendation};
+const ADAPTIVE_KEY="talktalk_story_adaptive_v1";
+function getAdaptiveHistory(){try{return JSON.parse(localStorage.getItem(ADAPTIVE_KEY)||"[]")}catch(e){return[]}}
+function saveAdaptiveHistory(rows){try{localStorage.setItem(ADAPTIVE_KEY,JSON.stringify(rows.slice(-30)))}catch(e){}}
+function sentenceComplexity(text){
+ text=String(text||"").trim();let clauses=(text.match(/그리고|그래서|하지만|때문에|지만|는데|면서|거나|만약|라면|기 때문에|반면에|예를 들면/g)||[]).length;
+ let sentences=(text.match(/[.!?]|요(?:\s|$)/g)||[]).length||1;
+ return {length:text.length,clauses,sentences};
+}
+function supportProfile(entry){
+ let finalText=entry?.final||entry?.sentence||entry?.corrected||st.final||st.corrected||st.seed||"";
+ let cx=sentenceComplexity(finalText);
+ let direct=!!(entry?.direct||entry?.directExpression||st.direct);
+ let revisions=Number(entry?.revisions||entry?.revisionCount||st.revisions||0);
+ let rejected=Array.isArray(st.rejected)?st.rejected.length:0;
+ // '없어요'와 수정은 실패가 아니라 의도 구별·자기점검 증거이므로 감점하지 않습니다.
+ let independence=direct?2:1;
+ let structure=cx.clauses>=2||cx.sentences>=2?2:cx.length>=18?1:0;
+ return {direct,revisions,rejected,independence,structure,...cx};
+}
+function recordAdaptivePerformance(entry){
+ if(!st.storyId)return;
+ let p=supportProfile(entry),row={at:new Date().toISOString(),storyId:st.storyId,level:storyLevelBand(),intent:st.intent||null,...p};
+ let rows=getAdaptiveHistory();rows.push(row);saveAdaptiveHistory(rows);return row;
+}
+function adaptiveRecommendation(){
+ let rows=getAdaptiveHistory().slice(-5);if(rows.length<2)return {kind:"observe",text:"이야기 활동을 2회 이상 완료하면 최근 수행을 바탕으로 난이도 제안을 보여드려요.",evidence:"한 번의 수행만으로 수준을 판단하지 않습니다."};
+ let cur=storyLevelBand(),same=rows.filter(r=>r.level===cur).slice(-3);if(same.length<2)same=rows.slice(-3);
+ let strong=same.filter(r=>r.independence>=2&&r.structure>=1).length;
+ let supported=same.filter(r=>r.independence<=1&&r.structure===0).length;
+ let labels={"12":"1–2학년","34":"3–4학년","56":"5–6학년"},up={"12":"34","34":"56","56":"56"},down={"56":"34","34":"12","12":"12"};
+ if(strong>=2&&up[cur]!==cur)return {kind:"up",target:up[cur],text:`최근 여러 활동에서 직접 표현과 문장 확장이 안정적으로 나타났어요. ${labels[up[cur]]} 과제를 한번 시도해 볼 수 있습니다.`,evidence:`최근 ${same.length}회 중 ${strong}회에서 직접 표현과 확장 구조가 함께 확인되었습니다.`};
+ if(supported>=2&&down[cur]!==cur)return {kind:"support",target:down[cur],text:`현재 수준을 낮춘다는 뜻이 아니라, 다음 활동에서 문장 부담을 줄여 표현을 더 쉽게 시작해 볼 수 있습니다.`,evidence:`최근 ${same.length}회 중 ${supported}회에서 짧은 구조와 후보 지원을 중심으로 활동했습니다.`};
+ return {kind:"keep",text:`현재 ${labels[cur]} 수준을 유지하면서 다른 작품과 표현 목적에서도 연습해 보세요.`,evidence:`최근 수행이 한 방향으로 충분히 안정되지 않아 자동 변경하지 않습니다.`};
+}
+function renderAdaptiveStory(){
+ let box=$("#adaptiveStoryBox");if(!box)return;box.hidden=false;let r=adaptiveRecommendation();
+ $("#adaptiveStoryText").textContent=r.text;$("#adaptiveStoryEvidence").textContent=r.evidence||"";
+ let a=$("#adaptiveStoryActions");a.innerHTML="";
+ if(r.target){let b=document.createElement("button");b.className="btn secondary";b.textContent=`${STORY_LEVELS[r.target].label} 한번 시도하기`;b.onclick=()=>{st.storyLevel=r.target;save();renderStoryMissions()};a.appendChild(b)}
+ let keep=document.createElement("button");keep.className="btn ghost";keep.textContent="현재 난이도 유지";keep.onclick=()=>{};a.appendChild(keep);
+}
+
+
+const USABILITY_KEY="talktalk_usability_v1";let usabilityScreenStarted=Date.now(),usabilityLastScreen="home";
+function getUsabilityLog(){try{return JSON.parse(localStorage.getItem(USABILITY_KEY)||"[]")}catch(e){return[]}}
+function saveUsabilityLog(r){localStorage.setItem(USABILITY_KEY,JSON.stringify(r.slice(-200)))}
+function activeScreenName(){let x=document.querySelector(".screen.active,.screen.on");return x?.dataset?.s||"unknown"}
+function toggleUsabilityPanel(){let p=$("#usabilityPanel");p.hidden=!p.hidden;if(!p.hidden)$("#usabilityScreenName").textContent="현재 화면: "+activeScreenName()}
+function closeUsabilityPanel(){$("#usabilityPanel").hidden=true}
+function logUsability(kind){let L={independent:"혼자 수행",verbal:"언어적 힌트",visual:"시각적 힌트",direct:"직접 도움",stuck:"막힘",confused:"버튼/문구 혼동"},r=getUsabilityLog();r.push({type:"observation",screen:activeScreenName(),kind,label:L[kind],note:$("#usabilityNote").value.trim(),storyId:st.storyId||null,intent:st.intent||null,at:new Date().toISOString()});saveUsabilityLog(r);$("#usabilityNote").value="";closeUsabilityPanel()}
+function usabilityAnalysis(){let r=getUsabilityLog(),o=r.filter(x=>x.type==="observation"),c={},i={};o.forEach(x=>{c[x.kind]=(c[x.kind]||0)+1;if(["direct","stuck","confused"].includes(x.kind))i[x.screen]=(i[x.screen]||0)+1});return {total:o.length,counts:c,screenIssues:i,recent:o.slice(-8).reverse()}}
+function renderUsabilityTeacher(){let root=$("#teacherUsability");if(!root)return;let a=usabilityAnalysis(),L={independent:"혼자 수행",verbal:"언어적 힌트",visual:"시각적 힌트",direct:"직접 도움",stuck:"막힘",confused:"버튼/문구 혼동"},issues=Object.entries(a.screenIssues).sort((a,b)=>b[1]-a[1]);root.innerHTML=`<div class="teacher-note"><b>관찰 ${a.total}건</b><br>${Object.entries(a.counts).map(([k,v])=>`${L[k]} ${v}회`).join(" · ")||"아직 기록이 없습니다."}</div>${issues.length?`<div class="usability-row"><b>도움이 많이 필요했던 화면</b><br>${issues.slice(0,5).map(([k,v])=>`${esc(k)} ${v}회`).join(" · ")}</div>`:""}<p class="help">관찰 기록은 진단 점수가 아니라 화면과 지원 방법을 개선하기 위한 자료입니다.</p>`}
+function downloadUsabilityLog(){let d={generatedAt:new Date().toISOString(),analysis:usabilityAnalysis(),records:getUsabilityLog(),protocol:getProtocol(),priorities:protocolPriorities()},b=new Blob([JSON.stringify(d,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="문장톡톡_사용성관찰.json";a.click()}
+
+const PROTOCOL_KEY="talktalk_usability_protocol_v1";
+const USABILITY_TASKS=[
+ {id:"start",title:"1. 활동 시작",criterion:"작품 또는 일반 문장 활동을 선택하고 다음 단계로 이동한다.",risk:"시작 위치·버튼 이해"},
+ {id:"input",title:"2. 생각 입력",criterion:"글자·말하기·사진 중 사용할 입력 방법을 이해하고 입력한다.",risk:"입력 방법 선택"},
+ {id:"intent",title:"3. 표현 목적",criterion:"내가 하려는 말의 종류를 선택하거나 지원을 받아 선택한다.",risk:"표현 목적 용어 이해"},
+ {id:"candidate",title:"4. 후보 문장",criterion:"가장 가까운 문장을 고르거나 ‘없어요’를 사용해 의도를 구별한다.",risk:"후보 수·읽기 부담"},
+ {id:"question",title:"5. 추가 질문",criterion:"한 번에 한 질문에 답하여 필요한 정보를 추가한다.",risk:"질문 이해·인지부하"},
+ {id:"direct",title:"6. 내 말로 표현",criterion:"말하기·쓰기·단어카드 중 가능한 방법으로 직접 표현을 시도한다.",risk:"직접 생성 전환"},
+ {id:"final",title:"7. 최종 문장",criterion:"완성된 문장이 내가 하려던 말과 맞는지 확인한다.",risk:"AI 문장과 자기 의도 구별"},
+ {id:"save",title:"8. 저장·보상",criterion:"문장 저장과 보상 결과를 이해하고 활동을 마친다.",risk:"보상이 과제보다 주의를 끄는지"}
+];
+function getProtocol(){try{return JSON.parse(localStorage.getItem(PROTOCOL_KEY)||'{"active":false,"tasks":{},"sessions":[]}')}catch(e){return {active:false,tasks:{},sessions:[]}}}
+function saveProtocol(x){localStorage.setItem(PROTOCOL_KEY,JSON.stringify(x))}
+function startUsabilitySession(){let x=getProtocol();x.active=true;x.startedAt=new Date().toISOString();x.tasks={};saveProtocol(x);renderProtocol()}
+function markProtocol(id,status){let x=getProtocol();if(!x.active)return msg("먼저 테스트 시작을 눌러 주세요.");x.tasks[id]={status,at:new Date().toISOString()};saveProtocol(x);renderProtocol()}
+function protocolAssessment(x=getProtocol()){
+ let vals=Object.values(x.tasks||{}),observed=vals.length,ind=vals.filter(v=>v.status==="independent").length,support=vals.filter(v=>v.status==="support").length,blocked=vals.filter(v=>v.status==="blocked").length;
+ let result=observed===0?"관찰 전":observed<USABILITY_TASKS.length?"관찰 진행 중":blocked>0?"수정 우선 과업 있음":support>=3?"지원 설계 검토":"1차 사용성 기준 충족";
+ return {observed,independent:ind,support,blocked,result};
+}
+function finishUsabilitySession(){let x=getProtocol(),a=protocolAssessment(x);if(!x.active)return msg("진행 중인 테스트가 없습니다.");x.active=false;x.finishedAt=new Date().toISOString();x.sessions=x.sessions||[];x.sessions.push({startedAt:x.startedAt,finishedAt:x.finishedAt,tasks:x.tasks,assessment:a});saveProtocol(x);renderProtocol();renderUsabilityTeacher()}
+function renderProtocol(){let sum=$("#protocolSummary"),grid=$("#protocolGrid");if(!sum||!grid)return;let x=getProtocol(),a=protocolAssessment(x);sum.innerHTML=`<b>${x.active?"테스트 진행 중":a.observed?"최근 테스트 기록":"아직 실제 관찰 기록 없음"}</b><br>관찰 ${a.observed}/${USABILITY_TASKS.length} · 혼자 수행 ${a.independent} · 지원 필요 ${a.support} · 막힘 ${a.blocked}<br><span class="protocol-status">판정: ${a.result}</span>`;
+ grid.innerHTML=USABILITY_TASKS.map(t=>{let s=x.tasks?.[t.id]?.status||"";return `<div class="protocol-item ${s==="blocked"?"priority-high":s==="support"?"priority-mid":"priority-low"}"><b>${t.title}</b><span>${t.criterion}</span><br><small>관찰 초점: ${t.risk}</small><div class="protocol-actions"><button class="btn ghost" onclick="markProtocol('${t.id}','independent')">혼자 수행</button><button class="btn ghost" onclick="markProtocol('${t.id}','support')">지원 필요</button><button class="btn ghost" onclick="markProtocol('${t.id}','blocked')">막힘</button></div></div>`}).join("")}
+function protocolPriorities(){let x=getProtocol(),rows=[];USABILITY_TASKS.forEach(t=>{let s=x.tasks?.[t.id]?.status;if(s==="blocked")rows.push({priority:"높음",task:t.title,reason:t.risk});else if(s==="support")rows.push({priority:"중간",task:t.title,reason:t.risk})});return rows}
+window.TALKTALK_PROTOCOL={tasks:USABILITY_TASKS,get:getProtocol,start:startUsabilitySession,mark:markProtocol,finish:finishUsabilitySession,assessment:protocolAssessment,priorities:protocolPriorities};
+window.TALKTALK_USABILITY={log:logUsability,analysis:usabilityAnalysis,records:getUsabilityLog,reset(){localStorage.removeItem(USABILITY_KEY)}};
+
+function renderTeacherGlobalAdaptive(){let root=$("#teacherGlobalAdaptive");if(!root)return;let x=getGlobalAdaptive(),r=globalRecommendation(),L=GLOBAL_LEVELS[x.level];root.innerHTML=`<b>현재: ${L.label}</b><br>${L.candidate}<br>${L.question}<br>${L.hint}<br><small>추천 근거: ${esc(r.reason)}</small>`}
+function teacherAnalysis(){
+ let dict=getDict?getDict():[],hist=getAdaptiveHistory(),storyEntries=dict.filter(e=>e.storyActivity),intents={},stories={},levels={};
+ dict.forEach(e=>{let k=e.intent||e.storyActivity?.expressionPurpose||"미분류";intents[k]=(intents[k]||0)+1});
+ storyEntries.forEach(e=>{let k=e.storyActivity?.workTitle||"이야기";stories[k]=(stories[k]||0)+1});
+ hist.forEach(r=>{let k=STORY_LEVELS[r.level]?.label||r.level;levels[k]=(levels[k]||0)+1});
+ return {saved:dict.length,storyCompleted:storyEntries.length,direct:hist.filter(r=>r.direct).length,expanded:hist.filter(r=>r.structure>=1).length,intents,stories,levels,history:hist.slice(-10).reverse(),recommendation:adaptiveRecommendation()};
+}
+function teacherBars(obj){let rows=Object.entries(obj||{}).sort((a,b)=>b[1]-a[1]),max=Math.max(1,...rows.map(x=>x[1]));return rows.length?`<div class="teacher-bars">${rows.map(([k,v])=>`<div class="teacher-bar-row"><span>${esc(k)}</span><div class="teacher-bar"><i style="width:${v/max*100}%"></i></div><b>${v}</b></div>`).join("")}</div>`:'<p class="help">아직 기록이 없습니다.</p>'}
+function renderTeacherDashboard(){
+ let root=$("#teacherDashboard");if(!root)return;let a=teacherAnalysis(),h=a.history;
+ root.innerHTML=`<div class="teacher-kpis"><div class="teacher-kpi"><small>저장한 문장</small><b>${a.saved}</b></div><div class="teacher-kpi"><small>이야기 활동</small><b>${a.storyCompleted}</b></div><div class="teacher-kpi"><small>직접 표현 기록</small><b>${a.direct}</b></div><div class="teacher-kpi"><small>확장 구조 기록</small><b>${a.expanded}</b></div></div>
+ <div class="teacher-section"><h3>표현 목적</h3>${teacherBars(a.intents)}</div><div class="teacher-section"><h3>이야기별 수행</h3>${teacherBars(a.stories)}</div><div class="teacher-section"><h3>난이도 경험</h3>${teacherBars(a.levels)}</div>
+ <div class="teacher-section"><h3>최근 수행 과정</h3><div class="teacher-history">${h.length?h.map(r=>`<div class="teacher-history-row"><b>${esc(TREASURES.find(t=>t.id===r.storyId)?.workTitle||"이야기")} · ${esc(STORY_LEVELS[r.level]?.label||r.level)}</b><small>${esc(r.intent||"표현")} · ${r.direct?"직접 표현":"후보/지원 활용"} · ${r.structure>=1?"문장 확장 확인":"짧은 구조"}${r.rejected?` · 의도 구별 ${r.rejected}회`:""}</small></div>`).join(""):'<p class="help">아직 수행 기록이 없습니다.</p>'}</div></div>
+ <div class="teacher-section"><h3>전체 문장 지원 수준</h3><div id="teacherGlobalAdaptive" class="teacher-note"></div></div><div class="teacher-section"><h3>다음 지원 제안</h3><div class="teacher-note"><b>${a.recommendation.kind==="up"?"다음 수준을 시험적으로 시도할 수 있습니다.":a.recommendation.kind==="support"?"표현 부담을 낮춘 지원을 사용할 수 있습니다.":a.recommendation.kind==="observe"?"조금 더 관찰합니다.":"현재 수준을 유지합니다."}</b><br>${esc(a.recommendation.text)}<br><small>${esc(a.recommendation.evidence||"")}</small></div></div>
+ <div class="teacher-section"><h3>해석 원칙</h3><p class="help">‘없어요’, 후보 거절, 수정은 실패로 계산하지 않습니다. 이는 자신의 의도를 구별하고 점검한 과정으로 봅니다. 이 화면은 진단 점수가 아니라 다음 수업의 지원 수준을 정하기 위한 형성평가 자료입니다.</p></div>`;
+}
+function showTeacherDashboard(){go("teacher");setTimeout(()=>{renderTeacherDashboard();renderUsabilityTeacher();renderProtocol();renderTeacherGlobalAdaptive()},0)}
+function downloadTeacherReport(){let data=teacherAnalysis(),blob=new Blob([JSON.stringify({generatedAt:new Date().toISOString(),...data},null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`문장톡톡_교사용분석_${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+window.TALKTALK_TEACHER={analysis:teacherAnalysis,render:renderTeacherDashboard,open:showTeacherDashboard,download:downloadTeacherReport};
+window.TALKTALK_ADAPTIVE={history:getAdaptiveHistory,recommendation:adaptiveRecommendation,record:recordAdaptivePerformance,reset(){localStorage.removeItem(ADAPTIVE_KEY);return true}};
+function storyLevelBand(){
+ if(st.storyLevel)return st.storyLevel;
+ let g=Number(st.grade||st.userGrade||3);
+ return g<=2?"12":g<=4?"34":"56";
+}
+const STORY_LEVELS={
+ "12":{label:"1–2학년",goal:"짧고 분명한 1문장",guide:"누가·무엇을 했는지 중심으로 말해요."},
+ "34":{label:"3–4학년",goal:"이유·순서가 들어간 1–2문장",guide:"왜, 그래서, 하지만 등을 사용해 생각을 이어 말해요."},
+ "56":{label:"5–6학년",goal:"근거·비교·가정이 들어간 2–3문장",guide:"사건을 연결하고 이유나 근거를 덧붙여 설명해요."}
+};
+function adaptStoryMission(m,t,level){
+ let x={...m},who=t.characters?.[0]||"등장인물",key=t.keywords?.[0]||t.treasureName;
+ if(level==="12"){
+  const simple={
+   "설명":"무슨 일이 있었나요? 짧게 한 문장으로 말해 보세요.",
+   "생각":`‘${key}’에 대해 어떻게 생각하나요? 한 문장으로 말해 보세요.`,
+   "질문":`‘${who}’에게 무엇을 묻고 싶나요? 질문 한 문장을 만들어 보세요.`,
+   "문제해결":"어떻게 하면 좋을까요? 한 가지 방법을 말해 보세요.",
+   "비교":"두 행동은 무엇이 다른가요? 한 가지 다른 점을 말해 보세요.",
+   "예측·가정":"다르게 했다면 어떻게 되었을까요? 짧게 말해 보세요."
+  }; x.guide=simple[x.intent]||x.guide;x.target="1문장";
+ }else if(level==="34"){
+  const mid={
+   "설명":"무슨 일이 있었는지 순서나 이유를 넣어 1–2문장으로 설명해 보세요.",
+   "생각":`‘${key}’에 대한 내 생각과 그 이유를 함께 말해 보세요.`,
+   "질문":`‘${who}’에게 묻고 싶은 질문을 만들고, 왜 궁금한지도 생각해 보세요.`,
+   "문제해결":"문제를 해결할 방법을 말하고 왜 그 방법이 좋은지 덧붙여 보세요.",
+   "비교":"두 행동의 같은 점이나 다른 점을 찾아 연결해서 말해 보세요.",
+   "예측·가정":"만약 행동이 달랐다면 결과가 어떻게 달라졌을지 말해 보세요."
+  };x.guide=mid[x.intent]||x.guide;x.target="1–2문장";
+ }else{
+  const high={
+   "설명":"사건의 원인과 결과를 연결하고 중요한 내용을 골라 2–3문장으로 설명해 보세요.",
+   "생각":`‘${key}’에 대한 내 생각을 말하고 이야기 속 사건을 근거로 이유를 덧붙여 보세요.`,
+   "질문":`‘${who}’의 선택이나 사건의 원인에 대해 더 깊이 생각할 수 있는 질문을 만들어 보세요.`,
+   "문제해결":"가능한 해결 방법을 제안하고 그 방법을 선택한 이유와 예상 결과를 설명해 보세요.",
+   "비교":"두 행동이나 선택을 기준을 정해 비교하고, 어느 점이 중요한지 이유를 말해 보세요.",
+   "예측·가정":"만약 중요한 사건 하나가 달라졌다면 이후 결과가 어떻게 달라질지 근거와 함께 말해 보세요."
+  };x.guide=high[x.intent]||x.guide;x.target="2–3문장";
+ }
+ return x;
+}
+function storyMissionsFor(t){
+ const s=t.storyIntro||[], c=t.characters||[], k=t.keywords||[];
+ const s1=s[0]||t.workTitle, s2=s[1]||s1, s3=s[2]||s2;
+ const who=c[0]||"등장인물", key=k[0]||t.treasureName, key2=k[1]||key;
+ // 작품별로 저장된 실제 사건 문장을 사용해 과제를 만듭니다.
+ // 새 사건·감정·동기를 AI가 임의로 덧붙이지 않습니다.
+ const patterns={
+  korean:[
+   {intent:"설명",title:"처음 사건 설명",prompt:s1,guide:`처음에 어떤 일이 있었는지 내 말로 설명해 보세요.`},
+   {intent:"설명",title:"원인과 결과 찾기",prompt:s2,guide:`이 사건이 일어난 까닭이나 그 뒤에 생긴 일을 말해 보세요.`},
+   {intent:"생각",title:"인물의 행동 생각",prompt:who,guide:`‘${who}’의 행동에 대해 내가 어떻게 생각하는지 말해 보세요.`},
+   {intent:"문제해결",title:"다른 방법 찾기",prompt:s3,guide:`마지막 상황에서 다른 방법이 있었을지 생각해 보세요.`}
+  ],
+  aesop:[
+   {intent:"설명",title:"중요한 행동 설명",prompt:s1,guide:`이야기에서 중요한 행동이 무엇이었는지 설명해 보세요.`},
+   {intent:"비교",title:"행동 비교하기",prompt:s2,guide:`등장인물들의 행동이나 선택에서 다른 점을 찾아 말해 보세요.`},
+   {intent:"생각",title:"이야기가 주는 생각",prompt:key,guide:`‘${key}’와 관련해 이 이야기를 읽고 든 생각을 말해 보세요.`},
+   {intent:"예측·가정",title:"다르게 했다면?",prompt:s3,guide:`등장인물이 다르게 행동했다면 결과가 어떻게 달라졌을지 말해 보세요.`}
+  ],
+  world:[
+   {intent:"설명",title:"핵심 장면 설명",prompt:s1,guide:`이 장면에서 어떤 일이 있었는지 내 말로 설명해 보세요.`},
+   {intent:"질문",title:"인물에게 질문",prompt:who,guide:`‘${who}’에게 묻고 싶은 것을 한 가지 만들어 보세요.`},
+   {intent:"생각",title:"선택에 대한 생각",prompt:s2,guide:`이 장면의 행동이나 선택에 대해 내 생각과 이유를 말해 보세요.`},
+   {intent:"예측·가정",title:"이후를 바꿔 보기",prompt:s3,guide:`한 가지 일이 달라졌다면 이야기가 어떻게 달라졌을지 말해 보세요.`}
+  ]
+ };
+ let list=(patterns[t.category]||patterns.world).map(x=>({...x}));
+ // 같은 범주 안에서도 작품별 핵심어와 두 번째 핵심어를 안내에 반영해 질문의 초점을 달리합니다.
+ if(list[2]) list[2].guide+=` 핵심어 ‘${key}${key2!==key?`’, ‘${key2}`:""}’를 참고해도 좋아요.`;
+ return list.map(m=>adaptStoryMission(m,t,storyLevelBand()));
+}
+function renderStoryMissions(){
+ let area=$("#storyMissionArea"),grid=$("#storyMissionGrid");if(!area||!grid)return;
+ let t=TREASURES.find(x=>x.id===Number(st.storyId||0));if(!t){area.hidden=true;grid.innerHTML="";return}
+ area.hidden=false;
+ let levelSel=$("#storyLevelSelect"),band=storyLevelBand(),lv=STORY_LEVELS[band];if(levelSel){levelSel.value=band;levelSel.onchange=()=>{st.storyLevel=levelSel.value;save();renderStoryMissions()}}let goal=$("#storyLevelGoal");if(goal)goal.textContent=`목표: ${lv.goal}`;
+ let ms=storyMissionsFor(t);renderAdaptiveStory();
+ let intro=$("#storyMissionIntro");if(intro){let labels={korean:"사건의 원인과 결과, 인물의 행동, 해결 방법을 중심으로 생각해 봅니다.",aesop:"인물의 행동을 비교하고 이야기의 의미와 다른 결과를 생각해 봅니다.",world:"핵심 장면과 인물의 선택을 살펴보고 질문과 가정을 만들어 봅니다."};intro.textContent=(labels[t.category]||"이야기를 바탕으로 내 생각을 문장으로 만들어 봅니다.")+" "+lv.guide}
+ grid.innerHTML=ms.map((m,i)=>`<button type="button" class="story-mission" data-story-mission="${i}"><b>${esc(m.title)}</b><small>${esc(m.guide)}</small></button>`).join("");
+ $$("[data-story-mission]").forEach(b=>b.onclick=()=>{let m=ms[Number(b.dataset.storyMission)];st.seed=m.prompt;st.intent=m.intent;st.storyMission={title:m.title,guide:m.guide};save();go("input")});
+}
+function initStoryActivitySelector(){
+ let sel=$("#storyActivitySelect");if(!sel)return;
+ sel.innerHTML='<option value="">일반 문장 활동 · 보물 없음</option>'+TREASURES.map(t=>`<option value="${t.id}">${String(t.id).padStart(2,"0")}. ${esc(t.workTitle)} → ${esc(t.treasureName)}</option>`).join("");
+ sel.value=st.storyId?String(st.storyId):"";
+ let paint=()=>{let t=TREASURES.find(x=>x.id===Number(sel.value));$("#storyActivityStatus").textContent=t?`현재: 《${t.workTitle}》 · 완료하면 ${t.treasureName} 획득`:"현재: 일반 문장 활동"};
+ paint();renderStoryMissions();
+ sel.onchange=()=>{st.storyId=sel.value?Number(sel.value):null;st.seed="";st.intent="";st.storyMission=null;save();paint();renderStoryMissions()};
+}
+window.TALKTALK_STORY_MISSIONS={forStory:id=>{let t=TREASURES.find(x=>x.id===Number(id));return t?storyMissionsFor(t):[]}};
+function completeSelectedStoryTreasure(entry){
+ const id=Number(st.storyId||0); if(!id)return [];
+ const t=TREASURES.find(x=>x.id===id); if(!t)return [];
+ entry.storyActivity={id:t.id,workTitle:t.workTitle,treasureName:t.treasureName,expressionPurpose:st.intent||null,startingPoint:st.seed||null,mission:st.storyMission||null,difficulty:STORY_LEVELS[storyLevelBand()].label,targetSentence:STORY_LEVELS[storyLevelBand()].goal,completedAt:new Date().toISOString()};recordAdaptivePerformance(entry);
+ // 문장사전 저장까지 완료한 경우만 이야기 활동 완료로 인정. 같은 보물은 unlockTreasureOnce가 중복 지급하지 않음.
+ return unlockTreasureOnce(t.id,`《${t.workTitle}》 이야기 문장 활동 완료`,"story_completion")?[t.id]:[];
+}
+window.TALKTALK_STORY_ACTIVITIES={
+ list:TREASURES.map(t=>({id:t.id,workTitle:t.workTitle,treasureName:t.treasureName})),
+ select(id){st.storyId=id?Number(id):null;save();initStoryActivitySelector();return st.storyId},
+ complete(){return completeSelectedStoryTreasure({})}
+};
+function evaluateTreasureUnlocks(entry,dict){
+ let newly=[],completed=dict.length,intentSet=new Set(dict.map(x=>x.intent).filter(Boolean));
+ let directCount=dict.filter(x=>x.metrics?.directAttempt).length,reaskCount=dict.filter(x=>x.evaluation&&x.evaluation!=="원하는 답이에요").length;
+ let rules=[
+  [1,completed>=1,"첫 문장 활동 완성"],[2,completed>=2,"완성 활동 2회"],[3,completed>=3,"완성 활동 3회"],
+  [4,(entry.rejectedCount||0)>0,"후보를 거절하고 다시 찾기"],[5,!!entry.metrics?.directAttempt,"직접 말하기·쓰기 시도"],
+  [6,!!entry.metrics?.selfCorrection,"자기 표현 수정"],[7,(entry.confirmedFacts||[]).length>0,"추가 질문으로 정보 확장"],
+  [8,!!entry.metrics?.expanded,"표현에 정보·어휘 확장"],[9,(entry.sentences||[]).length>=2,"두 문장 연결"],[10,completed>=5,"완성 활동 5회"],
+  [11,completed>=6,"완성 활동 6회"],[12,(entry.rejectedCount||0)>0&&!!entry.candidate,"후보를 다시 조정"],
+  [13,entry.intent==="감정","감정 표현 완성"],[14,/안 |못 |아니|않/.test(entry.final||""),"부정 표현 사용"],
+  [15,entry.intent==="요구","도움·요구 표현 완성"],[16,/왜|때문|해서|므로|니까/.test(entry.final||""),"이유 덧붙이기"],
+  [17,/었|았|할 |겠|내일|어제|앞으로/.test(entry.final||""),"과거·미래 표현"],[18,directCount>=5,"직접 표현 누적 5회"],
+  [19,intentSet.size>=5,"표현 목적 5종 경험"],[20,completed>=10,"완성 활동 10회"],
+  [21,!!entry.request,"AI에게 요구하기"],[22,!!entry.evaluation,"AI 답변 평가"],[23,!!entry.evaluation&&entry.evaluation!=="원하는 답이에요","AI에게 다시 요구하기"],
+  [24,!!entry.final,"최종 표현 직접 확정"],[25,!!entry.metrics?.expanded,"문장 확장"],[26,(entry.sentences||[]).length>=3,"세 문장 연결"],
+  [27,completed>=10,"문장사전 10개 저장"],[28,intentSet.size>=8,"표현 목적 8종 경험"],[29,reaskCount>=3,"AI 재요구 누적 3회"],[30,completed>=20,"완성 활동 20회"]
+ ];
+ // 막힘 방지: 특정 행동 조건을 만나지 못해도 충분히 활동하면 앞쪽 보물부터 차례로 발견합니다.
+ const fallback={4:7,5:8,6:9,7:10,8:11,9:12,12:13,13:14,14:15,15:16,16:17,17:18,18:19,19:20,21:12,22:13,23:14,24:15,25:16,26:17,28:18,29:19};
+ for(const [id,ok,reason] of rules){let pass=ok||completed>=(fallback[id]||999);if(pass&&unlockTreasureOnce(id,ok?reason:`누적 활동 ${completed}회로 발견`))newly.push(id)}
+ return newly;
+}
+function showTreasureRevealQueue(ids,onDone){let queue=[...new Set(ids)].filter(id=>TREASURES.some(t=>t.id===id));if(!queue.length){onDone?.();return}let showNext=()=>{if(!queue.length){onDone?.();return}let id=queue.shift(),t=TREASURES.find(x=>x.id===id);let modal=document.createElement('div');modal.className='treasure-reveal';modal.setAttribute('role','dialog');modal.setAttribute('aria-live','polite');modal.setAttribute('aria-modal','true');modal.setAttribute('aria-label',`새 이야기 보물 ${t.treasureName}`);modal.innerHTML=`<div class="treasure-reveal-card"><span class="treasure-reveal-badge">✦ 새로운 이야기 보물을 발견했어요!</span><div class="treasure-reveal-art">${treasureArt(t,true)}</div><h2>${esc(t.treasureName)}</h2><p class="work">《${esc(t.workTitle)}》</p><p class="help">${esc(t.storyIntro[0])}</p><p class="treasure-reveal-note">이 보물은 《${esc(t.workTitle)}》 이야기 활동을 끝까지 마치고 문장을 저장해서 발견했어요.</p><div class="treasure-reveal-actions"><button class="btn" data-reveal-continue>${queue.length?'다음 보물':'계속하기'}</button><button class="btn primary" data-reveal-atlas>도감에서 보기</button></div></div>`;document.body.appendChild(modal);let closeNext=()=>{modal.remove();showNext()};modal.querySelector('[data-reveal-continue]').onclick=closeNext;modal.querySelector('[data-reveal-atlas]').onclick=()=>{sessionStorage.setItem('talktalk_new_treasure',String(t.id));modal.remove();queue=[];go('treasures');setTimeout(()=>{let card=document.querySelector(`[data-treasure="${t.id}"]`);if(card){card.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});card.focus({preventScroll:true})}},120)};modal.querySelector('[data-reveal-continue]').focus()};showNext()}
+window.TALKTALK_TREASURE_REVEAL={evaluate:evaluateTreasureUnlocks,show:showTreasureRevealQueue};
+setTimeout(()=>{let b=document.getElementById('auditTreasureAssets');if(b)b.onclick=async()=>{let box=document.getElementById('treasureAssetAudit');b.disabled=true;b.textContent='확인 중…';let rows=await auditTreasureAssets();let ok=rows.filter(x=>x.status==='준비됨'),missing=rows.filter(x=>x.status!=='준비됨');box.innerHTML=`<b>${ok.length}/30 준비됨</b>${missing.length?` · 미등록 ${missing.length}개<br><small>${missing.map(x=>String(x.id).padStart(2,'0')+' '+esc(x.filename)).join(' · ')}</small>`:' · 모든 보물 이미지가 준비되었습니다.'}`;b.disabled=false;b.textContent='30개 이미지 다시 확인'}},0);
+
+// 23-7과 연결할 공개 인터페이스. 획득 규칙 엔진은 다음 단계에서 이 함수를 호출합니다.
+window.TALKTALK_TREASURES={data:TREASURES,schemaVersion:TREASURE_SCHEMA_VERSION,getState:getTreasureState,save:setTreasureState,unlock(id,reason=""){return unlockTreasureOnce(id,reason)},isUnlocked:treasureUnlocked,render:renderTreasureAtlas,recover(){return getTreasureState()},progress(){return getTreasureState().progress}};
+
+const PENGUIN_STAGES=[
+ {name:"아기 펭귄",file:"penguin-01-baby.png",meaning:"생각을 표현하기 시작했어요."},
+ {name:"꼬마 펭귄",file:"penguin-02-little.png",meaning:"내 생각을 한 걸음씩 문장으로 옮겨요."},
+ {name:"호기심 펭귄",file:"penguin-03-curious.png",meaning:"궁금한 것을 살펴보고 질문해요."},
+ {name:"단어 수집가",file:"penguin-04-word-collector.png",meaning:"표현에 필요한 단어를 모아요."},
+ {name:"생각 탐험가",file:"penguin-05-thought-explorer.png",meaning:"생각과 이유를 더 자세히 찾아가요."},
+ {name:"문장 탐험가",file:"penguin-06-sentence-explorer.png",meaning:"문장을 더 길고 정확하게 확장해요."},
+ {name:"책 읽는 펭귄",file:"penguin-07-reader.png",meaning:"읽고 이해한 내용을 내 문장으로 표현해요."},
+ {name:"표현 연구가",file:"penguin-08-expression-researcher.png",meaning:"상황에 맞는 다양한 표현을 선택해요."},
+ {name:"문장 연구가",file:"penguin-09-sentence-researcher.png",meaning:"문장을 고치고 연결하며 표현을 다듬어요."},
+ {name:"사각모 펭귄",file:"penguin-10-graduate.png",meaning:"내 생각을 스스로 문장으로 완성해요."}
+];
+function currentLevel(){return Math.min(10,Math.floor((Number(st.xp)||0)/50)+1)}
+function penguinSrc(lv=currentLevel()){return `assets/penguins/${PENGUIN_STAGES[lv-1].file}`}
+function updatePenguins(animate=false){let lv=currentLevel(),d=PENGUIN_STAGES[lv-1],src=penguinSrc(lv);[["#guidePenguin",`현재 ${lv}단계 ${d.name}`],["#homePenguin",`현재 ${lv}단계 ${d.name}`],["#growthPenguin",`${lv}단계 ${d.name}`]].forEach(([sel,alt])=>{let el=$(sel);if(el){if(!el.src.endsWith(d.file)){el.src=src;if(animate){el.classList.remove("level-reveal");void el.offsetWidth;el.classList.add("level-reveal")}}el.alt=alt}});if($("#homeLevelName"))$("#homeLevelName").textContent=`Lv.${lv} ${d.name}`}
+const EXP_RULES={input:2,intent:2,candidate:2,reselect_none:3,question:2,vocabulary:2,expand:3,direct:5,self_correct:4,ai_request:3,ai_evaluate:3,ai_reask:4,discourse:5,complete:5,dictionary_save:3};
+function reward(id,xp=EXP_RULES[id]||0){st.rewarded=st.rewarded||{};st.activityId=st.activityId||`legacy-${Date.now()}`;let key=`${st.activityId}:${id}`;if(st.rewarded[key])return false;let before=currentLevel();st.rewarded[key]=true;st.xp=(Number(st.xp)||0)+Number(xp||0);let after=currentLevel();updatePenguins(after>before);if(after>before)msg(`Lv.${after} ${PENGUIN_STAGES[after-1].name}로 성장했어요.`);else if(xp>0)msg(`+${xp} EXP`);save();return true}
+function renderGrowth(){let lv=currentLevel(),d=PENGUIN_STAGES[lv-1],xp=Number(st.xp)||0,next=lv===10?0:50-(xp%50);$("#growthName").textContent=`Lv.${lv} ${d.name}`;$("#growthMeaning").textContent=d.meaning;$("#growthXp").textContent=xp;if($("#growthNextXp"))$("#growthNextXp").textContent=next;$("#growthBar").style.width=(lv===10?100:(xp%50)/50*100)+"%";updatePenguins()}
+
+
+window.TALKTALK_REWARD_SYSTEM={
+ version:"23-12",
+ axes:{growth:"EXP → 펭귄 10단계 성장",collection:"표현 경험 → 이야기 보물 30개 수집"},
+ expRules:EXP_RULES,
+ policy:{correctnessRequired:false,supportPenalty:false,treasureGivesExp:false,duplicateReward:false,treasureCanBeLost:false},
+ level:()=>currentLevel(),xp:()=>Number(st.xp)||0,treasureProgress:()=>getTreasureState().progress
+};
+
+function metricOf(e){
+ const m=e.metrics||{}, initial=(e.initial||""), final=(e.final||"");
+ return {
+  confirmed:m.confirmedCount??(e.confirmedFacts||[]).length,
+  rejected:m.rejectedCount??(e.rejectedCount||0),
+  expanded:m.expanded??(final.length>initial.length+4),
+  direct:m.directAttempt??!!e.direct,
+  corrected:m.selfCorrection??!!(e.direct&&e.corrected&&e.direct!==e.corrected),
+  ai:m.aiRequest??!!e.request,
+  discourse:m.discourseCount??(e.sentences||[]).length
+ }
+}
+function pct(n,d){return d?Math.round(n/d*100):0}
+function escA(v){return String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderTeacherAnalysis(){
+ let all=getDict(),w=$("#analysisWindow")?.value||"all",data=w==="all"?all:all.slice(0,+w),n=data.length,box=$("#teacherDashboard");if(!box)return;
+ if(!n){box.innerHTML='<div class="empty-state"><b>아직 분석할 문장이 없습니다.</b><p class="help">문장사전에 기록이 쌓이면 과정 중심 분석이 표시됩니다.</p></div>';return}
+ let intents={};data.forEach(e=>intents[e.intent||"미분류"]=(intents[e.intent||"미분류"]||0)+1);
+ let supports={};data.forEach(e=>supports[e.support||"미기록"]=(supports[e.support||"미기록"]||0)+1);
+ let ms=data.map(metricOf),direct=ms.filter(x=>x.direct).length,expanded=ms.filter(x=>x.expanded).length,corrected=ms.filter(x=>x.corrected).length,ai=ms.filter(x=>x.ai).length,reject=ms.reduce((a,x)=>a+x.rejected,0),discourse=ms.filter(x=>x.discourse>=2).length;
+ let avgLen=Math.round(data.reduce((a,e)=>a+(e.final||"").length,0)/n);
+ let bars=(obj)=>Object.entries(obj).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar-row"><span>${escA(k)}</span><div class="mini-track"><div class="mini-fill" style="width:${pct(v,n)}%"></div></div><b>${v}</b></div>`).join("");
+ let recent=data.slice(0,8).map(e=>{let m=metricOf(e);return `<tr><td>${new Date(e.date||Date.now()).toLocaleDateString("ko-KR")}</td><td>${escA(e.intent||"")}</td><td>${escA(e.support||"")}</td><td>${m.direct?"직접 표현": "후보 도움"}</td><td>${m.expanded?"확장":"-"}</td><td>${m.rejected}</td><td>${m.ai?"사용":"-"}</td></tr>`}).join("");
+ let caution=n<5?"현재 기록이 5개 미만이므로 변화 추세보다 개별 수행 과정을 중심으로 보세요.":"비율은 저장된 활동 안에서 나타난 행동 빈도입니다. 능력·장애 정도를 의미하지 않습니다.";
+ box.innerHTML=`<div class="teacher-kpis"><div class="kpi">분석 문장<b>${n}</b></div><div class="kpi">표현 목적<b>${Object.keys(intents).length}종</b></div><div class="kpi">평균 최종 길이<b>${avgLen}자</b></div><div class="kpi">거절·재선택<b>${reject}회</b></div></div>
+ <div class="analysis-grid"><div class="analysis-card"><h3>표현 목적 경험</h3>${bars(intents)}</div><div class="analysis-card"><h3>지원 수준 기록</h3>${bars(supports)}</div></div>
+ <div class="analysis-card"><h3>과정 행동</h3><div class="bar-row"><span>직접 표현</span><div class="mini-track"><div class="mini-fill" style="width:${pct(direct,n)}%"></div></div><b>${pct(direct,n)}%</b></div><div class="bar-row"><span>문장 확장</span><div class="mini-track"><div class="mini-fill" style="width:${pct(expanded,n)}%"></div></div><b>${pct(expanded,n)}%</b></div><div class="bar-row"><span>자기수정</span><div class="mini-track"><div class="mini-fill" style="width:${pct(corrected,n)}%"></div></div><b>${pct(corrected,n)}%</b></div><div class="bar-row"><span>AI 요구</span><div class="mini-track"><div class="mini-fill" style="width:${pct(ai,n)}%"></div></div><b>${pct(ai,n)}%</b></div><div class="bar-row"><span>2문장+</span><div class="mini-track"><div class="mini-fill" style="width:${pct(discourse,n)}%"></div></div><b>${pct(discourse,n)}%</b></div></div>
+ <div class="analysis-card"><h3>최근 활동 관찰</h3><div style="overflow:auto"><table class="analysis-table"><thead><tr><th>날짜</th><th>목적</th><th>지원</th><th>표현</th><th>확장</th><th>재선택</th><th>AI 요구</th></tr></thead><tbody>${recent}</tbody></table></div></div>
+ <div class="note"><b>해석 기준</b><br>${caution}<br>거절·재선택은 실패가 아니라 자신의 의도와 다른 문장을 구별한 행동으로 기록합니다. 지원 수준은 높고 낮음의 점수가 아니라 어떤 도움에서 표현이 가능했는지를 보기 위한 수업 정보입니다.</div>`;
+}
+$("#analysisWindow").onchange=renderTeacherAnalysis;
+$("#printAnalysis").onclick=()=>window.print();
+$("#exportAnalysis").onclick=()=>{let all=getDict(),w=$("#analysisWindow").value,data=w==="all"?all:all.slice(0,+w),rows=[["날짜","표현목적","지원수준","처음표현","최종표현","확정정보수","거절재선택수","직접표현","문장확장","자기수정","AI요구","담화문장수"]];data.forEach(e=>{let m=metricOf(e);rows.push([e.date||"",e.intent||"",e.support||"",e.initial||"",e.final||"",m.confirmed,m.rejected,m.direct?"예":"아니오",m.expanded?"예":"아니오",m.corrected?"예":"아니오",m.ai?"예":"아니오",m.discourse])});let csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n"),blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="문장톡톡_교사용_누적분석.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
+
+const usabilityKey="talktalk_usability_v1";
+let testSession=null,screenEnteredAt=Date.now(),currentTestScreen="home",selectedSupport=0;
+function getUsability(){try{return JSON.parse(localStorage.getItem(usabilityKey)||"[]")}catch(e){return[]}}
+function setUsability(v){localStorage.setItem(usabilityKey,JSON.stringify(v))}
+function startUsabilitySession(){
+ testSession={id:Date.now(),started:new Date().toISOString(),ended:null,observations:[],inputModes:[]};
+ localStorage.setItem("talktalk_active_usability",JSON.stringify(testSession));screenEnteredAt=Date.now();updateTestUI();toast("사용성 테스트를 시작했어요.");
+}
+function loadActiveTest(){try{testSession=JSON.parse(localStorage.getItem("talktalk_active_usability")||"null")}catch(e){testSession=null}}
+function saveActiveTest(){if(testSession)localStorage.setItem("talktalk_active_usability",JSON.stringify(testSession))}
+function finishUsabilitySession(){
+ if(!testSession){toast("진행 중인 테스트가 없어요.");return}
+ testSession.ended=new Date().toISOString();let all=getUsability();all.unshift(testSession);setUsability(all);localStorage.removeItem("talktalk_active_usability");testSession=null;updateTestUI();renderUsability();toast("테스트 기록을 저장했어요.");
+}
+function updateTestUI(){
+ let fab=$("#testFab");if(!fab)return;fab.classList.toggle("active",!!testSession);fab.textContent=testSession?"관찰 기록 중":"관찰 기록";
+ $("#testScreenName").textContent=labels[currentTestScreen]||currentTestScreen;
+}
+function recordInputMode(mode){if(testSession&&!testSession.inputModes.includes(mode)){testSession.inputModes.push(mode);saveActiveTest()}}
+function saveObservation(){
+ if(!testSession){startUsabilitySession()}
+ let o={time:new Date().toISOString(),screen:currentTestScreen,label:labels[currentTestScreen]||currentTestScreen,seconds:Math.max(1,Math.round((Date.now()-screenEnteredAt)/1000)),support:selectedSupport,understanding:$("#understanding").value,friction:$("#friction").value,note:$("#testNote").value.trim(),inputMode:st.inputMode||""};
+ testSession.observations.push(o);saveActiveTest();$("#testNote").value="";$("#friction").value="none";$("#understanding").value="understood";toast("관찰을 기록했어요.");
+}
+function renderUsability(){
+ let box=$("#usabilitySummary");if(!box)return;let sessions=getUsability(),active=testSession;
+ if(!sessions.length&&!active){box.innerHTML='<div class="empty-state"><b>아직 테스트 기록이 없습니다.</b><p class="help">실제 학습자와 앱을 사용하면서 화면별 지원 수준과 멈춤 지점을 기록해 보세요.</p></div>';return}
+ let allObs=sessions.flatMap(x=>x.observations||[]),n=allObs.length;
+ let screen={};allObs.forEach(o=>{let k=o.label||o.screen;(screen[k]??={n:0,support:0,stop:0,sec:0});screen[k].n++;screen[k].support+=+o.support||0;screen[k].stop+=o.friction&&o.friction!=="none"?1:0;screen[k].sec+=+o.seconds||0});
+ let rows=Object.entries(screen).sort((a,b)=>(b[1].support/b[1].n)-(a[1].support/a[1].n)).map(([k,v])=>`<tr><td>${escA(k)}</td><td>${v.n}</td><td>${(v.support/v.n).toFixed(1)}</td><td>${v.stop}</td><td>${Math.round(v.sec/v.n)}초</td></tr>`).join("");
+ let independent=allObs.filter(o=>+o.support===0).length, verbal=allObs.filter(o=>+o.support===1).length, direct=allObs.filter(o=>+o.support>=2).length, misunderstand=allObs.filter(o=>o.understanding!=="understood").length;
+ let inputs={};sessions.forEach(x=>(x.inputModes||[]).forEach(m=>inputs[m]=(inputs[m]||0)+1));
+ let inputText=Object.keys(inputs).length?Object.entries(inputs).map(([k,v])=>`<span class="test-badge">${escA(k)} ${v}회</span>`).join(""):"아직 기록 없음";
+ box.innerHTML=`${active?'<div class="note"><b>현재 테스트 진행 중</b> · 활동 화면에서 오른쪽 아래 ‘관찰 기록 중’ 버튼을 눌러 기록하세요.</div>':""}<div class="teacher-kpis"><div class="kpi">완료 세션<b>${sessions.length}</b></div><div class="kpi">관찰 기록<b>${n}</b></div><div class="kpi">독립 수행<b>${pct(independent,n)}%</b></div><div class="kpi">이해 지원 필요<b>${pct(misunderstand,n)}%</b></div></div><div class="analysis-card"><h3>입력 방식 사용</h3>${inputText}</div><div class="analysis-card"><h3>화면별 사용성</h3><p class="help">평균 지원 0=독립, 1=말 안내, 2=시범·선택 도움, 3=직접 도움입니다. 높은 화면부터 표시합니다.</p><div style="overflow:auto"><table class="analysis-table"><thead><tr><th>화면</th><th>관찰</th><th>평균 지원</th><th>어려움</th><th>평균 시간</th></tr></thead><tbody>${rows}</tbody></table></div></div><div class="note"><b>사용성 판단 원칙</b><br>지원이 많이 필요했던 화면은 학습자의 능력 부족으로 해석하지 않고, 질문 문구·선택지 수·버튼 위치·읽기 부담·입력 방식이 적절했는지 먼저 검토합니다. 동일 화면에서 여러 학습자가 반복적으로 멈추면 UI 또는 과제 설계를 수정할 근거로 사용합니다.</div>`;
+}
+loadActiveTest();
+$("#testFab").onclick=()=>{if(!testSession)startUsabilitySession();$("#testPanel").classList.toggle("open");$("#testFab").setAttribute("aria-expanded",$("#testPanel").classList.contains("open"));updateTestUI()};
+$("#closeTestPanel").onclick=()=>$("#testPanel").classList.remove("open");
+$("#supportBtns").onclick=e=>{let b=e.target.closest("[data-support]");if(!b)return;selectedSupport=+b.dataset.support;[...$("#supportBtns").querySelectorAll("button")].forEach(x=>x.classList.toggle("primary",x===b))};
+$("#saveObservation").onclick=saveObservation;
+$("#startTestSession").onclick=startUsabilitySession;$("#finishTestSession").onclick=finishUsabilitySession;
+$("#exportUsability").onclick=()=>{let obs=getUsability().flatMap((x,si)=>(x.observations||[]).map(o=>[x.id,o.time,o.label,o.seconds,o.support,o.understanding,o.friction,o.inputMode,o.note]));let rows=[["세션","시간","화면","소요초","지원수준","이해","어려움","입력방식","메모"],...obs],csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n"),blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="문장톡톡_사용성테스트.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
+
+const adaptiveKey="talktalk_adaptive_support_v1";
+function getAdaptive(){try{return JSON.parse(localStorage.getItem(adaptiveKey)||'{"mode":"auto"}')}catch(e){return{mode:"auto"}}}
+function setAdaptive(v){localStorage.setItem(adaptiveKey,JSON.stringify(v))}
+function screenHistory(screen){
+ let sessions=getUsability(),obs=sessions.flatMap(x=>x.observations||[]).filter(o=>o.screen===screen).slice(0,6);
+ return obs;
+}
+function autoLevelFor(screen){
+ let obs=screenHistory(screen);
+ if(obs.length<2)return {level:1,reason:"아직 이 화면의 실제 사용 기록이 충분하지 않아 기본 도움을 제공합니다.",evidence:obs.length};
+ let avg=obs.reduce((a,o)=>a+(+o.support||0),0)/obs.length;
+ let friction=obs.filter(o=>o.friction&&o.friction!=="none").length/obs.length;
+ let understanding=obs.filter(o=>o.understanding!=="understood").length/obs.length;
+ let level=avg>=2||friction>=.5||understanding>=.5?2:(avg<.6&&friction<.25&&understanding<.25?0:1);
+ let reason=level===2?"최근 이 화면에서 반복 설명·선택 도움 또는 진행 어려움이 자주 기록되어 도움을 조금 더 제공합니다.":level===0?"최근 이 화면에서 독립 수행이 안정적으로 기록되어 먼저 스스로 해볼 시간을 제공합니다.":"최근 기록이 혼합되어 기본 도움을 유지합니다.";
+ return {level,reason,evidence:obs.length};
+}
+function effectiveLevel(screen){
+ let a=getAdaptive();
+ if(a.mode==="low")return {level:0,reason:"‘도움 적게’가 직접 선택되어 있습니다.",evidence:0};
+ if(a.mode==="high")return {level:2,reason:"‘도움 많이’가 직접 선택되어 있습니다.",evidence:0};
+ if(a.mode==="standard")return {level:1,reason:"‘기본’이 직접 선택되어 있습니다.",evidence:0};
+ return autoLevelFor(screen);
+}
+function adaptiveGuidance(screen,level){
+ const map={
+  input:[
+   "먼저 하고 싶은 말을 자유롭게 입력해 보세요.",
+   "짧은 단어나 한 문장만 말해도 괜찮아요. 텍스트·음성·사진 중 편한 방법을 고르세요.",
+   "한 번에 길게 말하지 않아도 됩니다. ‘누가/무엇을/어떻게’ 중 하나부터 표현하고, 필요하면 교사가 입력 방식을 함께 골라 주세요."
+  ],
+  intent:[
+   "가장 가까운 표현 목적을 스스로 골라 보세요.",
+   "무엇을 하려는 말인지 생각해 보세요. 설명·생각·감정·요구 중 가까운 것부터 찾을 수 있어요.",
+   "선택지를 한 번에 다 읽기 어렵다면 교사가 2~3개만 읽어 주고, 학습자가 마지막 선택을 하도록 합니다."
+  ],
+  candidates:[
+   "내 뜻과 가장 가까운 문장을 골라 보세요. 없으면 ‘없어요’를 선택해도 됩니다.",
+   "문장을 하나씩 들어보고 내 뜻과 같은지 비교해 보세요. 맞는 것이 없으면 ‘없어요’가 정답일 수 있습니다.",
+   "후보를 2개씩 비교해 보세요. 교사는 문장을 읽어 줄 수 있지만 어떤 문장이 맞는지는 학습자가 결정합니다."
+  ],
+  question:[
+   "질문 하나에 아는 만큼만 답해 보세요.",
+   "짧게 답해도 됩니다. 질문에서 묻는 한 가지 정보만 말해 보세요.",
+   "질문을 짧게 다시 읽어 주고, 필요하면 두 가지 예를 제시하되 실제 사실은 학습자가 선택하거나 말하도록 합니다."
+  ],
+  expand:[
+   "문장을 조금 더 자세하게 만들어 보세요.",
+   "언제·어디서·왜 중 하나만 더 붙여도 문장이 풍부해집니다.",
+   "한 번에 하나의 정보만 추가합니다. 교사가 선택 가능한 정보 종류를 제시하고 내용 자체는 학습자가 정합니다."
+  ],
+  direct:[
+   "이번에는 도움 없이 직접 말하거나 써 보세요.",
+   "앞에서 만든 내용을 떠올리며 한 문장으로 표현해 보세요.",
+   "핵심 단어를 먼저 말한 뒤 문장으로 연결해도 됩니다. 교사는 단어 순서를 손가락으로 짚어 줄 수 있습니다."
+  ],
+  aiRequest:[
+   "AI에게 무엇을 해 달라고 할지 직접 말해 보세요.",
+   "‘~해 줘’ 형태로 원하는 일을 한 가지 말해 보세요.",
+   "‘무엇을 + 어떻게 해 줘’ 틀을 사용해 보세요. 예: ‘이 문장을 더 짧게 해 줘.’"
+  ]
+ };
+ let arr=map[screen];return arr?arr[Math.min(level,arr.length-1)]:"필요하면 도움을 요청할 수 있습니다.";
+}
+function applyAdaptiveToScreen(screen){
+ if(!["input","intent","candidates","question","expand","direct","aiRequest"].includes(screen))return;
+ let el=document.querySelector(`.screen[data-s="${screen}"]`);if(!el)return;
+ let old=el.querySelector(".adaptive-inline");if(old)old.remove();
+ let e=effectiveLevel(screen),box=document.createElement("div");box.className="adaptive-hint adaptive-inline";
+ box.innerHTML=`<b>${e.level===0?"먼저 스스로":e.level===1?"필요할 때 도움":"단계별 도움"}</b><br>${escA(adaptiveGuidance(screen,e.level))}`;
+ let q=el.querySelector(".q");if(q)q.insertAdjacentElement("afterend",box);
+}
+function renderAdaptive(){
+ let a=getAdaptive(),labelsM={auto:"자동",low:"도움 적게",standard:"기본",high:"도움 많이"};$("#adaptiveModeLabel").textContent=labelsM[a.mode]||"자동";
+ [...$("#adaptiveModeBtns").querySelectorAll("[data-mode]")].forEach(b=>b.classList.toggle("selected",b.dataset.mode===a.mode));
+ let screens=["input","intent","candidates","question","expand","direct","aiRequest"];
+ let detail=screens.map(sc=>{let e=effectiveLevel(sc);return `<div class="bar-row"><span>${escA(labels[sc]||sc)}</span><div class="mini-track"><div class="mini-fill" style="width:${(e.level+1)*33}%"></div></div><b>${["적게","기본","많이"][e.level]}</b></div>`}).join("");
+ $("#adaptiveDetails").innerHTML=`<div class="analysis-card"><h3>화면별 현재 도움</h3>${detail}</div>`;
+ $("#adaptiveReason").innerHTML=a.mode==="auto"?"<b>자동 조절 기준</b><br>최근 최대 6회의 실제 사용성 기록에서 지원 수준, 이해 지원 필요, 진행 어려움을 함께 봅니다. 기록이 2회 미만이면 기본 도움을 유지합니다.":"<b>직접 설정 사용 중</b><br>자동 판단보다 현재 선택한 도움 수준을 우선합니다.";
+}
+$("#adaptiveModeBtns").onclick=e=>{let b=e.target.closest("[data-mode]");if(!b)return;let a=getAdaptive();a.mode=b.dataset.mode;setAdaptive(a);renderAdaptive();toast("도움 설정을 바꿨어요.")};
+
+function renderReport(){$("#reportInitial").textContent=st.originalInput||"기록 없음";$("#reportFinal").textContent=st.final||st.discourse.join(" ")||"기록 없음";$("#reportMeta").textContent=`${st.intent} · 지원 수준 ${st.support} · 추가 확인 정보 ${st.confirmed.length}개 · 거절/수정 ${st.rejected.length}회`}
+function updateHome(){updateTreasureHome();let d=getDict();$("#bookCount").textContent=d.length;$("#starCount").textContent=st.stars;$("#xpCount").textContent=st.xp;$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요.";updatePenguins()}
+function msg(t){$("#status").textContent=t}
+// 26단계: 실제 AI 연결 계층. 비밀키는 브라우저에 두지 않고 백엔드 프록시만 호출한다.
+const AI={
+ endpoint:localStorage.getItem("talktalk_ai_endpoint")||"/api/talktalk-ai",
+ async call(task,payload){
+  const body={task,version:"talktalk-ai-v1",policy:{learnerOwnsMeaning:true,noInventedFacts:true,noEmotionInference:true,oneQuestionAtATime:true,grade6Ceiling:true,rejectedMeanings:st.rejected||[]},context:{originalInput:st.originalInput,intent:st.intent,confirmedFacts:st.confirmed||[],workingSentence:st.working,directExpression:st.direct,targetLevel:6},payload};
+  if(!navigator.onLine)throw new Error("OFFLINE");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
+  try{const r=await fetch(this.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:controller.signal});if(!r.ok)throw new Error("AI_HTTP_"+r.status);const data=await r.json();return validateAI(task,data)}finally{clearTimeout(timer)}
+ }
+};
+function validateAI(task,d){if(!d||typeof d!=="object")throw new Error("AI_BAD_RESPONSE");if(d.inventedFacts===true||d.meaningChanged===true)throw new Error("AI_SAFETY_REJECT");if(task==="candidates"&&(!Array.isArray(d.candidates)||d.candidates.length<3))throw new Error("AI_BAD_CANDIDATES");if(task==="question"&&typeof d.question!=="string")throw new Error("AI_BAD_QUESTION");if(task==="correct"&&typeof d.corrected!=="string")throw new Error("AI_BAD_CORRECTION");return d}
+function aiFallback(reason){$("#aiStatus").textContent="로컬 지원 엔진 사용 중";$("#aiStatusCard").classList.add("yellow");if(reason)msg("AI 연결을 사용할 수 없어 로컬 지원 엔진으로 계속합니다.")}
+async function aiCandidates(){try{const d=await AI.call("candidates",{count:5,semanticDiversity:true});$("#aiStatus").textContent="AI 연결됨";return [...d.candidates.slice(0,5),"내가 말하려는 문장이 없어요."]}catch(e){aiFallback(e.message);return candidates()}}
+async function renderCandidatesAI(){let a=await aiCandidates(),box=$("#candidateList");box.innerHTML=a.map((x,i)=>`<button class="choice candidate" data-ai-c="${i}">${i+1}. ${x}</button>`).join("");box.querySelectorAll("[data-ai-c]").forEach(b=>b.onclick=()=>{let sentence=a[+b.dataset.aiC];if(sentence==="내가 말하려는 문장이 없어요."){st.rejected.push(...a.slice(0,-1));reward("reselect_none");save();prepareQuestionAI();go("question");return}st.candidate=sentence;reward("candidate");$("#selectedSentence").textContent=sentence;save();go("confirm")})}
+async function prepareQuestionAI(){try{const d=await AI.call("question",{askOnlyMostUsefulMissingInformation:true});$("#adaptiveQ").textContent=d.question;$("#aiStatus").textContent="AI 연결됨"}catch(e){prepareQuestion();aiFallback(e.message)}}
+async function correctAI(source){try{const d=await AI.call("correct",{source,allowedEdits:["particle","wordOrder","tense","ending","spacing"],preserveMeaning:true,noNewFacts:true});$("#aiStatus").textContent="AI 연결됨";return d.corrected}catch(e){aiFallback(e.message);return minCorrect(source)}}
+async function executeAIRequest(){try{const d=await AI.call("execute_request",{request:st.request});$("#aiAnswer").value=d.answer||"";$("#aiStatus").textContent="AI 연결됨";return true}catch(e){aiFallback(e.message);return false}}
+async function executeReask(request){try{const d=await AI.call("reask",{request,previousAnswer:$("#aiAnswer").value,evaluation:st.evaluation});$("#aiAnswer").value=d.answer||"";$("#aiStatus").textContent="AI 연결됨";return true}catch(e){aiFallback(e.message);return false}}
+// 기존 통합 흐름의 AI 필요 지점을 교체한다.
+$("#toCandidates").onclick=async()=>{await renderCandidatesAI();go("candidates")};
+$("#applyExtra").onclick=async()=>{let v=$("#extra").value.trim();if(v&&!['잘 모르겠어요','말하고 싶지 않아요'].includes(v))st.confirmed.push(v);save();await renderCandidatesAI();go("candidates")};
+$$('[data-confirm]').forEach(b=>b.onclick=async()=>{if(b.dataset.confirm==='yes'){st.working=st.candidate;st.confirmed.push(st.candidate);save();prepareExpand();go('expand')}else{if(st.candidate)st.rejected.push(st.candidate);reward('reselect_none');save();await prepareQuestionAI();go('question')}});
+$("#toCorrection").onclick=async()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=await correctAI(v);save();go("correction")};
+$("#toEvaluate").onclick=async()=>{st.request=$("#assembledRequest").textContent;reward("ai_request");save();renderEval();go("evaluate");await executeAIRequest()};
+// 평가 버튼은 수정 요구문을 만들고 실제 재요구를 실행할 수 있게 한다.
+const oldRenderEval=renderEval;renderEval=function(){oldRenderEval();$$('[data-e]').forEach(b=>{const old=b.onclick;b.onclick=async()=>{old();if(b.dataset.e!=="원하는 답이에요"){let req=$("#reask").textContent;await executeReask(req)}}})};
+$("#saveEndpoint").onclick=()=>{const v=$("#aiEndpoint").value.trim();if(!v)return msg("AI 연결 주소를 입력해 주세요.");AI.endpoint=v;localStorage.setItem("talktalk_ai_endpoint",v);msg("AI 연결 주소를 저장했습니다. 비밀 API 키는 저장하지 않습니다.")};
+$("#testAI").onclick=async()=>{try{await AI.call("health",{});$("#aiStatus").textContent="AI 연결됨";msg("AI 백엔드 연결을 확인했습니다.")}catch(e){aiFallback(e.message)}};
+$("#aiEndpoint").value=AI.endpoint;
+// 백엔드가 구현해야 하는 계약을 개발자 도구에서 확인할 수 있도록 공개한다.
+window.TALKTALK_ADAPTIVE_CONTEXT=()=>({candidate:adaptiveCandidateInstruction(),question:adaptiveQuestionInstruction(),hint:adaptiveHintInstruction(),directGoal:adaptiveDirectGoal()});
+window.TALKTALK_AI_CONTRACT={endpoint:AI.endpoint,tasks:{health:{returns:{ok:true}},candidates:{returns:{candidates:["string x 5"],inventedFacts:false}},question:{returns:{question:"string",inventedFacts:false}},correct:{returns:{corrected:"string",meaningChanged:false,inventedFacts:false}},execute_request:{returns:{answer:"string"}},reask:{returns:{answer:"string"}},vision_photo:{returns:{observations:["directly observable string x <=5"]}}},rules:["confirmed facts only","do not infer emotion","remember rejected meanings","one question per screen","grade 6 ceiling","minimal correction preserves meaning"]};
+
+// 27단계: 음성/사진 입력. photoObservation과 confirmedFacts는 분리 저장한다.
+st.media=st.media||{voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};
+$$("[data-media]").forEach(b=>b.onclick=()=>{$$("[data-media]").forEach(x=>x.classList.toggle("primary",x===b));$$("[data-pane]").forEach(x=>x.classList.toggle("active",x.dataset.pane===b.dataset.media))});
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let recognition=null;
+if(SR){recognition=new SR();recognition.lang="ko-KR";recognition.interimResults=true;recognition.continuous=false;recognition.onstart=()=>$("#voiceState").textContent="듣고 있어요…";recognition.onresult=e=>{let t="";for(let i=e.resultIndex;i<e.results.length;i++)t+=e.results[i][0].transcript;$("#voiceTranscript").value=t;st.media.voice.transcript=t;save()};recognition.onerror=e=>{msg("음성 인식을 완료하지 못했어요. 글자로 입력해 주세요.");$("#voiceState").textContent="다시 시도하거나 글자로 입력해 주세요."};recognition.onend=()=>$("#voiceState").textContent="인식 결과를 확인·수정한 뒤 입력을 확정해 주세요."}
+$("#startVoice").onclick=()=>{if(!recognition)return msg("이 브라우저에서는 음성 인식을 지원하지 않아요. 글자로 입력해 주세요.");try{recognition.start()}catch(e){msg("음성 인식이 이미 실행 중입니다.")}};
+$("#stopVoice").onclick=()=>{if(recognition)try{recognition.stop()}catch(e){}};
+$("#listenTranscript").onclick=()=>{let t=$("#voiceTranscript").value.trim();if(!t)return msg("인식된 말을 먼저 확인해 주세요.");if(!("speechSynthesis"in window))return msg("이 기기에서는 음성 읽기를 지원하지 않아요.");speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="ko-KR";u.rate=.92;speechSynthesis.speak(u)};
+$("#confirmVoice").onclick=()=>{let t=$("#voiceTranscript").value.trim();if(!t)return msg("인식된 말을 먼저 확인해 주세요.");st.media.voice={transcript:t,confirmed:true,confirmedAt:new Date().toISOString()};$("#thought").value=t;st.originalInput=t;save();msg("내가 확인한 음성을 생각 입력으로 사용합니다.")};
+$("#photoInput").onchange=e=>{let f=e.target.files[0];if(!f)return;if(!f.type.startsWith("image/"))return msg("이미지 파일을 선택해 주세요.");if(f.size>12*1024*1024)return msg("사진이 너무 큽니다. 12MB 이하 이미지를 사용해 주세요.");let r=new FileReader();r.onload=()=>{let img=new Image();img.onload=()=>{let max=1280,scale=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext("2d").drawImage(img,0,0,c.width,c.height);let data=c.toDataURL("image/jpeg",.82);st.media.photo={dataUrl:data,observations:[],confirmedFacts:[],analysisStatus:"ready"};$("#photoPreview").src=data;$("#photoPreviewWrap").classList.remove("hidden");$("#photoObservations").innerHTML="";$("#confirmedPhotoFacts").innerHTML="";try{save()}catch(err){st.media.photo.dataUrl=null;msg("기기 저장 공간이 부족해 사진을 저장하지 못했습니다. 더 작은 사진을 사용해 주세요.")}};img.onerror=()=>msg("사진을 읽지 못했습니다. 다른 사진을 선택해 주세요.");img.src=r.result};r.onerror=()=>msg("사진을 읽지 못했습니다. 다른 사진을 선택해 주세요.");r.readAsDataURL(f)};
+$("#analyzePhoto").onclick=async()=>{if(!st.media.photo.dataUrl)return msg("먼저 사진을 선택해 주세요.");$("#analyzePhoto").disabled=true;let obs=[];try{let res=await AI.call("vision_photo",{imageDataUrl:st.media.photo.dataUrl,instruction:"사진에서 직접 관찰 가능한 것만 최대 5개 제안. 감정, 관계, 의도, 경험은 추정하지 말 것."});if(Array.isArray(res.observations))obs=res.observations.slice(0,5)}catch(e){}if(!obs.length)obs=["사진에 보이는 사람 또는 동물","사진에 보이는 장소","사진에서 하고 있는 행동"];st.media.photo.observations=obs.map((x,i)=>({id:"obs"+i,text:String(x),source:"photoObservation",status:"unconfirmed"}));st.media.photo.analysisStatus="review";save();renderPhotoObs();$("#analyzePhoto").disabled=false};
+function renderPhotoObs(){$("#photoObservations").innerHTML='<p><b>AI가 이렇게 보았어요. 맞는 것만 골라 주세요.</b></p>'+(st.media.photo.observations||[]).map(o=>`<label class="observation"><input type="checkbox" data-obs="${o.id}" ${o.status==="confirmed"?"checked":""}><span>${o.text}<br><small>AI 관찰 후보 · 아직 미확정</small></span></label>`).join("");$$("[data-obs]").forEach(c=>c.onchange=()=>{let o=st.media.photo.observations.find(x=>x.id===c.dataset.obs);o.status=c.checked?"confirmed":"rejected";if(c.checked){if(!st.media.photo.confirmedFacts.some(x=>x.text===o.text))st.media.photo.confirmedFacts.push({text:o.text,source:"photoObservation",confirmedBy:"learner",status:"confirmed"})}else st.media.photo.confirmedFacts=st.media.photo.confirmedFacts.filter(x=>x.text!==o.text);save();renderPhotoFacts()});renderPhotoFacts()}
+function renderPhotoFacts(){$("#confirmedPhotoFacts").innerHTML=(st.media.photo.confirmedFacts||[]).map(x=>`<span class="confirmedFact">✓ ${x.text}</span>`).join("")}
+if(st.media.voice.transcript)$("#voiceTranscript").value=st.media.voice.transcript;if(st.media.photo.dataUrl){$("#photoPreview").src=st.media.photo.dataUrl;$("#photoPreviewWrap").classList.remove("hidden");renderPhotoObs()}
+
+
+window.TALKTALK_QA={version:"step23-12",checks:["activity reset","AI timeout/offline fallback","photo compression/storage safety","PWA assets","10 penguin assets","dictionary/analysis/usability/adaptive flow"]};
+window.TALKTALK_DICTIONARY_V2={version:"step30",schema:2,features:["portfolio","search","intent filter","favorite","detail","listen","rewrite","similar situation","legacy migration"]};
+window.TALKTALK_PENGUIN_ASSETS={version:"step29",count:10,size:"512x512",format:"transparent PNG",xpPerLevel:50};
+window.TALKTALK_UX_V1={
+ designSystem:{color:"calm blue/white",font:"Pretendard/Noto Sans KR",touchTarget:"52px+",cornerRadius:"12-28px"},
+ principles:["one primary question per screen","previous left / next or confirm right","large touch targets","calm information density","penguin is guide, not toy","not preschool-only","tablet first","mobile responsive","portrait and landscape responsive","reduced motion"],
+ accessibility:["keyboard focus visible","aria live status","progressbar aria","font enlargement","reduced motion","large touch targets"],
+ targetUsers:["early elementary readable","upper elementary appropriate","middle-school non-infantile"]
+};
+
+updateHome();initStoryActivitySelector();save();if(st.current&&st.current!=="home")$("#resumeText").textContent=`${st.current} 단계까지 저장되어 있어요.`;go("home");aiFallback();
+})();
+document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;let txt=(b.textContent||"").trim();if(txt.includes("내가 말하려는 문장이 없어요")){let r=getUsabilityLog();r.push({type:"self_differentiation",screen:activeScreenName(),storyId:st.storyId||null,at:new Date().toISOString()});saveUsabilityLog(r)}setTimeout(()=>{let s=activeScreenName(),now=Date.now();if(s!==usabilityLastScreen){let r=getUsabilityLog();r.push({type:"screen_time",screen:usabilityLastScreen,seconds:Math.round((now-usabilityScreenStarted)/1000),at:new Date().toISOString()});saveUsabilityLog(r);usabilityLastScreen=s;usabilityScreenStarted=now}},30)});
+
+document.addEventListener("click",()=>setTimeout(()=>{renderGlobalAdaptive();let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},50));
+renderGlobalAdaptive();setTimeout(()=>{let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},0);
+
+let deferredPWAInstall=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPWAInstall=e});
+async function installTalkTalk(){if(deferredPWAInstall){deferredPWAInstall.prompt();await deferredPWAInstall.userChoice;deferredPWAInstall=null}else{msg("iPhone/iPad에서는 Safari 공유 버튼 → ‘홈 화면에 추가’를 사용해 주세요.")}}
+function updatePWAStatus(){let x=document.getElementById("pwaStatus");if(x)x.textContent=navigator.onLine?"온라인":"오프라인 · 저장된 기본 기능 사용 가능"}
+window.addEventListener("online",updatePWAStatus);window.addEventListener("offline",updatePWAStatus);updatePWAStatus();
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+window.TALKTALK_PWA={install:installTalkTalk,online:()=>navigator.onLine};
+</script><div class="offline-badge" id="offlineBadge">오프라인 사용 중</div>
+<script>
+let deferredInstall=null;
+const installBanner=document.getElementById("installBanner"),installBtn=document.getElementById("installApp"),installHelp=document.getElementById("installHelp"),offlineBadge=document.getElementById("offlineBadge");
+function updateOnlineState(){offlineBadge.classList.toggle("show",!navigator.onLine)}
+window.addEventListener("online",updateOnlineState);window.addEventListener("offline",updateOnlineState);updateOnlineState();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;installBanner.classList.add("show")});
+installBtn?.addEventListener("click",async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;installBanner.classList.remove("show");return}
+ const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ installBanner.classList.add("show");
+ installHelp.textContent=isiOS?"Safari의 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택하세요.":"브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요.";
+});
+window.addEventListener("appinstalled",()=>{installBanner.classList.remove("show");deferredInstall=null});
+if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>installBanner.classList.add("show"),1200)}
+</script><button id="usabilityFab" class="usability-fab" onclick="toggleUsabilityPanel()">📝 관찰 기록</button><aside id="usabilityPanel" class="usability-panel" hidden><h3>교사 관찰</h3><p class="help" id="usabilityScreenName">현재 화면을 기록합니다.</p><div class="usability-buttons"><button class="btn secondary" onclick="logUsability('independent')">혼자 수행</button><button class="btn secondary" onclick="logUsability('verbal')">언어적 힌트</button><button class="btn secondary" onclick="logUsability('visual')">시각적 힌트</button><button class="btn secondary" onclick="logUsability('direct')">직접 도움</button><button class="btn ghost" onclick="logUsability('stuck')">막힘</button><button class="btn ghost" onclick="logUsability('confused')">버튼/문구 혼동</button></div><textarea id="usabilityNote" class="usability-note" placeholder="필요할 때만 짧게 메모"></textarea><div class="row"><button class="btn ghost" onclick="closeUsabilityPanel()">닫기</button></div></aside><div id="pwaStatus" aria-live="polite" style="position:fixed;left:12px;bottom:12px;z-index:70;font-size:.75rem;background:#fff;border:1px solid #d7e5eb;border-radius:999px;padding:6px 10px;box-shadow:0 3px 12px rgba(0,0,0,.08)">온라인</div></body></html>
