@@ -1014,6 +1014,33 @@ document.addEventListener("click",function(e){
  if(target)go(target);
 });
 
+
+// Resilient learner-flow navigation: keep primary progression controls clickable on touch devices.
+(function(){
+ const enable=(id)=>{const el=document.getElementById(id);if(el){el.disabled=false;el.removeAttribute('disabled');el.removeAttribute('aria-disabled');el.style.pointerEvents='auto';}};
+ ['toIntent','toCandidates','applyExtra','stopExpand','applyExpand','toCorrection','acceptCorrection','keepOriginal','skipAI','toEvaluate','toDiscourse','addSentence','saveSentence','unknown','private','hint','difficult'].forEach(enable);
+ document.querySelectorAll('.screen .btn,.screen .choice,.screen .chip,[data-go],[data-confirm]').forEach(el=>{
+   if(!el.hasAttribute('disabled')){el.style.pointerEvents='auto';el.style.touchAction='manipulation';}
+ });
+ const safeGo=(id,target,before)=>{
+   const el=document.getElementById(id); if(!el)return;
+   el.addEventListener('click',function(e){
+     if(typeof before==='function' && before()===false)return;
+     setTimeout(()=>{
+       const active=document.querySelector('.screen.active');
+       if(active && active.dataset.s===target)return;
+       if(typeof go==='function')go(target);
+     },80);
+   });
+ };
+ // These controls can always move forward/backward after their normal handler has stored state.
+ safeGo('stopExpand','direct');
+ safeGo('acceptCorrection','aiRequest');
+ safeGo('keepOriginal','aiRequest');
+ safeGo('skipAI','discourse');
+ safeGo('toDiscourse','discourse');
+})();
+
 // Direct home start activation
 (function(){
   const startBtn=document.getElementById('newActivity');
