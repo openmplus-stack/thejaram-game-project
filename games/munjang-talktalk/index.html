@@ -1093,17 +1093,28 @@ function talktalkOpenScreen(name){
  const target=document.querySelector('.screen[data-s="'+name+'"]');
  if(target){target.classList.add('active');window.scrollTo(0,0);return true}return false;
 }
+function talktalkFollowupFor(sentence){
+ const s=String(sentence||"");
+ if(/장난/.test(s))return "친구와 어떤 장난을 쳤어요?";
+ if(/싸워/.test(s))return "친구와 왜 싸우게 되었어요?";
+ if(/혼났/.test(s))return "무슨 일이 있어서 혼났어요?";
+ if(/울었/.test(s))return "왜 울게 되었어요?";
+ if(/다쳤/.test(s))return "어떻게 다쳤어요?";
+ if(/학교/.test(s))return "학교에서 언제 있었던 일이에요?";
+ return "그때 무슨 일이 더 있었어요?";
+}
 function talktalkSaveChosenSentence(sentence,intent){
  try{
-   const topic=(document.getElementById('thought')?.value||'').trim()||'내 문장';
-   const key='talktalk_sentence_dictionary';
+   const topic=(document.getElementById('thought')?.value||'').trim()||'내 문장',key='talktalk_sentence_dictionary';
    let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
-   dict.unshift({schemaVersion:1,id:'quick-'+Date.now(),date:new Date().toISOString(),updatedAt:new Date().toISOString(),topic:topic,intent:intent||'표현',initial:topic,candidate:sentence,confirmedFacts:[],rejectedCount:0,working:sentence,direct:sentence,corrected:sentence,final:sentence,sentences:[sentence],support:'문장 후보 선택',request:'',evaluation:'',favorite:false,tags:[intent||'표현',topic],reuseCount:0});
+   dict.unshift({schemaVersion:1,id:'quick-'+Date.now(),date:new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:intent||'생활문장',initial:topic,candidate:sentence,confirmedFacts:[],rejectedCount:0,working:sentence,direct:sentence,corrected:sentence,final:sentence,sentences:[sentence],support:'자동 저장',request:'',evaluation:'',favorite:false,tags:[intent||'생활문장',topic],reuseCount:0});
    localStorage.setItem(key,JSON.stringify(dict));
    try{if(typeof reward==='function'){reward('candidate');reward('complete');reward('dictionary_save')}}catch(_){}
-   try{if(typeof renderLibrary==='function')renderLibrary()}catch(_){}
-   talktalkOpenScreen('dictionary');
- }catch(err){talktalkOpenScreen('dictionary')}
+   window.talktalkStorySentences=[sentence];window.talktalkCurrentSentence=sentence;
+   const w=document.getElementById('workingSentence'),q=document.getElementById('followupQuestion'),x=document.getElementById('expansion');
+   if(w)w.textContent=sentence;if(q)q.textContent=talktalkFollowupFor(sentence);if(x){x.value='';x.placeholder='짧은 말이나 단어로 답해도 괜찮아요.'}
+   talktalkOpenScreen('expand');
+ }catch(err){talktalkOpenScreen('expand')}
 }
 document.addEventListener('click',function(e){
  const b=e.target.closest('#candidateList [data-sentence],#candidateList .fallback-candidate');
