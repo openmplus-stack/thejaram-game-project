@@ -250,6 +250,24 @@ body:has(.learner-home.active) .progress{opacity:.35}
  .learner-home .home-start{right:4%!important;bottom:29%!important;min-width:178px!important;padding:14px 16px!important}
  .learner-home .home-levelbar{left:3%!important;bottom:5%!important;width:72%!important}
 }
+
+/* Stage 4: mobile hero composition — speech, penguin and CTA as one scene */
+@media(max-width:700px){
+ .learner-home .home-world{min-height:calc(100svh - 150px)!important}
+ .learner-home .home-hero-art{left:7%!important;bottom:31%!important;width:35%!important;max-width:210px!important}
+ .learner-home .home-speech{top:auto!important;right:7%!important;bottom:58%!important;width:50%!important;max-width:330px!important;padding:16px 18px!important}
+ .learner-home .home-speech h2{font-size:clamp(1.2rem,5vw,1.7rem)!important;line-height:1.3!important}
+ .learner-home .home-start{top:auto!important;right:7%!important;bottom:36%!important;width:48%!important;min-width:0!important;max-width:310px!important;padding:17px 16px!important}
+ .learner-home .home-levelbar{left:7%!important;bottom:21%!important;width:62%!important;max-width:390px!important}
+}
+@media(max-width:430px){
+ .learner-home .home-world{min-height:calc(100svh - 138px)!important}
+ .learner-home .home-hero-art{left:5%!important;bottom:31%!important;width:34%!important}
+ .learner-home .home-speech{top:auto!important;right:6%!important;bottom:59%!important;width:52%!important;padding:13px 15px!important}
+ .learner-home .home-speech h2{font-size:1.12rem!important;line-height:1.3!important}
+ .learner-home .home-start{right:6%!important;bottom:38%!important;width:50%!important;min-width:0!important;padding:15px 12px!important}
+ .learner-home .home-levelbar{left:5%!important;bottom:21%!important;width:67%!important}
+}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
