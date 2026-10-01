@@ -1118,7 +1118,7 @@ document.addEventListener('click',function(e){
  make.disabled=false; make.removeAttribute('aria-disabled'); make.style.pointerEvents='auto'; make.style.touchAction='manipulation';
  make.addEventListener('click',function(e){
    const input=document.getElementById('thought');
-   const word=(input&&input.value||'').trim();
+   const word=(input&&input.value||'').trim();window.talktalkExtraWords=[];
    if(!word){alert('단어를 넣어 주세요.');return;}
    setTimeout(function(){
      const candidate=document.querySelector('.screen[data-s="candidates"]');
@@ -1150,10 +1150,12 @@ document.addEventListener('click',function(e){
    const word=(document.getElementById('thought')?.value||'').trim()||'이것';
    const extra=(document.getElementById('extra')?.value||'').trim();
    if(!extra){alert('단어를 하나 더 넣어 주세요.');return;}
-   const examples=[
-     word+'에 대해 '+extra+'을 알려 주세요.',
-     '나는 '+word+'의 '+talktalkSubject(extra)+' 중요하다고 생각해요.',
-     word+'의 '+extra+'은 다른 것과 어떻게 다를까요?'
+   let prior=(window.talktalkExtraWords||[]);prior.push(extra);window.talktalkExtraWords=prior;
+   const words=[word,...prior],daily=talktalkDailyCandidates(words);
+   const examples=daily.length?daily:[
+     '나는 '+talktalkTopic(word)+' '+extra+'에 대해 말하고 싶어요.',
+     talktalkSubject(word)+' '+extra+'와 관련이 있어요.',
+     word+'에 대해 '+talktalkObject(extra)+' 더 말하고 싶어요.'
    ];
    const box=document.getElementById('candidateList');
    if(box)box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-next-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
@@ -1174,7 +1176,7 @@ document.addEventListener('click',function(e){
    const extra=document.getElementById('extra');
    if(extra){
      extra.value='';
-     extra.placeholder=word+'에 대해 무엇이 더 궁금해요? 예: 먹이';
+     const n=(window.talktalkExtraWords||[]).length;extra.placeholder=n===0?'어디에서, 누구와, 무슨 일이 있었나요? 단어 하나를 더 넣어 보세요.':n===1?'한 단어만 더 넣어 보세요. 예: 혼났어, 놀았어, 속상해':'필요하면 단어를 하나 더 넣어 보세요.';
    }
    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
    const next=document.querySelector('.screen[data-s="question"]');
