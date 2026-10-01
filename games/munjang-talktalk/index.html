@@ -327,7 +327,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 const intents=["경험","설명","생각","감정","질문","요구","주장","비교","예측·가정","문제해결","이야기"],stageOrder=["home","input","intent","candidates","confirm","question","expand","direct","correction","aiRequest","evaluate","discourse","dictionary","teacher","usability","adaptive","treasures","growth","report"];
 const defaults={current:"home",originalInput:"",intent:"생각",candidate:null,rejected:[],confirmed:[],working:"",direct:"",support:"A",final:"",request:"",evaluation:"",discourse:[],stars:0,xp:0,lastSaved:null,storyId:null};
 let st;try{st=Object.assign({},defaults,JSON.parse(localStorage.getItem("talktalk_integrated_v1")||"{}"))}catch(e){st={...defaults}}
-function save(){st.lastSaved=new Date().toISOString();try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(e){if(st.media?.photo?.dataUrl){st.media.photo.dataUrl=null;try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(_){}}}$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요."}
+function save(){st.lastSaved=new Date().toISOString();try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(e){if(st.media?.photo?.dataUrl){st.media.photo.dataUrl=null;try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(_){}}}if($("#resumeText"))$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요."}
 const screenLabels={home:"홈",input:"생각 입력",intent:"표현 목적",candidates:"문장 후보",confirm:"의도 확인",question:"추가 질문",expand:"문장 확장",direct:"직접 표현",correction:"최소 교정",aiRequest:"AI 요구",evaluate:"AI 결과 평가",discourse:"짧은 담화",dictionary:"문장사전",teacher:"교사용 누적 분석",usability:"사용성 테스트",adaptive:"맞춤 도움 설정",treasures:"이야기 보물 도감",growth:"펭귄 성장",report:"학습 결과"};
 function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=name;save();$$(".screen").forEach(x=>x.classList.toggle("active",x.dataset.s===name));const i=stageOrder.indexOf(name);const pct=Math.round(i/(stageOrder.length-1)*100);$("#bar").style.width=pct+"%";$(".progress").setAttribute("aria-valuenow",pct);$(".progress").setAttribute("aria-valuemin","0");$(".progress").setAttribute("aria-valuemax","100");$(".progress").setAttribute("aria-label",`${screenLabels[name]||name} 진행 ${pct}%`);$("#guide").textContent=name==="home"?"생각은 네가 만들고, 문장 톡톡은 그 생각이 문장이 되도록 도와줘요.":`${screenLabels[name]||""} · 한 번에 한 가지씩 진행합니다.`;if(name==="dictionary")renderLibrary();if(name==="teacher")renderTeacherAnalysis();if(name==="usability")renderUsability();if(name==="adaptive")renderAdaptive();if(name==="treasures")renderTreasureAtlas();applyAdaptiveToScreen(name);if(name==="growth")renderGrowth();if(name==="report")renderReport();window.scrollTo({top:0,behavior:"smooth"})}
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
@@ -1048,6 +1048,35 @@ document.addEventListener("click",function(e){
  safeGo('keepOriginal','aiRequest');
  safeGo('skipAI','discourse');
  safeGo('toDiscourse','discourse');
+})();
+
+// Standalone input fallback: works even if the main initializer stops early.
+(function(){
+ const make=document.getElementById('toIntent');
+ if(!make)return;
+ make.disabled=false; make.removeAttribute('aria-disabled'); make.style.pointerEvents='auto'; make.style.touchAction='manipulation';
+ make.addEventListener('click',function(e){
+   const input=document.getElementById('thought');
+   const word=(input&&input.value||'').trim();
+   if(!word){alert('단어를 넣어 주세요.');return;}
+   setTimeout(function(){
+     const candidate=document.querySelector('.screen[data-s="candidates"]');
+     const isActive=candidate&&candidate.classList.contains('active');
+     if(isActive)return;
+     const box=document.getElementById('candidateList');
+     if(box){
+       const examples=[
+         '나는 '+word+'이 신기하다고 생각해요.',
+         word+'은 왜 그런 모습일까요?',
+         word+'에 대해 더 알려 주세요.'
+       ];
+       box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
+       document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+       candidate.classList.add('active');
+       window.scrollTo(0,0);
+     }
+   },120);
+ });
 })();
 
 // Direct home start activation
