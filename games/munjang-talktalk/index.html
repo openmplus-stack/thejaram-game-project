@@ -928,18 +928,17 @@ if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>inst
 <button type="button" data-go="growth"><span>🐧</span>성장</button>
 </nav>
 <script id="bottom-nav-fix">
-window.addEventListener("DOMContentLoaded",()=>{
- const nav=document.querySelector(".bottom-tabs");
- if(nav){
-  nav.addEventListener("click",e=>{
-   const b=e.target.closest("button"); if(!b)return;
-   const target=b.dataset.go;
-   if(target && typeof window.go==="function"){window.go(target);return}
-   if(b.id==="bottomStoryBtn"){
-    if(typeof window.go==="function")window.go("home");
-    setTimeout(()=>{const d=document.querySelector(".story-home-panel");if(d){d.open=true;d.scrollIntoView({behavior:"smooth",block:"start"})}},60);
-   }
-  });
+document.addEventListener("click",function(e){
+ const b=e.target.closest(".bottom-tabs button");
+ if(!b)return;
+ e.preventDefault();
+ if(b.id==="bottomStoryBtn"){
+   go("home");
+   const d=document.querySelector(".story-home-panel");
+   if(d){d.style.display="block";d.open=true;setTimeout(()=>d.scrollIntoView({behavior:"smooth",block:"start"}),30)}
+   return;
  }
+ const target=b.getAttribute("data-go");
+ if(target)go(target);
 });
 </script></body></html>
