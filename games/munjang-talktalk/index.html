@@ -1129,9 +1129,10 @@ document.addEventListener('click',function(e){
      if(isActive)return;
      const box=document.getElementById('candidateList');
      if(box){
-       const examples=[
+       const parts=talktalkSplitInput(word),daily=talktalkDailyCandidates(parts);
+       const examples=daily.length?daily:[
          '나는 '+talktalkSubject(word)+' 신기하다고 생각해요.',
-         word+'은 왜 그런 모습일까요?',
+         talktalkTopic(word)+' 왜 그런 모습일까요?',
          word+'에 대해 더 알려 주세요.'
        ];
        box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
