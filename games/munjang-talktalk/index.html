@@ -338,7 +338,7 @@ $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
 const purposeHints={생각:"어떻게 생각해요? 예: 재미있어",감정:"어떤 기분이에요? 예: 무서워",질문:"무엇이 궁금해요? 예: 먹이",요구:"무엇을 해 주면 좋겠어요? 예: 알려줘",주장:"꼭 말하고 싶은 점은? 예: 중요해",비교:"무엇과 비교할까요? 예: 코끼리","예측·가정":"어떻게 될까요? 예: 도망",문제해결:"어떻게 해결할까요? 예: 숨기",이야기:"무슨 일이 생길까요? 예: 여행",경험:"어디에서 봤어요? 예: 박물관",설명:"어떤 점을 설명할까요? 예: 크기"};
-function purposeSentence(p,t,e){e=e||"";let m={경험:t+"을 "+(e||"본 적이")+" 있어요.",설명:t+"의 "+(e||"특징")+"을 설명하고 싶어요.",생각:"나는 "+t+"이 "+(e||"흥미롭다고")+" 생각해요.",감정:"나는 "+t+"을 생각하면 "+(e||"특별한 기분이")+" 들어요.",질문:t+"의 "+(e||"특징")+"은 무엇인가요?",요구:t+"에 대해 "+(e||"알려")+" 주세요.",주장:"나는 "+t+"이 "+(e||"중요하다고")+" 생각해요.",비교:t+"과 "+(e||"다른 것")+"을 비교하고 싶어요.","예측·가정":"만약 "+t+"이 "+(e||"여기에 있다면")+" 어떻게 될까요?",문제해결:t+"의 문제를 "+(e||"해결하고")+" 싶어요.",이야기:t+"이 "+(e||"모험을 하는")+" 이야기를 만들고 싶어요."};return m[p]||t+"에 대해 말하고 싶어요."}
+function purposeSentence(p,t,e){e=e||"";let m={경험:talktalkObject(t)+" "+(e||"본 적이")+" 있어요.",설명:t+"의 "+(e||"특징")+"을 설명하고 싶어요.",생각:"나는 "+talktalkSubject(t)+" "+(e||"흥미롭다고")+" 생각해요.",감정:"나는 "+t+"을 생각하면 "+(e||"특별한 기분이")+" 들어요.",질문:t+"의 "+(e||"특징")+"은 무엇인가요?",요구:t+"에 대해 "+(e||"알려")+" 주세요.",주장:"나는 "+talktalkSubject(t)+" "+(e||"중요하다고")+" 생각해요.",비교:t+"과 "+(e||"다른 것")+"을 비교하고 싶어요.","예측·가정":"만약 "+t+"이 "+(e||"여기에 있다면")+" 어떻게 될까요?",문제해결:t+"의 문제를 "+(e||"해결하고")+" 싶어요.",이야기:talktalkSubject(t)+" "+(e||"모험을 하는")+" 이야기를 만들고 싶어요."};return m[p]||t+"에 대해 말하고 싶어요."}
 function renderCandidates(page=0){st.candidatePage=page;save();let box=$("#candidateList"),t=st.originalInput||"내 생각",e=st.extraWord||"",g=purposeGroups[Math.min(page,purposeGroups.length-1)];box.innerHTML=g.map((p,i)=>{let s=purposeSentence(p,t,e);return '<button class="choice candidate" data-purpose="'+p+'" data-sentence="'+encodeURIComponent(s)+'"><b>'+p+'</b> · '+(i+1)+'. '+s+'</button>'}).join("");box.querySelectorAll("[data-sentence]").forEach(b=>b.onclick=()=>{let s=decodeURIComponent(b.dataset.sentence);st.intent=b.dataset.purpose;st.candidate=s;st.working=s;st.final=s;st.confirmed.push(s);reward("candidate");save();$("#selectedSentence").textContent=s;go("dictionary");renderLibrary()});let d=$("#dislikeCandidates");if(d)d.onclick=()=>{st.rejected.push(...[...box.querySelectorAll("[data-sentence]")].map(b=>decodeURIComponent(b.dataset.sentence)));st.nextCandidatePage=Math.min(page+1,purposeGroups.length-1);reward("reselect_none");save();prepareNextWord();go("question")}}
 function prepareNextWord(){let p=purposeGroups[st.nextCandidatePage||1][0],x=$("#extra");if(x){x.value="";x.placeholder=(st.originalInput||"이것")+"에 대해 "+(purposeHints[p]||"단어 하나를 더 넣어 보세요.")}}
 $("#toCandidates").onclick=()=>{st.candidatePage=0;st.extraWord="";renderCandidates(0);go("candidates")};
@@ -1050,6 +1050,41 @@ document.addEventListener("click",function(e){
  safeGo('toDiscourse','discourse');
 })();
 
+// Korean particle helpers + resilient candidate save/reward/navigation.
+function talktalkHasBatchim(word){
+ const s=String(word||'').trim();if(!s)return false;
+ const ch=s.charCodeAt(s.length-1);return ch>=0xAC00&&ch<=0xD7A3&&((ch-0xAC00)%28)!==0;
+}
+function talktalkParticle(word,pair){const parts=pair.split('/');return parts[talktalkHasBatchim(word)?0:1]}
+function talktalkSubject(word){return word+talktalkParticle(word,'이/가')}
+function talktalkTopic(word){return word+talktalkParticle(word,'은/는')}
+function talktalkObject(word){return word+talktalkParticle(word,'을/를')}
+function talktalkOpenScreen(name){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+ const target=document.querySelector('.screen[data-s="'+name+'"]');
+ if(target){target.classList.add('active');window.scrollTo(0,0);return true}return false;
+}
+function talktalkSaveChosenSentence(sentence,intent){
+ try{
+   const topic=(document.getElementById('thought')?.value||'').trim()||'내 문장';
+   const key='talktalk_sentence_dictionary';
+   let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
+   dict.unshift({schemaVersion:1,id:'quick-'+Date.now(),date:new Date().toISOString(),updatedAt:new Date().toISOString(),topic:topic,intent:intent||'표현',initial:topic,candidate:sentence,confirmedFacts:[],rejectedCount:0,working:sentence,direct:sentence,corrected:sentence,final:sentence,sentences:[sentence],support:'문장 후보 선택',request:'',evaluation:'',favorite:false,tags:[intent||'표현',topic],reuseCount:0});
+   localStorage.setItem(key,JSON.stringify(dict));
+   try{if(typeof reward==='function'){reward('candidate');reward('complete');reward('dictionary_save')}}catch(_){}
+   try{if(typeof renderLibrary==='function')renderLibrary()}catch(_){}
+   talktalkOpenScreen('dictionary');
+ }catch(err){talktalkOpenScreen('dictionary')}
+}
+document.addEventListener('click',function(e){
+ const b=e.target.closest('#candidateList [data-sentence],#candidateList .fallback-candidate');
+ if(!b)return;
+ const sentence=b.dataset.sentence?decodeURIComponent(b.dataset.sentence):(b.textContent||'').replace(/^\s*\d+\.\s*/,'').trim();
+ if(!sentence)return;
+ e.preventDefault();e.stopPropagation();
+ talktalkSaveChosenSentence(sentence,b.dataset.purpose||'표현');
+},true);
+
 // Standalone input fallback: works even if the main initializer stops early.
 (function(){
  const make=document.getElementById('toIntent');
@@ -1066,7 +1101,7 @@ document.addEventListener("click",function(e){
      const box=document.getElementById('candidateList');
      if(box){
        const examples=[
-         '나는 '+word+'이 신기하다고 생각해요.',
+         '나는 '+talktalkSubject(word)+' 신기하다고 생각해요.',
          word+'은 왜 그런 모습일까요?',
          word+'에 대해 더 알려 주세요.'
        ];
@@ -1091,7 +1126,7 @@ document.addEventListener("click",function(e){
    if(!extra){alert('단어를 하나 더 넣어 주세요.');return;}
    const examples=[
      word+'에 대해 '+extra+'을 알려 주세요.',
-     '나는 '+word+'의 '+extra+'이 중요하다고 생각해요.',
+     '나는 '+word+'의 '+talktalkSubject(extra)+' 중요하다고 생각해요.',
      word+'의 '+extra+'은 다른 것과 어떻게 다를까요?'
    ];
    const box=document.getElementById('candidateList');
