@@ -222,6 +222,34 @@ body{background:linear-gradient(180deg,#83d7fb 0,#d9f4ff 34%,#f7fcff 68%,#dff4fb
 /* Stage 2: real illustrated glacier world background */
 .learner-home .home-world{background-image:linear-gradient(rgba(255,255,255,.02),rgba(255,255,255,.02)),url("assets/backgrounds/bg-home-glacier.webp")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
 .learner-home .home-world:before,.learner-home .home-world:after{content:none!important;display:none!important}
+
+/* Stage 3: composition on illustrated home world */
+body:has(.learner-home.active) header{background:rgba(255,255,255,.72);backdrop-filter:blur(8px)}
+body:has(.learner-home.active) .progress{opacity:.35}
+.learner-home{padding:0 0 72px!important;max-width:none!important}
+.learner-home .home-world{min-height:clamp(600px,calc(100vh - 112px),820px)!important;border-radius:0 0 32px 32px!important}
+.learner-home .home-hero-art{left:7%!important;bottom:15%!important;width:34%!important;max-width:330px!important}
+.learner-home .home-hero-art .penguin-img{width:100%!important;max-height:390px!important;object-fit:contain!important}
+.learner-home .home-speech{right:8%!important;top:16%!important;width:min(40%,410px)!important;padding:20px 24px!important}
+.learner-home .home-speech h2{font-size:clamp(1.45rem,2.7vw,2.05rem)!important}
+.learner-home .home-start{top:auto!important;right:11%!important;bottom:27%!important;min-width:260px!important}
+.learner-home .home-levelbar{left:7%!important;bottom:5%!important;width:min(500px,58%)!important;padding:8px 12px!important;background:rgba(255,255,255,.86)!important}
+.bottom-tabs.world-menu{background:rgba(255,255,255,.78)!important;box-shadow:0 5px 16px rgba(28,83,115,.1)!important}
+@media(max-width:700px){
+ .learner-home .home-world{min-height:610px!important}
+ .learner-home .home-hero-art{left:3%!important;bottom:17%!important;width:40%!important}
+ .learner-home .home-speech{right:4%!important;top:13%!important;width:48%!important}
+ .learner-home .home-start{right:6%!important;bottom:28%!important;min-width:205px!important}
+ .learner-home .home-levelbar{left:4%!important;bottom:5%!important;width:68%!important}
+}
+@media(max-width:430px){
+ .learner-home .home-world{min-height:560px!important;background-position:center center!important}
+ .learner-home .home-hero-art{left:1%!important;bottom:18%!important;width:43%!important}
+ .learner-home .home-speech{right:3%!important;top:12%!important;width:52%!important;padding:14px 16px!important}
+ .learner-home .home-speech h2{font-size:1.15rem!important}
+ .learner-home .home-start{right:4%!important;bottom:29%!important;min-width:178px!important;padding:14px 16px!important}
+ .learner-home .home-levelbar{left:3%!important;bottom:5%!important;width:72%!important}
+}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
