@@ -215,16 +215,22 @@ body{background:linear-gradient(180deg,#83d7fb 0,#d9f4ff 34%,#f7fcff 68%,#dff4fb
 .home-world .home-start{top:auto!important;right:9%!important;bottom:23%!important}
 @media(max-width:700px){.home-world .home-start{top:auto!important;right:6%!important;bottom:24%!important}}
 @media(max-width:430px){.home-world .home-start{top:auto!important;right:4%!important;bottom:25%!important}}
+
+/* Home structure v1 locked: world > penguin > prompt > primary action > growth. Story is a separate destination. */
+[data-s="stories"]{max-width:900px;margin:0 auto;padding-bottom:90px}[data-s="stories"] .story-screen-content{display:block!important}[data-s="stories"] .story-home-panel{display:block!important}.learner-home .home-world{isolation:isolate}.learner-home .home-data-hooks{display:none!important}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
  <div class="home-speech"><h2>어떤 생각을<br>표현하고 싶나요?</h2></div>
  <button class="home-start" id="newActivity" data-go="input"><span>💬</span><b>새 문장 만들기</b></button>
  <div class="home-levelbar"><span class="level-chip" id="homeLevelName">Lv.1 아기 펭귄</span><div class="xp-track"><span></span></div><span class="xp-text">⭐ <b id="starCount">0</b> · <b id="xpCount">0</b> EXP</span></div>
- <button class="home-resume-mini" id="resume" aria-label="이어하기">↻</button><span id="resumeText" class="visually-hidden">저장된 활동을 확인하고 있어요.</span>
 </div>
-<div class="home-data-hooks" aria-hidden="true"><span id="bookCount">0</span><span id="treasureHomeCount">0</span></div>
-<details class="story-home-panel home-hidden-story"><summary>📚 이야기</summary><div class="box yellow" id="storyActivityBox"><b>📖 이야기 활동 선택</b><select id="storyActivitySelect" aria-label="이야기 활동 선택"><option value="">일반 문장 활동 · 보물 없음</option></select><p class="status" id="storyActivityStatus">현재: 일반 문장 활동</p><div id="storyMissionArea" class="story-missions" hidden><h4>이 이야기로 어떤 말을 만들어 볼까요?</h4><div class="story-level-box"><label for="storyLevelSelect">이야기 난이도</label><select id="storyLevelSelect"><option value="12">1–2학년</option><option value="34">3–4학년</option><option value="56">5–6학년</option></select><span class="story-level-goal" id="storyLevelGoal"></span></div><p class="help" id="storyMissionIntro">아래에서 하나를 골라도 되고, 내 생각을 직접 말해도 됩니다.</p><div id="storyMissionGrid" class="story-mission-grid"></div><div id="adaptiveStoryBox" class="adaptive-box" hidden><b id="adaptiveStoryTitle">최근 수행에 맞는 난이도 제안</b><p id="adaptiveStoryText" class="help"></p><p id="adaptiveStoryEvidence" class="adaptive-evidence"></p><div class="adaptive-actions" id="adaptiveStoryActions"></div></div></div></div></details>
+<div class="home-data-hooks" aria-hidden="true"><span id="bookCount">0</span><span id="treasureHomeCount">0</span><span id="resumeText">새 문장 만들기</span></div>
+<button id="resume" type="button" hidden aria-hidden="true"></button>
+</section>
+<section class="screen" data-s="stories">
+<div class="eyebrow">이야기</div><h2 class="q">이야기를 골라요</h2>
+<div class="story-screen-content"><summary>📚 이야기</summary><div class="box yellow" id="storyActivityBox"><b>📖 이야기 활동 선택</b><select id="storyActivitySelect" aria-label="이야기 활동 선택"><option value="">일반 문장 활동 · 보물 없음</option></select><p class="status" id="storyActivityStatus">현재: 일반 문장 활동</p><div id="storyMissionArea" class="story-missions" hidden><h4>이 이야기로 어떤 말을 만들어 볼까요?</h4><div class="story-level-box"><label for="storyLevelSelect">이야기 난이도</label><select id="storyLevelSelect"><option value="12">1–2학년</option><option value="34">3–4학년</option><option value="56">5–6학년</option></select><span class="story-level-goal" id="storyLevelGoal"></span></div><p class="help" id="storyMissionIntro">아래에서 하나를 골라도 되고, 내 생각을 직접 말해도 됩니다.</p><div id="storyMissionGrid" class="story-mission-grid"></div><div id="adaptiveStoryBox" class="adaptive-box" hidden><b id="adaptiveStoryTitle">최근 수행에 맞는 난이도 제안</b><p id="adaptiveStoryText" class="help"></p><p id="adaptiveStoryEvidence" class="adaptive-evidence"></p><div class="adaptive-actions" id="adaptiveStoryActions"></div></div></div></div></div>
 </section>
 <section class="screen" data-s="input"><h2 class="q">무슨 말을 하고 싶어요?</h2><div class="mediaTabs"><button class="btn primary" data-media="text">⌨️ 글자로</button><button class="btn" data-media="voice">🎤 말하기</button><button class="btn" data-media="photo">📷 사진</button></div><div class="mediaPane active" data-pane="text"><textarea id="thought" placeholder="예: 공룡"></textarea></div><div class="mediaPane" data-pane="voice"><div class="voiceState" id="voiceState">마이크 버튼을 누르고 천천히 말해 주세요.</div><button class="btn primary" id="startVoice">🎤 말하기 시작</button> <button class="btn" id="stopVoice">■ 멈추기</button><div class="box"><b>인식된 말</b><textarea id="voiceTranscript" placeholder="인식 결과를 확인하고 잘못 들은 부분은 직접 고치세요."></textarea><button class="btn" id="listenTranscript">🔊 다시 듣기</button> <button class="btn primary" id="confirmVoice">이 말로 입력하기</button></div><p class="help">음성 인식이 지원되지 않으면 글자로 직접 입력할 수 있습니다.</p></div><div class="mediaPane" data-pane="photo"><input id="photoInput" type="file" accept="image/*" capture="environment"><div id="photoPreviewWrap" class="hidden"><img id="photoPreview" class="preview" alt="선택한 사진 미리보기"><div class="warning"><b>사진 속 내용은 아직 사실로 확정되지 않았어요.</b><br>AI의 관찰 후보는 내가 확인한 뒤에만 문장에 사용할 수 있습니다.</div><button class="btn" id="analyzePhoto">사진에서 보이는 것 찾기</button><div id="photoObservations"></div><div class="chips" id="confirmedPhotoFacts"></div></div></div><div class="nav"><button class="btn" data-go="home">←</button><button class="btn primary make-sentence-now" id="toIntent">✨ 문장 만들기</button></div></section>
 <section class="screen" data-s="intent"><div class="eyebrow">2. 표현 목적</div><h2 class="q">어떤 말을 하고 싶은가요?</h2><div class="choices" id="intentChoices"></div><div class="nav"><button class="btn" data-go="input">이전</button><button class="btn primary" id="toCandidates">문장 후보 보기</button></div></section>
@@ -931,7 +937,7 @@ if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>inst
 </script><button id="usabilityFab" class="usability-fab teacher-only-fab" onclick="toggleUsabilityPanel()">📝 관찰 기록</button><aside id="usabilityPanel" class="usability-panel" hidden><h3>교사 관찰</h3><p class="help" id="usabilityScreenName">현재 화면을 기록합니다.</p><div class="usability-buttons"><button class="btn secondary" onclick="logUsability('independent')">혼자 수행</button><button class="btn secondary" onclick="logUsability('verbal')">언어적 힌트</button><button class="btn secondary" onclick="logUsability('visual')">시각적 힌트</button><button class="btn secondary" onclick="logUsability('direct')">직접 도움</button><button class="btn ghost" onclick="logUsability('stuck')">막힘</button><button class="btn ghost" onclick="logUsability('confused')">버튼/문구 혼동</button></div><textarea id="usabilityNote" class="usability-note" placeholder="필요할 때만 짧게 메모"></textarea><div class="row"><button class="btn ghost" onclick="closeUsabilityPanel()">닫기</button></div></aside><div id="pwaStatus" aria-live="polite" style="position:fixed;left:12px;bottom:12px;z-index:70;font-size:.75rem;background:#fff;border:1px solid #d7e5eb;border-radius:999px;padding:6px 10px;box-shadow:0 3px 12px rgba(0,0,0,.08)">온라인</div><button class="teacher-entry" type="button" data-go="teacher">교사</button>
 <nav class="bottom-tabs world-menu" aria-label="주요 메뉴">
 <button type="button" data-go="dictionary"><span>📚</span>문장사전</button>
-<button type="button" id="bottomStoryBtn"><span>📖</span>이야기</button>
+<button type="button" data-go="stories"><span>📖</span>이야기</button>
 <button type="button" data-go="treasures"><span>🎁</span>보물</button>
 <button type="button" data-go="growth"><span>🐧</span>성장</button>
 </nav>
@@ -940,12 +946,7 @@ document.addEventListener("click",function(e){
  const b=e.target.closest(".bottom-tabs button");
  if(!b)return;
  e.preventDefault();
- if(b.id==="bottomStoryBtn"){
-   go("home");
-   const d=document.querySelector(".story-home-panel");
-   if(d){d.style.display="block";d.open=true;setTimeout(()=>d.scrollIntoView({behavior:"smooth",block:"start"}),30)}
-   return;
- }
+ 
  const target=b.getAttribute("data-go");
  if(target)go(target);
 });
