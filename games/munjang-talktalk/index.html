@@ -218,6 +218,10 @@ body{background:linear-gradient(180deg,#83d7fb 0,#d9f4ff 34%,#f7fcff 68%,#dff4fb
 
 /* Home structure v1 locked: world > penguin > prompt > primary action > growth. Story is a separate destination. */
 [data-s="stories"]{max-width:900px;margin:0 auto;padding-bottom:90px}[data-s="stories"] .story-screen-content{display:block!important}[data-s="stories"] .story-home-panel{display:block!important}.learner-home .home-world{isolation:isolate}.learner-home .home-data-hooks{display:none!important}
+
+/* Stage 2: real illustrated glacier world background */
+.learner-home .home-world{background-image:linear-gradient(rgba(255,255,255,.02),rgba(255,255,255,.02)),url("assets/backgrounds/bg-home-glacier.webp")!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+.learner-home .home-world:before,.learner-home .home-world:after{content:none!important;display:none!important}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
