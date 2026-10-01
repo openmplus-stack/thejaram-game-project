@@ -1079,6 +1079,29 @@ document.addEventListener("click",function(e){
  });
 })();
 
+// Standalone next-three navigation for the extra-word step.
+(function(){
+ const nextBtn=document.getElementById('applyExtra');
+ if(!nextBtn)return;
+ nextBtn.disabled=false;nextBtn.removeAttribute('aria-disabled');nextBtn.style.pointerEvents='auto';nextBtn.style.touchAction='manipulation';
+ nextBtn.addEventListener('click',function(e){
+   e.preventDefault();e.stopPropagation();
+   const word=(document.getElementById('thought')?.value||'').trim()||'이것';
+   const extra=(document.getElementById('extra')?.value||'').trim();
+   if(!extra){alert('단어를 하나 더 넣어 주세요.');return;}
+   const examples=[
+     word+'에 대해 '+extra+'을 알려 주세요.',
+     '나는 '+word+'의 '+extra+'이 중요하다고 생각해요.',
+     word+'의 '+extra+'은 다른 것과 어떻게 다를까요?'
+   ];
+   const box=document.getElementById('candidateList');
+   if(box)box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-next-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
+   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+   const target=document.querySelector('.screen[data-s="candidates"]');
+   if(target){target.classList.add('active');window.scrollTo(0,0);}
+ });
+})();
+
 // Standalone dislike navigation: always opens the one-more-word step.
 (function(){
  const dislike=document.getElementById('dislikeCandidates');
