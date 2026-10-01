@@ -1058,6 +1058,33 @@ function talktalkParticle(word,pair){const parts=pair.split('/');return parts[ta
 function talktalkSubject(word){return word+talktalkParticle(word,'이/가')}
 function talktalkTopic(word){return word+talktalkParticle(word,'은/는')}
 function talktalkObject(word){return word+talktalkParticle(word,'을/를')}
+function talktalkWith(word,pair){return word+talktalkParticle(word,pair)}
+function talktalkNormalizeVerb(w){
+ w=String(w||'').trim();
+ const map={"혼났어":"혼났어요","싸웠어":"싸웠어요","놀았어":"놀았어요","갔어":"갔어요","먹었어":"먹었어요","봤어":"봤어요","울었어":"울었어요","넘어졌어":"넘어졌어요","재미있어":"재미있어요","속상해":"속상했어요","화났어":"화가 났어요","좋아":"좋았어요","싫어":"싫었어요"};
+ return map[w]||w;
+}
+const TALK_PLACES=["학교","교실","운동장","집","학원","공원","놀이터","도서관","병원","마트","편의점","식당","버스","지하철"];
+const TALK_PEOPLE=["친구","선생님","엄마","아빠","할머니","할아버지","형","누나","언니","오빠","동생"];
+function talktalkRole(w){
+ if(TALK_PLACES.includes(w)||/(학교|교실|공원|놀이터|도서관|병원|마트|가게|집|학원)$/.test(w))return "place";
+ if(TALK_PEOPLE.includes(w)||/(친구|선생님|엄마|아빠|동생|형|누나|언니|오빠)$/.test(w))return "person";
+ if(/(했어|했어요|갔어|왔어|먹었어|봤어|놀았어|싸웠어|혼났어|울었어|넘어졌어|잃어버렸어|받았어|줬어|아파|좋아|싫어|무서워|속상해|화났어)$/.test(w))return "event";
+ return "thing";
+}
+function talktalkDailyCandidates(words){
+ const ws=words.map(x=>String(x||"").trim()).filter(Boolean), place=ws.find(x=>talktalkRole(x)==="place"), person=ws.find(x=>talktalkRole(x)==="person"), event=ws.find(x=>talktalkRole(x)==="event"), thing=ws.find(x=>talktalkRole(x)==="thing");
+ if(place&&person&&event){
+   const ev=talktalkNormalizeVerb(event), base=place+"에서 "+talktalkWith(person,"과/와");
+   if(/혼났/.test(event))return [base+" 싸워서 "+ev+".",base+" 장난을 치다가 "+ev+".",base+" 문제가 생겨서 "+ev+"."];
+   return [base+" "+ev+".",place+"에서 "+talktalkSubject(person)+" 함께 "+ev+".","나는 "+place+"에서 "+talktalkWith(person,"과/와")+" "+ev+"."];
+ }
+ if(place&&person)return [place+"에서 "+talktalkWith(person,"과/와")+" 함께 있었어요.",place+"에서 "+talktalkSubject(person)+" 나와 함께 있었어요.","나는 "+place+"에서 "+talktalkWith(person,"과/와")+" 무엇인가를 했어요."];
+ if(place&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+place+"에서 "+ev+".",place+"에서 어떤 일이 있어서 "+ev+".",place+"에 갔다가 "+ev+"."];}
+ if(person&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+talktalkWith(person,"과/와")+" "+ev+".",talktalkSubject(person)+" 함께 있을 때 "+ev+".",talktalkWith(person,"과/와")+" 어떤 일이 있어서 "+ev+"."];}
+ if(thing&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+talktalkObject(thing)+" "+ev+".",talktalkSubject(thing)+" 있어서 "+ev+".",talktalkTopic(thing)+" 나에게 중요한 일이었어요."];}
+ return [];
+}
 function talktalkOpenScreen(name){
  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
  const target=document.querySelector('.screen[data-s="'+name+'"]');
