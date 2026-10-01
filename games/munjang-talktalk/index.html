@@ -210,6 +210,11 @@ body{background:linear-gradient(180deg,#83d7fb 0,#d9f4ff 34%,#f7fcff 68%,#dff4fb
 
 /* direct word-to-sentence start */
 [data-s="input"]{max-width:720px;margin:0 auto}[data-s="input"] .q{text-align:center;font-size:clamp(1.65rem,4vw,2.3rem);margin:22px 0}[data-s="input"] #thought{min-height:120px;font-size:1.45rem;font-weight:850;color:#123f5f;background:#fff;border:3px solid #8fd8f4;border-radius:22px;padding:20px}[data-s="input"] #thought::placeholder{color:#7694a8;opacity:1}.make-sentence-now{font-size:1.15rem!important;font-weight:950!important;min-width:190px!important;background:linear-gradient(180deg,#ffb52d,#ff8618)!important;color:#fff!important;border:0!important;border-radius:999px!important}.mediaTabs{justify-content:center}.mediaTabs .btn{font-weight:900}
+
+/* keep primary CTA clear of penguin face */
+.home-world .home-start{top:auto!important;right:9%!important;bottom:23%!important}
+@media(max-width:700px){.home-world .home-start{top:auto!important;right:6%!important;bottom:24%!important}}
+@media(max-width:430px){.home-world .home-start{top:auto!important;right:4%!important;bottom:25%!important}}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
