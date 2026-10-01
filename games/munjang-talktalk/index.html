@@ -333,7 +333,7 @@ function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=n
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
 $("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생각";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();renderCandidates(0);go("candidates")};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1071,6 +1071,9 @@ function talktalkRole(w){
  if(TALK_PEOPLE.includes(w)||/(친구|선생님|엄마|아빠|동생|형|누나|언니|오빠)$/.test(w))return "person";
  if(/(했어|했어요|갔어|왔어|먹었어|봤어|놀았어|싸웠어|혼났어|울었어|넘어졌어|잃어버렸어|받았어|줬어|아파|좋아|싫어|무서워|속상해|화났어)$/.test(w))return "event";
  return "thing";
+}
+function talktalkSplitInput(text){
+ return String(text||"").split(/[,，\n\/]+/).map(x=>x.trim()).filter(Boolean);
 }
 function talktalkDailyCandidates(words){
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean), place=ws.find(x=>talktalkRole(x)==="place"), person=ws.find(x=>talktalkRole(x)==="person"), event=ws.find(x=>talktalkRole(x)==="event"), thing=ws.find(x=>talktalkRole(x)==="thing");
