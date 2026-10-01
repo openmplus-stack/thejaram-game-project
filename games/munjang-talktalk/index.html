@@ -1013,4 +1013,24 @@ document.addEventListener("click",function(e){
  const target=b.getAttribute("data-go");
  if(target)go(target);
 });
+
+// Direct home start activation
+(function(){
+  const startBtn=document.getElementById('newActivity');
+  if(startBtn){
+    startBtn.disabled=false;
+    startBtn.removeAttribute('aria-disabled');
+    startBtn.style.pointerEvents='auto';
+    startBtn.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof go==='function') go('input');
+      else {
+        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+        const target=document.querySelector('.screen[data-s="input"]');
+        if(target){target.classList.add('active'); target.scrollIntoView({block:'start'});}
+      }
+    });
+  }
+})();
 </script></body></html>
