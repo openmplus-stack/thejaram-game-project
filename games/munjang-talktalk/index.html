@@ -345,9 +345,16 @@ $("#toCandidates").onclick=()=>{st.candidatePage=0;st.extraWord="";renderCandida
 $$("[data-confirm]").forEach(b=>b.onclick=()=>{if(b.dataset.confirm==="yes"){st.working=st.candidate;st.confirmed.push(st.candidate);save();prepareExpand();go("expand")}else{if(st.candidate)st.rejected.push(st.candidate);reward("reselect_none");save();prepareQuestion();go("question")}});
 function prepareQuestion(){const q={경험:"그때 어떤 일이 있었나요?",설명:"어떤 점을 가장 설명하고 싶나요?",생각:"왜 그렇게 생각하나요?",감정:"어떤 기분인지 말해 줄 수 있나요?",질문:"무엇이 가장 궁금한가요?",요구:"AI나 다른 사람이 무엇을 해 주면 좋겠나요?",주장:"그렇게 생각하는 이유는 무엇인가요?",비교:"무엇과 비교하고 싶나요?","예측·가정":"어떤 상황을 가정해 보고 싶나요?",문제해결:"가장 해결하고 싶은 문제는 무엇인가요?",이야기:"먼저 어떤 일이 일어났나요?"};$("#adaptiveQ").textContent=q[st.intent]||"조금 더 알려 줄 수 있나요?"}
 $("#unknown").onclick=()=>{$("#extra").value="잘 모르겠어요"};$("#private").onclick=()=>{$("#extra").value="말하고 싶지 않아요"};$("#applyExtra").onclick=()=>{let v=$("#extra").value.trim();st.extraWord=v;if(v){st.confirmed.push(v);reward("question")}st.candidatePage=st.nextCandidatePage||1;save();renderCandidates(st.candidatePage);go("candidates")};
-const expands=["왜?","그래서?","어떤 점?","예를 들면?","무엇과 달라?","어떤 기분?","만약?","어떻게 해결할까?","나는 어떻게 생각해?","무엇을 원해?"];
-function prepareExpand(){$("#workingSentence").textContent=st.working;$("#expandChoices").innerHTML=expands.slice(0,5).map(x=>`<button class="choice">${x}</button>`).join("")}
-$("#applyExpand").onclick=()=>{let e=$("#expansion").value.trim();if(e)st.working=(st.working.replace(/[.!?]$/,"")+", "+e.replace(/^[, ]+/,""));reward("expand");save();go("direct")};$("#stopExpand").onclick=()=>go("direct");
+function prepareExpand(){if($("#workingSentence"))$("#workingSentence").textContent=window.talktalkCurrentSentence||st.working||""}
+function talktalkBuildContinuation(sentence,answer){
+ const s=String(sentence||""),a=String(answer||"").trim();
+ if(/장난/.test(s)&&a)return {revised:s.replace(/친구와 장난을 치다가/,"친구와 "+a+"로 장난을 치다가"),next:"그 장난을 어떻게 했어요?"};
+ if(/싸워/.test(s)&&a)return {revised:s+" "+a+" 때문에 싸우게 되었어요.",next:"그때 어떻게 했어요?"};
+ if(/혼났/.test(s)&&a)return {revised:s+" "+a+" 때문에 혼났어요.",next:"그 일은 언제 있었어요?"};
+ return {revised:s+" "+a+"에 대한 일이 있었어요.",next:"그때 어떻게 되었어요?"};
+}
+$("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return msg("짧은 말이나 단어를 넣어 주세요.");let cur=window.talktalkCurrentSentence||st.working||"",r=talktalkBuildContinuation(cur,a);window.talktalkCurrentSentence=r.revised;st.working=r.revised;st.final=r.revised;reward("expand");save();$("#workingSentence").textContent=r.revised;$("#followupQuestion").textContent=r.next;$("#expansion").value=""};
+$("#stopExpand").onclick=()=>{st.final=window.talktalkCurrentSentence||st.working;save();go("home")};
 $("#hint").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent="핵심 단어: "+st.originalInput+" · "+st.intent;st.support="C";save()};$("#difficult").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent=st.working;st.support="E";save()};
 $("#toCorrection").onclick=()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=minCorrect(v);save();go("correction")};
 function minCorrect(s){let t=s.trim().replace(/\s+/g," ");if(t&&!/[.!?]$/.test(t))t+=".";return t}
