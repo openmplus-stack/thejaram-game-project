@@ -1079,6 +1079,25 @@ document.addEventListener("click",function(e){
  });
 })();
 
+// Standalone dislike navigation: always opens the one-more-word step.
+(function(){
+ const dislike=document.getElementById('dislikeCandidates');
+ if(!dislike)return;
+ dislike.disabled=false; dislike.removeAttribute('aria-disabled'); dislike.style.pointerEvents='auto'; dislike.style.touchAction='manipulation';
+ dislike.addEventListener('click',function(e){
+   e.preventDefault(); e.stopPropagation();
+   const word=(document.getElementById('thought')?.value||'').trim()||'이것';
+   const extra=document.getElementById('extra');
+   if(extra){
+     extra.value='';
+     extra.placeholder=word+'에 대해 무엇이 더 궁금해요? 예: 먹이';
+   }
+   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+   const next=document.querySelector('.screen[data-s="question"]');
+   if(next){next.classList.add('active');window.scrollTo(0,0);}
+ });
+})();
+
 // Direct home start activation
 (function(){
   const startBtn=document.getElementById('newActivity');
