@@ -1015,14 +1015,13 @@ if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>inst
 </nav>
 <script id="bottom-nav-fix">
 document.addEventListener("click",function(e){
- const b=e.target.closest(".bottom-tabs button");
- if(!b)return;
- e.preventDefault();
- 
- const target=b.getAttribute("data-go");
- if(target)go(target);
-});
-
+ const btn=e.target.closest(".bottom-tabs button");if(!btn)return;
+ e.preventDefault();e.stopPropagation();const target=btn.getAttribute("data-go");if(!target)return;
+ try{if(typeof go==="function"){go(target);return}}catch(_){}
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ const screen=document.querySelector('.screen[data-s="'+target+'"]');if(screen){screen.classList.add("active");window.scrollTo(0,0)}
+},true);
+document.querySelectorAll(".bottom-tabs button").forEach(b=>{b.disabled=false;b.removeAttribute("disabled");b.removeAttribute("aria-disabled");b.style.pointerEvents="auto";b.style.touchAction="manipulation"});
 
 // Resilient learner-flow navigation: keep primary progression controls clickable on touch devices.
 (function(){
