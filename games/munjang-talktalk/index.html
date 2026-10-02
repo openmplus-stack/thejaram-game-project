@@ -868,7 +868,8 @@ function renderTeacherAnalysis(){
 }
 $("#analysisWindow").onchange=renderTeacherAnalysis;
 $("#printAnalysis").onclick=()=>window.print();
-$("#exportAnalysis").onclick=()=>{let all=getDict(),w=$("#analysisWindow").value,data=w==="all"?all:all.slice(0,+w),rows=[["날짜","표현목적","지원수준","처음표현","최종표현","확정정보수","거절재선택수","직접표현","문장확장","자기수정","AI요구","담화문장수"]];data.forEach(e=>{let m=metricOf(e);rows.push([e.date||"",e.intent||"",e.support||"",e.initial||"",e.final||"",m.confirmed,m.rejected,m.direct?"예":"아니오",m.expanded?"예":"아니오",m.corrected?"예":"아니오",m.ai?"예":"아니오",m.discourse])});let csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n"),blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="문장톡톡_교사용_누적분석.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$("#exportAnalysis").onclick=()=>{let all=getDict(),w=$("#analysisWindow").value,data=w==="all"?all:all.slice(0,+w),rows=[["날짜","글유형","표현목적","처음표현","최종표현","처음부터 제공한 정보수","질문 후 추가 정보수","질문수","힌트수","원인","결과","시간","감정","생각","문장연결"]];data.forEach(e=>{let m=metricOf(e);rows.push([e.date||"",e.writingTypeLabel||e.writingType||"",e.intent||"",e.initial||"",e.final||"",m.independentParts,m.promptedParts,m.questions,m.hints,m.cause?"예":"아니오",m.result?"예":"아니오",m.time?"예":"아니오",m.emotion?"예":"아니오",m.thought?"예":"아니오",m.connected?"예":"아니오"])});let csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n"),blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="문장톡톡_교사용_성장분석.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+
 
 
 const usabilityKey="talktalk_usability_v1";
