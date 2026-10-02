@@ -347,7 +347,6 @@ body:has(.learner-home.active) .progress{opacity:.35}
 const intents=["경험","설명","생각","감정","질문","요구","주장","비교","예측·가정","문제해결","이야기"],stageOrder=["home","input","intent","candidates","confirm","question","expand","direct","correction","aiRequest","evaluate","discourse","dictionary","teacher","usability","adaptive","treasures","growth","report"];
 const defaults={current:"home",originalInput:"",intent:"생각",candidate:null,rejected:[],confirmed:[],working:"",direct:"",support:"A",final:"",request:"",evaluation:"",discourse:[],stars:0,xp:0,lastSaved:null,storyId:null,thoughtModel:null};
 let st;try{st=Object.assign({},defaults,JSON.parse(localStorage.getItem("talktalk_integrated_v1")||"{}"))}catch(e){st={...defaults}}
-window.__talktalkState=st;
 function save(){st.lastSaved=new Date().toISOString();try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(e){if(st.media?.photo?.dataUrl){st.media.photo.dataUrl=null;try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(_){}}}if($("#resumeText"))$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요."}
 const screenLabels={home:"홈",input:"생각 입력",intent:"표현 목적",candidates:"문장 후보",confirm:"의도 확인",question:"추가 질문",expand:"문장 확장",direct:"직접 표현",correction:"최소 교정",aiRequest:"AI 요구",evaluate:"AI 결과 평가",discourse:"짧은 담화",dictionary:"문장사전",teacher:"교사용 누적 분석",usability:"사용성 테스트",adaptive:"맞춤 도움 설정",treasures:"이야기 보물 도감",growth:"펭귄 성장",report:"학습 결과"};
 function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=name;save();$$(".screen").forEach(x=>x.classList.toggle("active",x.dataset.s===name));const i=stageOrder.indexOf(name);const pct=Math.round(i/(stageOrder.length-1)*100);$("#bar").style.width=pct+"%";$(".progress").setAttribute("aria-valuenow",pct);$(".progress").setAttribute("aria-valuemin","0");$(".progress").setAttribute("aria-valuemax","100");$(".progress").setAttribute("aria-label",`${screenLabels[name]||name} 진행 ${pct}%`);$("#guide").textContent=name==="home"?"생각은 네가 만들고, 문장 톡톡은 그 생각이 문장이 되도록 도와줘요.":`${screenLabels[name]||""} · 한 번에 한 가지씩 진행합니다.`;if(name==="dictionary")renderLibrary();if(name==="teacher")renderTeacherAnalysis();if(name==="usability")renderUsability();if(name==="adaptive")renderAdaptive();if(name==="treasures")renderTreasureAtlas();applyAdaptiveToScreen(name);if(name==="growth")renderGrowth();if(name==="report")renderReport();window.scrollTo({top:0,behavior:"smooth"})}
@@ -1108,47 +1107,8 @@ window.TALKTALK_UX_V1={
  targetUsers:["early elementary readable","upper elementary appropriate","middle-school non-infantile"]
 };
 
-updateHome();initStoryActivitySelector();save();if(st.current&&st.current!=="home")$("#resumeText").textContent=`${st.current} 단계까지 저장되어 있어요.`;go("home");aiFallback();
-window.__talktalkContext={st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,completeSelectedStoryTreasure,showTreasureRevealQueue};
-Object.assign(window,window.__talktalkContext);
-})();
-document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;let txt=(b.textContent||"").trim();if(txt.includes("내가 말하려는 문장이 없어요")){let r=getUsabilityLog();r.push({type:"self_differentiation",screen:activeScreenName(),storyId:st.storyId||null,at:new Date().toISOString()});saveUsabilityLog(r)}setTimeout(()=>{let s=activeScreenName(),now=Date.now();if(s!==usabilityLastScreen){let r=getUsabilityLog();r.push({type:"screen_time",screen:usabilityLastScreen,seconds:Math.round((now-usabilityScreenStarted)/1000),at:new Date().toISOString()});saveUsabilityLog(r);usabilityLastScreen=s;usabilityScreenStarted=now}},30)});
 
-document.addEventListener("click",()=>setTimeout(()=>{renderGlobalAdaptive();let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},50));
-renderGlobalAdaptive();setTimeout(()=>{let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},0);
-
-let deferredPWAInstall=null;
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPWAInstall=e});
-async function installTalkTalk(){if(deferredPWAInstall){deferredPWAInstall.prompt();await deferredPWAInstall.userChoice;deferredPWAInstall=null}else{msg("iPhone/iPad에서는 Safari 공유 버튼 → ‘홈 화면에 추가’를 사용해 주세요.")}}
-function updatePWAStatus(){let x=document.getElementById("pwaStatus");if(x)x.textContent=navigator.onLine?"온라인":"오프라인 · 저장된 기본 기능 사용 가능"}
-window.addEventListener("online",updatePWAStatus);window.addEventListener("offline",updatePWAStatus);updatePWAStatus();
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
-window.TALKTALK_PWA={install:installTalkTalk,online:()=>navigator.onLine};
-</script><div class="offline-badge" id="offlineBadge">오프라인 사용 중</div>
-<script>
-let deferredInstall=null;
-const installBanner=document.getElementById("installBanner"),installBtn=document.getElementById("installApp"),installHelp=document.getElementById("installHelp"),offlineBadge=document.getElementById("offlineBadge");
-function updateOnlineState(){offlineBadge.classList.toggle("show",!navigator.onLine)}
-window.addEventListener("online",updateOnlineState);window.addEventListener("offline",updateOnlineState);updateOnlineState();
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;installBanner.classList.add("show")});
-installBtn?.addEventListener("click",async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;installBanner.classList.remove("show");return}
- const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
- installBanner.classList.add("show");
- installHelp.textContent=isiOS?"Safari의 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택하세요.":"브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요.";
-});
-window.addEventListener("appinstalled",()=>{installBanner.classList.remove("show");deferredInstall=null});
-if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>installBanner.classList.add("show"),1200)}
-</script><button id="usabilityFab" class="usability-fab teacher-only-fab" onclick="toggleUsabilityPanel()">📝 관찰 기록</button><aside id="usabilityPanel" class="usability-panel" hidden><h3>교사 관찰</h3><p class="help" id="usabilityScreenName">현재 화면을 기록합니다.</p><div class="usability-buttons"><button class="btn secondary" onclick="logUsability('independent')">혼자 수행</button><button class="btn secondary" onclick="logUsability('verbal')">언어적 힌트</button><button class="btn secondary" onclick="logUsability('visual')">시각적 힌트</button><button class="btn secondary" onclick="logUsability('direct')">직접 도움</button><button class="btn ghost" onclick="logUsability('stuck')">막힘</button><button class="btn ghost" onclick="logUsability('confused')">버튼/문구 혼동</button></div><textarea id="usabilityNote" class="usability-note" placeholder="필요할 때만 짧게 메모"></textarea><div class="row"><button class="btn ghost" onclick="closeUsabilityPanel()">닫기</button></div></aside><div id="pwaStatus" aria-live="polite" style="position:fixed;left:12px;bottom:12px;z-index:70;font-size:.75rem;background:#fff;border:1px solid #d7e5eb;border-radius:999px;padding:6px 10px;box-shadow:0 3px 12px rgba(0,0,0,.08)">온라인</div><button class="teacher-entry" type="button" data-go="teacher">교사</button>
-<nav class="bottom-tabs world-menu" aria-label="주요 메뉴">
-<button type="button" data-go="dictionary"><span>📚</span>문장사전</button>
-<button type="button" data-go="stories"><span>📖</span>이야기</button>
-<button type="button" data-go="treasures"><span>🎁</span>보물</button>
-<button type="button" data-go="growth"><span>🐧</span>성장</button>
-</nav>
-<script id="bottom-nav-fix">
-// Bridge the legacy app state into the 2.0 engine's lexical scope.
-const __ctx=window.__talktalkContext||{st:window.__talktalkState,save:window.save,reward:window.reward,go:window.go,msg:window.msg,updateHome:window.updateHome,renderLibrary:window.renderLibrary,getDict:window.getDict,setDict:window.setDict,makeTags:window.makeTags,completeSelectedStoryTreasure:window.completeSelectedStoryTreasure,showTreasureRevealQueue:window.showTreasureRevealQueue};const {st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,completeSelectedStoryTreasure,showTreasureRevealQueue}=__ctx;
+// TalkTalk 2.0 engine: same lexical scope as the legacy app state.
 
 document.addEventListener("click",function(e){
  const btn=e.target.closest(".bottom-tabs button");if(!btn)return;
@@ -1888,13 +1848,11 @@ function talktalkV2Render(){
  }
  talktalkOpenScreen("thoughtQuestion");return false;
 }
-function talktalkV2Start(raw,ctx=null){
+function talktalkV2Start(raw){
  const v=String(raw||"").trim();if(!v)return false;
- const live=ctx||window.__talktalkContext;if(!live||!live.st)throw new Error("앱 상태 연결 실패");
- if(st!==live.st)throw new Error("2.0 상태 객체 불일치");
  const parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);
- live.st.originalInput=v;live.st.working=v;live.st.intent="생활문장";live.st.candidatePage=0;live.st.nextCandidatePage=1;live.st.extraWord="";
- talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);live.save();talktalkV2Render();return true;
+ st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";
+ talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);save();talktalkV2Render();return true;
 }
 function talktalkAnalyzeCombinedInput(first,extra){return talktalkAnalyzeKeywords([...talktalkSplitInput(first||""),...talktalkSplitInput(extra||"")])}
 function talktalkInitialGuidedRoute(a){
@@ -2215,4 +2173,42 @@ document.addEventListener('click',function(e){
  talktalkSaveChosenSentence(sentence,b.dataset.purpose||'생활문장');
 },true);
 
-</script></body></html>
+
+updateHome();initStoryActivitySelector();save();if(st.current&&st.current!=="home")$("#resumeText").textContent=`${st.current} 단계까지 저장되어 있어요.`;go("home");aiFallback();
+Object.assign(window,{st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,completeSelectedStoryTreasure,showTreasureRevealQueue});
+})();
+document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;let txt=(b.textContent||"").trim();if(txt.includes("내가 말하려는 문장이 없어요")){let r=getUsabilityLog();r.push({type:"self_differentiation",screen:activeScreenName(),storyId:st.storyId||null,at:new Date().toISOString()});saveUsabilityLog(r)}setTimeout(()=>{let s=activeScreenName(),now=Date.now();if(s!==usabilityLastScreen){let r=getUsabilityLog();r.push({type:"screen_time",screen:usabilityLastScreen,seconds:Math.round((now-usabilityScreenStarted)/1000),at:new Date().toISOString()});saveUsabilityLog(r);usabilityLastScreen=s;usabilityScreenStarted=now}},30)});
+
+document.addEventListener("click",()=>setTimeout(()=>{renderGlobalAdaptive();let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},50));
+renderGlobalAdaptive();setTimeout(()=>{let d=$("#adaptiveDirectBanner");if(d)d.textContent="이번 목표: "+adaptiveDirectGoal().goal},0);
+
+let deferredPWAInstall=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPWAInstall=e});
+async function installTalkTalk(){if(deferredPWAInstall){deferredPWAInstall.prompt();await deferredPWAInstall.userChoice;deferredPWAInstall=null}else{msg("iPhone/iPad에서는 Safari 공유 버튼 → ‘홈 화면에 추가’를 사용해 주세요.")}}
+function updatePWAStatus(){let x=document.getElementById("pwaStatus");if(x)x.textContent=navigator.onLine?"온라인":"오프라인 · 저장된 기본 기능 사용 가능"}
+window.addEventListener("online",updatePWAStatus);window.addEventListener("offline",updatePWAStatus);updatePWAStatus();
+if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+window.TALKTALK_PWA={install:installTalkTalk,online:()=>navigator.onLine};
+</script><div class="offline-badge" id="offlineBadge">오프라인 사용 중</div>
+<script>
+let deferredInstall=null;
+const installBanner=document.getElementById("installBanner"),installBtn=document.getElementById("installApp"),installHelp=document.getElementById("installHelp"),offlineBadge=document.getElementById("offlineBadge");
+function updateOnlineState(){offlineBadge.classList.toggle("show",!navigator.onLine)}
+window.addEventListener("online",updateOnlineState);window.addEventListener("offline",updateOnlineState);updateOnlineState();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;installBanner.classList.add("show")});
+installBtn?.addEventListener("click",async()=>{if(deferredInstall){deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;installBanner.classList.remove("show");return}
+ const isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ installBanner.classList.add("show");
+ installHelp.textContent=isiOS?"Safari의 공유 버튼을 누른 뒤 ‘홈 화면에 추가’를 선택하세요.":"브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요.";
+});
+window.addEventListener("appinstalled",()=>{installBanner.classList.remove("show");deferredInstall=null});
+if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>installBanner.classList.add("show"),1200)}
+</script><button id="usabilityFab" class="usability-fab teacher-only-fab" onclick="toggleUsabilityPanel()">📝 관찰 기록</button><aside id="usabilityPanel" class="usability-panel" hidden><h3>교사 관찰</h3><p class="help" id="usabilityScreenName">현재 화면을 기록합니다.</p><div class="usability-buttons"><button class="btn secondary" onclick="logUsability('independent')">혼자 수행</button><button class="btn secondary" onclick="logUsability('verbal')">언어적 힌트</button><button class="btn secondary" onclick="logUsability('visual')">시각적 힌트</button><button class="btn secondary" onclick="logUsability('direct')">직접 도움</button><button class="btn ghost" onclick="logUsability('stuck')">막힘</button><button class="btn ghost" onclick="logUsability('confused')">버튼/문구 혼동</button></div><textarea id="usabilityNote" class="usability-note" placeholder="필요할 때만 짧게 메모"></textarea><div class="row"><button class="btn ghost" onclick="closeUsabilityPanel()">닫기</button></div></aside><div id="pwaStatus" aria-live="polite" style="position:fixed;left:12px;bottom:12px;z-index:70;font-size:.75rem;background:#fff;border:1px solid #d7e5eb;border-radius:999px;padding:6px 10px;box-shadow:0 3px 12px rgba(0,0,0,.08)">온라인</div><button class="teacher-entry" type="button" data-go="teacher">교사</button>
+<nav class="bottom-tabs world-menu" aria-label="주요 메뉴">
+<button type="button" data-go="dictionary"><span>📚</span>문장사전</button>
+<button type="button" data-go="stories"><span>📖</span>이야기</button>
+<button type="button" data-go="treasures"><span>🎁</span>보물</button>
+<button type="button" data-go="growth"><span>🐧</span>성장</button>
+</nav>
+</body></html>
