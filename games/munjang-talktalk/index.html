@@ -1354,10 +1354,10 @@ const TALK_WRITING_TYPES={
 function talktalkWritingType(text,intent){
  const s=String(text||"");
  if(intent==="궁금한 것")return "curiosity";
- if(/도와|불편|어려|문제|고장|잃어버|못 하|안 돼|어떻게 해야/.test(s))return "problem";
- if(/생각해|생각이에요|좋다고|싫다고|찬성|반대|왜냐하면|의견|했으면 좋겠|하면 좋겠|바라요|원해요/.test(s))return "opinion";
+ if(/도와|불편|어려|문제|고장|잃어버|못\s|못\s*찾|못\s*묶|못\s*하|안 돼|어떻게 해야|그만해\s*주세요|다시\s*설명해\s*주세요/.test(s))return "problem";
+ if(/생각해|생각은|생각이에요|좋다고|싫다고|찬성|반대|왜냐하면|의견|으면 좋겠|면 좋겠|바라요|원해요/.test(s))return "opinion";
  if(/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울/.test(s))return "incident";
- if(/궁금|알고 싶|무엇일까|왜 .*까요|어떻게 .*까/.test(s))return "curiosity";
+ if(/궁금|알고 싶|무엇일까|왜 .*?(까요|을까|일까)|어떻게 .*?(까|까요)/.test(s))return "curiosity";
  return "experience";
 }
 const TALK_REGRESSION_CASES=[
