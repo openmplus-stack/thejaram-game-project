@@ -349,7 +349,37 @@ function prepareQuestion(){const q={경험:"그때 어떤 일이 있었나요?",
 $("#unknown").onclick=()=>{$("#extra").value="잘 모르겠어요"};$("#private").onclick=()=>{$("#extra").value="말하고 싶지 않아요"};$("#applyExtra").onclick=()=>{let v=$("#extra").value.trim();st.extraWord=v;if(v){st.confirmed.push(v);reward("question")}st.candidatePage=st.nextCandidatePage||1;save();renderCandidates(st.candidatePage);go("candidates")};
 function prepareExpand(){if($("#workingSentence"))$("#workingSentence").textContent=window.talktalkCurrentSentence||st.working||""}
 function talktalkEnsurePeriod(s){s=String(s||"").trim();return s&&!/[.!?]$/.test(s)?s+".":s}
-function talktalkStoryText(){return (window.talktalkStorySentences||[]).map(talktalkEnsurePeriod).join(" ").replace(/\s+/g," ").trim()}
+function talktalkSentenceRole(s){
+ const t=String(s||"");
+ if(/기분|속상|화가|무서|슬펐|억울|당황|걱정|기뻤|좋았/.test(t))return "emotion";
+ if(/생각|알았|느꼈|궁금/.test(t))return "thought";
+ if(/때문|왜냐하면|그 전에|전에 .*했/.test(t))return "cause";
+ if(/친구가|상대방|선생님이|엄마가|아빠가/.test(t)&&/울|말|왔|갔|했|화/.test(t))return "reaction";
+ if(/혼났|다쳤|깨졌|잃어버렸|젖었|늦었|끝났/.test(t))return "result";
+ if(/던졌|때렸|밀었|놀았|싸웠|장난|갔|왔|먹었|줬|말했|했어요/.test(t))return "action";
+ return "detail";
+}
+function talktalkOrderStory(sentences){
+ const items=(sentences||[]).map((text,index)=>({text:talktalkEnsurePeriod(text),index,role:talktalkSentenceRole(text)}));
+ // Only reorder roles whose semantic relation is sufficiently explicit; keep original order inside each role.
+ const rank={cause:10,detail:20,action:30,reaction:40,result:50,emotion:60,thought:70};
+ return items.sort((a,b)=>(rank[a.role]??25)-(rank[b.role]??25)||a.index-b.index).map(x=>x.text);
+}
+function talktalkConnectStory(sentences){
+ const ordered=talktalkOrderStory(sentences),out=[];
+ ordered.forEach((s,i)=>{
+   let t=s;
+   if(i>0){
+     const prev=talktalkSentenceRole(ordered[i-1]),role=talktalkSentenceRole(s);
+     if(role==="reaction"&&!/^(그다음|그러자|그리고)/.test(t))t="그러자 "+t;
+     else if(role==="result"&&prev!=="cause"&&!/^(그래서|그 결과)/.test(t))t="그래서 "+t;
+     else if((role==="emotion"||role==="thought")&&!/^(그래서|그때|나는|저는)/.test(t))t="그때 "+t;
+   }
+   out.push(t);
+ });
+ return out;
+}
+function talktalkStoryText(){const ordered=talktalkConnectStory(window.talktalkStorySentences||[]);window.talktalkOrderedStory=ordered;return ordered.join(" ").replace(/\s+/g," ").trim()}
 function talktalkIntegrateAnswer(questionId,answer){
  const a=String(answer||"").trim(),story=window.talktalkStorySentences||[],last=story[story.length-1]||window.talktalkCurrentSentence||"";
  let mode="new",sentence="",replacement=last;
