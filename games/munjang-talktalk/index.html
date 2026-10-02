@@ -398,7 +398,7 @@ function talktalkIntegrateAnswer(questionId,answer){
    else sentence=a+"에 있었던 일이에요.";
  }else if(questionId==="emotion"){
    sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkPolitePredicate(a)+".";
- }else if(questionId==="next_event"){
+ }else if(questionId==="opinion"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="opinion_reason"){sentence=/왜냐하면|때문/.test(a)?talktalkEnsurePeriod(a):"그렇게 생각한 이유는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="opinion_example"){sentence=talktalkEnsurePeriod(a)\n }else if(questionId==="problem"){sentence=talktalkEnsurePeriod(a)\n }else if(questionId==="problem_cause"){sentence=/때문|해서|라서/.test(a)?talktalkEnsurePeriod(a):"어려워진 이유는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="problem_attempt"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="problem_help"){sentence=/도와|필요|부탁/.test(a)?talktalkEnsurePeriod(a):a+" 도움이 필요해요."\n }else if(questionId==="experience_context"){if(last){replacement=a+"에서 "+last.replace(/^나는\\s*/,"");mode="revise"}else sentence=a+"에서 있었던 일이에요."\n }else if(questionId==="experience_action"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkPolitePredicate(a)+"."\n }else if(questionId==="next_event"){
    sentence=talktalkEnsurePeriod(a);
  }else{
    sentence=talktalkEnsurePeriod(a);
@@ -1335,10 +1335,11 @@ const TALK_WRITING_TYPES={
 };
 function talktalkWritingType(text,intent){
  const s=String(text||"");
- if(intent==="궁금한 것"||/궁금|왜 .*까요|알고 싶|무엇일까|어떻게 .*까/.test(s))return "curiosity";
+ if(intent==="궁금한 것")return "curiosity";
  if(/도와|불편|어려|문제|고장|잃어버|못 하|안 돼|어떻게 해야/.test(s))return "problem";
- if(/생각해|좋다고|싫다고|찬성|반대|왜냐하면|의견/.test(s))return "opinion";
+ if(/생각해|생각이에요|좋다고|싫다고|찬성|반대|왜냐하면|의견|했으면 좋겠|하면 좋겠|바라요|원해요/.test(s))return "opinion";
  if(/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울/.test(s))return "incident";
+ if(/궁금|알고 싶|무엇일까|왜 .*까요|어떻게 .*까/.test(s))return "curiosity";
  return "experience";
 }
 function talktalkWritingProfile(){
