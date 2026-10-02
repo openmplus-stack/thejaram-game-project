@@ -1248,7 +1248,7 @@ document.addEventListener('click',function(e){
  const sentence=b.dataset.sentence?decodeURIComponent(b.dataset.sentence):(b.textContent||'').replace(/^\s*\d+\.\s*/,'').trim();
  if(!sentence)return;
  e.preventDefault();e.stopPropagation();
- talktalkSaveChosenSentence(sentence,b.dataset.purpose||'표현');
+ talktalkSaveChosenSentence(sentence,b.dataset.purpose||'생활문장');
 },true);
 
 // Standalone input fallback: works even if the main initializer stops early.
