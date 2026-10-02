@@ -1036,7 +1036,19 @@ async function executeAIRequest(){try{const d=await AI.call("execute_request",{r
 async function executeReask(request){try{const d=await AI.call("reask",{request,previousAnswer:$("#aiAnswer").value,evaluation:st.evaluation});$("#aiAnswer").value=d.answer||"";setAIStatus("AI 연결됨");return true}catch(e){aiFallback(e.message);return false}}
 // 기존 통합 흐름의 AI 필요 지점을 교체한다.
 $("#toCandidates").onclick=async()=>{await renderCandidatesAI();go("candidates")};
-$("#applyExtra").onclick=async()=>{let v=$("#extra").value.trim();if(v&&!['잘 모르겠어요','말하고 싶지 않아요'].includes(v))st.confirmed.push(v);save();await renderCandidatesAI();go("candidates")};
+$("#applyExtra").onclick=async()=>{
+ let v=$("#extra").value.trim();if(!v)return msg("단어를 하나 더 넣어 주세요.");
+ if(!['잘 모르겠어요','말하고 싶지 않아요'].includes(v))st.confirmed.push(v);
+ st.extraWord=v;
+ const combined=[...talktalkSplitInput(st.originalInput||""),...talktalkSplitInput(v)];
+ const analysis=talktalkAnalyzeKeywords(combined);
+ save();
+ if(talktalkNeedsEventClarification(analysis)){talktalkShowEventClarification(analysis);return}
+ if(talktalkEventType(analysis)==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||combined[0];talktalkShowCuriosity(topic);return}
+ const daily=talktalkDailyCandidates(combined);
+ if(daily.length){const box=$("#candidateList");box.innerHTML=daily.map((s,i)=>'<button class="choice candidate" data-purpose="생활문장" data-sentence="'+encodeURIComponent(s)+'">'+(i+1)+'. '+s+'</button>').join("");go("candidates");return}
+ await renderCandidatesAI();go("candidates");
+};
 $$('[data-confirm]').forEach(b=>b.onclick=async()=>{if(b.dataset.confirm==='yes'){st.working=st.candidate;st.confirmed.push(st.candidate);save();prepareExpand();go('expand')}else{if(st.candidate)st.rejected.push(st.candidate);reward('reselect_none');save();await prepareQuestionAI();go('question')}});
 $("#toCorrection").onclick=async()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=await correctAI(v);save();go("correction")};
 $("#toEvaluate").onclick=async()=>{st.request=$("#assembledRequest").textContent;reward("ai_request");save();renderEval();go("evaluate");await executeAIRequest()};
@@ -1297,6 +1309,7 @@ const TALK_EVERYDAY_OBJECT_ACTIONS={
 };
 const TALK_GUIDED_EMOTIONS=[["속상했어요","속상했어요"],["화가 났어요","화가 났어요"],["걱정됐어요","걱정됐어요"],["괜찮았어요","괜찮았어요"]];
 const TALK_GUIDED_AFTER=[["울었어요","울었어요"],["선생님께 말했어요","선생님께 말했어요"],["친구에게 말했어요","친구에게 말했어요"],["찾아봤어요","찾아봤어요"]];
+function talktalkAnalyzeCombinedInput(first,extra){return talktalkAnalyzeKeywords([...talktalkSplitInput(first||""),...talktalkSplitInput(extra||"")])}
 function talktalkNeedsEventClarification(a){
  return !!(a.place.length&&a.object.length&&!a.person.length&&!a.action.length&&!a.result.length&&!a.emotion.length);
 }
