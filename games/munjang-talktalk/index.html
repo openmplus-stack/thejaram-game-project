@@ -1870,7 +1870,7 @@ document.addEventListener("click",function(e){
  const input=document.getElementById("thought"),v=String(input?.value||"").trim();
  if(!v){if(typeof window.msg==="function")window.msg("단어나 짧은 말을 넣어 주세요.");return}
  try{if(typeof window.reward==="function")window.reward("input");talktalkV2Start(v)}
- catch(err){console.error("TalkTalk 2.0 start failed",err);const note=document.getElementById("inputV2Error")||document.createElement("div");note.id="inputV2Error";note.className="warning";note.textContent="시작하는 중 문제가 생겼어요. 페이지를 새로고침한 뒤 다시 눌러 주세요.";btn.parentElement?.before(note)}
+ catch(err){console.error("TalkTalk 2.0 start failed",err);const note=document.getElementById("inputV2Error")||document.createElement("div");note.id="inputV2Error";note.className="warning";note.textContent="시작 오류: "+(err?.name||"Error")+" · "+(err?.message||String(err));btn.parentElement?.before(note)}
 },true);
 function talktalkV2VisibleFacts(m){
  const hidden=new Set(["summary"]);return (m.facts||[]).filter(f=>f.confirmed!==false&&!hidden.has(f.role)&&String(f.value||"").trim()).map(f=>String(f.value).trim()).filter((v,i,a)=>a.indexOf(v)===i).slice(-8);
