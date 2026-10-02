@@ -1320,7 +1320,7 @@ function talktalkFollowupFor(sentence){
 function talktalkPersistActivity(){
  const key='talktalk_sentence_dictionary',id=window.talktalkActivityId||(window.talktalkActivityId='activity-'+Date.now());
  let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
- const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],final=window.talktalkCurrentSentence||sentences.join(" ");
+ const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],final=sentences.length?sentences.join(" "):(window.talktalkCurrentSentence||"");
  const entry={schemaVersion:2,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',initial:topic,final,sentences:[...sentences],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',questionHistory:JSON.parse(JSON.stringify(talktalkQuestionState())),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
  const idx=dict.findIndex(x=>x.id===id);if(idx>=0)dict[idx]=entry;else dict.unshift(entry);
  localStorage.setItem(key,JSON.stringify(dict));return entry;
