@@ -1467,13 +1467,53 @@ function talktalkNextQuestion(model=null){
  const text=TALK_NEXT_QUESTION_TEXT[type]?.[chosen.id]||"조금 더 이야기해 주세요.";
  return {complete:false,type,id:chosen.id,targetRoles:[...chosen.roles],question:text,label:chosen.label,priority:chosen.priority,reason:"지금까지 확인된 생각 다음에 필요한 정보를 묻습니다."};
 }
+function talktalkFactValue(m,roles){
+ const f=[...(m.facts||[])].reverse().find(x=>x.confirmed!==false&&roles.includes(x.role)&&String(x.value||"").trim());return f?.value||"";
+}
+function talktalkUniqueFourChoices(items){
+ const out=[];for(const item of items){const label=String(item[0]||"").trim(),value=item[1]??label;if(label&&!out.some(x=>x[0]===label))out.push([label,value]);if(out.length===4)break}
+ return out;
+}
+function talktalkChoiceSet(question,model=null){
+ const m=model||talktalkThoughtModel(),type=question.type||m.storyType?.type||"experience",id=question.id;
+ const object=talktalkFactValue(m,["object","topic"]),event=talktalkFactValue(m,["event","problem","result"]),action=talktalkFactValue(m,["followup_action","attempt","action"]);
+ let choices=[];
+ if(id==="emotion")choices=[["속상했어요","속상했어요"],["걱정됐어요","걱정됐어요"],["화가 났어요","화가 났어요"],["괜찮았어요","괜찮았어요"]];
+ else if(id==="attempt"){
+   if(/잃어버/.test(event))choices=[["찾아봤어요","찾아봤어요"],["선생님께 말했어요","선생님께 말했어요"],["친구에게 물어봤어요","친구에게 물어봤어요"],["아무것도 하지 않았어요","아무것도 하지 않았어요"]];
+   else choices=[["혼자 해 봤어요","혼자 해 봤어요"],["도움을 요청했어요","도움을 요청했어요"],["다른 방법을 해 봤어요","다른 방법을 해 봤어요"],["아무것도 하지 않았어요","아무것도 하지 않았어요"]];
+ }else if(id==="outcome"){
+   if(/잃어버/.test(event)&&/찾아/.test(action))choices=[["찾았어요","찾았어요"],["못 찾았어요","못 찾았어요"],["아직 찾고 있어요","아직 찾고 있어요"],["잘 모르겠어요","잘 모르겠어요"]];
+   else if(type==="problem")choices=[["해결됐어요","해결됐어요"],["조금 나아졌어요","조금 나아졌어요"],["아직 해결되지 않았어요","아직 해결되지 않았어요"],["잘 모르겠어요","잘 모르겠어요"]];
+   else choices=[["좋게 끝났어요","좋게 끝났어요"],["그대로였어요","그대로였어요"],["다른 일이 생겼어요","다른 일이 생겼어요"],["잘 모르겠어요","잘 모르겠어요"]];
+ }else if(id==="need")choices=[["그만했으면 좋겠어요","그만했으면 좋겠어요"],["도와줬으면 좋겠어요","도와줬으면 좋겠어요"],["다시 말해 줬으면 좋겠어요","다시 말해 줬으면 좋겠어요"],["혼자 하고 싶어요","혼자 하고 싶어요"]];
+ else if(id==="other_reaction")choices=[["말을 들었어요","말을 들었어요"],["계속했어요","계속했어요"],["도와줬어요","도와줬어요"],["잘 모르겠어요","잘 모르겠어요"]];
+ else if(id==="before")choices=[["친구가 먼저 말했어요","친구가 먼저 말했어요"],["같이 놀고 있었어요","같이 놀고 있었어요"],["물건 때문에 일이 생겼어요","물건 때문에 일이 생겼어요"],["잘 모르겠어요","잘 모르겠어요"]];
+ else if(id==="people")choices=[["친구와 있었어요","친구"],["선생님과 있었어요","선생님"],["가족과 있었어요","가족"],["혼자 있었어요","혼자"]];
+ else if(id==="context")choices=[["학교에서 있었어요","학교"],["집에서 있었어요","집"],["밖에서 있었어요","밖"],["잘 모르겠어요","잘 모르겠어요"]];
+ else if(id==="question"){
+   if(/공룡/.test(object))choices=[["왜 사라졌는지 궁금해요","왜 사라졌는지"],["무엇을 먹었는지 궁금해요","무엇을 먹었는지"],["얼마나 컸는지 궁금해요","얼마나 컸는지"],["어떻게 살았는지 궁금해요","어떻게 살았는지"]];
+   else choices=[["무엇인지 궁금해요","무엇인지"],["어떤 특징이 있는지 궁금해요","어떤 특징이 있는지"],["왜 그런지 궁금해요","왜 그런지"],["어떻게 되는지 궁금해요","어떻게 되는지"]];
+ }else if(id==="event"||id==="problem"||id==="situation"){
+   if(object&&TALK_EVERYDAY_OBJECT_ACTIONS[object])choices=TALK_EVERYDAY_OBJECT_ACTIONS[object].map(x=>[x[0],x[1]]);
+   else choices=[["잃어버렸어요","잃어버렸어요"],["안 가져갔어요","안 가져갔어요"],["빌렸어요","빌렸어요"],["빌려줬어요","빌려줬어요"]];
+ }else if(id==="fact")choices=[["첫 번째 정보를 알게 됐어요","fact_1"],["두 번째 정보를 알게 됐어요","fact_2"],["세 번째 정보를 알게 됐어요","fact_3"],["아직 잘 모르겠어요","unknown"]];
+ else if(id==="summary")choices=[["가장 중요한 내용을 말할래요","main"],["새로 알게 된 것을 말할래요","new"],["기억에 남는 것을 말할래요","memory"],["조금 더 알아볼래요","more"]];
+ choices=talktalkUniqueFourChoices(choices);
+ return {questionId:id,type,context:{object,event,action},choices,valid:choices.length===4,principle:"보기는 아동의 생각을 찾는 표현 지원이며 정답을 유도하지 않습니다."};
+}
+function talktalkPrepareNextChoiceQuestion(model=null){
+ const m=model||talktalkThoughtModel(),q=talktalkNextQuestion(m);
+ if(q.complete)return {...q,choices:[]};
+ const set=talktalkChoiceSet(q,m);return {...q,choices:set.choices,choicesValid:set.valid,context:set.context};
+}
 function talktalkNextQuestionSummary(model=null){
  const q=talktalkNextQuestion(model);return q.complete?{complete:true,type:q.type,question:null}:{complete:false,type:q.type,id:q.id,question:q.question,targetRoles:q.targetRoles};
 }
 function talktalkMissingSummary(model=null){
  const x=talktalkFindMissingThoughts(model);return {type:x.type,known:x.known.map(v=>v.label),missing:x.missing.map(v=>v.label),next:x.next?.label||null,complete:x.complete};
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkNextQuestion(m);return {storyType:m.storyType||null,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);return {storyType:m.storyType||null,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
