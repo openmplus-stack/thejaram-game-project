@@ -1172,30 +1172,48 @@ function talktalkEventType(a){
  if(a.object.some(x=>/(공룡|우주|동물|과학|역사)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
  return "event";
 }
-function talktalkDailyCandidates(words){
- const built=talktalkBuildConfirmedSentence(words),a=built.analysis;
- if(a.action.length&&(a.place.length||a.person.length||a.object.length)){
-   const confirmed=built.sentences;
-   if(confirmed.length>=1){
-     let variants=[...confirmed];
-     if(a.place[0]&&a.person[0]&&a.action[0])variants.push("나는 "+talktalkJosa(a.place[0],"placeAt")+" "+talktalkJosa(a.person[0],"with")+" "+talktalkPolitePredicate(a.action[0])+".");
-     if(a.time[0]&&a.place[0]&&a.action[0])variants.push(a.time[0]+" "+talktalkJosa(a.place[0],"placeAt")+" "+talktalkPolitePredicate(a.action[0])+".");
-     return [...new Set(variants)].slice(0,3);
+function talktalkFirstCandidates(words){
+ const ws=words.map(x=>String(x||"").trim()).filter(Boolean),a=talktalkAnalyzeKeywords(ws),type=talktalkEventType(a);
+ const time=a.time[0]||"",place=a.place[0]||"",person=a.person[0]||"",obj=a.object[0]||"",action=a.action[0]||"",result=a.result[0]||"",emotion=a.emotion[0]||"";
+ const prefix=[time,place?talktalkJosa(place,"placeAt"):""].filter(Boolean).join(" ");
+ const out=[],push=s=>{s=String(s||"").replace(/\s+/g," ").trim();if(s&&!out.includes(s))out.push(s)};
+ // 1) Confirmed-fact sentence: never invent a cause or action.
+ if(action){
+   let act=talktalkPolitePredicate(action);
+   if(person&&obj&&/(던졌|줬|보냈)/.test(action))push([prefix,"나는",talktalkJosa(obj,"object"),talktalkJosa(person,"personTo"),act].filter(Boolean).join(" ")+".");
+   else if(person&&/(놀았|싸웠)/.test(action))push([prefix,"나는",talktalkJosa(person,"with"),act].filter(Boolean).join(" ")+".");
+   else if(obj)push([prefix,"나는",talktalkJosa(obj,"object"),act].filter(Boolean).join(" ")+".");
+   else push([prefix,"나는",act].filter(Boolean).join(" ")+".");
+ }
+ if(result)push([prefix,"나는",talktalkPolitePredicate(result)].filter(Boolean).join(" ")+".");
+ if(emotion)push([prefix,"나는",talktalkPolitePredicate(emotion)].filter(Boolean).join(" ")+".");
+ // 2) When only a result is known, offer plausible bridges as CHOICES, not stored facts.
+ if(result&&person&&!action){
+   if(/혼났/.test(result)){
+     push([prefix,"나는",talktalkJosa(person,"with"),"장난을 치다가",talktalkPolitePredicate(result)].filter(Boolean).join(" ")+".");
+     push([prefix,"나는",talktalkJosa(person,"with"),"다투다가",talktalkPolitePredicate(result)].filter(Boolean).join(" ")+".");
+   }else{
+     push([prefix,"나는",talktalkJosa(person,"with"),"있다가",talktalkPolitePredicate(result)].filter(Boolean).join(" ")+".");
    }
  }
-
- const ws=words.map(x=>String(x||"").trim()).filter(Boolean), place=ws.find(x=>talktalkRole(x)==="place"), person=ws.find(x=>talktalkRole(x)==="person"), event=ws.find(x=>talktalkRole(x)==="event"), thing=ws.find(x=>talktalkRole(x)==="thing");
- if(place&&person&&event){
-   const ev=talktalkNormalizeVerb(event), base=place+"에서 "+talktalkWith(person,"과/와");
-   if(/혼났/.test(event))return [base+" 싸워서 "+ev+".",base+" 장난을 치다가 "+ev+".",base+" 문제가 생겨서 "+ev+"."];
-   return [base+" "+ev+".",place+"에서 "+talktalkSubject(person)+" 함께 "+ev+".","나는 "+place+"에서 "+talktalkWith(person,"과/와")+" "+ev+"."];
+ // 3) Curiosity/learning: do not force an event diary structure.
+ if(type==="curiosity"&&obj){
+   push(talktalkTopic(obj)+" 더 알고 싶어요.");
+   push(talktalkTopic(obj)+" 어떤 특징이 있는지 궁금해요.");
+   push(talktalkTopic(obj)+" 왜 그런지 알고 싶어요.");
  }
- if(place&&person)return [place+"에서 "+talktalkWith(person,"과/와")+" 함께 있었어요.",place+"에서 "+talktalkSubject(person)+" 나와 함께 있었어요.","나는 "+place+"에서 "+talktalkWith(person,"과/와")+" 무엇인가를 했어요."];
- if(place&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+place+"에서 "+ev+".",place+"에서 어떤 일이 있어서 "+ev+".",place+"에 갔다가 "+ev+"."];}
- if(person&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+talktalkWith(person,"과/와")+" "+ev+".",talktalkSubject(person)+" 함께 있을 때 "+ev+".",talktalkWith(person,"과/와")+" 어떤 일이 있어서 "+ev+"."];}
- if(thing&&event){const ev=talktalkNormalizeVerb(event);return ["나는 "+talktalkObject(thing)+" "+ev+".",talktalkSubject(thing)+" 있어서 "+ev+".",talktalkTopic(thing)+" 나에게 중요한 일이었어요."];}
- return [];
+ // 4) Sparse everyday input: natural but explicitly non-specific.
+ if(place&&person&&!action&&!result){
+   push("나는 "+talktalkJosa(place,"placeAt")+" "+talktalkJosa(person,"with")+" 함께 있었어요.");
+   push(talktalkJosa(place,"placeAt")+" "+talktalkJosa(person,"subject")+" 만났어요.");
+ }
+ if(obj&&!action&&!result&&type!=="curiosity"){
+   push("나는 "+talktalkTopic(obj)+" 이야기를 하고 싶어요.");
+   push(talktalkTopic(obj)+" 궁금한 것이 있어요.");
+ }
+ return out.slice(0,3);
 }
+function talktalkDailyCandidates(words){return talktalkFirstCandidates(words)}
 function talktalkOpenScreen(name){
  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
  const target=document.querySelector('.screen[data-s="'+name+'"]');
