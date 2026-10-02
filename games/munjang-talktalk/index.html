@@ -1099,6 +1099,51 @@ const TALK_FOLLOWUP_PRIORITY={
 function talktalkSplitInput(text){
  return String(text||"").split(/[,，\n\/]+/).map(x=>x.trim()).filter(Boolean);
 }
+// Korean sentence engine v2: particles, roles, predicates, and event links.
+function talktalkJosa(word,type){
+ const map={subject:"이/가",topic:"은/는",object:"을/를",with:"과/와",tool:"으로/로"};
+ if(type==="tool"){
+   const s=String(word||"").trim(),ch=s.charCodeAt(s.length-1),jong=(ch>=0xAC00&&ch<=0xD7A3)?((ch-0xAC00)%28):0;
+   return s+(jong===0||jong===8?"로":"으로");
+ }
+ if(type==="placeAt")return String(word||"")+"에서";
+ if(type==="placeTo")return String(word||"")+"에";
+ if(type==="personTo")return String(word||"")+"에게";
+ return String(word||"")+talktalkParticle(word,map[type]||"은/는");
+}
+function talktalkPolitePredicate(w){
+ const x=String(w||"").trim();
+ const map={"던졌어":"던졌어요","때렸어":"때렸어요","밀었어":"밀었어요","가져갔어":"가져갔어요","빌렸어":"빌렸어요","줬어":"줬어요","놀았어":"놀았어요","싸웠어":"싸웠어요","말했어":"말했어요","물어봤어":"물어봤어요","도와줬어":"도와줬어요","혼났어":"혼났어요","칭찬받았어":"칭찬받았어요","울었어":"울었어요","다쳤어":"다쳤어요","넘어졌어":"넘어졌어요","늦었어":"늦었어요","젖었어":"젖었어요","잃어버렸어":"잃어버렸어요","배웠어":"배웠어요","읽었어":"읽었어요","봤어":"봤어요","만들었어":"만들었어요","속상했어":"속상했어요","무서웠어":"무서웠어요","억울했어":"억울했어요"};
+ return map[x]||talktalkNormalizeVerb(x);
+}
+function talktalkClauseConnect(w,kind){
+ const x=String(w||"").trim();
+ const stem=x.replace(/(했어|했어요|었어|었어요|았어|았어요|어|어요)$/,"");
+ if(kind==="cause")return stem+"해서";
+ if(kind==="sequence")return stem+"하고";
+ return talktalkPolitePredicate(x);
+}
+function talktalkComposeFromAnalysis(a){
+ const time=a.time[0]||"",place=a.place[0]||"",person=a.person[0]||"",object=a.object[0]||"",action=a.action[0]||"",result=a.result[0]||"",emotion=a.emotion[0]||"";
+ let prefix=[time,place?talktalkJosa(place,"placeAt"):""].filter(Boolean).join(" ");
+ let actor="나는",actionClause="";
+ if(action){
+   if(person&&object&&/(던졌|줬|보냈|말했)/.test(action))actionClause=talktalkJosa(object,"object")+" "+talktalkJosa(person,"personTo")+" "+talktalkPolitePredicate(action);
+   else if(person&&/(놀았|싸웠)/.test(action))actionClause=talktalkJosa(person,"with")+" "+talktalkPolitePredicate(action);
+   else if(object)actionClause=talktalkJosa(object,"object")+" "+talktalkPolitePredicate(action);
+   else actionClause=talktalkPolitePredicate(action);
+ }
+ let first=[prefix,actor,actionClause].filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+ if(first&&!/[.!?]$/.test(first))first+=".";
+ const out=[];if(first&&actionClause)out.push(first);
+ if(result){let r=[prefix,"나는",talktalkPolitePredicate(result)].filter(Boolean).join(" ").replace(/\s+/g," ").trim()+".";out.push(r)}
+ if(emotion){let e="나는 "+talktalkPolitePredicate(emotion)+".";out.push(e)}
+ return out;
+}
+function talktalkBuildConfirmedSentence(words){
+ const a=talktalkAnalyzeKeywords(words),sentences=talktalkComposeFromAnalysis(a);
+ return {analysis:a,type:talktalkEventType(a),sentences};
+}
 function talktalkAnalyzeKeywords(words){
  const result={time:[],place:[],person:[],object:[],action:[],cause:[],result:[],emotion:[],thought:[],otherReaction:[],request:[],unknown:[]};
  const times=["오늘","어제","아침","점심","저녁","밤","쉬는 시간","수업 시간","점심시간","방과 후","주말"];
