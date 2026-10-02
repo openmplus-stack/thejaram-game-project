@@ -1079,6 +1079,23 @@ function talktalkRole(w){
  if(/(했어|했어요|갔어|왔어|먹었어|봤어|놀았어|싸웠어|혼났어|울었어|넘어졌어|잃어버렸어|받았어|줬어|아파|좋아|싫어|무서워|속상해|화났어)$/.test(w))return "event";
  return "thing";
 }
+// Child life-world model: elementary-to-middle school age, language level <= grade 6.
+const TALK_LIFE_WORLD={
+ school:{label:"학교",places:["학교","교실","운동장","급식실","도서관","보건실","화장실","복도","체육관"],people:["친구","선생님","반 친구","급식 선생님"],events:["수업","쉬는 시간","급식","숙제","준비물","발표","시험","체육","청소","현장학습","지각","칭찬","혼남","장난","다툼"]},
+ home:{label:"가정",places:["집","방","거실","부엌"],people:["엄마","아빠","형","누나","언니","오빠","동생","할머니","할아버지"],events:["식사","숙제","게임","잠","심부름","외출","칭찬","혼남","다툼","도움"]},
+ peers:{label:"친구",places:["교실","운동장","놀이터","학원","공원"],people:["친구","반 친구","형","누나","동생"],events:["같이 놀기","장난","약속","빌리기","돌려주기","나누기","놀림","오해","다툼","화해","거절"]},
+ community:{label:"생활환경",places:["편의점","마트","식당","병원","약국","도서관","공원","놀이터","버스","지하철","정류장"],people:["직원","의사","간호사","기사님","손님","친구","가족"],events:["사기","주문","계산","기다리기","길 찾기","진료","약 먹기","대중교통 이용","물건 잃어버림"]},
+ weather:{label:"날씨·돌발상황",places:["길","학교","운동장","공원","집"],people:["친구","가족","선생님"],events:["비","눈","더위","추위","우산","옷이 젖음","미끄러짐","넘어짐","지각","길을 잘못 감"]},
+ interest:{label:"관심·학습",places:["교실","도서관","박물관","과학관","집"],people:["선생님","친구","가족"],events:["공룡","동물","우주","자동차","날씨","역사","과학","책","영상","관찰","실험","질문"]},
+ selfAdvocacy:{label:"자기표현",events:["싫어요","그만해 주세요","도와주세요","모르겠어요","다시 말해 주세요","제가 한 것이 아니에요","아파요","불편해요","무서워요","억울해요"]}
+};
+const TALK_INFO_ROLES=["time","place","person","object","action","cause","result","emotion","thought","otherReaction","request"];
+const TALK_FOLLOWUP_PRIORITY={
+ event:["action","cause","result","otherReaction","time","emotion","thought"],
+ conflict:["before","action","cause","otherReaction","result","time","emotion"],
+ curiosity:["target","question","reason","known","wantToKnow"],
+ difficulty:["problem","cause","action","help","result","emotion"]
+};
 function talktalkSplitInput(text){
  return String(text||"").split(/[,，\n\/]+/).map(x=>x.trim()).filter(Boolean);
 }
