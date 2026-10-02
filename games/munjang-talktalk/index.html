@@ -307,7 +307,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 <section class="screen" data-s="candidates"><div class="eyebrow">문장 고르기</div><h2 class="q">마음에 드는 문장을 골라요</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button><button class="btn candidate-dislike" id="dislikeCandidates">마음에 안 들어요 →</button></div></section>
 <section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
 <section class="screen" data-s="question"><div class="eyebrow">단어 하나 더</div><h2 class="q">생각나는 단어를 하나 더 넣어 보세요</h2><input id="extra" class="extra-word-input" autocomplete="off"><div class="nav"><button class="btn" data-go="candidates">← 이전 문장</button><button class="btn primary" id="applyExtra">다음 문장 3개 보기 →</button></div></section>
-<section class="screen" data-s="expand"><div class="eyebrow">이야기 이어가기</div><div class="box soft" id="workingSentence"></div><h2 class="q" id="followupQuestion">조금 더 이야기해 줄래요?</h2><input id="expansion" class="extra-word-input" placeholder="짧게 써도 괜찮아요."><div class="nav"><button class="btn" id="stopExpand">여기서 끝낼래요</button><button class="btn primary" id="applyExpand">다음 문장 만들기 →</button></div></section>
+<section class="screen" data-s="expand"><div class="eyebrow">이야기 이어가기</div><div class="box soft" id="workingSentence"></div><h2 class="q" id="followupQuestion">조금 더 이야기해 줄래요?</h2><input id="expansion" class="extra-word-input" placeholder="짧게 써도 괜찮아요."><div id="completionChoice" class="box green hidden"><b>이제 글이 잘 만들어졌어요.</b><p>여기서 마칠까요, 조금 더 써 볼까요?</p><div class="choices"><button class="choice" id="finishSuggested">여기서 마칠래요</button><button class="choice" id="continueSuggested">조금 더 쓸래요</button></div></div><div class="nav"><button class="btn" id="stopExpand">여기서 끝낼래요</button><button class="btn primary" id="applyExpand">다음 문장 만들기 →</button></div></section>
 <section class="screen" data-s="direct"><div class="eyebrow">7. 내 말로 표현하기</div><h2 class="q">이제 문장을 보지 않고 네 말로 한번 말해볼래요?</h2><textarea id="directText" placeholder="내 말로 직접 적어 보세요."></textarea><div class="chips"><button class="chip" id="hint">힌트 보기</button><button class="chip" id="difficult">아직 어려워요</button></div><div class="box yellow hidden" id="hintBox"></div><div class="nav"><button class="btn primary" id="toCorrection">내 표현 저장</button></div></section>
 <section class="screen" data-s="correction"><div class="eyebrow">8. 최소 교정</div><h2 class="q">내 말의 뜻은 그대로 두고 필요한 부분만 살펴볼게요.</h2><div class="box"><b>내 원문</b><p id="originalDirect"></p></div><div class="box green"><b>최소 교정 제안</b><p id="corrected"></p></div><div class="choices"><button class="choice" id="acceptCorrection">이렇게 고칠래요</button><button class="choice" id="keepOriginal">원래 말이 좋아요</button></div></section>
 <section class="screen" data-s="aiRequest"><div class="eyebrow">9. AI에게 요구하기</div><h2 class="q">AI에게 무엇을 부탁하고 싶어요?</h2><select id="requestAction"><option>알려줘</option><option>설명해줘</option><option>추천해줘</option><option>비교해줘</option><option>정리해줘</option><option>요약해줘</option><option>만들어줘</option><option>그려줘</option><option>고쳐줘</option><option>문제 내줘</option></select><input id="requestContent" placeholder="무엇에 대해?"><select id="requestLevel"><option value="">수준 정하지 않기</option><option>초등학교 3~4학년이 이해할 수 있게</option><option>초등학교 5~6학년이 이해할 수 있게</option><option>쉬운 말로</option></select><div class="box green"><b>완성 요구문</b><p id="assembledRequest"></p></div><div class="nav"><button class="btn" id="skipAI">AI 요구 연습 건너뛰기</button><button class="btn primary" id="toEvaluate">요구문 저장</button></div></section>
@@ -1346,6 +1346,30 @@ function talktalkNeutralizeQuestion(id,q){
 function talktalkQuestionSafetyLog(item){
  const state=talktalkQuestionState();state.safety=state.safety||[];
  if(item.changed)state.safety.push({at:new Date().toISOString(),id:item.id,blocked:item.original,replacement:item.q});
+}
+function talktalkCompletionStatus(){
+ const text=talktalkStoryText(),sentences=window.talktalkStorySentences||[],qs=talktalkQuestionState(),intent=window.talktalkActivityIntent||"생활문장";
+ const isKnowledge=intent==="궁금한 것";
+ if(isKnowledge){
+   const enough=sentences.length>=2||((qs.step||0)>=2&&text.length>=45);
+   return {complete:enough,score:enough?1:0,reason:enough?"질문과 핵심 설명이 모였어요.":"설명할 내용을 조금 더 모아 볼 수 있어요."};
+ }
+ const conflict=talktalkHasAny(text,[/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울/]);
+ const hasAction=talktalkHasAny(text,[/했어요|던졌|때렸|밀었|놀았|싸웠|장난|갔어요|왔어요/]);
+ const hasOutcome=talktalkHasAny(text,[/혼났|울었|다쳤|그래서|그 결과|끝났|돌아갔|화해/]);
+ const hasContext=talktalkHasAny(text,[/학교|교실|집|공원|놀이터|오늘|어제|시간|친구|선생님|엄마|아빠/]);
+ const hasReaction=talktalkHasAny(text,[/그러자|친구가|상대방|선생님은|선생님이/]);
+ const hasEmotion=talktalkHasAny(text,[/기뻤|좋았|속상|화가|무서|슬펐|억울|당황|걱정/]);
+ let score=(hasAction?2:0)+(hasOutcome?2:0)+(hasContext?1:0)+(hasReaction?1:0)+(hasEmotion?1:0)+((qs.step||0)>=2?1:0);
+ const threshold=conflict?6:5;
+ return {complete:score>=threshold,score,reason:score>=threshold?"사건을 이해하는 데 필요한 내용이 충분히 모였어요.":"글을 이해하려면 중요한 정보를 조금 더 모을 수 있어요."};
+}
+function talktalkUpdateCompletionUI(){
+ const status=talktalkCompletionStatus(),box=document.getElementById("completionChoice"),input=document.getElementById("expansion"),next=document.getElementById("applyExpand");
+ if(!box)return status;
+ if(status.complete){box.classList.remove("hidden");if(input)input.classList.add("hidden");if(next)next.classList.add("hidden")}
+ else{box.classList.add("hidden");if(input)input.classList.remove("hidden");if(next)next.classList.remove("hidden")}
+ const state=talktalkQuestionState();state.completion={...status,checkedAt:new Date().toISOString()};return status;
 }
 function talktalkChooseFollowup(sentence){
  const s=String(sentence||""),state=talktalkQuestionState(),asked=new Set(state.asked||[]),candidates=[];
