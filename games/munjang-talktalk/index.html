@@ -304,7 +304,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 <section class="screen" data-s="intent"><div class="eyebrow">2. 표현 목적</div><h2 class="q">어떤 말을 하고 싶은가요?</h2><div class="choices" id="intentChoices"></div><div class="nav"><button class="btn" data-go="input">이전</button><button class="btn primary" id="toCandidates">문장 후보 보기</button></div></section>
 <section class="screen" data-s="curiosity"><div class="eyebrow">궁금한 것 찾기</div><h2 class="q" id="curiosityTitle">무엇이 궁금해요?</h2><div id="curiosityChoices"></div><div class="nav"><button class="btn" data-go="input">← 다른 주제 쓰기</button></div></section>
 <section class="screen" data-s="curiosityAnswer"><div class="eyebrow">답 알아보기</div><h2 class="q" id="curiosityQuestion"></h2><div id="curiosityAnswers"></div><div class="nav"><button class="btn" data-go="curiosity">← 다른 질문</button></div></section>
-<section class="screen" data-s="eventClarify"><div class="eyebrow">무슨 일이 있었나요?</div><h2 class="q" id="eventClarifyTitle">이것으로 무슨 일이 있었어요?</h2><div id="eventClarifyChoices" class="choices"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button></div></section>
+<section class="screen" data-s="eventClarify"><div class="eyebrow">이야기 만들기</div><div class="box soft hidden" id="guidedStoryBox"></div><h2 class="q" id="eventClarifyTitle">무슨 일이 있었어요?</h2><div id="eventClarifyChoices" class="choices"></div><div class="nav"><button class="btn" data-go="input">← 처음으로</button></div></section>
 <section class="screen" data-s="candidates"><div class="eyebrow">문장 고르기</div><h2 class="q">마음에 드는 문장을 골라요</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button><button class="btn candidate-dislike" id="dislikeCandidates">마음에 안 들어요 →</button></div></section>
 <section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
 <section class="screen" data-s="question"><div class="eyebrow">단어 하나 더</div><h2 class="q">생각나는 단어를 하나 더 넣어 보세요</h2><input id="extra" class="extra-word-input" autocomplete="off"><div class="nav"><button class="btn" data-go="candidates">← 이전 문장</button><button class="btn primary" id="applyExtra">다음 문장 3개 보기 →</button></div></section>
@@ -1295,6 +1295,8 @@ const TALK_EVERYDAY_OBJECT_ACTIONS={
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "우산":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]]
 };
+const TALK_GUIDED_EMOTIONS=[["속상했어요","속상했어요"],["화가 났어요","화가 났어요"],["걱정됐어요","걱정됐어요"],["괜찮았어요","괜찮았어요"]];
+const TALK_GUIDED_AFTER=[["울었어요","울었어요"],["선생님께 말했어요","선생님께 말했어요"],["친구에게 말했어요","친구에게 말했어요"],["찾아봤어요","찾아봤어요"]];
 function talktalkNeedsEventClarification(a){
  return !!(a.place.length&&a.object.length&&!a.person.length&&!a.action.length&&!a.result.length&&!a.emotion.length);
 }
@@ -1306,19 +1308,43 @@ function talktalkClarifiedSentence(place,obj,kind){
  if(kind==="lost")return "나는 "+at+" "+talktalkJosa(obj,"object")+" 잃어버렸어요.";
  return "";
 }
-function talktalkShowEventClarification(a){
- const place=a.place[0]||"",obj=a.object[0]||"",title=document.getElementById("eventClarifyTitle"),box=document.getElementById("eventClarifyChoices");
- if(title)title.textContent=obj+"로 무슨 일이 있었어요?";
- const actions=TALK_EVERYDAY_OBJECT_ACTIONS[obj]||[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]];
- if(box)box.innerHTML=actions.map(([label,kind])=>'<button class="choice event-action" data-kind="'+kind+'">'+label+'</button>').join("")+'<button class="choice event-action" data-kind="other">다른 일이 있었어요</button>';
- if(box)box.querySelectorAll("[data-kind]").forEach(b=>b.onclick=()=>{
-   const kind=b.dataset.kind;
-   if(kind==="other"){const x=document.getElementById("extra");if(x){x.value="";x.placeholder=obj+"로 무슨 일이 있었는지 짧게 써 주세요."}talktalkOpenScreen("question");return}
-   const sentence=talktalkClarifiedSentence(place,obj,kind),list=document.getElementById("candidateList");
-   if(list)list.innerHTML='<button class="choice candidate" data-purpose="생활문장" data-sentence="'+encodeURIComponent(sentence)+'">1. '+sentence+'</button>';
-   talktalkOpenScreen("candidates");
- });
+function talktalkGuidedRender(question,choices,onChoose){
+ const title=document.getElementById("eventClarifyTitle"),box=document.getElementById("eventClarifyChoices"),story=document.getElementById("guidedStoryBox");
+ if(title)title.textContent=question;
+ if(story){const text=(window.talktalkGuidedStory||[]).join(" ");story.textContent=text;story.classList.toggle("hidden",!text)}
+ if(box){box.innerHTML=choices.map(([label,value],i)=>'<button class="choice guided-choice" data-i="'+i+'">'+label+'</button>').join("");box.querySelectorAll("[data-i]").forEach(btn=>btn.onclick=()=>onChoose(choices[+btn.dataset.i][1]))}
  talktalkOpenScreen("eventClarify");
+}
+function talktalkGuidedFinish(){
+ const story=window.talktalkGuidedStory||[];
+ window.talktalkStorySentences=[...story];window.talktalkCurrentSentence=story.join(" ");
+ if(typeof st!=="undefined"){st.intent="생활문장";st.candidate=story[0]||"";st.working=window.talktalkCurrentSentence;st.final=window.talktalkCurrentSentence;st.confirmed=[...story];try{save()}catch(_){}}
+ const w=document.getElementById("workingSentence");if(w)w.textContent=window.talktalkCurrentSentence;
+ talktalkOpenScreen("expand");
+ const q=document.getElementById("followupQuestion");if(q)q.textContent="이 이야기에 더 넣고 싶은 것이 있나요?";
+ const x=document.getElementById("expansion");if(x)x.value="";
+}
+function talktalkGuidedAskAfter(){
+ talktalkGuidedRender("그래서 어떻게 행동했어요?",TALK_GUIDED_AFTER,answer=>{
+   window.talktalkGuidedStory.push("나는 "+answer);
+   talktalkGuidedFinish();
+ });
+}
+function talktalkGuidedAskEmotion(){
+ talktalkGuidedRender("기분이 어땠어요?",TALK_GUIDED_EMOTIONS,answer=>{
+   window.talktalkGuidedStory.push("나는 "+answer);
+   talktalkGuidedAskAfter();
+ });
+}
+function talktalkShowEventClarification(a){
+ const place=a.place[0]||"",obj=a.object[0]||"";
+ window.talktalkGuidedStory=[];window.talktalkGuidedContext={place,obj};
+ const actions=(TALK_EVERYDAY_OBJECT_ACTIONS[obj]||[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]]).slice(0,4);
+ talktalkGuidedRender(obj+"로 무슨 일이 있었어요?",actions,kind=>{
+   const sentence=talktalkClarifiedSentence(place,obj,kind);
+   window.talktalkGuidedStory=[sentence];
+   talktalkGuidedAskEmotion();
+ });
 }
 function talktalkFirstCandidates(words){
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean),a=talktalkAnalyzeKeywords(ws),type=talktalkEventType(a);
