@@ -290,7 +290,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
- <button class="home-start" id="newActivity" data-go="input"><span>▶</span><b>시작하기</b></button>
+ <button class="home-start" id="newActivity"><span>▶</span><b>시작하기</b></button>
  <div class="home-levelbar"><span class="level-chip" id="homeLevelName">Lv.1 아기 펭귄</span><div class="xp-track"><span></span></div><span class="xp-text">⭐ <b id="starCount">0</b> · <b id="xpCount">0</b> EXP</span></div>
 </div>
 <div class="home-data-hooks" aria-hidden="true"><span id="bookCount">0</span><span id="treasureHomeCount">0</span><span id="resumeText">새 문장 만들기</span></div>
@@ -1494,97 +1494,4 @@ document.addEventListener('click',function(e){
  talktalkSaveChosenSentence(sentence,b.dataset.purpose||'생활문장');
 },true);
 
-// Standalone input fallback: works even if the main initializer stops early.
-(function(){
- const make=document.getElementById('toIntent');
- if(!make)return;
- make.disabled=false; make.removeAttribute('aria-disabled'); make.style.pointerEvents='auto'; make.style.touchAction='manipulation';
- make.addEventListener('click',function(e){
-   const input=document.getElementById('thought');
-   const word=(input&&input.value||'').trim();window.talktalkExtraWords=[];
-   if(!word){alert('단어를 넣어 주세요.');return;}
-   setTimeout(function(){
-     const candidate=document.querySelector('.screen[data-s="candidates"]');
-     const isActive=candidate&&candidate.classList.contains('active');
-     if(isActive)return;
-     const box=document.getElementById('candidateList');
-     if(box){
-       const parts=talktalkSplitInput(word),analysis=talktalkAnalyzeKeywords(parts);if(talktalkEventType(analysis)==="curiosity"&&parts.length===1){talktalkShowCuriosity(parts[0]);return}const daily=talktalkDailyCandidates(parts);
-       const examples=daily.length?daily:[
-         '나는 '+talktalkSubject(word)+' 신기하다고 생각해요.',
-         talktalkTopic(word)+' 왜 그런 모습일까요?',
-         word+'에 대해 더 알려 주세요.'
-       ];
-       box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
-       document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-       candidate.classList.add('active');
-       window.scrollTo(0,0);
-     }
-   },120);
- });
-})();
-
-// Standalone next-three navigation for the extra-word step.
-(function(){
- const nextBtn=document.getElementById('applyExtra');
- if(!nextBtn)return;
- nextBtn.disabled=false;nextBtn.removeAttribute('aria-disabled');nextBtn.style.pointerEvents='auto';nextBtn.style.touchAction='manipulation';
- nextBtn.addEventListener('click',function(e){
-   e.preventDefault();e.stopPropagation();
-   const word=(document.getElementById('thought')?.value||'').trim()||'이것';
-   const extra=(document.getElementById('extra')?.value||'').trim();
-   if(!extra){alert('단어를 하나 더 넣어 주세요.');return;}
-   let prior=(window.talktalkExtraWords||[]);prior.push(extra);window.talktalkExtraWords=prior;
-   const words=[word,...prior],daily=talktalkDailyCandidates(words);
-   const examples=daily.length?daily:[
-     '나는 '+talktalkTopic(word)+' '+extra+'에 대해 말하고 싶어요.',
-     talktalkSubject(word)+' '+extra+'와 관련이 있어요.',
-     word+'에 대해 '+talktalkObject(extra)+' 더 말하고 싶어요.'
-   ];
-   const box=document.getElementById('candidateList');
-   if(box)box.innerHTML=examples.map((s,i)=>'<button class="choice candidate fallback-candidate" data-next-fallback="'+i+'">'+(i+1)+'. '+s+'</button>').join('');
-   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-   const target=document.querySelector('.screen[data-s="candidates"]');
-   if(target){target.classList.add('active');window.scrollTo(0,0);}
- });
-})();
-
-// Standalone dislike navigation: always opens the one-more-word step.
-(function(){
- const dislike=document.getElementById('dislikeCandidates');
- if(!dislike)return;
- dislike.disabled=false; dislike.removeAttribute('aria-disabled'); dislike.style.pointerEvents='auto'; dislike.style.touchAction='manipulation';
- dislike.addEventListener('click',function(e){
-   e.preventDefault(); e.stopPropagation();
-   const word=(document.getElementById('thought')?.value||'').trim()||'이것';
-   const extra=document.getElementById('extra');
-   if(extra){
-     extra.value='';
-     const n=(window.talktalkExtraWords||[]).length;extra.placeholder=n===0?'어디에서, 누구와, 무슨 일이 있었나요? 단어 하나를 더 넣어 보세요.':n===1?'한 단어만 더 넣어 보세요. 예: 혼났어, 놀았어, 속상해':'필요하면 단어를 하나 더 넣어 보세요.';
-   }
-   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-   const next=document.querySelector('.screen[data-s="question"]');
-   if(next){next.classList.add('active');window.scrollTo(0,0);}
- });
-})();
-
-// Direct home start activation
-(function(){
-  const startBtn=document.getElementById('newActivity');
-  if(startBtn){
-    startBtn.disabled=false;
-    startBtn.removeAttribute('aria-disabled');
-    startBtn.style.pointerEvents='auto';
-    startBtn.addEventListener('click',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      if(typeof go==='function') go('input');
-      else {
-        document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-        const target=document.querySelector('.screen[data-s="input"]');
-        if(target){target.classList.add('active'); target.scrollIntoView({block:'start'});}
-      }
-    });
-  }
-})();
 </script></body></html>
