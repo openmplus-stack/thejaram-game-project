@@ -421,7 +421,7 @@ $("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return m
 $("#stopExpand").onclick=()=>{st.final=window.talktalkCurrentSentence||st.working;save();talktalkFinishActivity()};
 $("#finishSuggested").onclick=()=>{st.final=talktalkStoryText();save();talktalkFinishActivity()};
 $("#continueSuggested").onclick=()=>{const box=$("#completionChoice"),input=$("#expansion"),next=$("#applyExpand");if(box)box.classList.add("hidden");if(input){input.classList.remove("hidden");input.focus()}if(next)next.classList.remove("hidden");const q=talktalkChooseFollowup(talktalkStoryText());if(q){const state=talktalkQuestionState();state.current=q.id;if(!state.asked.includes(q.id))state.asked.push(q.id);$("#followupQuestion").textContent=q.q}else $("#followupQuestion").textContent="더 쓰고 싶은 내용을 말해 주세요."};
-$("#hint").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent="핵심 단어: "+st.originalInput+" · "+st.intent;st.support="C";save()};$("#difficult").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent=st.working;st.support="E";save()};
+$("#hint").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent="핵심 단어: "+st.originalInput+" · "+st.intent;st.support="C";talktalkActivityTrace().support.hintCount++;talktalkTrace("support_used",{kind:"hint"});save();talktalkPersistActivity()};$("#difficult").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent=st.working;st.support="E";save()};
 $("#toCorrection").onclick=()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=minCorrect(v);save();go("correction")};
 function minCorrect(s){let t=s.trim().replace(/\s+/g," ");if(t&&!/[.!?]$/.test(t))t+=".";return t}
 $("#acceptCorrection").onclick=()=>{st.final=$("#corrected").textContent;reward("self_correct");save();prepareRequest();go("aiRequest")};$("#keepOriginal").onclick=()=>{st.final=st.direct;save();prepareRequest();go("aiRequest")};
@@ -1412,7 +1412,7 @@ function talktalkUpdateCompletionUI(){
  if(!box)return status;
  if(status.complete){box.classList.remove("hidden");if(input)input.classList.add("hidden");if(next)next.classList.add("hidden")}
  else{box.classList.add("hidden");if(input)input.classList.remove("hidden");if(next)next.classList.remove("hidden")}
- const state=talktalkQuestionState();state.completion={...status,checkedAt:new Date().toISOString()};return status;
+ const state=talktalkQuestionState(),prev=state.completion;state.completion={...status,checkedAt:new Date().toISOString()};if(!prev||prev.complete!==status.complete||prev.score!==status.score)talktalkTrace("completion_checked",{complete:status.complete,score:status.score,type:status.type||talktalkWritingProfile().type,reason:status.reason});return status;
 }
 function talktalkChooseFollowup(sentence){
  const s=String(sentence||""),state=talktalkQuestionState(),asked=new Set(state.asked||[]),candidates=[],profile=talktalkWritingProfile();
