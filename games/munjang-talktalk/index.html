@@ -302,6 +302,8 @@ body:has(.learner-home.active) .progress{opacity:.35}
 </section>
 <section class="screen" data-s="input"><h2 class="q">무슨 말을 하고 싶어요?</h2><div class="mediaTabs"><button class="btn primary" data-media="text">⌨️ 글자로</button><button class="btn" data-media="voice">🎤 말하기</button><button class="btn" data-media="photo">📷 사진</button></div><div class="mediaPane active" data-pane="text"><textarea id="thought" placeholder="예: 공룡"></textarea></div><div class="mediaPane" data-pane="voice"><div class="voiceState" id="voiceState">마이크 버튼을 누르고 천천히 말해 주세요.</div><button class="btn primary" id="startVoice">🎤 말하기 시작</button> <button class="btn" id="stopVoice">■ 멈추기</button><div class="box"><b>인식된 말</b><textarea id="voiceTranscript" placeholder="인식 결과를 확인하고 잘못 들은 부분은 직접 고치세요."></textarea><button class="btn" id="listenTranscript">🔊 다시 듣기</button> <button class="btn primary" id="confirmVoice">이 말로 입력하기</button></div><p class="help">음성 인식이 지원되지 않으면 글자로 직접 입력할 수 있습니다.</p></div><div class="mediaPane" data-pane="photo"><input id="photoInput" type="file" accept="image/*" capture="environment"><div id="photoPreviewWrap" class="hidden"><img id="photoPreview" class="preview" alt="선택한 사진 미리보기"><div class="warning"><b>사진 속 내용은 아직 사실로 확정되지 않았어요.</b><br>AI의 관찰 후보는 내가 확인한 뒤에만 문장에 사용할 수 있습니다.</div><button class="btn" id="analyzePhoto">사진에서 보이는 것 찾기</button><div id="photoObservations"></div><div class="chips" id="confirmedPhotoFacts"></div></div></div><div class="nav"><button class="btn" data-go="home">←</button><button class="btn primary make-sentence-now" id="toIntent">✨ 문장 만들기</button></div></section>
 <section class="screen" data-s="intent"><div class="eyebrow">2. 표현 목적</div><h2 class="q">어떤 말을 하고 싶은가요?</h2><div class="choices" id="intentChoices"></div><div class="nav"><button class="btn" data-go="input">이전</button><button class="btn primary" id="toCandidates">문장 후보 보기</button></div></section>
+<section class="screen" data-s="curiosity"><div class="eyebrow">궁금한 것 찾기</div><h2 class="q" id="curiosityTitle">무엇이 궁금해요?</h2><div id="curiosityChoices"></div><div class="nav"><button class="btn" data-go="input">← 다른 주제 쓰기</button></div></section>
+<section class="screen" data-s="curiosityAnswer"><div class="eyebrow">답 알아보기</div><h2 class="q" id="curiosityQuestion"></h2><div id="curiosityAnswers"></div><div class="nav"><button class="btn" data-go="curiosity">← 다른 질문</button></div></section>
 <section class="screen" data-s="candidates"><div class="eyebrow">문장 고르기</div><h2 class="q">마음에 드는 문장을 골라요</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button><button class="btn candidate-dislike" id="dislikeCandidates">마음에 안 들어요 →</button></div></section>
 <section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
 <section class="screen" data-s="question"><div class="eyebrow">단어 하나 더</div><h2 class="q">생각나는 단어를 하나 더 넣어 보세요</h2><input id="extra" class="extra-word-input" autocomplete="off"><div class="nav"><button class="btn" data-go="candidates">← 이전 문장</button><button class="btn primary" id="applyExtra">다음 문장 3개 보기 →</button></div></section>
@@ -1171,6 +1173,45 @@ function talktalkEventType(a){
  if(a.result.some(x=>/(혼|울|다|억울)/.test(x))||a.action.some(x=>/(싸|때|밀|던)/.test(x)))return "conflict";
  if(a.object.some(x=>/(공룡|우주|동물|과학|역사)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
  return "event";
+}
+const TALK_CURIOSITY={
+ "공룡":{
+  questions:[
+   {q:"공룡은 왜 사라졌을까요?",answers:["약 6,600만 년 전 큰 소행성이 지구에 충돌했어요.","충돌 뒤 먼지와 연기가 햇빛을 가려 지구 환경이 크게 변했어요.","환경이 급격히 변하면서 많은 공룡이 살아남기 어려워졌어요."]},
+   {q:"공룡은 무엇을 먹었을까요?",answers:["공룡마다 먹이가 달랐어요.","어떤 공룡은 식물을 먹었어요.","어떤 공룡은 다른 동물을 먹었어요."]},
+   {q:"공룡은 얼마나 컸을까요?",answers:["공룡의 크기는 종류마다 아주 달랐어요.","사람보다 작은 공룡도 있었어요.","아주 큰 공룡은 몸길이가 수십 미터에 이르기도 했어요."]}
+  ]
+ }
+};
+function talktalkCuriosityQuestions(topic){
+ const item=TALK_CURIOSITY[topic];
+ if(item)return item.questions;
+ return [
+  {q:topic+"은 무엇일까요?",answers:[topic+"에 대해 먼저 뜻을 알아봐요."]},
+  {q:topic+"은 어떤 특징이 있을까요?",answers:[topic+"의 중요한 특징을 찾아봐요."]},
+  {q:topic+"에 대해 무엇을 더 알고 싶나요?",answers:[topic+"에서 가장 궁금한 것을 하나 골라 알아봐요."]}
+ ];
+}
+function talktalkShowCuriosity(topic){
+ window.talktalkCuriosityTopic=topic;
+ const qs=talktalkCuriosityQuestions(topic),box=document.getElementById("curiosityChoices");
+ document.getElementById("curiosityTitle").textContent=topic+"에 대해 무엇이 궁금해요?";
+ box.innerHTML=qs.map((x,i)=>'<button class="choice curiosity-q" data-q="'+i+'">'+(i+1)+'. '+x.q+'</button>').join("");
+ box.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>talktalkShowCuriosityAnswers(+b.dataset.q));
+ talktalkOpenScreen("curiosity");
+}
+function talktalkShowCuriosityAnswers(index){
+ const topic=window.talktalkCuriosityTopic,entry=talktalkCuriosityQuestions(topic)[index];window.talktalkCuriosityEntry=entry;
+ document.getElementById("curiosityQuestion").textContent=entry.q;
+ const box=document.getElementById("curiosityAnswers");
+ box.innerHTML=entry.answers.map((x,i)=>'<button class="choice curiosity-a" data-a="'+i+'">'+(i+1)+'. '+x+'</button>').join("");
+ box.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>talktalkChooseCuriosityAnswer(entry.answers[+b.dataset.a]));
+ talktalkOpenScreen("curiosityAnswer");
+}
+function talktalkChooseCuriosityAnswer(answer){
+ const topic=window.talktalkCuriosityTopic||"이 주제",q=window.talktalkCuriosityEntry?.q||"";
+ const sentence=q+" "+answer;
+ talktalkSaveChosenSentence(sentence,"궁금한 것");
 }
 function talktalkFirstCandidates(words){
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean),a=talktalkAnalyzeKeywords(ws),type=talktalkEventType(a);
