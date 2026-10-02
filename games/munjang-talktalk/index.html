@@ -1342,7 +1342,7 @@ function talktalkQuestionState(){
 function talktalkHasAny(s,patterns){return patterns.some(p=>p.test(s))}
 const TALK_LEADING_PATTERNS=[
  /먼저\s*(때렸|밀었|시작했|그랬).*\?/,/일부러.*\?/,/억울하게.*\?/,/잘못했지.*\?/,/거짓말.*했지.*\?/,
- /친구가.*했지.*\?/,/선생님이.*잘못.*\?/,/화나서.*했지.*\?/,/싫어서.*했지.*\?/
+ /친구가.*했지.*\?/,/선생님이.*잘못.*\?/,/화나서.*\?/,/싫어서.*\?/
 ];
 function talktalkNeutralizeQuestion(id,q){
  const text=String(q||"").trim(),leading=TALK_LEADING_PATTERNS.some(r=>r.test(text));
