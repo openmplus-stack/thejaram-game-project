@@ -1173,6 +1173,17 @@ function talktalkEventType(a){
  return "event";
 }
 function talktalkDailyCandidates(words){
+ const built=talktalkBuildConfirmedSentence(words),a=built.analysis;
+ if(a.action.length&&(a.place.length||a.person.length||a.object.length)){
+   const confirmed=built.sentences;
+   if(confirmed.length>=1){
+     let variants=[...confirmed];
+     if(a.place[0]&&a.person[0]&&a.action[0])variants.push("나는 "+talktalkJosa(a.place[0],"placeAt")+" "+talktalkJosa(a.person[0],"with")+" "+talktalkPolitePredicate(a.action[0])+".");
+     if(a.time[0]&&a.place[0]&&a.action[0])variants.push(a.time[0]+" "+talktalkJosa(a.place[0],"placeAt")+" "+talktalkPolitePredicate(a.action[0])+".");
+     return [...new Set(variants)].slice(0,3);
+   }
+ }
+
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean), place=ws.find(x=>talktalkRole(x)==="place"), person=ws.find(x=>talktalkRole(x)==="person"), event=ws.find(x=>talktalkRole(x)==="event"), thing=ws.find(x=>talktalkRole(x)==="thing");
  if(place&&person&&event){
    const ev=talktalkNormalizeVerb(event), base=place+"에서 "+talktalkWith(person,"과/와");
