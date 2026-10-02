@@ -323,15 +323,15 @@ body:has(.learner-home.active) .progress{opacity:.35}
 <script>
 (()=>{const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];let large=false;
 const intents=["경험","설명","생각","감정","질문","요구","주장","비교","예측·가정","문제해결","이야기"],stageOrder=["home","input","intent","candidates","confirm","question","expand","direct","correction","aiRequest","evaluate","discourse","dictionary","teacher","usability","adaptive","treasures","growth","report"];
-const defaults={current:"home",originalInput:"",intent:"생각",candidate:null,rejected:[],confirmed:[],working:"",direct:"",support:"A",final:"",request:"",evaluation:"",discourse:[],stars:0,xp:0,lastSaved:null,storyId:null};
+const defaults={current:"home",originalInput:"",intent:"생각",candidate:null,rejected:[],confirmed:[],working:"",direct:"",support:"A",final:"",request:"",evaluation:"",discourse:[],stars:0,xp:0,lastSaved:null,storyId:null,thoughtModel:null};
 let st;try{st=Object.assign({},defaults,JSON.parse(localStorage.getItem("talktalk_integrated_v1")||"{}"))}catch(e){st={...defaults}}
 function save(){st.lastSaved=new Date().toISOString();try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(e){if(st.media?.photo?.dataUrl){st.media.photo.dataUrl=null;try{localStorage.setItem("talktalk_integrated_v1",JSON.stringify(st))}catch(_){}}}if($("#resumeText"))$("#resumeText").textContent=st.originalInput?`“${st.originalInput}” 활동이 저장되어 있어요.`:"아직 진행 중인 활동이 없어요."}
 const screenLabels={home:"홈",input:"생각 입력",intent:"표현 목적",candidates:"문장 후보",confirm:"의도 확인",question:"추가 질문",expand:"문장 확장",direct:"직접 표현",correction:"최소 교정",aiRequest:"AI 요구",evaluate:"AI 결과 평가",discourse:"짧은 담화",dictionary:"문장사전",teacher:"교사용 누적 분석",usability:"사용성 테스트",adaptive:"맞춤 도움 설정",treasures:"이야기 보물 도감",growth:"펭귄 성장",report:"학습 결과"};
 function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=name;save();$$(".screen").forEach(x=>x.classList.toggle("active",x.dataset.s===name));const i=stageOrder.indexOf(name);const pct=Math.round(i/(stageOrder.length-1)*100);$("#bar").style.width=pct+"%";$(".progress").setAttribute("aria-valuenow",pct);$(".progress").setAttribute("aria-valuemin","0");$(".progress").setAttribute("aria-valuemax","100");$(".progress").setAttribute("aria-label",`${screenLabels[name]||name} 진행 ${pct}%`);$("#guide").textContent=name==="home"?"생각은 네가 만들고, 문장 톡톡은 그 생각이 문장이 되도록 도와줘요.":`${screenLabels[name]||""} · 한 번에 한 가지씩 진행합니다.`;if(name==="dictionary")renderLibrary();if(name==="teacher")renderTeacherAnalysis();if(name==="usability")renderUsability();if(name==="adaptive")renderAdaptive();if(name==="treasures")renderTreasureAtlas();applyAdaptiveToScreen(name);if(name==="growth")renderGrowth();if(name==="report")renderReport();window.scrollTo({top:0,behavior:"smooth"})}
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
-$("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);if(talktalkEventType(analysis)==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||parts[0];talktalkShowCuriosity(topic);return}if(talktalkNeedsEventClarification(analysis)){talktalkShowEventClarification(analysis);return}let daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
+$("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.thoughtModel=null;st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);talktalkSeedThoughtModel(analysis,v);if(talktalkEventType(analysis)==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||parts[0];talktalkShowCuriosity(topic);return}if(talktalkNeedsEventClarification(analysis)){talktalkShowEventClarification(analysis);return}let daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1302,6 +1302,39 @@ function talktalkChooseCuriosityAnswer(answer){
  const sentence=q+" "+answer;
  talktalkSaveChosenSentence(sentence,"궁금한 것");
 }
+function talktalkNewThoughtModel(rawInput=""){
+ return {schemaVersion:2,id:"tm-"+Date.now(),rawInput:String(rawInput||""),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),facts:[],relations:[],questions:[],status:"collecting"};
+}
+function talktalkThoughtModel(rawInput){
+ if(!st.thoughtModel||st.thoughtModel.schemaVersion!==2)st.thoughtModel=talktalkNewThoughtModel(rawInput||st.originalInput||"");
+ if(rawInput&&!st.thoughtModel.rawInput)st.thoughtModel.rawInput=rawInput;
+ return st.thoughtModel;
+}
+function talktalkAddFact(role,value,meta={}){
+ value=String(value||"").trim();if(!value)return null;
+ const m=talktalkThoughtModel(),phase=meta.phase||"event",source=meta.source||"child_choice";
+ const existing=m.facts.find(f=>f.role===role&&f.value===value&&f.phase===phase);
+ if(existing)return existing;
+ const fact={id:"f"+(m.facts.length+1),role,value,phase,source,questionId:meta.questionId||null,question:meta.question||null,answer:meta.answer||value,order:m.facts.length+1,confirmed:meta.confirmed!==false,at:new Date().toISOString()};
+ m.facts.push(fact);m.updatedAt=new Date().toISOString();save();return fact;
+}
+function talktalkAddRelation(fromRole,toRole,type,meta={}){
+ const m=talktalkThoughtModel(),rel={id:"r"+(m.relations.length+1),fromRole,toRole,type,fromPhase:meta.fromPhase||null,toPhase:meta.toPhase||null,source:meta.source||"system_structure",confirmed:meta.confirmed!==false,at:new Date().toISOString()};
+ if(!m.relations.some(x=>x.fromRole===rel.fromRole&&x.toRole===rel.toRole&&x.type===rel.type&&x.fromPhase===rel.fromPhase&&x.toPhase===rel.toPhase))m.relations.push(rel);
+ m.updatedAt=new Date().toISOString();save();return rel;
+}
+function talktalkRecordQuestion(id,text,choices,answer=null){
+ const m=talktalkThoughtModel();let q=m.questions.find(x=>x.id===id&&!x.answer);
+ if(!q){q={id,text,choices:(choices||[]).map(x=>Array.isArray(x)?x[0]:x),order:m.questions.length+1,askedAt:new Date().toISOString(),answer:null,answeredAt:null};m.questions.push(q)}
+ if(answer!==null){q.answer=answer;q.answeredAt=new Date().toISOString()}
+ m.updatedAt=new Date().toISOString();save();return q;
+}
+function talktalkSeedThoughtModel(a,rawInput){
+ st.thoughtModel=talktalkNewThoughtModel(rawInput||st.originalInput||"");
+ [["time","time"],["place","place"],["person","person"],["object","object"],["action","action"],["result","result"],["emotion","emotion"],["thought","thought"],["request","request"]].forEach(([role,key])=>(a[key]||[]).forEach(v=>talktalkAddFact(role,v,{source:"child_input",phase:"initial"})));
+ return st.thoughtModel;
+}
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();return {facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
@@ -1321,11 +1354,12 @@ function talktalkClarifiedSentence(place,obj,kind){
  if(kind==="lost")return "나는 "+at+" "+talktalkJosa(obj,"object")+" 잃어버렸어요.";
  return "";
 }
-function talktalkGuidedRender(question,choices,onChoose){
+function talktalkGuidedRender(question,choices,onChoose,questionId="guided"){
  const title=document.getElementById("eventClarifyTitle"),box=document.getElementById("eventClarifyChoices"),story=document.getElementById("guidedStoryBox");
  if(title)title.textContent=question;
+ talktalkRecordQuestion(questionId,question,choices);
  if(story){const text=(window.talktalkGuidedStory||[]).join(" ");story.textContent=text;story.classList.toggle("hidden",!text)}
- if(box){box.innerHTML=choices.map(([label,value],i)=>'<button class="choice guided-choice" data-i="'+i+'">'+label+'</button>').join("");box.querySelectorAll("[data-i]").forEach(btn=>btn.onclick=()=>onChoose(choices[+btn.dataset.i][1]))}
+ if(box){box.innerHTML=choices.map(([label,value],i)=>'<button class="choice guided-choice" data-i="'+i+'">'+label+'</button>').join("");box.querySelectorAll("[data-i]").forEach(btn=>btn.onclick=()=>{const picked=choices[+btn.dataset.i];talktalkRecordQuestion(questionId,question,choices,picked[0]);onChoose(picked[1],picked[0])})}
  talktalkOpenScreen("eventClarify");
 }
 function talktalkGuidedFinish(){
@@ -1338,26 +1372,33 @@ function talktalkGuidedFinish(){
  const x=document.getElementById("expansion");if(x)x.value="";
 }
 function talktalkGuidedAskAfter(){
- talktalkGuidedRender("그래서 어떻게 행동했어요?",TALK_GUIDED_AFTER,answer=>{
+ talktalkGuidedRender("그래서 어떻게 행동했어요?",TALK_GUIDED_AFTER,(answer,label)=>{
+   talktalkAddFact("followup_action",answer,{source:"child_choice",phase:"after_event",questionId:"after_action",question:"그래서 어떻게 행동했어요?",answer:label});
+   talktalkAddRelation("event","followup_action","next_action",{fromPhase:"event",toPhase:"after_event"});
    window.talktalkGuidedStory.push("나는 "+answer);
    talktalkGuidedFinish();
- });
+ },"after_action");
 }
 function talktalkGuidedAskEmotion(){
- talktalkGuidedRender("기분이 어땠어요?",TALK_GUIDED_EMOTIONS,answer=>{
+ talktalkGuidedRender("기분이 어땠어요?",TALK_GUIDED_EMOTIONS,(answer,label)=>{
+   talktalkAddFact("emotion",answer,{source:"child_choice",phase:"event_reaction",questionId:"event_emotion",question:"기분이 어땠어요?",answer:label});
+   talktalkAddRelation("event","emotion","emotional_response",{fromPhase:"event",toPhase:"event_reaction"});
    window.talktalkGuidedStory.push("나는 "+answer);
    talktalkGuidedAskAfter();
- });
+ },"event_emotion");
 }
 function talktalkShowEventClarification(a){
  const place=a.place[0]||"",obj=a.object[0]||"";
  window.talktalkGuidedStory=[];window.talktalkGuidedContext={place,obj};
  const actions=(TALK_EVERYDAY_OBJECT_ACTIONS[obj]||[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]]).slice(0,4);
- talktalkGuidedRender(obj+"로 무슨 일이 있었어요?",actions,kind=>{
+ talktalkGuidedRender(obj+"로 무슨 일이 있었어요?",actions,(kind,label)=>{
    const sentence=talktalkClarifiedSentence(place,obj,kind);
+   talktalkAddFact("event",kind,{source:"child_choice",phase:"event",questionId:"event_kind",question:obj+"로 무슨 일이 있었어요?",answer:label});
+   talktalkAddRelation("place","event","setting",{fromPhase:"initial",toPhase:"event"});
+   talktalkAddRelation("object","event","event_object",{fromPhase:"initial",toPhase:"event"});
    window.talktalkGuidedStory=[sentence];
    talktalkGuidedAskEmotion();
- });
+ },"event_kind");
 }
 function talktalkFirstCandidates(words){
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean),a=talktalkAnalyzeKeywords(ws),type=talktalkEventType(a);
