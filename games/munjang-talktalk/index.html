@@ -1481,6 +1481,34 @@ function talktalkConfirmationQuestion(model=null){
  if(n.target==="emotion")return {complete:false,type:m.storyType?.type||"experience",id:"emotion",targetRoles:["emotion"],question:n.question,label:"감정 확인",priority:n.priority,reason:n.reason,confirmationRule:n.rule};
  return null;
 }
+const TALK_COMPLETENESS_RULES={
+ experience:{minimum:[["event","action","result"]],strong:[["place","time"],["emotion"],["outcome","result"]]},
+ conflict:{minimum:[["event","action","result"],["person"]],strong:[["cause","before"],["otherReaction"],["outcome","result"],["emotion"]]},
+ problem:{minimum:[["event","problem","result"],["followup_action","attempt"],["outcome"]],strong:[["emotion"],["place","time"]]},
+ self_advocacy:{minimum:[["event","action","result","problem"],["request"]],strong:[["emotion"],["otherReaction"]]},
+ curiosity:{minimum:[["object","topic"],["curiosity_question","thought"]],strong:[["learned_fact"],["summary"]]}
+};
+function talktalkCompleteness(model=null){
+ const m=model||talktalkThoughtModel(),type=m.storyType?.type||"experience",rule=TALK_COMPLETENESS_RULES[type]||TALK_COMPLETENESS_RULES.experience;
+ const confirmation=talktalkNeedsConfirmation(m);
+ const present=group=>talktalkHasThought(m,group);
+ const minimumChecks=rule.minimum.map(roles=>({roles,present:present(roles)}));
+ const strongChecks=rule.strong.map(roles=>({roles,present:present(roles)}));
+ const minimumMet=minimumChecks.every(x=>x.present),strongMet=strongChecks.every(x=>x.present);
+ let level="insufficient",canCompose=false;
+ if(minimumMet&&!confirmation.needed){level=strongMet?"complete":"minimally_complete";canCompose=true}
+ const result={
+   type,level,canCompose,
+   minimumMet,strongMet,
+   blockedByConfirmation:confirmation.needed,
+   missingMinimum:minimumChecks.filter(x=>!x.present).map(x=>x.roles),
+   missingStrong:strongChecks.filter(x=>!x.present).map(x=>x.roles),
+   confirmationNeeds:confirmation.needs.map(x=>x.id),
+   reason:confirmation.needed?"확인되지 않은 의미 관계가 남아 있어 글을 확정하지 않습니다.":!minimumMet?"한 편의 글을 만들 핵심 정보가 아직 부족합니다.":strongMet?"핵심 정보와 확장 정보가 충분합니다.":"핵심 정보는 충분하며, 확인된 내용만으로 짧은 글을 만들 수 있습니다."
+ };
+ m.completenessState={...result,checkedAt:new Date().toISOString()};save();return result;
+}
+function talktalkCanCompose(model=null){return talktalkCompleteness(model).canCompose}
 function talktalkNextQuestion(model=null){
  const m=model||talktalkThoughtModel(),missing=talktalkFindMissingThoughts(m),type=missing.type;
  const confirmation=talktalkConfirmationQuestion(m);if(confirmation)return confirmation;
@@ -1626,8 +1654,8 @@ function talktalkNextQuestionSummary(model=null){
 function talktalkMissingSummary(model=null){
  const x=talktalkFindMissingThoughts(model);return {type:x.type,known:x.known.map(v=>v.label),missing:x.missing.map(v=>v.label),next:x.next?.label||null,complete:x.complete};
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m);return {storyType:m.storyType||null,relationState,confirmation,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
-window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m),completeness=talktalkCompleteness(m);return {storyType:m.storyType||null,relationState,confirmation,completeness,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE10={completeness:()=>talktalkCompleteness(),canCompose:()=>talktalkCanCompose()};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
