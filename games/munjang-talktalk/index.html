@@ -1509,6 +1509,46 @@ function talktalkCompleteness(model=null){
  m.completenessState={...result,checkedAt:new Date().toISOString()};save();return result;
 }
 function talktalkCanCompose(model=null){return talktalkCompleteness(model).canCompose}
+function talktalkSentenceEnd(value){
+ let v=talktalkPolitePredicate(String(value||"").trim());if(!v)return "";return /[.!?]$/.test(v)?v:v+".";
+}
+function talktalkBaseSentences(model=null,{allowIncomplete=false}={}){
+ const m=model||talktalkThoughtModel(),completeness=talktalkCompleteness(m);
+ if(!allowIncomplete&&!completeness.canCompose)return {canCompose:false,level:completeness.level,sentences:[],reason:completeness.reason,sources:[]};
+ const type=m.storyType?.type||"experience",time=talktalkFactValue(m,["time"]),place=talktalkFactValue(m,["place"]),
+       person=talktalkFactValue(m,["person"]),object=talktalkFactValue(m,["object","topic"]),
+       event=talktalkFactValue(m,["event","problem"]),action=talktalkFactValue(m,["followup_action","attempt"]),
+       outcome=talktalkFactValue(m,["outcome"]),request=talktalkFactValue(m,["request"]),
+       other=talktalkFactValue(m,["otherReaction"]),question=talktalkFactValue(m,["curiosity_question","thought"]),
+       learned=talktalkFactValue(m,["learned_fact"]),summary=talktalkFactValue(m,["summary"]);
+ const eventEmotion=talktalkLatestFact(m,["emotion"],["event_reaction","initial"])?.value||"",
+       postEmotion=talktalkLatestFact(m,["emotion"],["post_outcome"])?.value||"";
+ const sentences=[],sources=[];
+ const push=(text,roles)=>{text=String(text||"").replace(/\s+/g," ").trim();if(text){if(!/[.!?]$/.test(text))text+=".";sentences.push(text);sources.push({sentence:text,roles})}};
+ const context=[time,place?talktalkJosa(place,"placeAt"):""].filter(Boolean).join(" ");
+ if(type==="curiosity"){
+   if(object&&question)push(talktalkJosa(object,"topic")+" "+question+" 궁금해요",["object","curiosity_question"]);
+   else if(object)push(talktalkJosa(object,"topic")+" 궁금해요",["object"]);
+   if(learned&&!/^fact_\d$|^unknown$/.test(learned))push("알게 된 것은 "+talktalkSentenceEnd(learned).replace(/[.]$/,""),["learned_fact"]);
+   if(summary&&!["main","new","memory","more"].includes(summary))push(summary,["summary"]);
+ }else{
+   if(event){
+     let body="";
+     if(object&&/잃어버|안 가져|빌렸|빌려줬/.test(event))body=talktalkJosa(object,"object")+" "+talktalkPolitePredicate(event);
+     else if(person&&/싸웠|놀았/.test(event))body=talktalkJosa(person,"with")+" "+talktalkPolitePredicate(event);
+     else body=talktalkPolitePredicate(event);
+     push([context,body].filter(Boolean).join(" "),[...(time?["time"]:[]),...(place?["place"]:[]),...(object?["object"]:[]),"event"]);
+   }
+   if(eventEmotion)push(talktalkPolitePredicate(eventEmotion),["emotion:event_reaction"]);
+   if(action)push(talktalkPolitePredicate(action),["followup_action"]);
+   if(outcome)push(talktalkPolitePredicate(outcome),["outcome"]);
+   if(postEmotion)push(talktalkPolitePredicate(postEmotion),["emotion:post_outcome"]);
+   if(request)push(talktalkPolitePredicate(request),["request"]);
+   if(other)push(talktalkPolitePredicate(other),["otherReaction"]);
+ }
+ const unique=[],uniqueSources=[];sentences.forEach((s,i)=>{if(!unique.includes(s)){unique.push(s);uniqueSources.push(sources[i])}});
+ return {canCompose:true,level:completeness.level,type,sentences:unique,sources:uniqueSources,usesConfirmedFactsOnly:true};
+}
 function talktalkNextQuestion(model=null){
  const m=model||talktalkThoughtModel(),missing=talktalkFindMissingThoughts(m),type=missing.type;
  const confirmation=talktalkConfirmationQuestion(m);if(confirmation)return confirmation;
@@ -1654,8 +1694,8 @@ function talktalkNextQuestionSummary(model=null){
 function talktalkMissingSummary(model=null){
  const x=talktalkFindMissingThoughts(model);return {type:x.type,known:x.known.map(v=>v.label),missing:x.missing.map(v=>v.label),next:x.next?.label||null,complete:x.complete};
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m),completeness=talktalkCompleteness(m);return {storyType:m.storyType||null,relationState,confirmation,completeness,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
-window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE10={completeness:()=>talktalkCompleteness(),canCompose:()=>talktalkCanCompose()};
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m),completeness=talktalkCompleteness(m),baseText=talktalkBaseSentences(m);return {storyType:m.storyType||null,relationState,confirmation,completeness,baseText,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE10={completeness:()=>talktalkCompleteness(),canCompose:()=>talktalkCanCompose()};window.TALKTALK_STAGE11={baseSentences:()=>talktalkBaseSentences()};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
