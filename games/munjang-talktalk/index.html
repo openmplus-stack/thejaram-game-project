@@ -1349,6 +1349,45 @@ function talktalkQuestionSafetyLog(item){
  const state=talktalkQuestionState();state.safety=state.safety||[];
  if(item.changed)state.safety.push({at:new Date().toISOString(),id:item.id,blocked:item.original,replacement:item.q});
 }
+const TALK_WRITING_TYPES={
+ experience:{label:"생활 경험글",roles:["context","action","result","emotion"]},
+ incident:{label:"사건 설명글",roles:["before","action","reaction","result","emotion"]},
+ curiosity:{label:"궁금한 것 알아보기",roles:["question","fact","explanation","summary"]},
+ opinion:{label:"생각·주장글",roles:["opinion","reason","example","conclusion"]},
+ problem:{label:"문제해결글",roles:["problem","cause","attempt","help","result"]}
+};
+function talktalkWritingType(text,intent){
+ const s=String(text||"");
+ if(intent==="궁금한 것"||/궁금|왜 .*까요|알고 싶|무엇일까|어떻게 .*까/.test(s))return "curiosity";
+ if(/도와|불편|어려|문제|고장|잃어버|못 하|안 돼|어떻게 해야/.test(s))return "problem";
+ if(/생각해|좋다고|싫다고|찬성|반대|왜냐하면|의견/.test(s))return "opinion";
+ if(/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울/.test(s))return "incident";
+ return "experience";
+}
+function talktalkWritingProfile(){
+ const text=talktalkStoryText(),intent=window.talktalkActivityIntent||"생활문장",type=talktalkWritingType(text,intent);
+ window.talktalkWritingType=type;return {type,label:TALK_WRITING_TYPES[type].label,text};
+}
+function talktalkTypeQuestions(type,s,asked){
+ const out=[],add=(id,score,q)=>{if(!asked.has(id))out.push({id,score,q})};
+ if(type==="opinion"){
+   if(!/생각|좋다고|싫다고|찬성|반대/.test(s))add("opinion",100,"어떻게 생각해요?");
+   if(!/왜냐하면|때문|이유/.test(s))add("opinion_reason",95,"왜 그렇게 생각해요?");
+   add("opinion_example",75,"그렇게 생각한 일이 있었어요?");
+ }
+ if(type==="problem"){
+   if(!/불편|어려|문제|고장|잃어버|못 하|안 돼/.test(s))add("problem",100,"어떤 점이 어려워요?");
+   if(!/때문|해서|라서|왜냐하면/.test(s))add("problem_cause",92,"어떤 일이 있어서 어려워졌어요?");
+   if(!/해 봤|시도|먼저|말했|찾았|물어봤/.test(s))add("problem_attempt",88,"해결하려고 무엇을 해 봤어요?");
+   if(!/도와|필요|부탁/.test(s))add("problem_help",82,"어떤 도움이 필요해요?");
+ }
+ if(type==="experience"){
+   if(!/학교|교실|집|공원|놀이터|마트|버스|지하철|도서관/.test(s))add("experience_context",82,"어디에서 있었던 일이에요?");
+   if(!/했어요|갔어요|왔어요|먹었어요|봤어요|놀았어요/.test(s))add("experience_action",95,"무엇을 했어요?");
+   if(!/기뻤|좋았|속상|화가|무서|슬펐|재미있|신났/.test(s))add("emotion",65,"그때 어떤 기분이 들었어요?");
+ }
+ return out;
+}
 function talktalkCompletionStatus(){
  const text=talktalkStoryText(),sentences=window.talktalkStorySentences||[],qs=talktalkQuestionState(),intent=window.talktalkActivityIntent||"생활문장";
  const isKnowledge=intent==="궁금한 것";
