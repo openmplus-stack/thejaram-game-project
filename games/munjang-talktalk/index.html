@@ -1389,21 +1389,23 @@ function talktalkTypeQuestions(type,s,asked){
  return out;
 }
 function talktalkCompletionStatus(){
- const text=talktalkStoryText(),sentences=window.talktalkStorySentences||[],qs=talktalkQuestionState(),intent=window.talktalkActivityIntent||"생활문장";
- const isKnowledge=intent==="궁금한 것";
- if(isKnowledge){
+ const text=talktalkStoryText(),sentences=window.talktalkStorySentences||[],qs=talktalkQuestionState(),profile=talktalkWritingProfile(),type=profile.type;
+ const has=x=>talktalkHasAny(text,x);
+ let score=0,threshold=5,reason="글을 이해하려면 중요한 정보를 조금 더 모을 수 있어요.";
+ if(type==="curiosity"){
    const enough=sentences.length>=2||((qs.step||0)>=2&&text.length>=45);
-   return {complete:enough,score:enough?1:0,reason:enough?"질문과 핵심 설명이 모였어요.":"설명할 내용을 조금 더 모아 볼 수 있어요."};
+   return {complete:enough,score:enough?5:2,type,label:profile.label,reason:enough?"질문과 핵심 설명이 모였어요.":"설명할 내용을 조금 더 모아 볼 수 있어요."};
  }
- const conflict=talktalkHasAny(text,[/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울/]);
- const hasAction=talktalkHasAny(text,[/했어요|던졌|때렸|밀었|놀았|싸웠|장난|갔어요|왔어요/]);
- const hasOutcome=talktalkHasAny(text,[/혼났|울었|다쳤|그래서|그 결과|끝났|돌아갔|화해/]);
- const hasContext=talktalkHasAny(text,[/학교|교실|집|공원|놀이터|오늘|어제|시간|친구|선생님|엄마|아빠/]);
- const hasReaction=talktalkHasAny(text,[/그러자|친구가|상대방|선생님은|선생님이/]);
- const hasEmotion=talktalkHasAny(text,[/기뻤|좋았|속상|화가|무서|슬펐|억울|당황|걱정/]);
- let score=(hasAction?2:0)+(hasOutcome?2:0)+(hasContext?1:0)+(hasReaction?1:0)+(hasEmotion?1:0)+((qs.step||0)>=2?1:0);
- const threshold=conflict?6:5;
- return {complete:score>=threshold,score,reason:score>=threshold?"사건을 이해하는 데 필요한 내용이 충분히 모였어요.":"글을 이해하려면 중요한 정보를 조금 더 모을 수 있어요."};
+ if(type==="incident"){
+   score=(has([/했어요|던졌|때렸|밀었|놀았|싸웠|장난/])?2:0)+(has([/혼났|울었|다쳤|그래서|화해/])?2:0)+(has([/학교|교실|집|공원|친구|선생님/])?1:0)+(has([/그러자|친구가|상대방|선생님은|선생님이/])?1:0)+(has([/기뻤|속상|화가|무서|슬펐|억울|당황/])?1:0);threshold=6;
+ }else if(type==="problem"){
+   score=(has([/불편|어려|문제|고장|잃어버|못 하|안 돼/])?2:0)+(has([/해 봤|시도|말했|찾았|물어봤|도와/])?2:0)+(has([/해결|됐어요|괜찮|필요|부탁/])?2:0)+((qs.step||0)>=2?1:0);threshold=5;
+ }else if(type==="opinion"){
+   score=(has([/생각|좋다고|싫다고|찬성|반대/])?2:0)+(has([/왜냐하면|때문|이유/])?2:0)+((qs.step||0)>=2?1:0);threshold=5;
+ }else{
+   score=(has([/했어요|갔어요|왔어요|먹었어요|봤어요|놀았어요/])?2:0)+(has([/학교|교실|집|공원|마트|버스|도서관/])?1:0)+(has([/기뻤|좋았|속상|재미있|신났|무서/])?1:0)+((qs.step||0)>=2?1:0);threshold=4;
+ }
+ const complete=score>=threshold;return {complete,score,type,label:profile.label,reason:complete?"이 글에 필요한 핵심 내용이 충분히 모였어요.":reason};
 }
 function talktalkUpdateCompletionUI(){
  const status=talktalkCompletionStatus(),box=document.getElementById("completionChoice"),input=document.getElementById("expansion"),next=document.getElementById("applyExpand");
@@ -1413,8 +1415,9 @@ function talktalkUpdateCompletionUI(){
  const state=talktalkQuestionState();state.completion={...status,checkedAt:new Date().toISOString()};return status;
 }
 function talktalkChooseFollowup(sentence){
- const s=String(sentence||""),state=talktalkQuestionState(),asked=new Set(state.asked||[]),candidates=[];
+ const s=String(sentence||""),state=talktalkQuestionState(),asked=new Set(state.asked||[]),candidates=[],profile=talktalkWritingProfile();
  const add=(id,score,q)=>{if(!asked.has(id))candidates.push({id,score,q})};
+ talktalkTypeQuestions(profile.type,s,asked).forEach(x=>add(x.id,x.score,x.q));
  const conflict=talktalkHasAny(s,[/혼났/,/싸웠/,/다퉜/,/때렸/,/밀었/,/던졌/,/울었/,/다쳤/,/억울/]);
  const hasTime=talktalkHasAny(s,[/오늘|어제|아침|점심|저녁|밤|쉬는 시간|수업 시간|점심시간|방과 후|주말/]);
  const hasCause=talktalkHasAny(s,[/때문|해서|라서|니까|왜냐하면/]);
@@ -1440,7 +1443,7 @@ function talktalkPersistActivity(){
  const key='talktalk_sentence_dictionary',id=window.talktalkActivityId||(window.talktalkActivityId='activity-'+Date.now());
  let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
  const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],final=sentences.length?sentences.join(" "):(window.talktalkCurrentSentence||"");
- const organized=talktalkConnectStory(sentences);const entry={schemaVersion:3,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',initial:topic,final:organized.join(' '),sentences:[...sentences],organizedSentences:[...organized],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',questionHistory:JSON.parse(JSON.stringify(talktalkQuestionState())),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
+ const organized=talktalkConnectStory(sentences),profile=talktalkWritingProfile();const entry={schemaVersion:4,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',writingType:profile.type,writingTypeLabel:profile.label,initial:topic,final:organized.join(' '),sentences:[...sentences],organizedSentences:[...organized],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',questionHistory:JSON.parse(JSON.stringify(talktalkQuestionState())),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
  const idx=dict.findIndex(x=>x.id===id);if(idx>=0)dict[idx]=entry;else dict.unshift(entry);
  localStorage.setItem(key,JSON.stringify(dict));return entry;
 }
