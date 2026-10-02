@@ -398,7 +398,25 @@ function talktalkIntegrateAnswer(questionId,answer){
    else sentence=a+"에 있었던 일이에요.";
  }else if(questionId==="emotion"){
    sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkPolitePredicate(a)+".";
- }else if(questionId==="opinion"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="opinion_reason"){sentence=/왜냐하면|때문/.test(a)?talktalkEnsurePeriod(a):"그렇게 생각한 이유는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="opinion_example"){sentence=talktalkEnsurePeriod(a)\n }else if(questionId==="problem"){sentence=talktalkEnsurePeriod(a)\n }else if(questionId==="problem_cause"){sentence=/때문|해서|라서/.test(a)?talktalkEnsurePeriod(a):"어려워진 이유는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="problem_attempt"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a)\n }else if(questionId==="problem_help"){sentence=/도와|필요|부탁/.test(a)?talktalkEnsurePeriod(a):a+" 도움이 필요해요."\n }else if(questionId==="experience_context"){if(last){replacement=a+"에서 "+last.replace(/^나는\\s*/,"");mode="revise"}else sentence=a+"에서 있었던 일이에요."\n }else if(questionId==="experience_action"){sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkPolitePredicate(a)+"."\n }else if(questionId==="next_event"){
+ }else if(questionId==="opinion"){
+   sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a);
+ }else if(questionId==="opinion_reason"){
+   sentence=/왜냐하면|때문/.test(a)?talktalkEnsurePeriod(a):"그렇게 생각한 이유는 "+talktalkEnsurePeriod(a);
+ }else if(questionId==="opinion_example"){
+   sentence=talktalkEnsurePeriod(a);
+ }else if(questionId==="problem"){
+   sentence=talktalkEnsurePeriod(a);
+ }else if(questionId==="problem_cause"){
+   sentence=/때문|해서|라서/.test(a)?talktalkEnsurePeriod(a):"어려워진 이유는 "+talktalkEnsurePeriod(a);
+ }else if(questionId==="problem_attempt"){
+   sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkEnsurePeriod(a);
+ }else if(questionId==="problem_help"){
+   sentence=/도와|필요|부탁/.test(a)?talktalkEnsurePeriod(a):a+" 도움이 필요해요.";
+ }else if(questionId==="experience_context"){
+   if(last){replacement=a+"에서 "+last.replace(/^나는\s*/,"");mode="revise"}else sentence=a+"에서 있었던 일이에요.";
+ }else if(questionId==="experience_action"){
+   sentence=/^(나는|저는)/.test(a)?talktalkEnsurePeriod(a):"나는 "+talktalkPolitePredicate(a)+".";
+ }else if(questionId==="next_event"){
    sentence=talktalkEnsurePeriod(a);
  }else{
    sentence=talktalkEnsurePeriod(a);
