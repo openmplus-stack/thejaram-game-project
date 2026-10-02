@@ -287,6 +287,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 #candidateList .candidate{font-size:1.1em!important;font-weight:800!important;line-height:1.45!important;padding:18px 20px!important}
 #candidateList .candidate-more{display:block!important;margin:16px auto 0!important;font-size:1.02rem!important;font-weight:750!important;min-height:52px!important}
 #candidateList .candidate-none{margin-top:12px!important}
+.talktalk-v2-screen{max-width:760px;margin:0 auto}.thought-v2-summary{margin-bottom:28px}.thought-v2-summary .chips{margin-top:10px}.thought-v2-summary .chip{font-size:1.05rem;padding:9px 14px;background:#fff}.thought-v2-choices{gap:14px}.thought-v2-choices .choice{min-height:82px;padding:18px 20px;font-size:clamp(1.08rem,2.5vw,1.28rem);font-weight:800;text-align:center;display:flex;align-items:center;justify-content:center}.thought-v2-choices .choice:active{transform:scale(.99)}@media(max-width:700px){.thought-v2-choices .choice{min-height:72px}}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
@@ -305,6 +306,14 @@ body:has(.learner-home.active) .progress{opacity:.35}
 <section class="screen" data-s="curiosity"><div class="eyebrow">궁금한 것 찾기</div><h2 class="q" id="curiosityTitle">무엇이 궁금해요?</h2><div id="curiosityChoices"></div><div class="nav"><button class="btn" data-go="input">← 다른 주제 쓰기</button></div></section>
 <section class="screen" data-s="curiosityAnswer"><div class="eyebrow">답 알아보기</div><h2 class="q" id="curiosityQuestion"></h2><div id="curiosityAnswers"></div><div class="nav"><button class="btn" data-go="curiosity">← 다른 질문</button></div></section>
 <section class="screen" data-s="eventClarify"><div class="eyebrow">이야기 만들기</div><div class="box soft hidden" id="guidedStoryBox"></div><h2 class="q" id="eventClarifyTitle">무슨 일이 있었어요?</h2><div id="eventClarifyChoices" class="choices"></div><div class="nav"><button class="btn" data-go="input">← 처음으로</button></div></section>
+<section class="screen talktalk-v2-screen" data-s="thoughtQuestion">
+ <div class="eyebrow">내 생각 모으기</div>
+ <div class="box soft thought-v2-summary"><b>지금까지 말한 생각</b><div id="thoughtV2Chips" class="chips" aria-live="polite"></div></div>
+ <h2 class="q" id="thoughtV2Question">조금 더 이야기해 주세요.</h2>
+ <p class="help">내 생각과 가장 가까운 것을 하나 골라요.</p>
+ <div id="thoughtV2Choices" class="choices thought-v2-choices"></div>
+ <div class="nav"><button class="btn" id="thoughtV2Restart">← 처음부터</button><button class="btn hidden" id="thoughtV2Finish">내 글 보기 →</button></div>
+</section>
 <section class="screen" data-s="candidates"><div class="eyebrow">문장 고르기</div><h2 class="q">마음에 드는 문장을 골라요</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button><button class="btn candidate-dislike" id="dislikeCandidates">마음에 안 들어요 →</button></div></section>
 <section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
 <section class="screen" data-s="question"><div class="eyebrow">단어 하나 더</div><h2 class="q">생각나는 단어를 하나 더 넣어 보세요</h2><input id="extra" class="extra-word-input" autocomplete="off"><div class="nav"><button class="btn" data-go="candidates">← 이전 문장</button><button class="btn primary" id="applyExtra">다음 문장 3개 보기 →</button></div></section>
@@ -331,7 +340,7 @@ function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=n
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
 $("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.thoughtModel=null;st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);talktalkSeedThoughtModel(analysis,v);const storyClass=talktalkStoreStoryType(analysis,v);if(storyClass.type==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||parts[0];talktalkShowCuriosity(topic);return}if(analysis.place.length&&analysis.object.length&&talktalkInitialGuidedRoute(analysis))return;let daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어나 짧은 말을 넣어 주세요.");reward("input");talktalkV2Start(v)};
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1798,6 +1807,9 @@ function talktalkMissingSummary(model=null){
 }
 function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m),completeness=talktalkCompleteness(m),baseText=talktalkBaseSentences(m),naturalText=talktalkNaturalText(m),literacyLevels=talktalkAllLiteracyLevels(m);return {storyType:m.storyType||null,relationState,confirmation,completeness,baseText,naturalText,literacyLevels,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE10={completeness:()=>talktalkCompleteness(),canCompose:()=>talktalkCanCompose()};window.TALKTALK_STAGE11={baseSentences:()=>talktalkBaseSentences()};window.TALKTALK_STAGE12={naturalText:()=>talktalkNaturalText(),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE13={text:(level=2)=>talktalkLiteracyText(level),all:()=>talktalkAllLiteracyLevels()};
+document.getElementById("thoughtV2Restart")?.addEventListener("click",()=>{st.thoughtModel=null;save();talktalkOpenScreen("input")});
+document.getElementById("thoughtV2Finish")?.addEventListener("click",()=>{const made=talktalkLiteracyText(2);if(!made.canCompose)return talktalkV2Render();window.talktalkStorySentences=[...made.sentences];window.talktalkCurrentSentence=made.text;st.working=made.text;st.final=made.text;save();const w=document.getElementById("workingSentence");if(w)w.textContent=made.text;talktalkOpenScreen("expand")});
+window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
@@ -1805,6 +1817,29 @@ const TALK_EVERYDAY_OBJECT_ACTIONS={
 };
 const TALK_GUIDED_EMOTIONS=[["속상했어요","속상했어요"],["화가 났어요","화가 났어요"],["걱정됐어요","걱정됐어요"],["괜찮았어요","괜찮았어요"]];
 const TALK_GUIDED_AFTER=[["울었어요","울었어요"],["선생님께 말했어요","선생님께 말했어요"],["친구에게 말했어요","친구에게 말했어요"],["찾아봤어요","찾아봤어요"]];
+function talktalkV2VisibleFacts(m){
+ const hidden=new Set(["summary"]);return (m.facts||[]).filter(f=>f.confirmed!==false&&!hidden.has(f.role)&&String(f.value||"").trim()).map(f=>String(f.value).trim()).filter((v,i,a)=>a.indexOf(v)===i).slice(-8);
+}
+function talktalkV2Render(){
+ const m=talktalkThoughtModel(),q=talktalkPrepareNextChoiceQuestion(m),chips=document.getElementById("thoughtV2Chips"),title=document.getElementById("thoughtV2Question"),box=document.getElementById("thoughtV2Choices"),finish=document.getElementById("thoughtV2Finish");
+ if(chips){const vals=talktalkV2VisibleFacts(m);chips.innerHTML=vals.length?vals.map(v=>'<span class="chip confirmedFact">'+v+'</span>').join(""):'<span class="help">처음 말한 생각부터 모아 볼게요.</span>'}
+ if(q.complete){
+   const comp=talktalkCompleteness(m);if(title)title.textContent=comp.canCompose?"생각이 잘 모였어요.":"조금 더 생각을 모아 볼게요.";
+   if(box)box.innerHTML="";if(finish)finish.classList.toggle("hidden",!comp.canCompose);return comp.canCompose;
+ }
+ if(title)title.textContent=q.question;
+ if(finish)finish.classList.add("hidden");
+ if(box){box.innerHTML=(q.choices||[]).slice(0,4).map((choice,i)=>'<button class="choice" type="button" data-v2-choice="'+i+'">'+choice[0]+'</button>').join("");
+   box.querySelectorAll("[data-v2-choice]").forEach(btn=>btn.onclick=()=>{btn.disabled=true;talktalkApplyChoiceAnswer(q,q.choices[+btn.dataset.v2Choice],m);talktalkV2Render()});
+ }
+ talktalkOpenScreen("thoughtQuestion");return false;
+}
+function talktalkV2Start(raw){
+ const v=String(raw||"").trim();if(!v)return false;
+ const parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);
+ st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";
+ talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);save();talktalkV2Render();return true;
+}
 function talktalkAnalyzeCombinedInput(first,extra){return talktalkAnalyzeKeywords([...talktalkSplitInput(first||""),...talktalkSplitInput(extra||"")])}
 function talktalkInitialGuidedRoute(a){
  const place=a.place[0]||"",obj=a.object[0]||"",event=(a.result||[]).find(v=>/잃어버|혼났|다쳤|넘어졌|깨졌/.test(v))||(a.action||[])[0]||"";
