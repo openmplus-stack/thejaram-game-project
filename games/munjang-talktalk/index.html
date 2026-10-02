@@ -1099,6 +1099,34 @@ const TALK_FOLLOWUP_PRIORITY={
 function talktalkSplitInput(text){
  return String(text||"").split(/[,，\n\/]+/).map(x=>x.trim()).filter(Boolean);
 }
+function talktalkAnalyzeKeywords(words){
+ const result={time:[],place:[],person:[],object:[],action:[],cause:[],result:[],emotion:[],thought:[],otherReaction:[],request:[],unknown:[]};
+ const times=["오늘","어제","아침","점심","저녁","밤","쉬는 시간","수업 시간","점심시간","방과 후","주말"];
+ const emotions=["기뻐","기뻤어","좋아","좋았어","속상해","속상했어","화났어","무서워","무서웠어","슬퍼","슬펐어","억울해","억울했어","당황했어","걱정됐어"];
+ const results=["혼났어","칭찬받았어","울었어","다쳤어","넘어졌어","늦었어","젖었어","잃어버렸어","깨졌어","끝났어"];
+ const actions=["던졌어","때렸어","밀었어","잡았어","가져갔어","빌렸어","줬어","먹었어","마셨어","갔어","왔어","놀았어","싸웠어","말했어","물어봤어","도와줬어","도망갔어","기다렸어","샀어","읽었어","배웠어","봤어","만들었어"];
+ const allPlaces=Object.values(TALK_LIFE_WORLD).flatMap(x=>x.places||[]);
+ const allPeople=Object.values(TALK_LIFE_WORLD).flatMap(x=>x.people||[]);
+ for(const raw of words){
+  const w=String(raw||"").trim();if(!w)continue;
+  if(times.includes(w)||/(시간|때|아침|점심|저녁|오늘|어제)$/.test(w)){result.time.push(w);continue}
+  if(allPlaces.includes(w)||talktalkRole(w)==="place"){result.place.push(w);continue}
+  if(allPeople.includes(w)||talktalkRole(w)==="person"){result.person.push(w);continue}
+  if(emotions.some(x=>w.includes(x.replace("했어","")))){result.emotion.push(w);continue}
+  if(results.some(x=>w.includes(x.replace("했어","")))){result.result.push(w);continue}
+  if(actions.some(x=>w.includes(x.replace("했어","")))){result.action.push(w);continue}
+  if(/(때문|해서|라서|니까)$/.test(w)){result.cause.push(w);continue}
+  if(/(해줘|주세요|도와|그만|싫어|원해)$/.test(w)){result.request.push(w);continue}
+  result.object.push(w);
+ }
+ return result;
+}
+function talktalkEventType(a){
+ if(a.request.length)return "difficulty";
+ if(a.result.some(x=>/(혼|울|다|억울)/.test(x))||a.action.some(x=>/(싸|때|밀|던)/.test(x)))return "conflict";
+ if(a.object.some(x=>/(공룡|우주|동물|과학|역사)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
+ return "event";
+}
 function talktalkDailyCandidates(words){
  const ws=words.map(x=>String(x||"").trim()).filter(Boolean), place=ws.find(x=>talktalkRole(x)==="place"), person=ws.find(x=>talktalkRole(x)==="person"), event=ws.find(x=>talktalkRole(x)==="event"), thing=ws.find(x=>talktalkRole(x)==="thing");
  if(place&&person&&event){
