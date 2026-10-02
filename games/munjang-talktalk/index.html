@@ -1362,12 +1362,12 @@ function talktalkRecordQuestion(id,text,choices,answer=null){
 }
 function talktalkSeedThoughtModel(a,rawInput){
  st.thoughtModel=talktalkNewThoughtModel(rawInput||st.originalInput||"");
- [["time","time"],["place","place"],["person","person"],["object","object"],["action","action"],["result","result"],["emotion","emotion"],["thought","thought"],["request","request"]].forEach(([role,key])=>(a[key]||[]).forEach(v=>talktalkAddFact(role,v,{source:"child_input",phase:"initial"})));
+ [["time","time"],["place","place"],["person","person"],["object","object"],["action","action"],["result","result"],["thought","thought"],["request","request"]].forEach(([role,key])=>(a[key]||[]).forEach(v=>talktalkAddFact(role,v,{source:"child_input",phase:"initial"})));(a.emotion||[]).forEach(v=>talktalkAddFact("emotion",v,{source:"child_input",phase:"event_reaction"}));
  const event=(a.result||[]).find(v=>/잃어버|혼났|다쳤|넘어졌|깨졌/.test(v))||(a.action||[])[0]||null;
  if(event)talktalkAddFact("event",event,{source:"child_input",phase:"event"});
  if(event&&a.place.length)talktalkAddRelation("place","event","setting",{fromPhase:"initial",toPhase:"event",source:"input_analysis"});
  if(event&&a.object.length)talktalkAddRelation("object","event","event_object",{fromPhase:"initial",toPhase:"event",source:"input_analysis"});
- if(event&&a.emotion.length)talktalkAddRelation("event","emotion","emotional_response",{fromPhase:"event",toPhase:"initial",source:"input_analysis"});
+ if(event&&a.emotion.length)talktalkAddRelation("event","emotion","emotion_at_event",{fromPhase:"event",toPhase:"event_reaction",source:"input_analysis"});
  return st.thoughtModel;
 }
 const TALK_REQUIRED_THOUGHTS={
@@ -1523,21 +1523,54 @@ function talktalkSemanticValue(questionId,label,value){
  }
  return String(value??label??"").trim();
 }
+function talktalkLatestFact(m,roles,phases=null){
+ return [...(m.facts||[])].reverse().find(f=>f.confirmed!==false&&roles.includes(f.role)&&(!phases||phases.includes(f.phase)))||null;
+}
+function talktalkEmotionPhase(m){
+ const outcome=talktalkLatestFact(m,["outcome"],["outcome"]);
+ return outcome?"post_outcome":"event_reaction";
+}
+function talktalkRebuildSemanticRelations(model=null){
+ const m=model||talktalkThoughtModel();
+ const add=(fromRole,toRole,type,fromPhase,toPhase)=>talktalkAddRelation(fromRole,toRole,type,{fromPhase,toPhase,source:"semantic_relation_engine"});
+ const time=talktalkLatestFact(m,["time"]),place=talktalkLatestFact(m,["place"]),cause=talktalkLatestFact(m,["cause","before"]),
+       event=talktalkLatestFact(m,["event","problem"]),action=talktalkLatestFact(m,["followup_action","attempt"]),
+       outcome=talktalkLatestFact(m,["outcome"]),eventEmotion=talktalkLatestFact(m,["emotion"],["event_reaction","initial"]),
+       postEmotion=talktalkLatestFact(m,["emotion"],["post_outcome"]);
+ if(time&&event)add("time","event","time_of_event",time.phase,event.phase);
+ if(place&&event)add("place","event","setting",place.phase,event.phase);
+ if(cause&&event)add(cause.role,"event","cause_or_preceding_event",cause.phase,event.phase);
+ if(event&&action)add("event",action.role,"leads_to_action",event.phase,action.phase);
+ if(action&&outcome)add(action.role,"outcome","outcome_of_action",action.phase,outcome.phase);
+ else if(event&&outcome)add("event","outcome","event_outcome",event.phase,outcome.phase);
+ if(event&&eventEmotion)add("event","emotion","emotion_at_event",event.phase,eventEmotion.phase);
+ if(outcome&&postEmotion)add("outcome","emotion","emotion_after_outcome",outcome.phase,postEmotion.phase);
+ m.relationState={sequence:[
+   cause&&{role:cause.role,value:cause.value,phase:cause.phase},
+   event&&{role:event.role,value:event.value,phase:event.phase},
+   action&&{role:action.role,value:action.value,phase:action.phase},
+   outcome&&{role:outcome.role,value:outcome.value,phase:outcome.phase},
+   postEmotion&&{role:"emotion",value:postEmotion.value,phase:postEmotion.phase}
+ ].filter(Boolean),eventEmotion:eventEmotion?.value||null,postOutcomeEmotion:postEmotion?.value||null,updatedAt:new Date().toISOString()};
+ save();return m.relationState;
+}
 function talktalkApplyChoiceAnswer(question,choice,model=null){
  const m=model||talktalkThoughtModel(),label=Array.isArray(choice)?choice[0]:String(choice||""),rawValue=Array.isArray(choice)?choice[1]:choice;
- const map=TALK_ANSWER_ROLE_MAP[question.id]||{role:question.targetRoles?.[0]||question.id,phase:"event"};
+ const baseMap=TALK_ANSWER_ROLE_MAP[question.id]||{role:question.targetRoles?.[0]||question.id,phase:"event"};
+ const map={...baseMap};if(question.id==="emotion")map.phase=talktalkEmotionPhase(m);
  const value=talktalkSemanticValue(question.id,label,rawValue);
  talktalkRecordQuestion(question.id,question.question,question.choices||[],label);
  const fact=talktalkAddFact(map.role,value,{source:"child_choice",phase:map.phase,questionId:question.id,question:question.question,answer:label,confirmed:true});
  if(question.id==="attempt")talktalkAddRelation("event",map.role,"next_action",{fromPhase:"event",toPhase:map.phase,source:"child_choice"});
  else if(question.id==="outcome")talktalkAddRelation("followup_action",map.role,"outcome_of_action",{fromPhase:"after_event",toPhase:map.phase,source:"child_choice"});
- else if(question.id==="emotion")talktalkAddRelation("event",map.role,"emotional_response",{fromPhase:"event",toPhase:map.phase,source:"child_choice"});
+ else if(question.id==="emotion")talktalkAddRelation(map.phase==="post_outcome"?"outcome":"event",map.role,map.phase==="post_outcome"?"emotion_after_outcome":"emotion_at_event",{fromPhase:map.phase==="post_outcome"?"outcome":"event",toPhase:map.phase,source:"child_choice"});
  else if(question.id==="before")talktalkAddRelation(map.role,"event","precedes",{fromPhase:map.phase,toPhase:"event",source:"child_choice"});
  else if(question.id==="other_reaction")talktalkAddRelation("event",map.role,"other_person_response",{fromPhase:"event",toPhase:map.phase,source:"child_choice"});
  else if(question.id==="need")talktalkAddRelation("event",map.role,"expressed_need",{fromPhase:"event",toPhase:map.phase,source:"child_choice"});
  else if(question.id==="question")talktalkAddRelation("topic",map.role,"curiosity_about",{fromPhase:"learning",toPhase:map.phase,source:"child_choice"});
  else if(question.id==="fact")talktalkAddRelation("curiosity_question",map.role,"learned_from_question",{fromPhase:"learning",toPhase:map.phase,source:"child_choice"});
  m.updatedAt=new Date().toISOString();save();
+ talktalkRebuildSemanticRelations(m);
  const next=talktalkPrepareNextChoiceQuestion(m);
  return {saved:{role:map.role,value,phase:map.phase,factId:fact?.id||null,source:"child_choice"},next,complete:next.complete===true};
 }
@@ -1553,7 +1586,7 @@ function talktalkNextQuestionSummary(model=null){
 function talktalkMissingSummary(model=null){
  const x=talktalkFindMissingThoughts(model);return {type:x.type,known:x.known.map(v=>v.label),missing:x.missing.map(v=>v.label),next:x.next?.label||null,complete:x.complete};
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);return {storyType:m.storyType||null,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m);return {storyType:m.storyType||null,relationState,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
