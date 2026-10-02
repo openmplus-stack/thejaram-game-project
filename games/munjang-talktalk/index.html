@@ -1167,6 +1167,9 @@ function talktalkCanonicalToken(raw){
  let w=String(raw||"").trim().replace(/[.!?？！，,]+$/g,"");
  const fixed={"먹었어요":"먹었어","마셨어요":"마셨어","갔어요":"갔어","왔어요":"왔어","놀았어요":"놀았어","싸웠어요":"싸웠어","말했어요":"말했어","봤어요":"봤어","읽었어요":"읽었어","배웠어요":"배웠어","만들었어요":"만들었어","던졌어요":"던졌어","때렸어요":"때렸어","밀었어요":"밀었어","혼났어요":"혼났어","울었어요":"울었어","다쳤어요":"다쳤어","넘어졌어요":"넘어졌어","젖었어요":"젖었어","늦었어요":"늦었어","칭찬받았어요":"칭찬받았어","속상했어요":"속상했어","무서웠어요":"무서웠어","억울했어요":"억울했어","기뻤어요":"기뻤어","슬펐어요":"슬펐어","재미있었어요":"재미있었어","신났어요":"신났어","탔어요":"탔어","했어요":"했어"};
  if(fixed[w])return fixed[w];
+ if(/했어요$/.test(w))return w.replace(/했어요$/,"했어");
+ if(/었어요$/.test(w))return w.replace(/었어요$/,"었어");
+ if(/았어요$/.test(w))return w.replace(/았어요$/,"았어");
  return w;
 }
 function talktalkBareNoun(raw){
@@ -1229,11 +1232,12 @@ function talktalkAnalyzeKeywords(words){
  for(const raw of words){
   const original=String(raw||"").trim(),w=talktalkCanonicalToken(original),noun=talktalkBareNoun(original);if(!w)continue;
   if(times.includes(w)||/(시간|때|아침|점심|저녁|오늘|어제)$/.test(w)){result.time.push(w);continue}
+  if(/(을|를)$/.test(talktalkCanonicalToken(original))&&["버스","지하철","책","밥","급식","김밥","라면"].includes(noun)){result.object.push(noun);continue}
   if(allPlaces.includes(noun)||talktalkRole(noun)==="place"){result.place.push(noun);continue}
   if(allPeople.includes(noun)||talktalkRole(noun)==="person"){result.person.push(noun);continue}
   if(emotions.some(x=>w.includes(x.replace("했어","")))){result.emotion.push(w);continue}
   if(results.some(x=>w.includes(x.replace("했어","")))){result.result.push(w);continue}
-  if(actions.some(x=>w.includes(x.replace("했어","")))){result.action.push(w);continue}
+  if(actions.includes(w)||/했어$/.test(w)){result.action.push(w);continue}
   if(/(때문|해서|라서|니까)$/.test(w)){result.cause.push(w);continue}
   if(/(해줘|주세요|도와|그만|싫어|원해)/.test(w)){result.request.push(w);continue}
   result.object.push(noun||w);
