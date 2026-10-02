@@ -1370,7 +1370,7 @@ function talktalkWritingType(text,intent){
  if(/도와|불편|어려|문제|고장|잃어버|(?:^|[^잘])못\s|못\s*찾|못\s*묶|못\s*하|안 돼|어떻게 해야|그만해\s*주세요|다시\s*설명해\s*주세요/.test(s))return "problem";
  if(/생각해|생각은|생각이에요|좋다고|싫다고|찬성|반대|왜냐하면|의견|으면 좋겠|면 좋겠|바라요|원해요/.test(s))return "opinion";
  if(/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울|제가 한 것이 아니|내가 한 것이 아니|내 물건을 가져|때리지 마|밀지 마/.test(s))return "incident";
- if(/궁금|알고 싶|무엇일까|왜 .*?(까요|을까|일까)|어떻게 .*?(까|까요)/.test(s)||/^\\s*(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구)\\s*$/.test(s))return "curiosity";
+ if(/궁금|알고 싶|무엇일까|왜 .*?(까요|을까|일까)|어떻게 .*?(까|까요)/.test(s)||/^\s*(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구)\s*$/.test(s))return "curiosity";
  return "experience";
 }
 const TALK_REGRESSION_CASES=[
