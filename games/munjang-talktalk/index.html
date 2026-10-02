@@ -1424,7 +1424,7 @@ function talktalkRunRegressionTests(){
   {words:["말랑이","던졌어"],must:/말랑이를 던졌어요/,mustNot:/말랑이을/},
   {words:["공룡"],must:/공룡/,mustNot:/공룡은 더 알고 싶|왜 그런지/},
   {words:["학원","선생님"],must:/나는 학원에서 선생님을 만났어요/,mustNot:/선생님이 만났어요/},
-  {words:["학교","지우개"],must:/(?!)/,mustNot:/이야기를 하고 싶어요|궁금한 것이 있어요/}
+  {words:["학교","지우개"],must:/^$/,mustNot:/이야기를 하고 싶어요|궁금한 것이 있어요/}
  ].map(x=>{const out=talktalkFirstCandidates(x.words).join(" ");return {...x,out,pass:x.must.test(out)&&!x.mustNot.test(out)}});
  const failed=typeResults.filter(x=>!x.pass),neutralityFailed=neutrality.filter(x=>!x.pass),particleFailed=particles.filter(x=>!x.pass),candidateFailed=candidateCases.filter(x=>!x.pass);
  const tokenFailed=tokenCases.filter(x=>!x.pass),analysisFailed=analysisCases.filter(x=>!x.pass);return {version:"stage16-v2",total:typeResults.length+neutrality.length+particles.length+tokenCases.length+analysisCases.length+candidateCases.length,classificationTotal:typeResults.length,passed:typeResults.length-failed.length,failed,neutrality,neutralityFailed,particles,particleFailed,tokenCases,tokenFailed,analysisCases,analysisFailed,candidateCases,candidateFailed,ok:failed.length===0&&!neutralityFailed.length&&!particleFailed.length&&!tokenFailed.length&&!analysisFailed.length&&!candidateFailed.length};
