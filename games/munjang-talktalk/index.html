@@ -1663,7 +1663,8 @@ function talktalkNextQuestion(model=null){
    if(has(["object","topic"])&&!has(["curiosity_question","thought"]))chosen=candidates.find(x=>x.id==="question")||chosen;
    else if(has(["curiosity_question","thought"])&&!has(["learned_fact"]))chosen=candidates.find(x=>x.id==="fact")||chosen;
  }
- const text=TALK_NEXT_QUESTION_TEXT[type]?.[chosen.id]||"조금 더 이야기해 주세요.";
+ let text=TALK_NEXT_QUESTION_TEXT[type]?.[chosen.id]||"조금 더 이야기해 주세요.";
+ const object=talktalkFactValue(m,["object","topic"]);if(object&&(chosen.id==="event"||chosen.id==="problem"||chosen.id==="situation"))text=object+"로 무슨 일이 있었어요?";
  return {complete:false,type,id:chosen.id,targetRoles:[...chosen.roles],question:text,label:chosen.label,priority:chosen.priority,reason:"지금까지 확인된 생각 다음에 필요한 정보를 묻습니다."};
 }
 function talktalkFactValue(m,roles){
@@ -1704,7 +1705,7 @@ function talktalkChoiceSet(question,model=null){
 function talktalkPrepareNextChoiceQuestion(model=null){
  const m=model||talktalkThoughtModel(),q=talktalkNextQuestion(m);
  if(q.complete)return {...q,choices:[]};
- const set=talktalkChoiceSet(q,m);return {...q,choices:set.choices,choicesValid:set.valid,context:set.context};
+ const set=talktalkChoiceSet(q,m);if(!set.valid)throw new Error("질문 선택지 4개를 만들지 못했습니다: "+q.id);return {...q,choices:set.choices,choicesValid:true,context:set.context};
 }
 const TALK_ANSWER_ROLE_MAP={
  event:{role:"event",phase:"event"},problem:{role:"problem",phase:"event"},situation:{role:"event",phase:"event"},
@@ -1815,7 +1816,7 @@ function talktalkV2CompleteDone(){
 }
 document.getElementById("thoughtV2Restart")?.addEventListener("click",()=>{st.thoughtModel=null;save();talktalkOpenScreen("input")});
 document.getElementById("thoughtV2Finish")?.addEventListener("click",()=>talktalkV2ShowCompletion());document.getElementById("storyV2More")?.addEventListener("click",()=>talktalkV2Continue());document.getElementById("storyV2Done")?.addEventListener("click",()=>talktalkV2CompleteDone());
-window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};window.TALKTALK_STAGE15={show:()=>talktalkV2ShowCompletion(),more:()=>talktalkV2Continue(),done:()=>talktalkV2CompleteDone()};window.TALKTALK_STAGE16={process:()=>talktalkV2ProcessRecord(),save:()=>{const x=talktalkLiteracyText(2);return x.canCompose?talktalkSaveV2DictionaryEntry(x):null}};
+window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};window.TALKTALK_STAGE15={show:()=>talktalkV2ShowCompletion(),more:()=>talktalkV2Continue(),done:()=>talktalkV2CompleteDone()};window.TALKTALK_STAGE16={process:()=>talktalkV2ProcessRecord(),save:()=>{const x=talktalkLiteracyText(2);return x.canCompose?talktalkSaveV2DictionaryEntry(x):null}};window.TALKTALK_SMOKE={schoolEraser:()=>talktalkSmokeTestSchoolEraser()};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
@@ -1845,6 +1846,16 @@ function talktalkV2Start(raw){
  const parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);
  st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";
  talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);save();talktalkV2Render();return true;
+}
+function talktalkSmokeTestSchoolEraser(){
+ const backup=JSON.parse(JSON.stringify(st));
+ try{
+  const raw="학교 지우개",analysis=talktalkAnalyzeKeywords(talktalkSplitInput(raw));
+  st.thoughtModel=null;talktalkSeedThoughtModel(analysis,raw);talktalkStoreStoryType(analysis,raw);
+  const q=talktalkPrepareNextChoiceQuestion();
+  return {ok:analysis.place.includes("학교")&&analysis.object.includes("지우개")&&!q.complete&&q.choices?.length===4,analysis,question:q.question,choices:(q.choices||[]).map(x=>x[0]),storyType:st.thoughtModel?.storyType?.type||null};
+ }catch(error){return {ok:false,error:error?.message||String(error)}}
+ finally{Object.keys(st).forEach(k=>delete st[k]);Object.assign(st,backup);save()}
 }
 function talktalkBindV2Start(){
  const btn=$("#toIntent");if(!btn)return false;
