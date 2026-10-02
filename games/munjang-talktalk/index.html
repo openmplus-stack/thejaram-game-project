@@ -355,7 +355,7 @@ function talktalkBuildContinuation(sentence,answer){
  if(/혼났/.test(s)&&a)return {revised:s+" "+a+" 때문에 혼났어요.",next:"그 일은 언제 있었어요?"};
  return {revised:s+" "+a+"에 대한 일이 있었어요.",next:"그때 어떻게 되었어요?"};
 }
-$("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return msg("짧은 말이나 단어를 넣어 주세요.");let cur=window.talktalkCurrentSentence||st.working||"",r=talktalkBuildContinuation(cur,a);window.talktalkCurrentSentence=r.revised;window.talktalkStorySentences=window.talktalkStorySentences||[];window.talktalkStorySentences[window.talktalkStorySentences.length-1]=r.revised;st.working=r.revised;st.final=r.revised;reward("expand");save();talktalkPersistActivity();$("#workingSentence").textContent=r.revised;$("#followupQuestion").textContent=r.next;$("#expansion").value=""};
+$("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return msg("짧은 말이나 단어를 넣어 주세요.");let cur=window.talktalkCurrentSentence||st.working||"",qs=talktalkQuestionState(),qid=qs.current||"unknown";qs.answers[qid]=a;qs.step=(qs.step||0)+1;let r=talktalkBuildContinuation(cur,a);window.talktalkCurrentSentence=r.revised;window.talktalkStorySentences=window.talktalkStorySentences||[];window.talktalkStorySentences[window.talktalkStorySentences.length-1]=r.revised;st.working=r.revised;st.final=r.revised;reward("expand");save();talktalkPersistActivity();$("#workingSentence").textContent=r.revised;$("#followupQuestion").textContent=talktalkFollowupFor(r.revised);$("#expansion").value=""};
 $("#stopExpand").onclick=()=>{st.final=window.talktalkCurrentSentence||st.working;save();talktalkFinishActivity()};
 $("#hint").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent="핵심 단어: "+st.originalInput+" · "+st.intent;st.support="C";save()};$("#difficult").onclick=()=>{$("#hintBox").classList.remove("hidden");$("#hintBox").textContent=st.working;st.support="E";save()};
 $("#toCorrection").onclick=()=>{let v=$("#directText").value.trim();if(!v)return msg("내 말로 표현한 문장을 먼저 적어 주세요.");st.direct=v;reward("direct");$("#originalDirect").textContent=v;$("#corrected").textContent=minCorrect(v);save();go("correction")};
@@ -1291,7 +1291,7 @@ function talktalkPersistActivity(){
  const key='talktalk_sentence_dictionary',id=window.talktalkActivityId||(window.talktalkActivityId='activity-'+Date.now());
  let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
  const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],final=window.talktalkCurrentSentence||sentences.join(" ");
- const entry={schemaVersion:2,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',initial:topic,final,sentences:[...sentences],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
+ const entry={schemaVersion:2,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',initial:topic,final,sentences:[...sentences],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',questionHistory:JSON.parse(JSON.stringify(talktalkQuestionState())),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
  const idx=dict.findIndex(x=>x.id===id);if(idx>=0)dict[idx]=entry;else dict.unshift(entry);
  localStorage.setItem(key,JSON.stringify(dict));return entry;
 }
