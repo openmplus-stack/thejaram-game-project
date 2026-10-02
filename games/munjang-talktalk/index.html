@@ -353,7 +353,7 @@ function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=n
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
 $("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.thoughtModel=null;st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어나 짧은 말을 넣어 주세요.");reward("input");talktalkV2Start(v,window.__talktalkContext)};
+$("#thought").value=st.originalInput;
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1823,14 +1823,6 @@ const TALK_EVERYDAY_OBJECT_ACTIONS={
 };
 const TALK_GUIDED_EMOTIONS=[["속상했어요","속상했어요"],["화가 났어요","화가 났어요"],["걱정됐어요","걱정됐어요"],["괜찮았어요","괜찮았어요"]];
 const TALK_GUIDED_AFTER=[["울었어요","울었어요"],["선생님께 말했어요","선생님께 말했어요"],["친구에게 말했어요","친구에게 말했어요"],["찾아봤어요","찾아봤어요"]];
-document.addEventListener("click",function(e){
- const btn=e.target.closest("#toIntent");if(!btn)return;
- e.preventDefault();e.stopImmediatePropagation();
- const input=document.getElementById("thought"),v=String(input?.value||"").trim();
- if(!v){if(typeof window.msg==="function")window.msg("단어나 짧은 말을 넣어 주세요.");return}
- try{if(typeof window.reward==="function")window.reward("input");talktalkV2Start(v)}
- catch(err){console.error("TalkTalk 2.0 start failed",err);const note=document.getElementById("inputV2Error")||document.createElement("div");note.id="inputV2Error";note.className="warning";note.textContent="시작 오류: "+(err?.name||"Error")+" · "+(err?.message||String(err));btn.parentElement?.before(note)}
-},true);
 function talktalkV2VisibleFacts(m){
  const hidden=new Set(["summary"]);return (m.facts||[]).filter(f=>f.confirmed!==false&&!hidden.has(f.role)&&String(f.value||"").trim()).map(f=>String(f.value).trim()).filter((v,i,a)=>a.indexOf(v)===i).slice(-8);
 }
@@ -1854,6 +1846,18 @@ function talktalkV2Start(raw){
  st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";
  talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);save();talktalkV2Render();return true;
 }
+function talktalkBindV2Start(){
+ const btn=$("#toIntent");if(!btn)return false;
+ btn.onclick=()=>{
+   const note=$("#inputV2Error");if(note)note.remove();
+   const v=String($("#thought")?.value||"").trim();
+   if(!v)return msg("단어나 짧은 말을 넣어 주세요.");
+   try{reward("input");return talktalkV2Start(v)}
+   catch(err){console.error("TalkTalk 2.0 start failed",err);const n=document.createElement("div");n.id="inputV2Error";n.className="warning";n.textContent="시작 오류: "+(err?.name||"Error")+" · "+(err?.message||String(err));btn.parentElement?.before(n);return false}
+ };
+ return true;
+}
+talktalkBindV2Start();
 function talktalkAnalyzeCombinedInput(first,extra){return talktalkAnalyzeKeywords([...talktalkSplitInput(first||""),...talktalkSplitInput(extra||"")])}
 function talktalkInitialGuidedRoute(a){
  const place=a.place[0]||"",obj=a.object[0]||"",event=(a.result||[]).find(v=>/잃어버|혼났|다쳤|넘어졌|깨졌/.test(v))||(a.action||[])[0]||"";
