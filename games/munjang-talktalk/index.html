@@ -1260,15 +1260,32 @@ function talktalkOpenScreen(name){
  const target=document.querySelector('.screen[data-s="'+name+'"]');
  if(target){target.classList.add('active');window.scrollTo(0,0);return true}return false;
 }
+function talktalkQuestionState(){
+ return window.talktalkQuestionState||(window.talktalkQuestionState={asked:[],answers:{},step:0});
+}
+function talktalkHasAny(s,patterns){return patterns.some(p=>p.test(s))}
+function talktalkChooseFollowup(sentence){
+ const s=String(sentence||""),state=talktalkQuestionState(),asked=new Set(state.asked||[]),candidates=[];
+ const add=(id,score,q)=>{if(!asked.has(id))candidates.push({id,score,q})};
+ const conflict=talktalkHasAny(s,[/혼났/,/싸웠/,/다퉜/,/때렸/,/밀었/,/던졌/,/울었/,/다쳤/,/억울/]);
+ const hasTime=talktalkHasAny(s,[/오늘|어제|아침|점심|저녁|밤|쉬는 시간|수업 시간|점심시간|방과 후|주말/]);
+ const hasCause=talktalkHasAny(s,[/때문|해서|라서|니까|왜냐하면/]);
+ const hasReaction=talktalkHasAny(s,[/친구가 .*울|친구가 .*말|선생님이|엄마가|아빠가|상대가/]);
+ const hasEmotion=talktalkHasAny(s,[/기뻤|좋았|속상|화가|무서|슬펐|억울|당황|걱정/]);
+ if(/장난/.test(s)&&!talktalkHasAny(s,[/말랑이|공|장난감|카드|게임|놀이/]))add("what_play",100,"친구와 어떤 장난을 쳤어요?");
+ if(/장난/.test(s)&&talktalkHasAny(s,[/말랑이|공|장난감|카드/])&&!talktalkHasAny(s,[/던졌|굴렸|숨겼|빼앗|주고받|눌렀/]))add("how_play",98,"그것으로 어떻게 장난을 쳤어요?");
+ if(conflict&&!hasCause)add("before_or_cause",95,"그 일이 생기기 전에 무슨 일이 있었어요?");
+ if(talktalkHasAny(s,[/던졌|때렸|밀었/])&&!talktalkHasAny(s,[/세게|살살|갑자기|일부러|실수로/]))add("how_action",93,"어떻게 했어요?");
+ if(conflict&&!hasReaction)add("other_reaction",90,"그다음 상대방은 어떻게 했어요?");
+ if(!hasTime)add("time",72,"그 일은 언제 있었어요?");
+ if(conflict&&!hasEmotion)add("emotion",65,"그때 어떤 기분이 들었어요?");
+ add("next_event",40,"그다음에는 무슨 일이 있었어요?");
+ candidates.sort((x,y)=>y.score-x.score);return candidates[0];
+}
 function talktalkFollowupFor(sentence){
- const s=String(sentence||"");
- if(/장난/.test(s))return "친구와 어떤 장난을 쳤어요?";
- if(/싸워/.test(s))return "친구와 왜 싸우게 되었어요?";
- if(/혼났/.test(s))return "무슨 일이 있어서 혼났어요?";
- if(/울었/.test(s))return "왜 울게 되었어요?";
- if(/다쳤/.test(s))return "어떻게 다쳤어요?";
- if(/학교/.test(s))return "학교에서 언제 있었던 일이에요?";
- return "그때 무슨 일이 더 있었어요?";
+ const next=talktalkChooseFollowup(sentence);if(!next)return "그다음에는 무슨 일이 있었어요?";
+ const state=talktalkQuestionState();state.current=next.id;state.asked=state.asked||[];if(!state.asked.includes(next.id))state.asked.push(next.id);
+ return next.q;
 }
 function talktalkPersistActivity(){
  const key='talktalk_sentence_dictionary',id=window.talktalkActivityId||(window.talktalkActivityId='activity-'+Date.now());
@@ -1280,7 +1297,7 @@ function talktalkPersistActivity(){
 }
 function talktalkStartChosenSentence(sentence,intent){
  window.talktalkActivityId='activity-'+Date.now();window.talktalkActivityStarted=new Date().toISOString();window.talktalkActivityComplete=false;window.talktalkActivityIntent=intent||'생활문장';
- window.talktalkStorySentences=[sentence];window.talktalkCurrentSentence=sentence;
+ window.talktalkStorySentences=[sentence];window.talktalkCurrentSentence=sentence;window.talktalkQuestionState={asked:[],answers:{},step:0};
  talktalkPersistActivity();
  try{if(typeof reward==='function')reward('candidate')}catch(_){}
  const w=document.getElementById('workingSentence'),q=document.getElementById('followupQuestion'),x=document.getElementById('expansion');
