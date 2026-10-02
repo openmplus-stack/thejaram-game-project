@@ -1108,6 +1108,10 @@ window.TALKTALK_UX_V1={
 };
 
 updateHome();initStoryActivitySelector();save();if(st.current&&st.current!=="home")$("#resumeText").textContent=`${st.current} 단계까지 저장되어 있어요.`;go("home");aiFallback();
+Object.assign(window,{
+ st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,
+ completeSelectedStoryTreasure,showTreasureRevealQueue
+});
 })();
 document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;let txt=(b.textContent||"").trim();if(txt.includes("내가 말하려는 문장이 없어요")){let r=getUsabilityLog();r.push({type:"self_differentiation",screen:activeScreenName(),storyId:st.storyId||null,at:new Date().toISOString()});saveUsabilityLog(r)}setTimeout(()=>{let s=activeScreenName(),now=Date.now();if(s!==usabilityLastScreen){let r=getUsabilityLog();r.push({type:"screen_time",screen:usabilityLastScreen,seconds:Math.round((now-usabilityScreenStarted)/1000),at:new Date().toISOString()});saveUsabilityLog(r);usabilityLastScreen=s;usabilityScreenStarted=now}},30)});
 
