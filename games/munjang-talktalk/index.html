@@ -396,6 +396,8 @@ function talktalkIntegrateAnswer(questionId,answer){
    sentence=talktalkEnsurePeriod(a);
  }else if(questionId==="other_reaction"){
    sentence=/^(친구|선생님|엄마|아빠|그 아이|상대)/.test(a)?talktalkEnsurePeriod(a):"그다음 상대방은 "+talktalkPolitePredicate(a)+".";
+ }else if(questionId==="adult_words"){
+   sentence=/^선생님/.test(a)?talktalkEnsurePeriod(a):"선생님은 "+talktalkPolitePredicate(a)+".";
  }else if(questionId==="time"){
    if(last&&!/오늘|어제|아침|점심|저녁|밤|쉬는 시간|수업 시간|점심시간|방과 후|주말/.test(last)){replacement=a+"에 "+last.replace(/^나는\s*/,"");mode="revise"}
    else sentence=a+"에 있었던 일이에요.";
@@ -1358,6 +1360,7 @@ function talktalkChooseFollowup(sentence){
  if(conflict&&!hasCause)add("before_or_cause",95,"그 일이 생기기 전에 무슨 일이 있었어요?");
  if(talktalkHasAny(s,[/던졌|때렸|밀었/])&&!talktalkHasAny(s,[/세게|살살|갑자기|일부러|실수로/]))add("how_action",93,"어떻게 했어요?");
  if(conflict&&!hasReaction)add("other_reaction",90,"그다음 상대방은 어떻게 했어요?");
+ if(conflict&&/선생님/.test(s)&&!asked.has("adult_words"))add("adult_words",82,"선생님은 뭐라고 말했어요?");
  if(!hasTime)add("time",72,"그 일은 언제 있었어요?");
  if(conflict&&!hasEmotion)add("emotion",65,"그때 어떤 기분이 들었어요?");
  add("next_event",40,"그다음에는 무슨 일이 있었어요?");
