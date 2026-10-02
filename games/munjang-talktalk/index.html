@@ -417,7 +417,7 @@ function talktalkBuildContinuation(sentence,answer){
  const qs=talktalkQuestionState(),qid=qs.current||"unknown",r=talktalkIntegrateAnswer(qid,answer);
  return {revised:r.text,mode:r.mode,story:r.story};
 }
-$("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return msg("짧은 말이나 단어를 넣어 주세요.");let cur=window.talktalkCurrentSentence||st.working||"",qs=talktalkQuestionState(),qid=qs.current||"unknown";qs.answers[qid]=a;qs.step=(qs.step||0)+1;let r=talktalkBuildContinuation(cur,a);st.working=r.revised;st.final=r.revised;reward("expand");save();talktalkPersistActivity();$("#workingSentence").textContent=r.revised;$("#followupQuestion").textContent=talktalkFollowupFor(r.revised);$("#expansion").value="";talktalkUpdateCompletionUI()};
+$("#applyExpand").onclick=()=>{let a=$("#expansion").value.trim();if(!a)return msg("짧은 말이나 단어를 넣어 주세요.");let cur=window.talktalkCurrentSentence||st.working||"",qs=talktalkQuestionState(),qid=qs.current||"unknown";qs.answers[qid]=a;qs.step=(qs.step||0)+1;talktalkTrace("answer_given",{questionId:qid,question:talktalkCurrentQuestion().text,rawAnswer:a});let before=[...(window.talktalkStorySentences||[])],r=talktalkBuildContinuation(cur,a);talktalkTrace("answer_integrated",{questionId:qid,rawAnswer:a,mode:r.mode,before,after:[...(r.story||[])],resultText:r.revised});st.working=r.revised;st.final=r.revised;reward("expand");save();talktalkPersistActivity();$("#workingSentence").textContent=r.revised;$("#followupQuestion").textContent=talktalkFollowupFor(r.revised);$("#expansion").value="";talktalkUpdateCompletionUI()};
 $("#stopExpand").onclick=()=>{st.final=window.talktalkCurrentSentence||st.working;save();talktalkFinishActivity()};
 $("#finishSuggested").onclick=()=>{st.final=talktalkStoryText();save();talktalkFinishActivity()};
 $("#continueSuggested").onclick=()=>{const box=$("#completionChoice"),input=$("#expansion"),next=$("#applyExpand");if(box)box.classList.add("hidden");if(input){input.classList.remove("hidden");input.focus()}if(next)next.classList.remove("hidden");const q=talktalkChooseFollowup(talktalkStoryText());if(q){const state=talktalkQuestionState();state.current=q.id;if(!state.asked.includes(q.id))state.asked.push(q.id);$("#followupQuestion").textContent=q.q}else $("#followupQuestion").textContent="더 쓰고 싶은 내용을 말해 주세요."};
@@ -1436,7 +1436,7 @@ function talktalkChooseFollowup(sentence){
 }
 function talktalkFollowupFor(sentence){
  const next=talktalkChooseFollowup(sentence);if(!next)return "그다음에는 무슨 일이 있었어요?";
- const state=talktalkQuestionState();state.current=next.id;state.asked=state.asked||[];if(!state.asked.includes(next.id))state.asked.push(next.id);
+ const state=talktalkQuestionState();state.current=next.id;state.asked=state.asked||[];if(!state.asked.includes(next.id))state.asked.push(next.id);talktalkActivityTrace().support.promptCount++;talktalkTrace("question_asked",{questionId:next.id,question:next.q,writingType:talktalkWritingProfile().type});
  return next.q;
 }
 function talktalkActivityTrace(){
@@ -1468,7 +1468,8 @@ function talktalkPersistActivity(){
 }
 function talktalkStartChosenSentence(sentence,intent){
  window.talktalkActivityId='activity-'+Date.now();window.talktalkActivityStarted=new Date().toISOString();window.talktalkActivityComplete=false;window.talktalkActivityIntent=intent||'생활문장';
- window.talktalkStorySentences=[sentence];window.talktalkCurrentSentence=sentence;window.talktalkQuestionState={asked:[],answers:{},step:0};
+ window.talktalkStorySentences=[sentence];window.talktalkCurrentSentence=sentence;window.talktalkSelectedSentence=sentence;window.talktalkQuestionState={asked:[],answers:{},step:0};window.talktalkActivityTrace={version:1,events:[],support:{promptCount:0,hintCount:0,rephraseCount:0},startedAt:window.talktalkActivityStarted};
+ talktalkTrace('input',{text:(document.getElementById('thought')?.value||'').trim()});talktalkTrace('sentence_selected',{sentence,intent:window.talktalkActivityIntent});
  talktalkPersistActivity();
  try{if(typeof reward==='function')reward('candidate')}catch(_){}
  const w=document.getElementById('workingSentence'),q=document.getElementById('followupQuestion'),x=document.getElementById('expansion');
@@ -1476,7 +1477,7 @@ function talktalkStartChosenSentence(sentence,intent){
  talktalkOpenScreen('expand');talktalkUpdateCompletionUI();
 }
 function talktalkFinishActivity(){
- window.talktalkActivityComplete=true;talktalkPersistActivity();
+ window.talktalkActivityComplete=true;talktalkTrace("activity_completed",{final:talktalkStoryText(),completion:talktalkQuestionState().completion||null});talktalkPersistActivity();
  try{if(typeof reward==='function'){reward('complete');reward('dictionary_save')}}catch(_){}
  talktalkOpenScreen('home');
 }
