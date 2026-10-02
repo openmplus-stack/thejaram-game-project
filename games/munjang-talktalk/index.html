@@ -1148,6 +1148,9 @@ if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>inst
 <button type="button" data-go="growth"><span>🐧</span>성장</button>
 </nav>
 <script id="bottom-nav-fix">
+// Bridge the legacy app state into the 2.0 engine's lexical scope.
+const st=window.st,save=window.save,reward=window.reward,go=window.go,msg=window.msg,updateHome=window.updateHome,renderLibrary=window.renderLibrary,getDict=window.getDict,setDict=window.setDict,makeTags=window.makeTags,completeSelectedStoryTreasure=window.completeSelectedStoryTreasure,showTreasureRevealQueue=window.showTreasureRevealQueue;
+
 document.addEventListener("click",function(e){
  const btn=e.target.closest(".bottom-tabs button");if(!btn)return;
  e.preventDefault();e.stopPropagation();const target=btn.getAttribute("data-go");if(!target)return;
