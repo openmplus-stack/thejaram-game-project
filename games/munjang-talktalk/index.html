@@ -1220,30 +1220,30 @@ function talktalkBuildConfirmedSentence(words){
 }
 function talktalkAnalyzeKeywords(words){
  const result={time:[],place:[],person:[],object:[],action:[],cause:[],result:[],emotion:[],thought:[],otherReaction:[],request:[],unknown:[]};
- const times=["오늘","어제","아침","점심","저녁","밤","쉬는 시간","수업 시간","점심시간","방과 후","주말"];
- const emotions=["기뻐","기뻤어","좋아","좋았어","속상해","속상했어","화났어","무서워","무서웠어","슬퍼","슬펐어","억울해","억울했어","당황했어","걱정됐어"];
+ const times=["오늘","어제","아침","점심","저녁","밤","쉬는 시간","수업 시간","점심 시간","점심시간","방과 후","주말"];
+ const emotions=["기뻐","기뻤어","좋아","좋았어","속상해","속상했어","화났어","무서워","무서웠어","슬퍼","슬펐어","억울해","억울했어","당황했어","걱정됐어","재미있었어","신났어"];
  const results=["혼났어","칭찬받았어","울었어","다쳤어","넘어졌어","늦었어","젖었어","잃어버렸어","깨졌어","끝났어"];
- const actions=["던졌어","때렸어","밀었어","잡았어","가져갔어","빌렸어","줬어","먹었어","마셨어","갔어","왔어","놀았어","싸웠어","말했어","물어봤어","도와줬어","도망갔어","기다렸어","샀어","읽었어","배웠어","봤어","만들었어"];
+ const actions=["던졌어","때렸어","밀었어","잡았어","가져갔어","빌렸어","줬어","먹었어","마셨어","갔어","왔어","놀았어","싸웠어","말했어","물어봤어","도와줬어","도망갔어","기다렸어","샀어","읽었어","배웠어","봤어","만들었어","탔어","했어","그렸어","만났어","걸었어","수영했어","청소했어"];
  const allPlaces=Object.values(TALK_LIFE_WORLD).flatMap(x=>x.places||[]);
  const allPeople=Object.values(TALK_LIFE_WORLD).flatMap(x=>x.people||[]);
  for(const raw of words){
-  const w=String(raw||"").trim();if(!w)continue;
+  const original=String(raw||"").trim(),w=talktalkCanonicalToken(original),noun=talktalkBareNoun(original);if(!w)continue;
   if(times.includes(w)||/(시간|때|아침|점심|저녁|오늘|어제)$/.test(w)){result.time.push(w);continue}
-  if(allPlaces.includes(w)||talktalkRole(w)==="place"){result.place.push(w);continue}
-  if(allPeople.includes(w)||talktalkRole(w)==="person"){result.person.push(w);continue}
+  if(allPlaces.includes(noun)||talktalkRole(noun)==="place"){result.place.push(noun);continue}
+  if(allPeople.includes(noun)||talktalkRole(noun)==="person"){result.person.push(noun);continue}
   if(emotions.some(x=>w.includes(x.replace("했어","")))){result.emotion.push(w);continue}
   if(results.some(x=>w.includes(x.replace("했어","")))){result.result.push(w);continue}
   if(actions.some(x=>w.includes(x.replace("했어","")))){result.action.push(w);continue}
   if(/(때문|해서|라서|니까)$/.test(w)){result.cause.push(w);continue}
-  if(/(해줘|주세요|도와|그만|싫어|원해)$/.test(w)){result.request.push(w);continue}
-  result.object.push(w);
+  if(/(해줘|주세요|도와|그만|싫어|원해)/.test(w)){result.request.push(w);continue}
+  result.object.push(noun||w);
  }
  return result;
 }
 function talktalkEventType(a){
  if(a.request.length)return "difficulty";
  if(a.result.some(x=>/(혼|울|다|억울)/.test(x))||a.action.some(x=>/(싸|때|밀|던)/.test(x)))return "conflict";
- if(a.object.some(x=>/(공룡|우주|동물|과학|역사)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
+ if(a.object.some(x=>/(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
  return "event";
 }
 const TALK_CURIOSITY={
@@ -1370,7 +1370,7 @@ function talktalkWritingType(text,intent){
  if(/도와|불편|어려|문제|고장|잃어버|(?:^|[^잘])못\s|못\s*찾|못\s*묶|못\s*하|안 돼|어떻게 해야|그만해\s*주세요|다시\s*설명해\s*주세요/.test(s))return "problem";
  if(/생각해|생각은|생각이에요|좋다고|싫다고|찬성|반대|왜냐하면|의견|으면 좋겠|면 좋겠|바라요|원해요/.test(s))return "opinion";
  if(/혼났|싸웠|다퉜|때렸|밀었|던졌|울었|다쳤|억울|제가 한 것이 아니|내가 한 것이 아니|내 물건을 가져|때리지 마|밀지 마/.test(s))return "incident";
- if(/궁금|알고 싶|무엇일까|왜 .*?(까요|을까|일까)|어떻게 .*?(까|까요)/.test(s))return "curiosity";
+ if(/궁금|알고 싶|무엇일까|왜 .*?(까요|을까|일까)|어떻게 .*?(까|까요)/.test(s)||/^\\s*(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구)\\s*$/.test(s))return "curiosity";
  return "experience";
 }
 const TALK_REGRESSION_CASES=[
