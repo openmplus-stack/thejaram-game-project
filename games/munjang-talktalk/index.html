@@ -331,7 +331,7 @@ function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=n
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
 $("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.thoughtModel=null;st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);talktalkSeedThoughtModel(analysis,v);if(talktalkEventType(analysis)==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||parts[0];talktalkShowCuriosity(topic);return}if(analysis.place.length&&analysis.object.length&&talktalkInitialGuidedRoute(analysis))return;let daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어를 넣어 주세요.");st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";reward("input");save();let parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);talktalkSeedThoughtModel(analysis,v);const storyClass=talktalkStoreStoryType(analysis,v);if(storyClass.type==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||parts[0];talktalkShowCuriosity(topic);return}if(analysis.place.length&&analysis.object.length&&talktalkInitialGuidedRoute(analysis))return;let daily=talktalkDailyCandidates(parts);if(daily.length){let box=$("#candidateList");box.innerHTML=daily.map((s,i)=>`<button class="choice candidate" data-purpose="생활문장" data-sentence="${encodeURIComponent(s)}">${i+1}. ${s}</button>`).join("");go("candidates")}else{renderCandidates(0);go("candidates")}};
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1042,9 +1042,9 @@ $("#applyExtra").onclick=async()=>{
  st.extraWord=v;
  const combined=[...talktalkSplitInput(st.originalInput||""),...talktalkSplitInput(v)];
  const analysis=talktalkAnalyzeKeywords(combined);
- talktalkSeedThoughtModel(analysis,combined.join(" "));save();
+ talktalkSeedThoughtModel(analysis,combined.join(" "));const storyClass=talktalkStoreStoryType(analysis,combined.join(" "));save();
  if(analysis.place.length&&analysis.object.length&&talktalkInitialGuidedRoute(analysis))return;
- if(talktalkEventType(analysis)==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||combined[0];talktalkShowCuriosity(topic);return}
+ if(storyClass.type==="curiosity"){const topic=analysis.object.find(x=>TALK_CURIOSITY[x])||analysis.object[0]||combined[0];talktalkShowCuriosity(topic);return}
  const daily=talktalkDailyCandidates(combined);
  if(daily.length){const box=$("#candidateList");box.innerHTML=daily.map((s,i)=>'<button class="choice candidate" data-purpose="생활문장" data-sentence="'+encodeURIComponent(s)+'">'+(i+1)+'. '+s+'</button>').join("");go("candidates");return}
  await renderCandidatesAI();go("candidates");
@@ -1265,11 +1265,34 @@ function talktalkAnalyzeKeywords(words){
  }
  return result;
 }
-function talktalkEventType(a){
- if(a.request.length)return "difficulty";
- if(a.result.some(x=>/(혼|울|다|억울)/.test(x))||a.action.some(x=>/(싸|때|밀|던)/.test(x)))return "conflict";
- if(a.object.some(x=>/(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구)/.test(x))&&!a.action.length&&!a.result.length)return "curiosity";
- return "event";
+const TALK_STORY_TYPES={
+ experience:{label:"생활 경험",description:"일상에서 있었던 일을 말하는 이야기"},
+ conflict:{label:"갈등·사건",description:"사람 사이의 갈등이나 중요한 사건을 설명하는 이야기"},
+ problem:{label:"문제해결",description:"어려움이나 문제와 해결 과정을 말하는 이야기"},
+ self_advocacy:{label:"자기옹호",description:"싫음·도움·요구·거절처럼 자신의 필요를 표현하는 이야기"},
+ curiosity:{label:"호기심·학습",description:"궁금한 것을 질문하고 알아가는 이야기"}
+};
+function talktalkClassifyStory(a,rawText=""){
+ const text=talktalkNormalizeChildPhrase(rawText||"");
+ const joined=[...(a.action||[]),...(a.result||[]),...(a.request||[]),...(a.thought||[]),...(a.object||[])].join(" ");
+ const evidence=[];
+ const hit=(type,reason,confidence)=>({type,label:TALK_STORY_TYPES[type].label,reason,confidence,evidence:[...evidence,reason]});
+ if(/그만|하지 마|싫어|도와줘|도와주세요|주세요|원해|필요|말하고 싶|내가 할래|혼자 할래/.test(text+" "+joined))
+   return hit("self_advocacy","아동이 자신의 요구·거절·도움 필요를 표현했어요.","high");
+ if(/싸웠|다퉜|때렸|밀었|던졌|놀렸|괴롭|빼앗|혼났|억울|내 물건을 가져/.test(text+" "+joined))
+   return hit("conflict","갈등 행동이나 사건을 나타내는 표현이 있어요.","high");
+ if(/잃어버|못 찾|고장|길을 잃|어려|문제|안 돼|넘어졌|다쳤|없어/.test(text+" "+joined))
+   return hit("problem","해결이 필요한 문제나 어려움이 나타났어요.","high");
+ const curiosityTopic=(a.object||[]).some(x=>/(공룡|우주|동물|과학|역사|자동차|고양이|책|날씨|별|달|화산|고래|지구|무지개|비)/.test(x));
+ if(/궁금|알고 싶|왜\s|무엇|어떻게.*(까|까요)/.test(text)||curiosityTopic&&!(a.action||[]).length&&!(a.result||[]).length)
+   return hit("curiosity","궁금한 주제나 알아보고 싶은 내용이 있어요.","high");
+ return hit("experience","특별한 갈등·문제·요구 없이 생활 경험을 말하고 있어요.",text?"medium":"low");
+}
+function talktalkEventType(a,rawText=""){return talktalkClassifyStory(a,rawText).type}
+function talktalkStoreStoryType(a,rawText=""){
+ const classification=talktalkClassifyStory(a,rawText),m=talktalkThoughtModel(rawText);
+ m.storyType={...classification,classifiedAt:new Date().toISOString(),source:"input_analysis"};
+ m.updatedAt=new Date().toISOString();save();return classification;
 }
 const TALK_CURIOSITY={
  "공룡":{
@@ -1347,7 +1370,7 @@ function talktalkSeedThoughtModel(a,rawInput){
  if(event&&a.emotion.length)talktalkAddRelation("event","emotion","emotional_response",{fromPhase:"event",toPhase:"initial",source:"input_analysis"});
  return st.thoughtModel;
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();return {facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();return {storyType:m.storyType||null,facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
