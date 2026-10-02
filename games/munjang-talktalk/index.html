@@ -354,7 +354,7 @@ function go(name){currentTestScreen=name;screenEnteredAt=Date.now();st.current=n
 $$("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));$("#homeBtn").onclick=()=>go("home");$("#font").onclick=()=>{large=!large;document.documentElement.style.setProperty("--scale",large?"1.14":"1")};
 $("#resume").onclick=()=>go(st.current==="home"?(st.originalInput?"intent":"input"):st.current);
 $("#newActivity").onclick=()=>{st.activityId=`a-${Date.now()}`;st.originalInput="";st.thoughtModel=null;st.intent="생각";st.candidate=null;st.rejected=[];st.confirmed=[];st.working="";st.direct="";st.final="";st.request="";st.evaluation="";st.discourse=[];st.support="A";st.media={voice:{transcript:"",confirmed:false},photo:{dataUrl:null,observations:[],confirmedFacts:[],analysisStatus:"idle"}};["thought","voiceTranscript","extra","expansion","directText","requestContent","aiAnswer","nextSentence"].forEach(id=>{let el=$("#"+id);if(el)el.value=""});$("#photoPreviewWrap")?.classList.add("hidden");$("#photoObservations")&&( $("#photoObservations").innerHTML="");$("#confirmedPhotoFacts")&&( $("#confirmedPhotoFacts").innerHTML="");save();go("input")};
-$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어나 짧은 말을 넣어 주세요.");reward("input");talktalkV2Start(v)};
+$("#thought").value=st.originalInput;$("#toIntent").onclick=()=>{const v=$("#thought").value.trim();if(!v)return msg("단어나 짧은 말을 넣어 주세요.");reward("input");talktalkV2Start(v,window.__talktalkContext)};
 $("#intentChoices").innerHTML=intents.map(x=>`<button class="choice" data-intent="${x}">${x}</button>`).join("")+`<button class="choice" data-intent="잘 모르겠어요">잘 모르겠어요</button>`;
 $$("[data-intent]").forEach(b=>b.onclick=()=>{st.intent=b.dataset.intent;reward("intent");$$("[data-intent]").forEach(x=>x.classList.toggle("selected",x===b));save()});
 const purposeGroups=[["생각","감정","질문"],["요구","주장","비교"],["예측·가정","문제해결","이야기"],["경험","설명","질문"]];
@@ -1109,10 +1109,8 @@ window.TALKTALK_UX_V1={
 };
 
 updateHome();initStoryActivitySelector();save();if(st.current&&st.current!=="home")$("#resumeText").textContent=`${st.current} 단계까지 저장되어 있어요.`;go("home");aiFallback();
-Object.assign(window,{
- st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,
- completeSelectedStoryTreasure,showTreasureRevealQueue
-});
+window.__talktalkContext={st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,completeSelectedStoryTreasure,showTreasureRevealQueue};
+Object.assign(window,window.__talktalkContext);
 })();
 document.addEventListener("click",e=>{let b=e.target.closest("button");if(!b)return;let txt=(b.textContent||"").trim();if(txt.includes("내가 말하려는 문장이 없어요")){let r=getUsabilityLog();r.push({type:"self_differentiation",screen:activeScreenName(),storyId:st.storyId||null,at:new Date().toISOString()});saveUsabilityLog(r)}setTimeout(()=>{let s=activeScreenName(),now=Date.now();if(s!==usabilityLastScreen){let r=getUsabilityLog();r.push({type:"screen_time",screen:usabilityLastScreen,seconds:Math.round((now-usabilityScreenStarted)/1000),at:new Date().toISOString()});saveUsabilityLog(r);usabilityLastScreen=s;usabilityScreenStarted=now}},30)});
 
@@ -1150,7 +1148,7 @@ if(!window.matchMedia("(display-mode: standalone)").matches){setTimeout(()=>inst
 </nav>
 <script id="bottom-nav-fix">
 // Bridge the legacy app state into the 2.0 engine's lexical scope.
-const st=window.__talktalkState,save=window.save,reward=window.reward,go=window.go,msg=window.msg,updateHome=window.updateHome,renderLibrary=window.renderLibrary,getDict=window.getDict,setDict=window.setDict,makeTags=window.makeTags,completeSelectedStoryTreasure=window.completeSelectedStoryTreasure,showTreasureRevealQueue=window.showTreasureRevealQueue;
+const __ctx=window.__talktalkContext||{st:window.__talktalkState,save:window.save,reward:window.reward,go:window.go,msg:window.msg,updateHome:window.updateHome,renderLibrary:window.renderLibrary,getDict:window.getDict,setDict:window.setDict,makeTags:window.makeTags,completeSelectedStoryTreasure:window.completeSelectedStoryTreasure,showTreasureRevealQueue:window.showTreasureRevealQueue};const {st,save,reward,go,msg,updateHome,renderLibrary,getDict,setDict,makeTags,completeSelectedStoryTreasure,showTreasureRevealQueue}=__ctx;
 
 document.addEventListener("click",function(e){
  const btn=e.target.closest(".bottom-tabs button");if(!btn)return;
@@ -1890,11 +1888,13 @@ function talktalkV2Render(){
  }
  talktalkOpenScreen("thoughtQuestion");return false;
 }
-function talktalkV2Start(raw){
+function talktalkV2Start(raw,ctx=null){
  const v=String(raw||"").trim();if(!v)return false;
+ const live=ctx||window.__talktalkContext;if(!live||!live.st)throw new Error("앱 상태 연결 실패");
+ if(st!==live.st)throw new Error("2.0 상태 객체 불일치");
  const parts=talktalkSplitInput(v),analysis=talktalkAnalyzeKeywords(parts);
- st.originalInput=v;st.working=v;st.intent="생활문장";st.candidatePage=0;st.nextCandidatePage=1;st.extraWord="";
- talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);save();talktalkV2Render();return true;
+ live.st.originalInput=v;live.st.working=v;live.st.intent="생활문장";live.st.candidatePage=0;live.st.nextCandidatePage=1;live.st.extraWord="";
+ talktalkSeedThoughtModel(analysis,v);talktalkStoreStoryType(analysis,v);live.save();talktalkV2Render();return true;
 }
 function talktalkAnalyzeCombinedInput(first,extra){return talktalkAnalyzeKeywords([...talktalkSplitInput(first||""),...talktalkSplitInput(extra||"")])}
 function talktalkInitialGuidedRoute(a){
