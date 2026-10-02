@@ -1419,10 +1419,61 @@ function talktalkFindMissingThoughts(model=null){
  m.updatedAt=new Date().toISOString();save();
  return {type,label:TALK_STORY_TYPES[type]?.label||type,known,missing,next:missing[0]||null,complete:missing.length===0};
 }
+const TALK_NEXT_QUESTION_TEXT={
+ experience:{
+  event:"무슨 일이 있었어요?",context:"어디에서 있었던 일이에요?",emotion:"그때 기분이 어땠어요?",outcome:"그다음에는 어떻게 되었어요?"
+ },
+ conflict:{
+  event:"무슨 일이 있었어요?",people:"누구와 있었던 일이에요?",before:"그 일이 생기기 전에 무슨 일이 있었어요?",other_reaction:"그다음 상대방은 어떻게 했어요?",outcome:"그 뒤에는 어떻게 되었어요?",emotion:"그때 기분이 어땠어요?"
+ },
+ problem:{
+  problem:"어떤 문제가 생겼어요?",attempt:"해결하려고 어떻게 했어요?",outcome:"그래서 어떻게 되었어요?",emotion:"그때 기분이 어땠어요?"
+ },
+ self_advocacy:{
+  situation:"무슨 일이 있었어요?",need:"어떻게 해 주면 좋겠어요?",emotion:"그때 기분이 어땠어요?",other_reaction:"말한 뒤 상대방은 어떻게 했어요?"
+ },
+ curiosity:{
+  topic:"무엇이 궁금해요?",question:"무엇을 가장 알고 싶어요?",fact:"무엇을 알게 되었어요?",summary:"알게 된 것을 내 말로 말해 볼까요?"
+ }
+};
+function talktalkQuestionWasAnswered(m,id){
+ return (m.questions||[]).some(q=>q.id===id&&q.answer!==null&&q.answer!==undefined&&String(q.answer).trim()!=="");
+}
+function talktalkQuestionWasAskedUnanswered(m,id){
+ return (m.questions||[]).some(q=>q.id===id&&(q.answer===null||q.answer===undefined||String(q.answer).trim()===""));
+}
+function talktalkNextQuestion(model=null){
+ const m=model||talktalkThoughtModel(),missing=talktalkFindMissingThoughts(m),type=missing.type;
+ if(missing.complete)return {complete:true,type,question:null,reason:"필요한 핵심 생각이 모두 확인되었어요."};
+ let candidates=missing.missing.filter(x=>!talktalkQuestionWasAnswered(m,x.id));
+ // An unanswered question currently on screen should remain stable instead of jumping to another one.
+ const pending=candidates.find(x=>talktalkQuestionWasAskedUnanswered(m,x.id));
+ let chosen=pending||candidates[0]||missing.next;
+ if(!chosen)return {complete:true,type,question:null,reason:"더 물어볼 핵심 정보가 없어요."};
+ // Semantic transition rules override raw priority only when the preceding thought is already confirmed.
+ const has=roles=>talktalkHasThought(m,roles);
+ if(type==="problem"){
+   if(has(["event","problem","result"])&&!has(["followup_action","attempt"]))chosen=candidates.find(x=>x.id==="attempt")||chosen;
+   else if(has(["followup_action","attempt"])&&!has(["outcome"]))chosen=candidates.find(x=>x.id==="outcome")||chosen;
+ }else if(type==="conflict"){
+   if(has(["event","action","result"])&&!has(["cause","before"]))chosen=candidates.find(x=>x.id==="before")||chosen;
+   else if(has(["cause","before"])&&!has(["otherReaction"]))chosen=candidates.find(x=>x.id==="other_reaction")||chosen;
+ }else if(type==="self_advocacy"){
+   if(has(["event","action","result","problem"])&&!has(["request"]))chosen=candidates.find(x=>x.id==="need")||chosen;
+ }else if(type==="curiosity"){
+   if(has(["object","topic"])&&!has(["curiosity_question","thought"]))chosen=candidates.find(x=>x.id==="question")||chosen;
+   else if(has(["curiosity_question","thought"])&&!has(["learned_fact"]))chosen=candidates.find(x=>x.id==="fact")||chosen;
+ }
+ const text=TALK_NEXT_QUESTION_TEXT[type]?.[chosen.id]||"조금 더 이야기해 주세요.";
+ return {complete:false,type,id:chosen.id,targetRoles:[...chosen.roles],question:text,label:chosen.label,priority:chosen.priority,reason:"지금까지 확인된 생각 다음에 필요한 정보를 묻습니다."};
+}
+function talktalkNextQuestionSummary(model=null){
+ const q=talktalkNextQuestion(model);return q.complete?{complete:true,type:q.type,question:null}:{complete:false,type:q.type,id:q.id,question:q.question,targetRoles:q.targetRoles};
+}
 function talktalkMissingSummary(model=null){
  const x=talktalkFindMissingThoughts(model);return {type:x.type,known:x.known.map(v=>v.label),missing:x.missing.map(v=>v.label),next:x.next?.label||null,complete:x.complete};
 }
-function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m);return {storyType:m.storyType||null,missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
+function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkNextQuestion(m);return {storyType:m.storyType||null,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
