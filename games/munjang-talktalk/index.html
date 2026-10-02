@@ -829,17 +829,23 @@ window.TALKTALK_REWARD_SYSTEM={
  level:()=>currentLevel(),xp:()=>Number(st.xp)||0,treasureProgress:()=>getTreasureState().progress
 };
 
+function growthMetricOf(e){
+ const process=e.process||{},events=Array.isArray(process.events)?process.events:[],support=process.support||{};
+ const answers=events.filter(x=>x.type==="answer_given"),integrations=events.filter(x=>x.type==="answer_integrated"),questions=events.filter(x=>x.type==="question_asked");
+ const initial=String(e.initial||""),selected=String(e.selectedSentence||e.candidate||""),final=String(e.final||"");
+ const independentParts=talktalkSplitInput(initial).length||(/\S/.test(initial)?1:0);
+ const promptedParts=answers.filter(x=>String(x.rawAnswer||"").trim()).length;
+ const cause=/때문|해서|라서|니까|왜냐하면/.test(final);
+ const result=/그래서|그 결과|혼났|울었|다쳤|됐어요|끝났|화해/.test(final);
+ const time=/오늘|어제|아침|점심|저녁|밤|쉬는 시간|수업 시간|점심시간|방과 후|주말/.test(final);
+ const emotion=/기뻤|좋았|속상|화가|무서|슬펐|억울|당황|걱정|재미있|신났/.test(final);
+ const thought=/생각|느꼈|궁금|알았|바랐|원했/.test(final);
+ const connected=(e.organizedSentences||e.sentences||[]).length>=2||/그러자|그래서|그다음|하지만|그리고/.test(final);
+ return {independentParts,promptedParts,questions:questions.length,hints:Number(support.hintCount)||0,rephrases:Number(support.rephraseCount)||0,integrations:integrations.length,cause,result,time,emotion,thought,connected,hasTrace:!!e.process,selectedChanged:!!selected&&selected!==initial};
+}
 function metricOf(e){
- const m=e.metrics||{}, initial=(e.initial||""), final=(e.final||"");
- return {
-  confirmed:m.confirmedCount??(e.confirmedFacts||[]).length,
-  rejected:m.rejectedCount??(e.rejectedCount||0),
-  expanded:m.expanded??(final.length>initial.length+4),
-  direct:m.directAttempt??!!e.direct,
-  corrected:m.selfCorrection??!!(e.direct&&e.corrected&&e.direct!==e.corrected),
-  ai:m.aiRequest??!!e.request,
-  discourse:m.discourseCount??(e.sentences||[]).length
- }
+ const m=e.metrics||{},initial=(e.initial||""),final=(e.final||""),g=growthMetricOf(e);
+ return {confirmed:m.confirmedCount??(e.confirmedFacts||[]).length,rejected:m.rejectedCount??(e.rejectedCount||0),expanded:m.expanded??(final.length>initial.length+4),direct:m.directAttempt??!!e.direct,corrected:m.selfCorrection??!!(e.direct&&e.corrected&&e.direct!==e.corrected),ai:m.aiRequest??!!e.request,discourse:m.discourseCount??(e.sentences||[]).length,...g}
 }
 function pct(n,d){return d?Math.round(n/d*100):0}
 function escA(v){return String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
