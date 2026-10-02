@@ -1158,7 +1158,20 @@ const TALK_FOLLOWUP_PRIORITY={
  difficulty:["problem","cause","action","help","result","emotion"]
 };
 function talktalkSplitInput(text){
- return String(text||"").split(/[,，\n\/]+/).map(x=>x.trim()).filter(Boolean);
+ const s=String(text||"").trim();if(!s)return [];
+ const protectedPhrases=["쉬는 시간","수업 시간","점심 시간","점심시간","방과 후","그만해 주세요","다시 설명해 주세요","알고 싶어","알고 싶어요","하면 좋겠어","하면 좋겠어요"];
+ let work=s,keep=[];protectedPhrases.forEach(p=>{if(work.includes(p)){const key="__TT"+keep.length+"__";keep.push(p);work=work.split(p).join(key)}});
+ return work.split(/[,，\n\/\s]+/).map(x=>x.replace(/__TT(\d+)__/g,(_,n)=>keep[+n]||"").trim()).filter(Boolean);
+}
+function talktalkCanonicalToken(raw){
+ let w=String(raw||"").trim().replace(/[.!?？！，,]+$/g,"");
+ const fixed={"먹었어요":"먹었어","마셨어요":"마셨어","갔어요":"갔어","왔어요":"왔어","놀았어요":"놀았어","싸웠어요":"싸웠어","말했어요":"말했어","봤어요":"봤어","읽었어요":"읽었어","배웠어요":"배웠어","만들었어요":"만들었어","던졌어요":"던졌어","때렸어요":"때렸어","밀었어요":"밀었어","혼났어요":"혼났어","울었어요":"울었어","다쳤어요":"다쳤어","넘어졌어요":"넘어졌어","젖었어요":"젖었어","늦었어요":"늦었어","칭찬받았어요":"칭찬받았어","속상했어요":"속상했어","무서웠어요":"무서웠어","억울했어요":"억울했어","기뻤어요":"기뻤어","슬펐어요":"슬펐어","재미있었어요":"재미있었어","신났어요":"신났어","탔어요":"탔어","했어요":"했어"};
+ if(fixed[w])return fixed[w];
+ return w;
+}
+function talktalkBareNoun(raw){
+ let w=talktalkCanonicalToken(raw);
+ return w.replace(/(에게|한테|에서|으로|로|과|와|랑|이랑|을|를|은|는|이|가|에)$/,"");
 }
 // Korean sentence engine v2: particles, roles, predicates, and event links.
 function talktalkJosa(word,type){
