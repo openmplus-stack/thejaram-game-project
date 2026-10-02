@@ -288,6 +288,7 @@ body:has(.learner-home.active) .progress{opacity:.35}
 #candidateList .candidate-more{display:block!important;margin:16px auto 0!important;font-size:1.02rem!important;font-weight:750!important;min-height:52px!important}
 #candidateList .candidate-none{margin-top:12px!important}
 .talktalk-v2-screen{max-width:760px;margin:0 auto}.thought-v2-summary{margin-bottom:28px}.thought-v2-summary .chips{margin-top:10px}.thought-v2-summary .chip{font-size:1.05rem;padding:9px 14px;background:#fff}.thought-v2-choices{gap:14px}.thought-v2-choices .choice{min-height:82px;padding:18px 20px;font-size:clamp(1.08rem,2.5vw,1.28rem);font-weight:800;text-align:center;display:flex;align-items:center;justify-content:center}.thought-v2-choices .choice:active{transform:scale(.99)}@media(max-width:700px){.thought-v2-choices .choice{min-height:72px}}
+.story-v2-final{font-size:clamp(1.25rem,3vw,1.55rem);line-height:1.9;padding:24px;min-height:150px;display:flex;align-items:center}.story-v2-actions{margin-top:14px}.story-v2-actions .choice{min-height:76px;font-size:1.08rem;font-weight:800;text-align:center}.story-v2-actions .primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 </style></head><body><a href="#mainShell" class="hidden" id="skipLink">내용으로 바로가기</a><div class="app"><header><div class="brand"><div class="logo">💬</div><h1>문장 톡톡</h1></div><div><button class="btn" id="font">가 크게</button> <button class="btn" id="homeBtn">홈</button></div></header><div class="progress" role="progressbar"><div class="bar" id="bar"></div></div><main class="shell" id="mainShell" tabindex="-1"><section class="screen active learner-home" data-s="home">
 <div class="home-world">
  <div class="home-hero-art"><img id="homePenguin" class="penguin-img" src="assets/penguins/penguin-01-baby.png" alt="현재 성장 단계 펭귄"></div>
@@ -313,6 +314,18 @@ body:has(.learner-home.active) .progress{opacity:.35}
  <p class="help">내 생각과 가장 가까운 것을 하나 골라요.</p>
  <div id="thoughtV2Choices" class="choices thought-v2-choices"></div>
  <div class="nav"><button class="btn" id="thoughtV2Restart">← 처음부터</button><button class="btn hidden" id="thoughtV2Finish">내 글 보기 →</button></div>
+</section>
+<section class="screen talktalk-v2-screen" data-s="storyComplete">
+ <div class="eyebrow">내가 만든 이야기</div>
+ <h2 class="q">내 생각이 글이 되었어요.</h2>
+ <div class="box green story-v2-final" id="storyV2Final" aria-live="polite"></div>
+ <div class="box soft">
+   <b>어떻게 할까요?</b>
+   <div class="choices story-v2-actions">
+     <button class="choice" type="button" id="storyV2More">조금 더 이야기할래요</button>
+     <button class="choice primary" type="button" id="storyV2Done">여기서 끝낼래요</button>
+   </div>
+ </div>
 </section>
 <section class="screen" data-s="candidates"><div class="eyebrow">문장 고르기</div><h2 class="q">마음에 드는 문장을 골라요</h2><div id="candidateList"></div><div class="nav"><button class="btn" data-go="input">← 단어 바꾸기</button><button class="btn candidate-dislike" id="dislikeCandidates">마음에 안 들어요 →</button></div></section>
 <section class="screen" data-s="confirm"><div class="eyebrow">4. 확인·거절</div><h2 class="q">이 문장이 내가 하려던 말과 맞나요?</h2><div class="box green big" id="selectedSentence"></div><div class="choices"><button class="choice" data-confirm="yes">맞아요</button><button class="choice" data-confirm="close">조금 달라요</button><button class="choice" data-confirm="no">없어요</button></div></section>
@@ -1807,9 +1820,23 @@ function talktalkMissingSummary(model=null){
 }
 function talktalkThoughtSnapshot(){const m=talktalkThoughtModel();const missing=talktalkFindMissingThoughts(m),nextQuestion=talktalkPrepareNextChoiceQuestion(m);const relationState=talktalkRebuildSemanticRelations(m),confirmation=talktalkNeedsConfirmation(m),completeness=talktalkCompleteness(m),baseText=talktalkBaseSentences(m),naturalText=talktalkNaturalText(m),literacyLevels=talktalkAllLiteracyLevels(m);return {storyType:m.storyType||null,relationState,confirmation,completeness,baseText,naturalText,literacyLevels,nextQuestion:nextQuestion.complete?null:{id:nextQuestion.id,question:nextQuestion.question,targetRoles:nextQuestion.targetRoles,choices:nextQuestion.choices},missing:{known:missing.known.map(x=>x.id),missing:missing.missing.map(x=>x.id),next:missing.next?.id||null,complete:missing.complete},facts:m.facts.map(x=>({role:x.role,value:x.value,phase:x.phase,source:x.source,questionId:x.questionId})),relations:m.relations.map(x=>({from:x.fromRole,to:x.toRole,type:x.type})),questions:m.questions.map(x=>({id:x.id,text:x.text,answer:x.answer}))}}
 window.TALKTALK_STAGE7={next:()=>talktalkPrepareNextChoiceQuestion(),answer:i=>talktalkAnswerNextChoice(i),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE10={completeness:()=>talktalkCompleteness(),canCompose:()=>talktalkCanCompose()};window.TALKTALK_STAGE11={baseSentences:()=>talktalkBaseSentences()};window.TALKTALK_STAGE12={naturalText:()=>talktalkNaturalText(),snapshot:()=>talktalkThoughtSnapshot()};window.TALKTALK_STAGE13={text:(level=2)=>talktalkLiteracyText(level),all:()=>talktalkAllLiteracyLevels()};
+function talktalkV2ShowCompletion(){
+ const made=talktalkLiteracyText(2),box=document.getElementById("storyV2Final");if(!made.canCompose)return talktalkV2Render();
+ window.talktalkStorySentences=[...made.sentences];window.talktalkCurrentSentence=made.text;st.working=made.text;st.final=made.text;save();
+ if(box)box.textContent=made.text;talktalkOpenScreen("storyComplete");return true;
+}
+function talktalkV2Continue(){
+ const m=talktalkThoughtModel(),missing=talktalkFindMissingThoughts(m),optional=(missing.missing||[])[0];
+ if(optional){const q=talktalkNextQuestion(m);if(q&&!q.complete){talktalkV2Render();return}}
+ talktalkOpenScreen("input");const t=document.getElementById("thought");if(t){t.value=st.originalInput||"";t.focus()}
+}
+function talktalkV2CompleteDone(){
+ const made=talktalkLiteracyText(2);if(made.canCompose){st.working=made.text;st.final=made.text;st.confirmed=Array.from(new Set([...(st.confirmed||[]),...made.sentences]));save()}
+ if(typeof renderLibrary==="function")renderLibrary();talktalkOpenScreen("dictionary");
+}
 document.getElementById("thoughtV2Restart")?.addEventListener("click",()=>{st.thoughtModel=null;save();talktalkOpenScreen("input")});
-document.getElementById("thoughtV2Finish")?.addEventListener("click",()=>{const made=talktalkLiteracyText(2);if(!made.canCompose)return talktalkV2Render();window.talktalkStorySentences=[...made.sentences];window.talktalkCurrentSentence=made.text;st.working=made.text;st.final=made.text;save();const w=document.getElementById("workingSentence");if(w)w.textContent=made.text;talktalkOpenScreen("expand")});
-window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};
+document.getElementById("thoughtV2Finish")?.addEventListener("click",()=>talktalkV2ShowCompletion());document.getElementById("storyV2More")?.addEventListener("click",()=>talktalkV2Continue());document.getElementById("storyV2Done")?.addEventListener("click",()=>talktalkV2CompleteDone());
+window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};window.TALKTALK_STAGE15={show:()=>talktalkV2ShowCompletion(),more:()=>talktalkV2Continue(),done:()=>talktalkV2CompleteDone()};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
