@@ -1439,11 +1439,30 @@ function talktalkFollowupFor(sentence){
  const state=talktalkQuestionState();state.current=next.id;state.asked=state.asked||[];if(!state.asked.includes(next.id))state.asked.push(next.id);
  return next.q;
 }
+function talktalkActivityTrace(){
+ return window.talktalkActivityTrace||(window.talktalkActivityTrace={version:1,events:[],support:{promptCount:0,hintCount:0,rephraseCount:0},startedAt:new Date().toISOString()});
+}
+function talktalkTrace(type,data){
+ const trace=talktalkActivityTrace();trace.events.push({seq:trace.events.length+1,at:new Date().toISOString(),type,...(data||{})});return trace;
+}
+function talktalkCurrentQuestion(){
+ const qs=talktalkQuestionState(),id=qs.current||null;
+ const el=document.getElementById("followupQuestion");
+ return {id,text:el?el.textContent.trim():""};
+}
 function talktalkPersistActivity(){
  const key='talktalk_sentence_dictionary',id=window.talktalkActivityId||(window.talktalkActivityId='activity-'+Date.now());
  let dict=[];try{dict=JSON.parse(localStorage.getItem(key)||'[]')}catch(_){}
- const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],final=sentences.length?sentences.join(" "):(window.talktalkCurrentSentence||"");
- const organized=talktalkConnectStory(sentences),profile=talktalkWritingProfile();const entry={schemaVersion:4,id,date:window.talktalkActivityStarted||new Date().toISOString(),updatedAt:new Date().toISOString(),topic,intent:window.talktalkActivityIntent||'생활문장',writingType:profile.type,writingTypeLabel:profile.label,initial:topic,final:organized.join(' '),sentences:[...sentences],organizedSentences:[...organized],support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',questionHistory:JSON.parse(JSON.stringify(talktalkQuestionState())),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]};
+ const topic=(document.getElementById('thought')?.value||'').trim()||'내 글',sentences=window.talktalkStorySentences||[],organized=talktalkConnectStory(sentences),profile=talktalkWritingProfile(),trace=talktalkActivityTrace(),qs=talktalkQuestionState();
+ const entry={
+  schemaVersion:5,id,date:window.talktalkActivityStarted||trace.startedAt,updatedAt:new Date().toISOString(),
+  topic,intent:window.talktalkActivityIntent||'생활문장',writingType:profile.type,writingTypeLabel:profile.label,
+  initial:topic,selectedSentence:window.talktalkSelectedSentence||sentences[0]||"",final:organized.join(" "),
+  sentences:[...sentences],organizedSentences:[...organized],
+  process:{events:JSON.parse(JSON.stringify(trace.events)),support:JSON.parse(JSON.stringify(trace.support)),questionState:JSON.parse(JSON.stringify(qs))},
+  support:'자동 저장',status:window.talktalkActivityComplete?'complete':'in_progress',
+  questionHistory:JSON.parse(JSON.stringify(qs)),favorite:false,tags:[window.talktalkActivityIntent||'생활문장',topic]
+ };
  const idx=dict.findIndex(x=>x.id===id);if(idx>=0)dict[idx]=entry;else dict.unshift(entry);
  localStorage.setItem(key,JSON.stringify(dict));return entry;
 }
