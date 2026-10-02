@@ -1322,7 +1322,7 @@ function talktalkFirstCandidates(words){
  // 4) Sparse everyday input: natural but explicitly non-specific.
  if(place&&person&&!action&&!result){
    push("나는 "+talktalkJosa(place,"placeAt")+" "+talktalkJosa(person,"with")+" 함께 있었어요.");
-   push(talktalkJosa(place,"placeAt")+" "+talktalkJosa(person,"subject")+" 만났어요.");
+   push("나는 "+talktalkJosa(place,"placeAt")+" "+talktalkJosa(person,"object")+" 만났어요.");
  }
  if(obj&&!action&&!result&&type!=="curiosity"){
    push("나는 "+talktalkTopic(obj)+" 이야기를 하고 싶어요.");
@@ -1394,7 +1394,8 @@ function talktalkRunRegressionTests(){
   {words:talktalkSplitInput("학교 친구 혼났어"),must:/학교에서/,mustNot:/거북이이|친구과|학교이/},
   {words:["학교","친구","싸웠어"],must:/친구와 싸웠어요/,mustNot:/친구과/},
   {words:["말랑이","던졌어"],must:/말랑이를 던졌어요/,mustNot:/말랑이을/},
-  {words:["공룡"],must:/공룡/,mustNot:/공룡은 더 알고 싶|왜 그런지/}
+  {words:["공룡"],must:/공룡/,mustNot:/공룡은 더 알고 싶|왜 그런지/},
+  {words:["학원","선생님"],must:/나는 학원에서 선생님을 만났어요/,mustNot:/선생님이 만났어요/}
  ].map(x=>{const out=talktalkFirstCandidates(x.words).join(" ");return {...x,out,pass:x.must.test(out)&&!x.mustNot.test(out)}});
  const failed=typeResults.filter(x=>!x.pass),neutralityFailed=neutrality.filter(x=>!x.pass),particleFailed=particles.filter(x=>!x.pass),candidateFailed=candidateCases.filter(x=>!x.pass);
  const tokenFailed=tokenCases.filter(x=>!x.pass),analysisFailed=analysisCases.filter(x=>!x.pass);return {version:"stage16-v2",total:typeResults.length+neutrality.length+particles.length+tokenCases.length+analysisCases.length+candidateCases.length,classificationTotal:typeResults.length,passed:typeResults.length-failed.length,failed,neutrality,neutralityFailed,particles,particleFailed,tokenCases,tokenFailed,analysisCases,analysisFailed,candidateCases,candidateFailed,ok:failed.length===0&&!neutralityFailed.length&&!particleFailed.length&&!tokenFailed.length&&!analysisFailed.length&&!candidateFailed.length};
@@ -1519,11 +1520,23 @@ function talktalkFinishActivity(){
 }
 function talktalkSaveChosenSentence(sentence,intent){talktalkStartChosenSentence(sentence,intent)}
 document.addEventListener('click',function(e){
+ const dislike=e.target.closest('#dislikeCandidates');
+ if(dislike){
+  e.preventDefault();e.stopImmediatePropagation();
+  const box=document.getElementById('candidateList');
+  if(box&&typeof st!=='undefined'){
+   st.rejected=st.rejected||[];
+   box.querySelectorAll('[data-sentence]').forEach(b=>{try{st.rejected.push(decodeURIComponent(b.dataset.sentence))}catch(_){}});
+   try{if(typeof reward==='function')reward('reselect_none');if(typeof save==='function')save()}catch(_){}
+  }
+  const x=document.getElementById('extra');if(x){x.value='';x.placeholder='단어를 하나 더 넣어 보세요.'}
+  talktalkOpenScreen('question');return;
+ }
  const b=e.target.closest('#candidateList [data-sentence],#candidateList .fallback-candidate');
  if(!b)return;
  const sentence=b.dataset.sentence?decodeURIComponent(b.dataset.sentence):(b.textContent||'').replace(/^\s*\d+\.\s*/,'').trim();
  if(!sentence)return;
- e.preventDefault();e.stopPropagation();
+ e.preventDefault();e.stopImmediatePropagation();
  talktalkSaveChosenSentence(sentence,b.dataset.purpose||'생활문장');
 },true);
 
