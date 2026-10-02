@@ -470,7 +470,7 @@ function renderDiscourse(){$("#discourseList").innerHTML=st.discourse.map((x,i)=
 $("#addSentence").onclick=()=>{if(st.discourse.length>=3)return msg("짧은 글은 최대 3문장까지 만들어요.");let v=$("#nextSentence").value.trim();if(!v)return msg("이어질 문장을 적어 주세요.");if(!/[.!?]$/.test(v))v+=".";st.discourse.push(v);reward("discourse");$("#nextSentence").value="";renderDiscourse();save()};
 $("#saveSentence").onclick=()=>{let dict=getDict(),now=new Date().toISOString(),entry={schemaVersion:2,id:"b"+Date.now(),date:now,updatedAt:now,topic:st.originalInput||"내 문장",intent:st.intent||"생각",initial:st.originalInput||"",candidate:st.candidate||"",confirmedFacts:[...(st.confirmed||[])],rejectedCount:(st.rejected||[]).length,working:st.working||"",direct:st.direct||"",corrected:st.final||"",final:st.discourse.join(" ")||st.final||st.working||st.originalInput,sentences:[...(st.discourse||[])],support:st.support||"A",request:st.request||"",evaluation:st.evaluation||"",metrics:{confirmedCount:(st.confirmed||[]).length,rejectedCount:(st.rejected||[]).length,expanded:!!(st.working&&st.originalInput&&st.working.length>st.originalInput.length),directAttempt:!!st.direct,selfCorrection:!!(st.direct&&st.final&&st.direct!==st.final),aiRequest:!!st.request,discourseCount:(st.discourse||[]).length},favorite:false,tags:makeTags(st.originalInput,st.intent),reuseCount:0};dict.unshift(entry);setDict(dict);reward("complete");reward("dictionary_save");st.final=entry.final;save();updateHome();let newly=completeSelectedStoryTreasure(entry);if(newly.length)showTreasureRevealQueue(newly,()=>go("dictionary"));else go("dictionary")};
 function makeTags(topic,intent){let a=[intent];String(topic||"").split(/[\s,./]+/).filter(x=>x.length>=2).slice(0,3).forEach(x=>a.push(x));return [...new Set(a.filter(Boolean))]}
-function normalizeEntry(x){return {schemaVersion:x.schemaVersion||1,id:x.id||("legacy-"+Math.random().toString(36).slice(2)),date:x.date||new Date().toISOString(),updatedAt:x.updatedAt||x.date||new Date().toISOString(),topic:x.topic||x.initial||"내 문장",intent:x.intent||"생각",writingType:x.writingType||"",writingTypeLabel:x.writingTypeLabel||"",initial:x.initial||x.topic||"",selectedSentence:x.selectedSentence||x.candidate||"",candidate:x.candidate||x.selectedSentence||"",confirmedFacts:Array.isArray(x.confirmedFacts)?x.confirmedFacts:[],rejectedCount:Number(x.rejectedCount)||0,working:x.working||"",direct:x.direct||"",corrected:x.corrected||"",final:x.final||"",sentences:Array.isArray(x.sentences)?x.sentences:(x.final?[x.final]:[]),organizedSentences:Array.isArray(x.organizedSentences)?x.organizedSentences:[],process:x.process&&typeof x.process==="object"?x.process:null,support:x.support||"기록 없음",request:x.request||"",evaluation:x.evaluation||"",favorite:!!x.favorite,tags:Array.isArray(x.tags)?x.tags:makeTags(x.topic,x.intent),reuseCount:Number(x.reuseCount)||0}}
+function normalizeEntry(x){return {schemaVersion:x.schemaVersion||1,id:x.id||("legacy-"+Math.random().toString(36).slice(2)),date:x.date||new Date().toISOString(),updatedAt:x.updatedAt||x.date||new Date().toISOString(),topic:x.topic||x.initial||"내 문장",intent:x.intent||"생각",writingType:x.writingType||"",writingTypeLabel:x.writingTypeLabel||"",initial:x.initial||x.topic||"",selectedSentence:x.selectedSentence||x.candidate||"",candidate:x.candidate||x.selectedSentence||"",confirmedFacts:Array.isArray(x.confirmedFacts)?x.confirmedFacts:[],rejectedCount:Number(x.rejectedCount)||0,working:x.working||"",direct:x.direct||"",corrected:x.corrected||"",final:x.final||"",sentences:Array.isArray(x.sentences)?x.sentences:(x.final?[x.final]:[]),organizedSentences:Array.isArray(x.organizedSentences)?x.organizedSentences:[],process:x.process&&typeof x.process==="object"?x.process:null,process2:x.process2&&typeof x.process2==="object"?x.process2:null,support:x.support||"기록 없음",request:x.request||"",evaluation:x.evaluation||"",favorite:!!x.favorite,tags:Array.isArray(x.tags)?x.tags:makeTags(x.topic,x.intent),reuseCount:Number(x.reuseCount)||0}}
 function getDict(){try{return JSON.parse(localStorage.getItem("talktalk_sentence_dictionary")||"[]").map(normalizeEntry)}catch(e){return[]}}
 function setDict(d){localStorage.setItem("talktalk_sentence_dictionary",JSON.stringify(d))}
 let dictView={query:"",intent:"전체",sort:"new",open:null};
@@ -867,17 +867,18 @@ window.TALKTALK_REWARD_SYSTEM={
 
 function growthMetricOf(e){
  const process=e.process||{},events=Array.isArray(process.events)?process.events:[],support=process.support||{};
+ const p2=e.process2&&e.process2.version==="2.0"?e.process2:null;
  const answers=events.filter(x=>x.type==="answer_given"),integrations=events.filter(x=>x.type==="answer_integrated"),questions=events.filter(x=>x.type==="question_asked");
  const initial=String(e.initial||""),selected=String(e.selectedSentence||e.candidate||""),final=String(e.final||"");
- const independentParts=talktalkSplitInput(initial).length||(/\S/.test(initial)?1:0);
- const promptedParts=answers.filter(x=>String(x.rawAnswer||"").trim()).length;
+ const independentParts=p2?(Number(p2.independentParts)||0):(talktalkSplitInput(initial).length||(/\S/.test(initial)?1:0));
+ const promptedParts=p2?(Number(p2.promptedParts)||0):answers.filter(x=>String(x.rawAnswer||"").trim()).length;
  const cause=/때문|해서|라서|니까|왜냐하면/.test(final);
  const result=/그래서|그 결과|혼났|울었|다쳤|됐어요|끝났|화해/.test(final);
  const time=/오늘|어제|아침|점심|저녁|밤|쉬는 시간|수업 시간|점심시간|방과 후|주말/.test(final);
  const emotion=/기뻤|좋았|속상|화가|무서|슬펐|억울|당황|걱정|재미있|신났/.test(final);
  const thought=/생각|느꼈|궁금|알았|바랐|원했/.test(final);
  const connected=(e.organizedSentences||e.sentences||[]).length>=2||/그러자|그래서|그다음|하지만|그리고/.test(final);
- return {independentParts,promptedParts,questions:questions.length,hints:Number(support.hintCount)||0,rephrases:Number(support.rephraseCount)||0,integrations:integrations.length,cause,result,time,emotion,thought,connected,hasTrace:!!e.process,selectedChanged:!!selected&&selected!==initial};
+ return {independentParts,promptedParts,questions:p2?(Number(p2.questionCount)||0):questions.length,hints:Number(support.hintCount)||0,rephrases:Number(support.rephraseCount)||0,integrations:integrations.length,cause,result,time,emotion,thought,connected,hasTrace:!!e.process,selectedChanged:!!selected&&selected!==initial};
 }
 function metricOf(e){
  const m=e.metrics||{},initial=(e.initial||""),final=(e.final||""),g=growthMetricOf(e);
@@ -1830,13 +1831,25 @@ function talktalkV2Continue(){
  if(optional){const q=talktalkNextQuestion(m);if(q&&!q.complete){talktalkV2Render();return}}
  talktalkOpenScreen("input");const t=document.getElementById("thought");if(t){t.value=st.originalInput||"";t.focus()}
 }
+function talktalkV2ProcessRecord(model=null,finalText=""){
+ const m=model||talktalkThoughtModel(),facts=(m.facts||[]).filter(f=>f.confirmed!==false),questions=(m.questions||[]),initialFacts=facts.filter(f=>f.source==="initial_input"||f.source==="child_input"),promptedFacts=facts.filter(f=>f.source==="child_choice");
+ return {version:"2.0",startedWith:m.rawInput||st.originalInput||"",storyType:m.storyType||null,initialFacts:initialFacts.map(f=>({role:f.role,value:f.value,phase:f.phase||"initial"})),promptedFacts:promptedFacts.map(f=>({role:f.role,value:f.value,phase:f.phase||"",questionId:f.questionId||""})),questions:questions.map(q=>({id:q.id,text:q.text,choices:[...(q.choices||[])].map(x=>Array.isArray(x)?x[0]:x),answer:q.answer||"",askedAt:q.askedAt||"",answeredAt:q.answeredAt||""})),confirmation:talktalkNeedsConfirmation(m),completeness:talktalkCompleteness(m),relations:(m.relations||[]).filter(x=>x.confirmed!==false).map(x=>({fromRole:x.fromRole,toRole:x.toRole,type:x.type})),finalText:finalText||st.final||"",independentParts:initialFacts.length,promptedParts:promptedFacts.length,questionCount:questions.length,createdAt:new Date().toISOString()};
+}
+function talktalkSaveV2DictionaryEntry(made){
+ const m=talktalkThoughtModel(),process2=talktalkV2ProcessRecord(m,made.text),dict=getDict(),now=new Date().toISOString(),type=m.storyType?.type||"experience",label=m.storyType?.label||"생활 경험";
+ const entry={schemaVersion:3,id:"v2-"+Date.now(),date:now,updatedAt:now,topic:st.originalInput||"내 이야기",intent:"생각 표현",writingType:type,writingTypeLabel:label,initial:st.originalInput||"",candidate:"",selectedSentence:"",confirmedFacts:(m.facts||[]).filter(f=>f.confirmed!==false).map(f=>f.value),rejectedCount:0,working:made.text,direct:"",corrected:"",final:made.text,sentences:[...made.sentences],organizedSentences:[...made.sentences],support:"질문 선택 지원",request:"",evaluation:"",metrics:{confirmedCount:(m.facts||[]).filter(f=>f.confirmed!==false).length,rejectedCount:0,expanded:made.text.length>(st.originalInput||"").length,directAttempt:false,selfCorrection:false,aiRequest:false,discourseCount:made.sentences.length},process:{version:"2.0",events:process2.questions.flatMap(q=>[{type:"question_asked",questionId:q.id,question:q.text,at:q.askedAt},{type:"answer_given",questionId:q.id,rawAnswer:q.answer,at:q.answeredAt}]),support:{hintCount:0,rephraseCount:0}},process2,favorite:false,tags:makeTags(st.originalInput,label),reuseCount:0};
+ dict.unshift(entry);setDict(dict);return entry;
+}
 function talktalkV2CompleteDone(){
- const made=talktalkLiteracyText(2);if(made.canCompose){st.working=made.text;st.final=made.text;st.confirmed=Array.from(new Set([...(st.confirmed||[]),...made.sentences]));save()}
- if(typeof renderLibrary==="function")renderLibrary();talktalkOpenScreen("dictionary");
+ const made=talktalkLiteracyText(2);if(!made.canCompose)return talktalkV2Render();
+ st.working=made.text;st.final=made.text;st.confirmed=Array.from(new Set([...(st.confirmed||[]),...made.sentences]));
+ const entry=talktalkSaveV2DictionaryEntry(made);save();reward("complete");reward("dictionary_save");updateHome();
+ if(typeof renderLibrary==="function")renderLibrary();let newly=typeof completeSelectedStoryTreasure==="function"?completeSelectedStoryTreasure(entry):[];
+ if(newly.length&&typeof showTreasureRevealQueue==="function")showTreasureRevealQueue(newly,()=>talktalkOpenScreen("dictionary"));else talktalkOpenScreen("dictionary");
 }
 document.getElementById("thoughtV2Restart")?.addEventListener("click",()=>{st.thoughtModel=null;save();talktalkOpenScreen("input")});
 document.getElementById("thoughtV2Finish")?.addEventListener("click",()=>talktalkV2ShowCompletion());document.getElementById("storyV2More")?.addEventListener("click",()=>talktalkV2Continue());document.getElementById("storyV2Done")?.addEventListener("click",()=>talktalkV2CompleteDone());
-window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};window.TALKTALK_STAGE15={show:()=>talktalkV2ShowCompletion(),more:()=>talktalkV2Continue(),done:()=>talktalkV2CompleteDone()};
+window.TALKTALK_STAGE14={start:raw=>talktalkV2Start(raw),render:()=>talktalkV2Render(),facts:()=>talktalkV2VisibleFacts(talktalkThoughtModel())};window.TALKTALK_STAGE15={show:()=>talktalkV2ShowCompletion(),more:()=>talktalkV2Continue(),done:()=>talktalkV2CompleteDone()};window.TALKTALK_STAGE16={process:()=>talktalkV2ProcessRecord(),save:()=>{const x=talktalkLiteracyText(2);return x.canCompose?talktalkSaveV2DictionaryEntry(x):null}};
 const TALK_EVERYDAY_OBJECT_ACTIONS={
  "지우개":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
  "연필":[["안 가져갔어요","forgot"],["친구에게 빌렸어요","borrowed"],["친구에게 빌려줬어요","lent"],["잃어버렸어요","lost"]],
