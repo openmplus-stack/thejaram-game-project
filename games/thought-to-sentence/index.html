@@ -27,6 +27,9 @@ const nodes={
  interestWhy:{q:"어떤 점이 좋아?",h:"좋아하는 이유를 구체적으로 찾아보자.",c:["재미있어서","멋있어서","귀여워서","신기해서","편안해서","잘할 수 있어서","새로운 것을 알 수 있어서","직접 말하기"],slot:"reason"},
  interestDetail:{q:"그것을 할 때 무엇을 해?",h:"좋아하는 것을 실제 행동과 연결해 보자.",c:["자주 본다","직접 해본다","찾아본다","모은다","그린다","친구와 이야기한다","더 배우고 싶다","직접 말하기"],slot:"action"},
  interestThought:{q:"그것에 대해 더 하고 싶은 것은 뭐야?",h:"내 관심을 다음 생각으로 이어 보자.",c:["더 알아보고 싶다","더 잘하고 싶다","직접 해보고 싶다","다른 사람에게 알려주고 싶다","새로운 것을 찾아보고 싶다","계속 즐기고 싶다","관련된 곳에 가보고 싶다","직접 말하기"],slot:"next"},
+ interestReasonDetail:{q:"구체적으로 어떤 점이 그래?",h:"좋아하는 이유를 한 가지 더 자세히 말해 보자.",c:["생김새","움직이는 모습","종류가 많은 점","크기와 힘","사는 방법","특별한 특징","이야기와 영상","직접 말하기"],slot:"reasonDetail"},
+ interestActionDetail:{q:"무엇을 찾아보거나 보고 있어?",h:"내가 실제로 관심을 두는 내용을 하나 골라 보자.",c:["종류와 이름","생김새","사는 곳","먹이","움직이는 방법","특별한 특징","사진과 영상","직접 말하기"],slot:"actionDetail"},
+ interestNextDetail:{q:"무엇을 더 알고 싶어?",h:"앞으로 알고 싶은 내용을 하나 더 구체적으로 정해 보자.",c:["종류와 이름","어떻게 살았는지","무엇을 먹었는지","왜 사라졌는지","몸이 어떻게 생겼는지","어떻게 움직였는지","화석과 흔적","직접 말하기"],slot:"nextDetail"},
  emotionEvent:{q:"무슨 일이 있어서 그렇게 느꼈어?",h:"기분보다 먼저 있었던 일을 찾아보자.",c:["잘한 일이 있었다","실수했다","원하는 대로 되지 않았다","칭찬을 받았다","친구와 일이 있었다","갑자기 바뀐 일이 있었다","기다려야 했다","직접 말하기"],slot:"event"},
  addResult:{q:"그 일 때문에 어떻게 되었어?",h:"일어난 결과를 하나 더 생각해 보자.",c:["문제가 해결됐다","할 수 없었다","다시 해봤다","도움을 받았다","시간이 더 걸렸다","생각과 달라졌다","괜찮아졌다","직접 말하기"],slot:"result"},
  addReason:{q:"왜 그런 마음이 들었을까?",h:"기분의 이유를 조금 더 말해 보자.",c:["원하는 대로 돼서","생각과 달라서","잘할 수 있어서","잘하지 못해서","도움을 받아서","갑자기 일어나서","기대했던 것과 달라서","직접 말하기"],slot:"emotionReason"},
@@ -61,7 +64,7 @@ function semanticQuestions(t){t=trimEnd(t);if(TOPIC_QUESTIONS[t])return TOPIC_QU
  science:[p+" 어떻게 생길까?",p+" 왜 그럴까?",p+" 어디에서 볼 수 있을까?",p+" 어떻게 변할까?",p+" 무엇과 관련이 있을까?",p+" 다른 것과 무엇이 다를까?",p+" 우리 생활과 어떤 관계가 있을까?",p+" 어떤 점이 가장 궁금할까?"],
  activity:[p+" 할 때 무엇을 할까?",p+" 어떤 점이 재미있을까?",p+" 잘하려면 무엇이 필요할까?",p+" 누구와 함께할 수 있을까?",p+" 어디에서 할 수 있을까?",p+" 어려운 점은 무엇일까?",p+" 더 잘하고 싶은 것은 무엇일까?",p+" 새롭게 해보고 싶은 것은 무엇일까?"],
  general:[p+" 어떤 특징이 있을까?",p+" 무엇을 할 때 필요할까?",p+" 어디에서 볼 수 있을까?",p+" 왜 중요할까?",p+" 무엇과 관련이 있을까?",p+" 다른 것과 무엇이 다를까?",p+" 내가 알고 있는 것은 무엇일까?",p+" 더 알고 싶은 것은 무엇일까?"]};return sets[cat]}
-function applySemanticNode(){if(state.node!=="curiosityFocus")return;const t=state.facts.topic;if(!t)return;nodes.curiosityFocus.q=t+"에 대해 무엇이 가장 궁금해?";nodes.curiosityFocus.h="내가 궁금한 방향을 하나 골라 더 깊게 생각해 보자.";nodes.curiosityFocus.c=semanticQuestions(t)}
+function applySemanticNode(){const t=state.facts.topic;if(!t)return;if(state.node==="curiosityFocus"){nodes.curiosityFocus.q=t+"에 대해 무엇이 가장 궁금해?";nodes.curiosityFocus.h="내가 궁금한 방향을 하나 골라 더 깊게 생각해 보자.";nodes.curiosityFocus.c=semanticQuestions(t)}if(state.node==="interestReasonDetail")nodes.interestReasonDetail.q=t+"의 어떤 점이 "+trimEnd(state.facts.reason||"좋아")+"?";if(state.node==="interestActionDetail")nodes.interestActionDetail.q=t+"의 무엇을 찾아보거나 보고 있어?";if(state.node==="interestNextDetail")nodes.interestNextDetail.q=t+"에 대해 무엇을 더 알고 싶어?"}
 function nextNode(node,value){
  if(node==="eventSeed"||node==="freeSeed") return "event";
  if(node==="emotionSeed") return "emotionEvent";
@@ -76,8 +79,12 @@ function nextNode(node,value){
  if(node==="curiosityWhy")return "curiosityKnow";
  if(node==="curiosityKnow")return "curiosityNext";
  if(node==="interestSeed")return "interestWhy";
- if(node==="interestWhy")return "interestDetail";
- if(node==="interestDetail")return "interestThought";
+ if(node==="interestWhy")return /^(재미있어서|멋있어서|귀여워서|신기해서|편안해서|새로운 것을 알 수 있어서)$/.test(value)?"interestReasonDetail":"interestDetail";
+ if(node==="interestReasonDetail")return "interestDetail";
+ if(node==="interestDetail")return /^(자주 본다|찾아본다|모은다|그린다)$/.test(value)?"interestActionDetail":"interestThought";
+ if(node==="interestActionDetail")return "interestThought";
+ if(node==="interestThought")return /^(더 알아보고 싶다|새로운 것을 찾아보고 싶다)$/.test(value)?"interestNextDetail":"finish";
+ if(node==="interestNextDetail")return "finish";
  return "finish";
 }
 function missingNode(){
@@ -94,7 +101,7 @@ function missingNode(){
 }
 function reviewThoughts(){const m=missingNode();if(!m){finish();return}state.node=m;bar.style.width="88%";render()}
 function thoughtMap(){if(!state.answers.length)return "";return '<div class="thoughts"><b>🌱 지금까지 찾은 생각</b><div class="map">'+state.answers.map((a,i)=>'<span class="thought">'+esc(a.value)+'</span>'+(i<state.answers.length-1?'<span class="arrow">→</span>':"")).join("")+'</div></div>'}
-function hintPrompt(n){var s=n.slot,t=state.facts.topic||"그것";if(s==="topic")return "사람, 장소, 물건, 활동 중에서 하나를 떠올려 봐.";if(s==="event")return t+"에 대해 ‘무슨 일이 있었지?’라고 생각해 봐.";if(s==="result")return "그 일이 생긴 뒤 무엇이 달라졌는지 생각해 봐.";if(s==="emotion")return "그때 내 몸과 마음이 어땠는지 떠올려 봐.";if(s==="emotionReason"||s==="reason"||s==="cause")return "‘왜?’라고 한 번만 더 물어봐.";if(s==="thought")return "그 일을 겪고 머릿속에 든 말을 떠올려 봐.";if(s==="next")return "다음에 내가 해볼 수 있는 일을 생각해 봐.";if(s==="question")return t+"에 대해 ‘왜? 어떻게? 어디서? 무엇을?’ 중 하나를 골라 생각해 봐.";if(s==="known")return "이미 알고 있는 아주 작은 사실 하나만 떠올려 봐.";if(s==="action")return t+"을 할 때 내가 실제로 하는 행동을 떠올려 봐.";return "질문의 중요한 말을 다시 보고 한 단어만 떠올려 봐."}
+function hintPrompt(n){var s=n.slot,t=state.facts.topic||"그것";if(s==="topic")return "사람, 장소, 물건, 활동 중에서 하나를 떠올려 봐.";if(s==="event")return t+"에 대해 ‘무슨 일이 있었지?’라고 생각해 봐.";if(s==="result")return "그 일이 생긴 뒤 무엇이 달라졌는지 생각해 봐.";if(s==="emotion")return "그때 내 몸과 마음이 어땠는지 떠올려 봐.";if(s==="emotionReason"||s==="reason"||s==="cause")return "‘왜?’라고 한 번만 더 물어봐.";if(s==="thought")return "그 일을 겪고 머릿속에 든 말을 떠올려 봐.";if(s==="next")return "다음에 내가 해볼 수 있는 일을 생각해 봐.";if(s==="question")return t+"에 대해 ‘왜? 어떻게? 어디서? 무엇을?’ 중 하나를 골라 생각해 봐.";if(s==="known")return "이미 알고 있는 아주 작은 사실 하나만 떠올려 봐.";if(s==="action")return t+"을 할 때 내가 실제로 하는 행동을 떠올려 봐.";if(s==="reasonDetail")return "‘어떤 점이?’라고 한 번 더 생각해 봐.";if(s==="actionDetail")return "내가 자주 보는 내용 하나를 떠올려 봐.";if(s==="nextDetail")return "가장 궁금한 것 하나만 골라 봐.";return "질문의 중요한 말을 다시 보고 한 단어만 떠올려 봐."}
 function render(){applySemanticNode();const n=nodes[state.node];if(state.hintNode!==state.node){state.hintNode=state.node;state.hintLevel=0}bar.style.width=Math.min(92,15+state.answers.length*13)+"%";const opts=n.c.filter(x=>x!=="직접 말하기"),level=state.hintLevel||0;var hint="";if(level===1)hint='<div class="hintbox"><div class="hintlevel">도움 1 · 생각 단서</div>'+esc(hintPrompt(n))+'</div>';if(level===2)hint='<div class="hintbox"><div class="hintlevel">도움 2 · 몇 가지 예시</div><div class="choices">'+opts.slice(0,3).map((x,i)=>'<button class="choice" data-v="'+encodeURIComponent(x)+'">'+esc(x)+'</button>').join("")+'</div></div>';if(level>=3)hint='<div class="hintbox"><div class="hintlevel">도움 3 · 선택해서 말하기</div><div class="choices">'+opts.map(x=>'<button class="choice" data-v="'+encodeURIComponent(x)+'">'+esc(x)+'</button>').join("")+'</div></div>';var helpLabel=level===0?"💡 도움 받기":level===1?"💡 예시 조금 보기":level===2?"💡 선택지 더 보기":"도움 모두 봤어";main.innerHTML='<section class="card"><div class="mascot-row"><div class="mini">'+H+'</div><div><div class="question">'+esc(n.q)+'</div><div class="help">먼저 내 생각을 직접 써 보자.</div></div></div><div class="tryfirst"><div class="trytitle">✏️ 내 생각 먼저 쓰기</div><div class="help" style="margin:0">한 단어나 짧은 말도 괜찮아.</div><div class="inputrow"><input id="custom" placeholder="여기에 내 생각을 써 봐"><button class="btn secondary" id="customBtn">말 더하기</button></div></div>'+hint+'<div class="reviewactions"><button class="smallbtn" onclick="moreHelp()" '+(level>=3?'disabled style="opacity:.45"':'')+'>'+helpLabel+'</button></div>'+thoughtMap()+'<div class="nav"><button class="btn ghost" onclick="back()">← 이전</button><button class="btn ghost" onclick="dontKnow()">잘 모르겠어</button></div></section>';document.querySelectorAll("[data-v]").forEach(function(btn){btn.onclick=function(){choose(decodeURIComponent(btn.dataset.v))}});document.querySelector("#customBtn").onclick=customAnswer}
 function moreHelp(){state.hintLevel=Math.min(3,(state.hintLevel||0)+1);render()}
 function dontKnow(){if((state.hintLevel||0)<3){moreHelp();return}skip()}
@@ -120,9 +127,9 @@ function makeStory(){const f=state.facts,t=trimEnd(f.topic),a=[];
   if(f.next)a.push("그래서 앞으로 "+endDa(f.next));
  }else if(state.mode==="interest"){
   if(t)a.push("나는 "+particle(t,"을","를")+" 좋아한다.");
-  if(f.reason)a.push("특히 좋아하는 이유는 "+reasonText(f.reason)+".");
-  if(f.action)a.push("그래서 평소에 "+endDa(f.action));
-  if(f.next)a.push("앞으로는 "+endDa(f.next));
+  if(f.reasonDetail)a.push("특히 "+particle(f.reasonDetail,"이","가")+" "+reasonText(f.reason)+".");else if(f.reason)a.push("특히 좋아하는 이유는 "+reasonText(f.reason)+".");
+  if(f.actionDetail&&/찾아본다/.test(f.action||""))a.push("그래서 평소에 "+particle(f.actionDetail,"을","를")+" 찾아본다.");else if(f.actionDetail)a.push("그래서 평소에 "+particle(f.actionDetail,"을","를")+" 관심 있게 본다.");else if(f.action)a.push("그래서 평소에 "+endDa(f.action));
+  if(f.nextDetail)a.push("앞으로는 "+particle(f.nextDetail,"을","를")+" 더 알아보고 싶다.");else if(f.next)a.push("앞으로는 "+endDa(f.next));
  }else{
   if(t&&f.event)a.push(particle(t,"과","와")+" 관련해 "+endDa(f.event));else if(f.event)a.push(endDa(f.event));
   if(f.result)a.push("그래서 "+endDa(f.result));else if(f.cause)a.push("그 일이 잘된 데에는 "+endDa(f.cause));
