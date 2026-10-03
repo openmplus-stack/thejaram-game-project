@@ -131,9 +131,10 @@ function eventSentence(t,v,detail){t=String(t||"").trim();v=String(v||"").trim()
 function noPeriod(v){return String(v||"").trim().replace(/[.。]+$/,"")}
 function emotionSentence(emotion){var e=noPeriod(emotion);return e?sentence("그때 "+e):""}
 function emotionReasonSentence(reason){var r=reasonText(reason);return r?sentence("그렇게 느낀 이유는 "+r):""}
-function resultSentence(t,result,detail){result=noPeriod(result);if(!result)return "";if(result==="할 수 없었다")return sentence(detail?particle(detail,"을","를")+" 사용할 수 없었다":t+"을 제대로 할 수 없었다");if(result==="잘 되지 않았다")return sentence("그래서 "+t+"이 잘 되지 않았다");if(result==="시간이 더 걸렸다")return sentence("그래서 "+t+"을 하는 데 시간이 더 걸렸다");if(result==="다시 해야 했다")return sentence("그래서 "+t+"을 다시 해야 했다");if(result==="도움을 요청했다")return sentence("그래서 도움을 요청했다");if(result==="친구에게 빌렸다")return sentence("그래서 친구에게 필요한 것을 빌렸다");if(result==="선생님께 말했다")return sentence("그래서 선생님께 상황을 말했다");if(result==="그냥 계속했다")return sentence("그래도 하던 일을 계속했다");return sentence("그래서 "+result)}
+function activityPhrase(t){t=noPeriod(t);var map={"시험":"시험을 볼 때","숙제":"숙제를 할 때","공부":"공부할 때","수업":"수업할 때","운동":"운동할 때","게임":"게임을 할 때","만들기":"만들기를 할 때","그림":"그림을 그릴 때"};return map[t]||particle(t,"을","를")+" 할 때"}
+function resultSentence(t,result,detail,event){result=noPeriod(result);detail=noPeriod(detail);if(!result)return "";if(event==="잊어버렸다"&&detail&&result==="할 수 없었다"){if(t==="시험"&&detail==="지우개")return sentence("시험을 볼 때 지우개가 없어서 잘못 쓴 답을 고칠 수 없었다");return sentence(activityPhrase(t)+" "+particle(detail,"이","가")+" 없어서 필요한 일을 할 수 없었다")}if(event==="없어서 곤란했다"&&detail&&result==="할 수 없었다")return sentence(activityPhrase(t)+" "+particle(detail,"이","가")+" 없어서 필요한 일을 할 수 없었다");if(result==="할 수 없었다")return sentence(activityPhrase(t)+" 필요한 일을 할 수 없었다");if(result==="잘 되지 않았다")return sentence("그래서 "+t+"이 잘 되지 않았다");if(result==="시간이 더 걸렸다")return sentence("그래서 "+particle(t,"을","를")+" 하는 데 시간이 더 걸렸다");if(result==="다시 해야 했다")return sentence("그래서 "+particle(t,"을","를")+" 다시 해야 했다");if(result==="도움을 요청했다")return sentence("그래서 도움을 요청했다");if(result==="친구에게 빌렸다")return sentence("그래서 친구에게 "+(detail||"필요한 것")+"을 빌렸다");if(result==="선생님께 말했다")return sentence("그래서 선생님께 상황을 말했다");if(result==="그냥 계속했다")return sentence("그래도 하던 일을 계속했다");return sentence("그래서 "+result)}
 function reflectionSentence(thought,emotion,reason){thought=noPeriod(thought);emotion=noPeriod(emotion);if(thought)return sentence("이 일을 겪고 "+thought);if(emotion&&reason)return sentence("그때 "+emotion+"고, "+reasonText(reason).replace(/기 때문이다$/,"기 때문이었다"));if(emotion)return sentence("그때 "+emotion);return ""}
-function nextActionSentence(v){v=noPeriod(v);if(!v)return "";var map={"미리 준비하겠다":"다음에는 필요한 것을 미리 준비해야겠다","한 번 더 확인하겠다":"다음에는 준비물을 한 번 더 확인해야겠다","도움을 요청하겠다":"다음에는 필요할 때 도움을 요청해야겠다","내 생각을 말하겠다":"다음에는 내 생각을 분명하게 말해야겠다","천천히 해보겠다":"다음에는 서두르지 않고 천천히 해봐야겠다","다시 도전하겠다":"다음에는 포기하지 않고 다시 도전해야겠다","다른 방법을 찾아보겠다":"다음에는 다른 방법도 찾아봐야겠다"};return sentence(map[v]||("다음에는 "+v))}
+function learningSentence(next,thought){next=noPeriod(next);thought=noPeriod(thought);var map={"미리 준비하겠다":"앞으로 필요한 준비물을 잘 챙겨야겠다는 생각을 했다","한 번 더 확인하겠다":"앞으로 준비물을 잘 챙겨야겠다는 생각을 했다","도움을 요청하겠다":"앞으로 어려울 때는 도움을 요청해야겠다는 생각을 했다","내 생각을 말하겠다":"앞으로 내 생각을 분명하게 말해야겠다는 생각을 했다","천천히 해보겠다":"앞으로 서두르지 않고 천천히 해야겠다는 생각을 했다","다시 도전하겠다":"앞으로 포기하지 않고 다시 도전해야겠다는 생각을 했다","다른 방법을 찾아보겠다":"앞으로 잘되지 않을 때는 다른 방법도 찾아봐야겠다는 생각을 했다"};if(map[next])return sentence(map[next]);if(thought)return sentence("이 일을 겪고 "+thought);return next?sentence("앞으로 "+next):""}
 function makeStory(){const f=state.facts,t=noPeriod(f.topic),a=[];
  if(state.mode==="curiosity"){
   if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push(sentence("나는 "+t+"에 대해 궁금하다"));
@@ -149,10 +150,10 @@ function makeStory(){const f=state.facts,t=noPeriod(f.topic),a=[];
   if(f.next)a.push(interestNextSentence(t,f.next,f.nextDetail));
   return a.filter(Boolean).slice(0,4)
  }
- if(f.event)a.push(eventSentence(t,f.event,f.eventDetail));
- if(f.result)a.push(resultSentence(t,f.result,f.eventDetail));else if(f.cause)a.push(sentence("그 일이 그렇게 된 이유는 "+noPeriod(f.cause)));
- var reflect=reflectionSentence(f.thought,f.emotion,f.emotionReason);if(reflect)a.push(reflect);
- if(f.next)a.push(nextActionSentence(f.next));
+ var combined=!!(f.result&&(f.event==="잊어버렸다"||f.event==="없어서 곤란했다")&&f.eventDetail);
+ if(combined)a.push(resultSentence(t,f.result,f.eventDetail,f.event));else{if(f.event)a.push(eventSentence(t,f.event,f.eventDetail));if(f.result)a.push(resultSentence(t,f.result,f.eventDetail,f.event));else if(f.cause)a.push(sentence("그 일이 그렇게 된 이유는 "+noPeriod(f.cause)))}
+ if(f.emotion)a.push(emotionSentence(f.emotion));
+ if(f.next)a.push(learningSentence(f.next,f.thought));else{var reflect=reflectionSentence(f.thought,f.emotion,f.emotionReason);if(reflect)a.push(reflect)}
  return a.filter(Boolean).slice(0,4)
 }
 function storyTitle(){const f=state.facts,t=trimEnd(f.topic);if(state.mode==="curiosity")return t? t+"에 대한 나의 궁금증":"내가 궁금한 것";if(state.mode==="interest")return t? "내가 좋아하는 "+t:"내가 좋아하는 것";if(t)return t+"에 있었던 일";return "나의 이야기"}
