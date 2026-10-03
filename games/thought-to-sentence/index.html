@@ -113,30 +113,36 @@ function back(){if(!state.answers.length){startMenu();return}const last=state.an
 function trimEnd(v){return String(v||"").trim().replace(/[.!?]+$/,"")}
 function hasBatchim(word){const s=trimEnd(word),ch=s.charCodeAt(s.length-1);return ch>=0xAC00&&ch<=0xD7A3&&((ch-0xAC00)%28)!==0}
 function particle(word,batchim,noBatchim){return trimEnd(word)+(hasBatchim(word)?batchim:noBatchim)}
-function endDa(v){v=trimEnd(v);if(!v)return "";if(/(다|겠다|했다|됐다|였다|이었다|있었다|없었다)$/.test(v))return v+".";if(/고 싶어$/.test(v))return v.replace(/고 싶어$/,"고 싶다.");if(/궁금해$/.test(v))return v.replace(/궁금해$/,"궁금하다.");return v+"."}
-function reasonText(v){v=trimEnd(v);const map={"재미있어서":"재미있기 때문이다","멋있어서":"멋있기 때문이다","귀여워서":"귀엽기 때문이다","신기해서":"신기하기 때문이다","편안해서":"편안하기 때문이다","잘할 수 있어서":"잘할 수 있기 때문이다","새로운 것을 알 수 있어서":"새로운 것을 알 수 있기 때문이다","책에서 봐서":"책에서 보았기 때문이다","영상에서 봐서":"영상에서 보았기 때문이다","직접 봐서":"직접 보았기 때문이다","수업에서 배워서":"수업에서 배웠기 때문이다","친구가 말해서":"친구가 말해 주었기 때문이다","좋아해서":"좋아하기 때문이다","잘 몰라서":"잘 모르기 때문이다"};return map[v]||(/서$/.test(v)?v.replace(/서$/,"기 때문이다"):v)}
-function curiositySentence(t,q){q=trimEnd(q).replace(/[?？]+$/,"");var topic=trimEnd(t);if(!q)return "나는 "+topic+"에 대해 궁금하다.";if(q.startsWith(topic)){var z=q.replace(/을까$/,"는지").replace(/할까$/,"하는지").replace(/일까$/,"인지").replace(/까$/,"지");return "나는 "+z+" 궁금하다."}var special={"왜 그런지":"왜 그런지","어떻게 하는지":"어떻게 하는지","어디에 있는지":"어디에 있는지","무엇을 먹는지":"무엇을 먹는지","어떻게 생겼는지":"어떻게 생겼는지","언제 생겼는지":"언제 생겼는지","다른 것과 무엇이 다른지":"다른 것과 무엇이 다른지"};if(special[q])return "나는 "+topic+"이 "+special[q]+" 궁금하다.";if(/^(바퀴|엔진|문|창문|좌석|핸들|몸체|색|모양|크기|속도|이름|종류)$/.test(q))return "나는 "+topic+"의 "+particle(q,"이","가")+" 궁금하다.";if(/^(왜|어떻게|언제|어디|무엇|어떤)/.test(q))return "나는 "+topic+"에 대해 "+q+" 궁금하다.";return "나는 "+topic+"의 "+particle(q,"이","가")+" 궁금하다."}
-function knownSentence(t,v){v=trimEnd(v);if(!v)return "";if(v==="거의 모른다")return "아직 "+t+"에 대해서는 잘 모른다.";var m=v.match(/^(.+?)(?:가|이)\s*(.+)$/);if(m)return "나는 "+t+"의 "+m[1]+particle(m[1],"은","는")+" "+m[2]+"라는 것을 알고 있다.";var map={"생김새를 안다":"생김새","이름을 안다":"이름","사는 곳을 안다":"사는 곳","하는 일을 안다":"하는 일","특징을 안다":"특징"};if(map[v])return "나는 "+t+"의 "+map[v]+"을 알고 있다.";if(v==="들은 적이 있다")return "나는 "+t+"에 대해 들은 적이 있다.";return "나는 "+t+"에 대해 "+endDa(v)}
-function nextSentence(t,v,q){v=trimEnd(v);var target=q?trimEnd(q).replace(/[?？]+$/,""):"";var about=target&&target.length<20?t+"의 "+target:t;if(v==="검색해 보겠다"||v==="검색")return "앞으로 "+about+"에 대해 검색해 보고 싶다.";if(v==="책을 찾아보겠다")return "앞으로 "+about+"에 관한 책을 찾아보고 싶다.";if(v==="영상으로 보겠다")return "앞으로 "+about+"에 관한 영상을 찾아보고 싶다.";if(v==="선생님께 묻겠다")return "앞으로 "+about+"에 대해 선생님께 물어보고 싶다.";if(v==="가족에게 묻겠다")return "앞으로 "+about+"에 대해 가족에게 물어보고 싶다.";if(v==="직접 관찰하겠다")return "앞으로 "+about+"을 직접 관찰해 보고 싶다.";if(v==="친구와 이야기하겠다")return "앞으로 "+about+"에 대해 친구와 이야기해 보고 싶다.";return "앞으로 "+endDa(v)}
-function noPeriod(v){return trimEnd(v)}
-function joinCauseEmotion(emotion,reason){const e=noPeriod(emotion),r=reasonText(reason);if(!e)return "";if(!reason)return "그때 "+endDa(e);return "그때 "+e+". 그 이유는 "+r+"."}
-function makeStory(){const f=state.facts,t=trimEnd(f.topic),a=[];
+function sentence(v){v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";return v+"."}
+function endDa(v){v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";var map={"검색":"검색해 보고 싶다","찾아본다":"찾아본다","자주 본다":"자주 본다","모른다":"모른다"};if(map[v])return sentence(map[v]);if(/(다|겠다|했다|됐다|였다|이었다|있었다|없었다|싶다|한다|본다|안다|모른다)$/.test(v))return sentence(v);if(/고 싶어(?:요)?$/.test(v))return sentence(v.replace(/고 싶어(?:요)?$/,"고 싶다"));if(/궁금해(?:요)?$/.test(v))return sentence(v.replace(/궁금해(?:요)?$/,"궁금하다"));if(/했어요$/.test(v))return sentence(v.replace(/했어요$/,"했다"));if(/였어요$/.test(v))return sentence(v.replace(/였어요$/,"였다"));if(/이에요$/.test(v))return sentence(v.replace(/이에요$/,"이다"));if(/예요$/.test(v))return sentence(v.replace(/예요$/,"이다"));return sentence(v)}
+function reasonText(v){v=String(v||"").trim().replace(/[.。]+$/,"");const map={"재미있어서":"재미있기 때문이다","멋있어서":"멋있기 때문이다","귀여워서":"귀엽기 때문이다","신기해서":"신기하기 때문이다","편안해서":"편안하기 때문이다","잘할 수 있어서":"잘할 수 있기 때문이다","새로운 것을 알 수 있어서":"새로운 것을 알 수 있기 때문이다","책에서 봐서":"책에서 보았기 때문이다","영상에서 봐서":"영상에서 보았기 때문이다","직접 봐서":"직접 보았기 때문이다","수업에서 배워서":"수업에서 배웠기 때문이다","친구가 말해서":"친구가 말해 주었기 때문이다","좋아해서":"좋아하기 때문이다","잘 몰라서":"잘 모르기 때문이다","원하는 대로 돼서":"원하는 대로 되었기 때문이다","생각과 달라서":"생각과 달랐기 때문이다","잘하지 못해서":"잘하지 못했기 때문이다","도움을 받아서":"도움을 받았기 때문이다","갑자기 일어나서":"갑자기 일어났기 때문이다","기대했던 것과 달라서":"기대했던 것과 달랐기 때문이다"};return map[v]||v}
+function detailReason(detail,reason){detail=String(detail||"").trim();reason=String(reason||"").trim();if(!detail)return reasonText(reason);var d=particle(detail,"이","가");if(reason==="재미있어서")return d+" 재미있기 때문이다";if(reason==="멋있어서")return d+" 멋있기 때문이다";if(reason==="귀여워서")return d+" 귀엽기 때문이다";if(reason==="신기해서")return d+" 신기하기 때문이다";if(reason==="편안해서")return d+" 편안하게 느껴지기 때문이다";return d+" "+reasonText(reason)}
+function normalizeQuestion(q){q=String(q||"").trim().replace(/[?？.]+$/,"");return q}
+function curiositySentence(t,q){t=String(t||"").trim();q=normalizeQuestion(q);if(!q)return sentence("나는 "+t+"에 대해 궁금하다");if(q.startsWith(t)){var z=q.replace(/은 왜 /,"은 왜 ").replace(/는 왜 /,"는 왜 ").replace(/을까$/,"는지").replace(/할까$/,"하는지").replace(/일까$/,"인지");return sentence("나는 "+z+" 궁금하다")}var special={"왜 그런지":"왜 그런지","어떻게 하는지":"어떻게 하는지","어디에 있는지":"어디에 있는지","무엇을 먹는지":"무엇을 먹는지","어떻게 생겼는지":"어떻게 생겼는지","언제 생겼는지":"언제 생겼는지","다른 것과 무엇이 다른지":"다른 것과 무엇이 다른지"};if(special[q])return sentence("나는 "+t+"이 "+special[q]+" 궁금하다");if(/^(왜|어떻게|언제|어디|무엇|어떤)/.test(q))return sentence("나는 "+t+"에 대해 "+q+" 궁금하다");return sentence("나는 "+t+"의 "+particle(q,"이","가")+" 궁금하다")}
+function knownSentence(t,v){t=String(t||"").trim();v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";if(v==="거의 모른다")return sentence("아직 "+t+"에 대해서는 잘 모른다");var m=v.match(/^(.+?)(?:가|이)\s*(.+)$/);if(m)return sentence("나는 "+t+"의 "+particle(m[1],"은","는")+" "+m[2]+"라는 것을 알고 있다");var map={"생김새를 안다":"생김새","이름을 안다":"이름","사는 곳을 안다":"사는 곳","하는 일을 안다":"하는 일","특징을 안다":"특징"};if(map[v])return sentence("나는 "+t+"의 "+particle(map[v],"을","를")+" 알고 있다");if(v==="들은 적이 있다")return sentence("나는 "+t+"에 대해 들은 적이 있다");return sentence("나는 "+t+"에 대해 "+v)}
+function questionTarget(t,q){q=normalizeQuestion(q);if(!q||/^(왜|어떻게|언제|어디|무엇|어떤)/.test(q)||q.length>18)return t;if(q.startsWith(t))return q;return t+"의 "+q}
+function nextSentence(t,v,q){v=String(v||"").trim().replace(/[.。]+$/,"");var target=questionTarget(t,q);if(v==="검색해 보겠다"||v==="검색")return sentence("앞으로 "+target+"에 대해 검색해 보고 싶다");if(v==="책을 찾아보겠다")return sentence("앞으로 "+target+"에 관한 책을 찾아보고 싶다");if(v==="영상으로 보겠다")return sentence("앞으로 "+target+"에 관한 영상을 찾아보고 싶다");if(v==="선생님께 묻겠다")return sentence("앞으로 "+target+"에 대해 선생님께 물어보고 싶다");if(v==="가족에게 묻겠다")return sentence("앞으로 "+target+"에 대해 가족에게 물어보고 싶다");if(v==="직접 관찰하겠다")return sentence("앞으로 "+particle(target,"을","를")+" 직접 관찰해 보고 싶다");if(v==="친구와 이야기하겠다")return sentence("앞으로 "+target+"에 대해 친구와 이야기해 보고 싶다");return sentence("앞으로 "+v)}
+function interestActionSentence(t,action,detail){t=String(t||"").trim();action=String(action||"").trim();detail=String(detail||"").trim();if(detail&&action==="찾아본다")return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 찾아본다");if(detail&&action==="자주 본다")return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 자주 본다");if(detail)return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 관심 있게 본다");if(action==="찾아본다")return sentence("그래서 평소에 "+t+"에 대해 찾아본다");if(action==="자주 본다")return sentence("그래서 평소에 "+particle(t,"을","를")+" 자주 본다");return sentence("그래서 평소에 "+action)}
+function interestNextSentence(t,next,detail){t=String(t||"").trim();next=String(next||"").trim();detail=String(detail||"").trim();if(detail)return sentence("앞으로는 "+t+"의 "+particle(detail,"을","를")+" 더 알아보고 싶다");if(next==="더 알아보고 싶다"||next==="새로운 것을 찾아보고 싶다")return sentence("앞으로는 "+t+"에 대해 더 알아보고 싶다");return sentence("앞으로는 "+next)}
+function eventSentence(t,v){t=String(t||"").trim();v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";if(!t)return endDa(v);var generic=/^(실수했다|문제가 생겼다|원하는 대로 되지 않았다|계획이 바뀌었다|잘한 일이 있었다|칭찬을 받았다|기다려야 했다)$/.test(v);if(generic)return sentence(t+"와 관련해서 "+v);return sentence(t+"와 관련해서 "+v)}
+function noPeriod(v){return String(v||"").trim().replace(/[.。]+$/,"")}
+function joinCauseEmotion(emotion,reason){var e=noPeriod(emotion),r=reasonText(reason);if(!e)return "";if(!reason)return sentence("그때 "+e);return sentence("그때 "+e)+ " "+sentence("그 이유는 "+r)}
+function makeStory(){const f=state.facts,t=noPeriod(f.topic),a=[];
  if(state.mode==="curiosity"){
-  if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push("나는 "+t+"에 대해 궁금하다.");
-  if(f.cause)a.push("이것이 궁금해진 이유는 "+reasonText(f.cause)+".");
+  if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push(sentence("나는 "+t+"에 대해 궁금하다"));
+  if(f.cause)a.push(sentence("이것이 궁금해진 이유는 "+reasonText(f.cause)));
   if(f.known)a.push(knownSentence(t,f.known));
   if(f.next)a.push(nextSentence(t,f.next,f.question));
  }else if(state.mode==="interest"){
-  if(t)a.push("나는 "+particle(t,"을","를")+" 좋아한다.");
-  if(f.reasonDetail)a.push("특히 "+particle(f.reasonDetail,"이","가")+" "+reasonText(f.reason)+".");else if(f.reason)a.push("특히 좋아하는 이유는 "+reasonText(f.reason)+".");
-  if(f.actionDetail&&/찾아본다/.test(f.action||""))a.push("그래서 평소에 "+particle(f.actionDetail,"을","를")+" 찾아본다.");else if(f.actionDetail)a.push("그래서 평소에 "+particle(f.actionDetail,"을","를")+" 관심 있게 본다.");else if(f.action)a.push("그래서 평소에 "+endDa(f.action));
-  if(f.nextDetail)a.push("앞으로는 "+particle(f.nextDetail,"을","를")+" 더 알아보고 싶다.");else if(f.next)a.push("앞으로는 "+endDa(f.next));
+  if(t)a.push(sentence("나는 "+particle(t,"을","를")+" 좋아한다"));
+  if(f.reasonDetail)a.push(sentence("특히 "+detailReason(f.reasonDetail,f.reason)));else if(f.reason)a.push(sentence("특히 좋아하는 이유는 "+reasonText(f.reason)));
+  if(f.action)a.push(interestActionSentence(t,f.action,f.actionDetail));
+  if(f.next)a.push(interestNextSentence(t,f.next,f.nextDetail));
  }else{
-  if(t&&f.event)a.push(particle(t,"과","와")+" 관련해 "+endDa(f.event));else if(f.event)a.push(endDa(f.event));
-  if(f.result)a.push("그래서 "+endDa(f.result));else if(f.cause)a.push("그 일이 잘된 데에는 "+endDa(f.cause));
-  if(f.emotion)a.push(joinCauseEmotion(f.emotion,f.emotionReason));
-  else if(f.thought)a.push("이 일을 겪고 "+endDa(f.thought));
-  if(f.next)a.push("다음에는 "+endDa(f.next));else if(f.thought&&f.emotion)a.push("이 일을 겪고 "+endDa(f.thought));
+  if(f.event)a.push(eventSentence(t,f.event));
+  if(f.result)a.push(sentence("그래서 "+noPeriod(f.result)));else if(f.cause)a.push(sentence("그 일이 그렇게 된 이유는 "+noPeriod(f.cause)));
+  if(f.emotion)a.push(joinCauseEmotion(f.emotion,f.emotionReason));else if(f.thought)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
+  if(f.next)a.push(sentence("다음에는 "+noPeriod(f.next)));else if(f.thought&&f.emotion)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
  }
  return a.filter(Boolean).slice(0,4)
 }
