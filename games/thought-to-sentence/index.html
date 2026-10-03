@@ -115,16 +115,17 @@ function hasBatchim(word){const s=trimEnd(word),ch=s.charCodeAt(s.length-1);retu
 function particle(word,batchim,noBatchim){return trimEnd(word)+(hasBatchim(word)?batchim:noBatchim)}
 function endDa(v){v=trimEnd(v);if(!v)return "";if(/(다|겠다|했다|됐다|였다|이었다|있었다|없었다)$/.test(v))return v+".";if(/고 싶어$/.test(v))return v.replace(/고 싶어$/,"고 싶다.");if(/궁금해$/.test(v))return v.replace(/궁금해$/,"궁금하다.");return v+"."}
 function reasonText(v){v=trimEnd(v);const map={"재미있어서":"재미있기 때문이다","멋있어서":"멋있기 때문이다","귀여워서":"귀엽기 때문이다","신기해서":"신기하기 때문이다","편안해서":"편안하기 때문이다","잘할 수 있어서":"잘할 수 있기 때문이다","새로운 것을 알 수 있어서":"새로운 것을 알 수 있기 때문이다","책에서 봐서":"책에서 보았기 때문이다","영상에서 봐서":"영상에서 보았기 때문이다","직접 봐서":"직접 보았기 때문이다","수업에서 배워서":"수업에서 배웠기 때문이다","친구가 말해서":"친구가 말해 주었기 때문이다","좋아해서":"좋아하기 때문이다","잘 몰라서":"잘 모르기 때문이다"};return map[v]||(/서$/.test(v)?v.replace(/서$/,"기 때문이다"):v)}
-function curiositySentence(t,q){q=trimEnd(q);if(/[?？]$/.test(q))q=q.replace(/[?？]+$/,"");if(q.startsWith(t))return q.replace(/을까$/,"는지").replace(/할까$/,"하는지").replace(/일까$/,"인지").replace(/까$/,"지")+" 궁금하다.";const special={"왜 그런지":"왜 그런지","어떻게 하는지":"어떻게 하는지","어디에 있는지":"어디에 있는지","무엇을 먹는지":"무엇을 먹는지","어떻게 생겼는지":"어떻게 생겼는지","언제 생겼는지":"언제 생겼는지","다른 것과 무엇이 다른지":"다른 것과 무엇이 다른지"};return particle(t,"이","가")+" "+(special[q]||q)+" 궁금하다."}
+function curiositySentence(t,q){q=trimEnd(q).replace(/[?？]+$/,"");var topic=trimEnd(t);if(!q)return "나는 "+topic+"에 대해 궁금하다.";if(q.startsWith(topic)){var z=q.replace(/을까$/,"는지").replace(/할까$/,"하는지").replace(/일까$/,"인지").replace(/까$/,"지");return "나는 "+z+" 궁금하다."}var special={"왜 그런지":"왜 그런지","어떻게 하는지":"어떻게 하는지","어디에 있는지":"어디에 있는지","무엇을 먹는지":"무엇을 먹는지","어떻게 생겼는지":"어떻게 생겼는지","언제 생겼는지":"언제 생겼는지","다른 것과 무엇이 다른지":"다른 것과 무엇이 다른지"};if(special[q])return "나는 "+topic+"이 "+special[q]+" 궁금하다.";if(/^(바퀴|엔진|문|창문|좌석|핸들|몸체|색|모양|크기|속도|이름|종류)$/.test(q))return "나는 "+topic+"의 "+particle(q,"이","가")+" 궁금하다.";if(/^(왜|어떻게|언제|어디|무엇|어떤)/.test(q))return "나는 "+topic+"에 대해 "+q+" 궁금하다.";return "나는 "+topic+"의 "+particle(q,"이","가")+" 궁금하다."}
+function knownSentence(t,v){v=trimEnd(v);if(!v)return "";if(v==="거의 모른다")return "아직 "+t+"에 대해서는 잘 모른다.";var m=v.match(/^(.+?)(?:가|이)\s*(.+)$/);if(m)return "나는 "+t+"의 "+m[1]+particle(m[1],"은","는")+" "+m[2]+"라는 것을 알고 있다.";var map={"생김새를 안다":"생김새","이름을 안다":"이름","사는 곳을 안다":"사는 곳","하는 일을 안다":"하는 일","특징을 안다":"특징"};if(map[v])return "나는 "+t+"의 "+map[v]+"을 알고 있다.";if(v==="들은 적이 있다")return "나는 "+t+"에 대해 들은 적이 있다.";return "나는 "+t+"에 대해 "+endDa(v)}
+function nextSentence(t,v,q){v=trimEnd(v);var target=q?trimEnd(q).replace(/[?？]+$/,""):"";var about=target&&target.length<20?t+"의 "+target:t;if(v==="검색해 보겠다"||v==="검색")return "앞으로 "+about+"에 대해 검색해 보고 싶다.";if(v==="책을 찾아보겠다")return "앞으로 "+about+"에 관한 책을 찾아보고 싶다.";if(v==="영상으로 보겠다")return "앞으로 "+about+"에 관한 영상을 찾아보고 싶다.";if(v==="선생님께 묻겠다")return "앞으로 "+about+"에 대해 선생님께 물어보고 싶다.";if(v==="가족에게 묻겠다")return "앞으로 "+about+"에 대해 가족에게 물어보고 싶다.";if(v==="직접 관찰하겠다")return "앞으로 "+about+"을 직접 관찰해 보고 싶다.";if(v==="친구와 이야기하겠다")return "앞으로 "+about+"에 대해 친구와 이야기해 보고 싶다.";return "앞으로 "+endDa(v)}
 function noPeriod(v){return trimEnd(v)}
 function joinCauseEmotion(emotion,reason){const e=noPeriod(emotion),r=reasonText(reason);if(!e)return "";if(!reason)return "그때 "+endDa(e);return "그때 "+e+". 그 이유는 "+r+"."}
 function makeStory(){const f=state.facts,t=trimEnd(f.topic),a=[];
  if(state.mode==="curiosity"){
   if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push("나는 "+t+"에 대해 궁금하다.");
   if(f.cause)a.push("이것이 궁금해진 이유는 "+reasonText(f.cause)+".");
-  if(f.known&&f.known!=="거의 모른다")a.push("내가 지금 알고 있는 것은 "+endDa(f.known));
-  else if(f.known==="거의 모른다")a.push("아직 이것에 대해서는 잘 모른다.");
-  if(f.next)a.push("그래서 앞으로 "+endDa(f.next));
+  if(f.known)a.push(knownSentence(t,f.known));
+  if(f.next)a.push(nextSentence(t,f.next,f.question));
  }else if(state.mode==="interest"){
   if(t)a.push("나는 "+particle(t,"을","를")+" 좋아한다.");
   if(f.reasonDetail)a.push("특히 "+particle(f.reasonDetail,"이","가")+" "+reasonText(f.reason)+".");else if(f.reason)a.push("특히 좋아하는 이유는 "+reasonText(f.reason)+".");
