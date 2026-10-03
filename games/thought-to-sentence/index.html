@@ -74,6 +74,7 @@ function nextNode(node,value){
  if(node==="emotion")return "emotionCause";
  if(node==="emotionCause")return "thought";
  if(node==="thought")return "next";
+ if(node==="next"||node==="addResult"||node==="addReason"||node==="addThought"||node==="addNext")return "review";
  if(node==="curiositySeed")return "curiosityFocus";
  if(node==="curiosityFocus")return "curiosityWhy";
  if(node==="curiosityWhy")return "curiosityKnow";
@@ -124,9 +125,10 @@ function questionTarget(t,q){q=normalizeQuestion(q);if(!q||/^(왜|어떻게|언�
 function nextSentence(t,v,q){v=String(v||"").trim().replace(/[.。]+$/,"");var target=questionTarget(t,q);if(v==="검색해 보겠다"||v==="검색")return sentence("앞으로 "+target+"에 대해 검색해 보고 싶다");if(v==="책을 찾아보겠다")return sentence("앞으로 "+target+"에 관한 책을 찾아보고 싶다");if(v==="영상으로 보겠다")return sentence("앞으로 "+target+"에 관한 영상을 찾아보고 싶다");if(v==="선생님께 묻겠다")return sentence("앞으로 "+target+"에 대해 선생님께 물어보고 싶다");if(v==="가족에게 묻겠다")return sentence("앞으로 "+target+"에 대해 가족에게 물어보고 싶다");if(v==="직접 관찰하겠다")return sentence("앞으로 "+particle(target,"을","를")+" 직접 관찰해 보고 싶다");if(v==="친구와 이야기하겠다")return sentence("앞으로 "+target+"에 대해 친구와 이야기해 보고 싶다");return sentence("앞으로 "+v)}
 function interestActionSentence(t,action,detail){t=String(t||"").trim();action=String(action||"").trim();detail=String(detail||"").trim();if(detail&&action==="찾아본다")return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 찾아본다");if(detail&&action==="자주 본다")return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 자주 본다");if(detail)return sentence("그래서 평소에 "+t+"의 "+particle(detail,"을","를")+" 관심 있게 본다");if(action==="찾아본다")return sentence("그래서 평소에 "+t+"에 대해 찾아본다");if(action==="자주 본다")return sentence("그래서 평소에 "+particle(t,"을","를")+" 자주 본다");return sentence("그래서 평소에 "+action)}
 function interestNextSentence(t,next,detail){t=String(t||"").trim();next=String(next||"").trim();detail=String(detail||"").trim();if(detail)return sentence("앞으로는 "+t+"의 "+particle(detail,"을","를")+" 더 알아보고 싶다");if(next==="더 알아보고 싶다"||next==="새로운 것을 찾아보고 싶다")return sentence("앞으로는 "+t+"에 대해 더 알아보고 싶다");return sentence("앞으로는 "+next)}
-function eventSentence(t,v){t=String(t||"").trim();v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";if(!t)return endDa(v);var generic=/^(실수했다|문제가 생겼다|원하는 대로 되지 않았다|계획이 바뀌었다|잘한 일이 있었다|칭찬을 받았다|기다려야 했다)$/.test(v);if(generic)return sentence(t+"와 관련해서 "+v);return sentence(t+"와 관련해서 "+v)}
+function eventSentence(t,v){t=String(t||"").trim();v=String(v||"").trim().replace(/[.。]+$/,"");if(!v)return "";if(!t)return endDa(v);if(v==="잊어버렸다")return sentence(t+"을 준비하면서 필요한 것을 잊어버렸다");if(v==="없어서 곤란했다")return sentence(t+"을 할 때 필요한 것이 없어서 곤란했다");if(v==="실수했다")return sentence(t+"을 하다가 실수했다");if(v==="문제가 생겼다")return sentence(t+"을 하는 중에 문제가 생겼다");if(v==="원하는 대로 되지 않았다")return sentence(t+"이 원하는 대로 되지 않았다");if(v==="계획이 바뀌었다")return sentence(t+"과 관련된 계획이 바뀌었다");if(v==="잘한 일이 있었다")return sentence(t+"에서 내가 잘한 일이 있었다");if(v==="칭찬을 받았다")return sentence(t+"과 관련해서 칭찬을 받았다");if(v==="기다려야 했다")return sentence(t+"과 관련해서 기다려야 했다");return sentence(t+"과 관련해서 "+v)}
 function noPeriod(v){return String(v||"").trim().replace(/[.。]+$/,"")}
-function joinCauseEmotion(emotion,reason){var e=noPeriod(emotion),r=reasonText(reason);if(!e)return "";if(!reason)return sentence("그때 "+e);return sentence("그때 "+e)+ " "+sentence("그 이유는 "+r)}
+function emotionSentence(emotion){var e=noPeriod(emotion);return e?sentence("그때 "+e):""}
+function emotionReasonSentence(reason){var r=reasonText(reason);return r?sentence("그렇게 느낀 이유는 "+r):""}
 function makeStory(){const f=state.facts,t=noPeriod(f.topic),a=[];
  if(state.mode==="curiosity"){
   if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push(sentence("나는 "+t+"에 대해 궁금하다"));
@@ -141,8 +143,9 @@ function makeStory(){const f=state.facts,t=noPeriod(f.topic),a=[];
  }else{
   if(f.event)a.push(eventSentence(t,f.event));
   if(f.result)a.push(sentence("그래서 "+noPeriod(f.result)));else if(f.cause)a.push(sentence("그 일이 그렇게 된 이유는 "+noPeriod(f.cause)));
-  if(f.emotion)a.push(joinCauseEmotion(f.emotion,f.emotionReason));else if(f.thought)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
-  if(f.next)a.push(sentence("다음에는 "+noPeriod(f.next)));else if(f.thought&&f.emotion)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
+  if(f.emotion)a.push(emotionSentence(f.emotion));
+  if(f.emotionReason)a.push(emotionReasonSentence(f.emotionReason));else if(f.thought)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
+  if(f.next)a.push(sentence("다음에는 "+noPeriod(f.next)));else if(f.thought&&f.emotion&&!f.emotionReason)a.push(sentence("이 일을 겪고 "+noPeriod(f.thought)));
  }
  return a.filter(Boolean).slice(0,4)
 }
