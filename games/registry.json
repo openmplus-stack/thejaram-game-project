@@ -43,6 +43,12 @@
       "title": "문장 톡톡",
       "description": "단어와 짧은 표현에서 시작해 자신의 생각과 의도를 문장으로 확장하도록 돕는 독서인지 표현 지원 앱",
       "status": "published"
+    },
+    {
+      "slug": "thought-to-sentence",
+      "title": "생각을 문장으로",
+      "description": "단어를 하나씩 선택하고 사건·감정·다음 행동을 연결해 3~4문장으로 자신의 생각을 표현하는 자기표현 학습 앱",
+      "status": "published"
     }
   ]
 }
