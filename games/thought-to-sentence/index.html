@@ -93,11 +93,30 @@ function particle(word,batchim,noBatchim){return trimEnd(word)+(hasBatchim(word)
 function endDa(v){v=trimEnd(v);if(!v)return "";if(/(다|겠다|했다|됐다|였다|이었다|있었다|없었다)$/.test(v))return v+".";if(/고 싶어$/.test(v))return v.replace(/고 싶어$/,"고 싶다.");if(/궁금해$/.test(v))return v.replace(/궁금해$/,"궁금하다.");return v+"."}
 function reasonText(v){v=trimEnd(v);const map={"재미있어서":"재미있기 때문이다","멋있어서":"멋있기 때문이다","귀여워서":"귀엽기 때문이다","신기해서":"신기하기 때문이다","편안해서":"편안하기 때문이다","잘할 수 있어서":"잘할 수 있기 때문이다","새로운 것을 알 수 있어서":"새로운 것을 알 수 있기 때문이다","책에서 봐서":"책에서 보았기 때문이다","영상에서 봐서":"영상에서 보았기 때문이다","직접 봐서":"직접 보았기 때문이다","수업에서 배워서":"수업에서 배웠기 때문이다","친구가 말해서":"친구가 말해 주었기 때문이다","좋아해서":"좋아하기 때문이다","잘 몰라서":"잘 모르기 때문이다"};return map[v]||(/서$/.test(v)?v.replace(/서$/,"기 때문이다"):v)}
 function curiositySentence(t,q){q=trimEnd(q);if(/[?？]$/.test(q))q=q.replace(/[?？]+$/,"");if(q.startsWith(t))return q.replace(/을까$/,"는지").replace(/할까$/,"하는지").replace(/일까$/,"인지").replace(/까$/,"지")+" 궁금하다.";const special={"왜 그런지":"왜 그런지","어떻게 하는지":"어떻게 하는지","어디에 있는지":"어디에 있는지","무엇을 먹는지":"무엇을 먹는지","어떻게 생겼는지":"어떻게 생겼는지","언제 생겼는지":"언제 생겼는지","다른 것과 무엇이 다른지":"다른 것과 무엇이 다른지"};return particle(t,"이","가")+" "+(special[q]||q)+" 궁금하다."}
+function noPeriod(v){return trimEnd(v)}
+function joinCauseEmotion(emotion,reason){const e=noPeriod(emotion),r=reasonText(reason);if(!e)return "";if(!reason)return "그때 "+endDa(e);return "그때 "+e+". 그 이유는 "+r+"."}
 function makeStory(){const f=state.facts,t=trimEnd(f.topic),a=[];
- if(state.mode==="curiosity"){if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push("나는 "+particle(t,"에 대해","에 대해")+" 궁금하다.");if(f.cause)a.push("궁금해진 이유는 "+reasonText(f.cause)+".");if(f.known&&f.known!=="거의 모른다")a.push("지금은 "+endDa(f.known));if(f.next)a.push("앞으로 "+endDa(f.next));}
- else if(state.mode==="interest"){if(t)a.push("나는 "+particle(t,"을","를")+" 좋아한다.");if(f.reason)a.push("좋아하는 이유는 "+reasonText(f.reason)+".");if(f.action)a.push("나는 "+endDa(f.action));if(f.next)a.push("앞으로 "+endDa(f.next));}
- else{if(t&&f.event)a.push(particle(t,"과","와")+" 관련된 일에서 "+endDa(f.event));else if(f.event)a.push(endDa(f.event));if(f.result)a.push("그 결과 "+endDa(f.result));else if(f.cause)a.push("그때 "+endDa(f.cause));if(f.emotion&&f.emotionReason)a.push("그때 "+trimEnd(f.emotion)+". "+reasonText(f.emotionReason)+".");else if(f.emotion)a.push("그때 "+endDa(f.emotion));if(f.thought)a.push(endDa(f.thought));if(f.next)a.push("다음에는 "+endDa(f.next));}
- return a.filter(Boolean).slice(0,4)}
-function finish(){bar.style.width="100%";const story=makeStory();main.innerHTML='<section class="card"><div class="question">내 생각이 한 편의 글이 됐어!</div><div class="help">내가 고른 내용을 3~4문장으로 정리했다.</div>'+thoughtMap()+'<div class="result"><b>📝 나의 최종 문장</b><br><br>'+story.map(x=>'<div style="margin:9px 0">'+esc(x)+'</div>').join("")+'</div><div class="nav"><button class="btn ghost" onclick="back()">← 생각 고치기</button><button class="btn primary" onclick="home()">새 이야기 시작</button></div></section>'}
+ if(state.mode==="curiosity"){
+  if(t&&f.question)a.push(curiositySentence(t,f.question));else if(t)a.push("나는 "+t+"에 대해 궁금하다.");
+  if(f.cause)a.push("이것이 궁금해진 이유는 "+reasonText(f.cause)+".");
+  if(f.known&&f.known!=="거의 모른다")a.push("내가 지금 알고 있는 것은 "+endDa(f.known));
+  else if(f.known==="거의 모른다")a.push("아직 이것에 대해서는 잘 모른다.");
+  if(f.next)a.push("그래서 앞으로 "+endDa(f.next));
+ }else if(state.mode==="interest"){
+  if(t)a.push("나는 "+particle(t,"을","를")+" 좋아한다.");
+  if(f.reason)a.push("특히 좋아하는 이유는 "+reasonText(f.reason)+".");
+  if(f.action)a.push("그래서 평소에 "+endDa(f.action));
+  if(f.next)a.push("앞으로는 "+endDa(f.next));
+ }else{
+  if(t&&f.event)a.push(particle(t,"과","와")+" 관련해 "+endDa(f.event));else if(f.event)a.push(endDa(f.event));
+  if(f.result)a.push("그래서 "+endDa(f.result));else if(f.cause)a.push("그 일이 잘된 데에는 "+endDa(f.cause));
+  if(f.emotion)a.push(joinCauseEmotion(f.emotion,f.emotionReason));
+  else if(f.thought)a.push("이 일을 겪고 "+endDa(f.thought));
+  if(f.next)a.push("다음에는 "+endDa(f.next));else if(f.thought&&f.emotion)a.push("이 일을 겪고 "+endDa(f.thought));
+ }
+ return a.filter(Boolean).slice(0,4)
+}
+function storyTitle(){const f=state.facts,t=trimEnd(f.topic);if(state.mode==="curiosity")return t? t+"에 대한 나의 궁금증":"내가 궁금한 것";if(state.mode==="interest")return t? "내가 좋아하는 "+t:"내가 좋아하는 것";if(t)return t+"에 있었던 일";return "나의 이야기"}
+function finish(){bar.style.width="100%";const story=makeStory();main.innerHTML='<section class="card"><div class="question">내 생각이 한 편의 글이 됐어!</div><div class="help">내가 말한 내용을 흐름에 맞게 연결했다.</div>'+thoughtMap()+'<div class="result"><div style="font-size:17px;color:#6d7c78;font-weight:800;margin-bottom:5px">📝 나의 글</div><div style="font-size:26px;font-weight:950;margin-bottom:14px">'+esc(storyTitle())+'</div><div style="line-height:2">'+story.map(x=>'<span>'+esc(x)+' </span>').join("")+'</div></div><div class="nav"><button class="btn ghost" onclick="back()">← 생각 고치기</button><button class="btn primary" onclick="home()">새 이야기 시작</button></div></section>'}
 document.querySelector("#startBtn")?.addEventListener("click",startMenu);document.querySelector("#storyBtn")?.addEventListener("click",()=>alert("나의 이야기장은 다음 개발 단계에서 연결됩니다."));
 </script></body></html>
