@@ -67,6 +67,22 @@ function openTreasure(name){let x=treasureDB.find(t=>t.name===name);if(!x)return
 function closeTreasure(){let m=document.getElementById('treasureModal');m.classList.remove('open');m.setAttribute('aria-hidden','true')}
 function rewardSentence(sentence){if(state.sentences.some(x=>x.text===sentence))return {duplicate:true};state.sentences.push({text:sentence,at:new Date().toISOString()});state.fish+=1;let reward=null;let roll=Math.random();if(roll<.18){let locked=treasurePool.filter(x=>!state.treasures.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];state.treasures.push(reward)}}else if(roll<.23){let locked=specialPool.filter(x=>!state.specialPenguins.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];state.specialPenguins.push(reward)}}saveState();return {duplicate:false,reward}}
 let idx=0, ans={}, expanded={};const card=document.querySelector('#card'),bar=document.querySelector('#bar'),stepText=document.querySelector('#stepText');
+const placeObjectRules=[
+ {test:/편의점|마트/,objects:['간식을','과자를','빵을','우유를','음료수를','아이스크림을','우산을','문구를']},
+ {test:/도서관|서점/,objects:['책을','도서관 책을','교과서를','공책을']},
+ {test:/교실|수업|과학실|미술실|음악실/,objects:['책을','숙제를','연필을','공책을','교과서를','준비물을']},
+ {test:/학교 운동장|놀이터|체육관/,objects:['공을','물을','신발을','사진을']},
+ {test:/급식실/,objects:['급식판을','물을','우유를']},
+ {test:/집|친구 집/,objects:['숙제를','책을','휴대전화를','가방을','간식을','게임을','옷을']},
+ {test:/학원/,objects:['책을','숙제를','연필을','공책을','교과서를','준비물을']},
+ {test:/공원|동네 길|집 앞/,objects:['자전거를','공을','물을','사진을','우산을']},
+ {test:/버스|지하철|버스 정류장/,objects:['버스 카드를','휴대전화를','가방을','우산을']},
+ {test:/식당|카페/,objects:['물을','음료수를','간식을','빵을']},
+ {test:/문구점/,objects:['연필을','공책을','문구를','준비물을']},
+ {test:/병원|보건실/,objects:['약을','물을']},
+ {test:/수영장/,objects:['물을','가방을','옷을','신발을']},
+ {test:/학교 복도|학교 앞/,objects:['가방을','우산을','준비물을','친구의 물건을']}
+];
 const objectActionRules=[
  {test:/책|교과서|도서관 책/,actions:['읽었어요','빌렸어요','돌려주었어요','가져왔어요','찾았어요']},
  {test:/숙제/,actions:['했어요','가져왔어요','정리했어요']},
@@ -103,6 +119,10 @@ const actionReasonRules=[
 ];
 function contextItems(s){
  const all=[...s.items,...s.examples];
+ if(s.key==='object'&&ans.place){
+  const rule=placeObjectRules.find(r=>r.test.test(ans.place));
+  if(rule){const first=rule.objects.filter(x=>all.includes(x));return {main:first,extra:all.filter(x=>!first.includes(x)),matched:true,restricted:false}}
+ }
  if(s.key==='predicate'&&ans.object){
   const rule=objectActionRules.find(r=>r.test.test(stripParticle(ans.object)));
   if(rule){const valid=rule.actions.filter(x=>all.includes(x));return {main:valid,extra:all.filter(x=>!valid.includes(x)),matched:true,restricted:true}}
