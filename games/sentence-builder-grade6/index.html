@@ -228,6 +228,18 @@ function extensionChoices(round=1){
  const clean=list=>list.filter(v=>!used.has(v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim()));
  return {result:clean(result),thought:clean(thought),feeling:clean(feeling)}
 }
+function contextualQuestions(){
+ const last=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'',p=ans.predicate||'',o=stripParticle(ans.object||'');
+ let result='그 다음에는 어떻게 되었어요?',thought='그 일에 대해 어떤 생각을 했어요?',feeling='그때 어떤 기분이 들었어요?';
+ if(/샀어요|골랐어요/.test(last)||(/샀어요|골랐어요/.test(p)&&storyDraft.length===1))result=(o?o+'을(를) ':'산 것을 ')+'고른 다음에는 무엇을 했어요?';
+ if(/먹었어요|마셨어요|든든/.test(last))result='먹거나 마신 다음에는 어떻게 되었어요?';
+ if(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p))result='상대방은 어떻게 반응했어요?';
+ if(/숙제|해야 할 일|끝냈어요|마쳤어요/.test(last))result='해야 할 일을 끝낸 다음에는 무엇을 했어요?';
+ if(/찾았어요/.test(last)||/찾았어요/.test(p))result='찾은 다음에는 그 물건을 어떻게 했어요?';
+ if(/기분|뿌듯|마음/.test(last)){thought='왜 그런 기분이 들었다고 생각해요?';feeling='그 기분은 계속되었나요?'}
+ if(/생각/.test(last)){result='그렇게 생각한 뒤에는 무엇을 했어요?';thought='다음에는 어떻게 하고 싶어요?'}
+ return {result,thought,feeling}
+}
 function coherentNext(kind,text){
  const prev=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
  let t=text.trim();
@@ -241,8 +253,8 @@ function coherentNext(kind,text){
 
 let storyDraft=[];
 function renderStoryExtension(){
- const round=storyDraft.length,x=extensionChoices(round);
- card.innerHTML=`<h1>${round===1?'조금 더 말해 볼까요?':'이야기를 더 이어 볼까요?'}</h1><p class="help">원하는 내용을 골라 문장을 계속 이어 보세요. 그만하고 싶을 때는 아래의 ‘그만하기’를 누르세요.</p><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="extend-box"><div class="extend-title">다음에는 무엇을 말할까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ 다음 사건</button><button class="extend-option" data-kind="thought">💭 생각</button><button class="extend-option" data-kind="feeling">🙂 감정</button></div><div id="extendChoices"></div></div><button class="btn next" id="stopStory">그만하기 · 글 완성</button>`;
+ const round=storyDraft.length,x=extensionChoices(round),q=contextualQuestions();
+ card.innerHTML=`<h1>${round===1?'조금 더 말해 볼까요?':'이야기를 더 이어 볼까요?'}</h1><p class="help">방금 만든 문장을 생각하며 질문 하나를 골라 보세요.</p><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="extend-box"><div class="extend-title">무엇을 더 말해 볼까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ ${escapeHtml(q.result)}</button><button class="extend-option" data-kind="thought">💭 ${escapeHtml(q.thought)}</button><button class="extend-option" data-kind="feeling">🙂 ${escapeHtml(q.feeling)}</button></div><div id="extendChoices"></div></div><button class="btn next" id="stopStory">그만하기 · 글 완성</button>`;
  card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind].filter(v=>!storyDraft.includes(v));if(!list.length)list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>{storyDraft.push(coherentNext(b.dataset.kind,q.dataset.v));renderStoryExtension()})});
  document.getElementById('stopStory').onclick=finishStory
 }
