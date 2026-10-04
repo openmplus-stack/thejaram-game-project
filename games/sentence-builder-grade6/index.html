@@ -227,8 +227,9 @@ function naturalObject(x){let v=cleanToken(x);return v?obj(v):''}
 function normalizePredicate(x){let v=cleanToken(x);if(!v)return '';const map={'구매했어요':'샀어요','섭취했어요':'먹었어요','음용했어요':'마셨어요'};return map[v]||v}
 function buildSentence(){
  const time=normalizeTime(ans.time),reason=naturalReason(ans.reason),place=normalizePlace(ans.place),subject=naturalSubject(ans.subject),object=naturalObject(ans.object),predicate=normalizePredicate(ans.predicate);
- // 기본 어순: 시간 → 이유 → 장소 → 주어(필요할 때) → 목적어 → 서술어
- const parts=[time,reason,place,subject,object,predicate].filter(Boolean);
+ // 기본 어순: 시간 → 주어 → 이유 → 장소 → 목적어 → 서술어
+ // 예: 오늘 오후에 친구는 화가 나서 급식실에서 우유를 던졌어요.
+ const parts=[time,subject,reason,place,object,predicate].filter(Boolean);
  let s=parts.join(' ').replace(/\s+/g,' ').trim();
  // 같은 조사가 직접 입력 과정에서 겹친 경우 정리한다.
  s=s.replace(/에서에서/g,'에서').replace(/은은|는는/g,m=>m[0]).replace(/을을|를를/g,m=>m[0]);
