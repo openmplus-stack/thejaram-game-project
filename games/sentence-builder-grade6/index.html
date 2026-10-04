@@ -380,33 +380,39 @@ function finishStory(){
 function commitSentence(sentence){
  state=normalizeState(state);
  const normalized=normalizeMeaningText(sentence);
- const existing=state.sentences.some(x=>normalizeMeaningText(x.text)===normalized);
- if(existing)return {duplicate:true,fish:0,reward:null,rewardType:null};
- const next=normalizeState(state);
- next.sentences.push({text:sentence,kind:'sentence',at:new Date().toISOString()});
- next.fish+=1;
- let reward=null,rewardType=null,roll=Math.random();
- if(roll<.18){let locked=treasurePool.filter(x=>!next.treasures.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='treasure';next.treasures.push(reward)}}
- else if(roll<.23){let locked=specialPool.filter(x=>!next.specialPenguins.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='penguin';next.specialPenguins.push(reward)}}
- // 먼저 영구 저장에 성공한 뒤 화면 상태를 교체한다.
- localStorage.setItem(STORE_KEY,JSON.stringify(next));
- state=next;
- try{updateUI()}catch(e){console.warn('saved; UI refresh failed',e)}
- return {duplicate:false,fish:1,reward,rewardType}
+ if(state.sentences.some(x=>normalizeMeaningText(x.text)===normalized))return {duplicate:true,fish:0,reward:null,rewardType:null,persisted:true};
+ // 핵심 보상은 다른 기능과 분리한다: 문장 1개 + 물고기 1마리.
+ state.sentences.push({text:sentence,kind:'sentence',at:new Date().toISOString()});
+ state.fish=(Number(state.fish)||0)+1;
+ let persisted=false;
+ try{localStorage.setItem(STORE_KEY,JSON.stringify(state));persisted=true}catch(e){console.warn('localStorage unavailable; keeping session state',e)}
+ // 특별 보상 오류는 핵심 저장을 실패시키지 않는다.
+ let reward=null,rewardType=null;
+ try{
+  const roll=Math.random();
+  if(roll<.18){const locked=treasurePool.filter(x=>!state.treasures.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='treasure';state.treasures.push(reward)}}
+  else if(roll<.23){const locked=specialPool.filter(x=>!state.specialPenguins.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='penguin';state.specialPenguins.push(reward)}}
+  if(persisted)localStorage.setItem(STORE_KEY,JSON.stringify(state));
+ }catch(e){console.warn('optional reward skipped',e)}
+ try{updateUI()}catch(e){console.warn('UI refresh failed',e)}
+ return {duplicate:false,fish:1,reward,rewardType,persisted}
 }
 function bindFinishedButtons(sentence){
  const back=document.getElementById('back'),complete=document.getElementById('completeSentence');
  if(back)back.onclick=()=>{idx=4;render()};
  if(complete)complete.onclick=()=>{
-   complete.disabled=true;
-   let result,msg;
-   try{result=commitSentence(sentence);msg=rewardSummary(result)}
-   catch(e){console.error('complete sentence failed',e);complete.disabled=false;document.getElementById('completeStatus').textContent='저장하지 못했어요. 다시 눌러 주세요.';return}
-   document.getElementById('completeStatus').innerHTML=(result.duplicate?'이미 문장 사전에 저장된 문장이에요.':msg+'<br>📖 문장 사전에 저장했어요.');
-   complete.textContent='✓ 문장 완료';
-   const after=document.getElementById('afterComplete');after.style.display='block';
-   document.getElementById('extend').onclick=()=>showExtension(sentence);
-   document.getElementById('again').onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()}
+  complete.disabled=true;
+  let result;
+  try{result=commitSentence(sentence)}
+  catch(e){console.error('completion failed',e);complete.disabled=false;document.getElementById('completeStatus').textContent='완료 처리 중 문제가 생겼어요. 다시 눌러 주세요.';return}
+  const status=document.getElementById('completeStatus');
+  if(result.duplicate)status.textContent='이미 문장 사전에 저장된 문장이에요.';
+  else status.innerHTML='🐟 물고기 1마리를 받았어요!<br>📖 문장 사전에 저장했어요.'+(result.persisted?'':'<br>※ 현재 실행 중에는 저장되지만 브라우저를 닫으면 기록이 사라질 수 있어요.');
+  complete.textContent='✓ 완료됨';
+  const after=document.getElementById('afterComplete');if(after)after.style.display='block';
+  const extend=document.getElementById('extend'),again=document.getElementById('again');
+  if(extend)extend.onclick=()=>showExtension(sentence);
+  if(again)again.onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()}
  }
 }
 function showSafeFinishedSentence(sentence){bar.style.width='100%';showSentencePreview(sentence||'문장을 다시 확인해 주세요.')}
