@@ -269,10 +269,27 @@ function renderStoryExtension(){
  document.getElementById('stopStory').onclick=finishStory
 }
 function showExtension(firstSentence){storyDraft=[firstSentence];renderStoryExtension()}
+function polishStory(lines){
+ let out=(lines||[]).map((v,i)=>{
+  let s=String(v||'').trim().replace(/\s+/g,' ');
+  s=s.replace(/에서에서/g,'에서').replace(/은은|는는/g,m=>m[0]).replace(/을을|를를/g,m=>m[0]);
+  // 첫 문장에서 주어가 이미 분명하면 뒤 문장의 반복되는 '나는'은 생략한다.
+  if(i>0&&/^나는\s+/.test(s))s=s.replace(/^나는\s+/,'');
+  // 연결어가 중복된 경우 하나만 남긴다.
+  s=s.replace(/^(그래서|그리고|그 뒤에|그러자)\s+\1\s+/,'$1 ');
+  // 문장부호는 하나로 정리한다.
+  s=s.replace(/[.?!]+$/,'')+'.';
+  return s;
+ }).filter(Boolean);
+ // 같은 의미의 문장이 연속되는 경우 뒤 문장을 제거한다.
+ out=out.filter((v,i,a)=>i===0||normalizeMeaningText(v)!==normalizeMeaningText(a[i-1]));
+ return out
+}
 function finishStory(){
- const combined=storyDraft.join(' ');
- if(state.sentences.length&&state.sentences[state.sentences.length-1].text===storyDraft[0]){state.sentences[state.sentences.length-1].text=combined;state.sentences[state.sentences.length-1].kind=storyDraft.length>1?'story':'sentence';saveState()}
- card.innerHTML=`<h1>${storyDraft.length>1?'나의 글이 완성됐어요':'내 문장이 완성됐어요'}</h1><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="actions" style="margin-top:20px"><button class="btn" id="homeAfter">홈으로</button><button class="btn primary" id="againAfter">새 문장 만들기</button></div>`;
+ const polished=polishStory(storyDraft),combined=polished.join(' ');
+ if(state.sentences.length&&state.sentences[state.sentences.length-1].text===storyDraft[0]){state.sentences[state.sentences.length-1].text=combined;state.sentences[state.sentences.length-1].kind=polished.length>1?'story':'sentence';saveState()}
+ storyDraft=polished;
+ card.innerHTML=`<h1>${polished.length>1?'나의 글이 완성됐어요':'내 문장이 완성됐어요'}</h1><p class="help">내가 고른 내용은 그대로 두고 문장이 자연스럽게 이어지도록 정리했어요.</p><div class="story-two">${polished.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="actions" style="margin-top:20px"><button class="btn" id="homeAfter">홈으로</button><button class="btn primary" id="againAfter">새 문장 만들기</button></div>`;
  document.getElementById('homeAfter').onclick=()=>showScreen('homeScreen');document.getElementById('againAfter').onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()}
 }
 
