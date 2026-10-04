@@ -214,25 +214,30 @@ function render(){let s=steps[idx],ci=contextItems(s);stepText.textContent=`${id
 function stripParticle(x){return x.replace(/(은|는|이|가|을|를)$/,'')}function hasBatchim(word){let c=word.charCodeAt(word.length-1);return c>=0xAC00&&c<=0xD7A3&&((c-0xAC00)%28)!==0}function subj(x){if(/(은|는|이|가)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'은':'는')}function obj(x){if(/(을|를)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'을':'를')}
 function semanticOK(){let o=stripParticle(ans.object||''),p=ans.predicate||'';let rule=objectActionRules.find(r=>r.test.test(o));return !rule||rule.actions.includes(p)}
 function cleanToken(x){return String(x||'').trim().replace(/[.?!,]+$/,'')}
-function normalizeTime(x){return cleanToken(x)}
+function normalizeTime(x){let v=cleanToken(x);if(!v)return '';const map={'오늘 아침':'오늘 아침에','오늘 점심':'오늘 점심에','오늘 오후':'오늘 오후에','오늘 저녁':'오늘 저녁에','쉬는 시간':'쉬는 시간에','수업 시간':'수업 시간에','방과 후':'방과 후에','주말':'주말에'};return map[v]||v}
 function normalizePlace(x){let v=cleanToken(x);if(!v)return '';if(/(에서|에게서|앞에서|안에서|밖에서)$/.test(v))return v;return v+'에서'}
-function naturalReason(r){let x=cleanToken(r);if(!x)return '';const map={'배가 고프기 때문에':'배가 고파서','목이 마르기 때문에':'목이 말라서','비가 오기 때문에':'비가 와서','필요하기 때문에':'필요해서'};return map[x]||x}
-function naturalSubject(x){
- let v=cleanToken(x);if(!v)return '';
- // 1인칭 '나는'은 한국어 문맥에서 생략해도 뜻이 분명하므로 최종 문장에서는 기본 생략한다.
- if(/^(나|나는|내가)$/.test(v))return '';
- return subj(v)
+function naturalReason(r){let x=cleanToken(r);if(!x)return '';const map={
+'배가 고프기 때문에':'배가 고파서','목이 마르기 때문에':'목이 말라서','비가 오기 때문에':'비가 와서','비가 왔기 때문에':'비가 와서',
+'필요하기 때문에':'필요해서','필요했기 때문에':'필요해서','재미있기 때문에':'재미있어서','궁금하기 때문에':'궁금해서',
+'기분이 좋기 때문에':'기분이 좋아서','친구를 도와주기 위해서':'친구를 도와주려고','잊어버리지 않기 위해서':'잊어버리지 않으려고',
+'숙제를 끝내기 위해서':'숙제를 끝내려고','집에 가져가기 위해서':'집에 가져가려고','깨끗하게 하기 위해서':'깨끗하게 하려고',
+'늦지 않기 위해서':'늦지 않으려고','다음 날 사용하기 위해서':'다음 날 사용하려고'};
+ return map[x]||x.replace(/하기 위해서$/,'하려고').replace(/기 때문에$/,'어서')
 }
+function naturalSubject(x){let v=cleanToken(x);if(!v)return '';if(/^(나|나는|내가)$/.test(v))return '';return subj(v)}
 function naturalObject(x){let v=cleanToken(x);return v?obj(v):''}
-function normalizePredicate(x){let v=cleanToken(x);if(!v)return '';const map={'구매했어요':'샀어요','섭취했어요':'먹었어요','음용했어요':'마셨어요'};return map[v]||v}
+function normalizePredicate(x){let v=cleanToken(x);if(!v)return '';const map={'구매했어요':'샀어요','섭취했어요':'먹었어요','음용했어요':'마셨어요','사용 하였어요':'사용했어요','정리 하였어요':'정리했어요'};return map[v]||v.replace(/\s+했어요$/,'했어요')}
+function polishSentenceText(s){
+ return s.replace(/\s+/g,' ').replace(/에서에서/g,'에서').replace(/은은/g,'은').replace(/는는/g,'는').replace(/이이/g,'이').replace(/가가/g,'가').replace(/을을/g,'을').replace(/를를/g,'를')
+ .replace(/때문에\s+때문에/g,'때문에').replace(/하려고\s+위해서/g,'하려고').replace(/\s+([,.!?])/g,'$1').trim()
+}
 function buildSentence(){
  const time=normalizeTime(ans.time),reason=naturalReason(ans.reason),place=normalizePlace(ans.place),subject=naturalSubject(ans.subject),object=naturalObject(ans.object),predicate=normalizePredicate(ans.predicate);
- // 기본 어순: 시간 → 주어 → 이유 → 장소 → 목적어 → 서술어
- // 예: 오늘 오후에 친구는 화가 나서 급식실에서 우유를 던졌어요.
- const parts=[time,subject,reason,place,object,predicate].filter(Boolean);
- let s=parts.join(' ').replace(/\s+/g,' ').trim();
- // 같은 조사가 직접 입력 과정에서 겹친 경우 정리한다.
- s=s.replace(/에서에서/g,'에서').replace(/은은|는는/g,m=>m[0]).replace(/을을|를를/g,m=>m[0]);
+ // 아동이 고른 의미는 유지하고 한국어 정보 구조만 자연스럽게 배열한다.
+ // 주어가 있으면 시간 → 주어 → 이유 → 장소 → 목적어 → 행동,
+ // 주어가 생략되면 시간 → 이유 → 장소 → 목적어 → 행동 순서를 기본으로 한다.
+ const parts=subject?[time,subject,reason,place,object,predicate]:[time,reason,place,object,predicate];
+ let s=polishSentenceText(parts.filter(Boolean).join(' '));
  return s+(s&&/[.!?]$/.test(s)?'':'.')
 }
 function extensionChoices(){
