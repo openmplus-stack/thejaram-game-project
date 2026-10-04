@@ -224,48 +224,32 @@ function extensionChoices(round=1){
  return {result:clean(result),thought:clean(thought),feeling:clean(feeling)}
 }
 function contextualQuestions(){
- const last=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'',p=ans.predicate||'',o=stripParticle(ans.object||'');
+ const last=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
+ const p=ans.predicate||'',rawObject=ans.object||'',o=rawObject?stripParticle(rawObject):'';
+ const hasObject=!!rawObject,hasPlace=!!ans.place,hasSubject=!!ans.subject,hasReason=!!ans.reason;
  let result='그 다음에는 어떻게 되었어요?',thought='그 일에 대해 어떤 생각을 했어요?',feeling='그때 어떤 기분이 들었어요?';
- if(/샀어요|골랐어요/.test(last)||(/샀어요|골랐어요/.test(p)&&storyDraft.length===1))result=(o?o+'을(를) ':'산 것을 ')+'고른 다음에는 무엇을 했어요?';
- if(/먹었어요|마셨어요|든든/.test(last))result='먹거나 마신 다음에는 어떻게 되었어요?';
- if(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p))result='상대방은 어떻게 반응했어요?';
- if(/숙제|해야 할 일|끝냈어요|마쳤어요/.test(last))result='해야 할 일을 끝낸 다음에는 무엇을 했어요?';
- if(/찾았어요/.test(last)||/찾았어요/.test(p))result='찾은 다음에는 그 물건을 어떻게 했어요?';
- if(/기분|뿌듯|마음/.test(last)){thought='왜 그런 기분이 들었다고 생각해요?';feeling='그 기분은 계속되었나요?'}
+
+ // 구체적인 정보가 실제로 선택되었을 때만 그 정보를 질문에 사용한다.
+ if(hasObject&&(/샀어요|골랐어요/.test(last)||(/샀어요|골랐어요/.test(p)&&storyDraft.length===1)))result=o+'을(를) 고른 다음에는 무엇을 했어요?';
+ else if(!hasObject&&/샀어요|골랐어요/.test(p))result='그 다음에는 무엇을 했어요?';
+
+ if(/먹었어요|마셨어요|든든/.test(last))result='그 다음에는 어떻게 되었어요?';
+ if(hasSubject&&(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p)))result='그 사람은 어떻게 반응했어요?';
+ else if(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p))result='그 다음에는 어떻게 되었어요?';
+ if(hasObject&&(/숙제/.test(o)||/해야 할 일|끝냈어요|마쳤어요/.test(last)))result='그 일을 끝낸 다음에는 무엇을 했어요?';
+ if(hasObject&&(/찾았어요/.test(last)||/찾았어요/.test(p)))result='찾은 다음에는 그것을 어떻게 했어요?';
+ else if(!hasObject&&(/찾았어요/.test(last)||/찾았어요/.test(p)))result='찾은 다음에는 무엇을 했어요?';
+
+ if(/기분|뿌듯|마음/.test(last)){thought=hasReason?'왜 그런 기분이 들었다고 생각해요?':'그 기분에 대해 어떤 생각을 했어요?';feeling='그 기분은 계속되었나요?'}
  if(/생각/.test(last)){result='그렇게 생각한 뒤에는 무엇을 했어요?';thought='다음에는 어떻게 하고 싶어요?'}
+
+ // 장소·주어·이유가 없으면 후속 질문이 이를 새 사실처럼 전제하지 않는다.
+ if(!hasPlace)thought=thought.replace(/그곳에서[^?]*\?/g,'그 일에 대해 어떤 생각을 했어요?');
+ if(!hasSubject)result=result.replace(/친구|상대방|그 사람/g,'그 다음');
+ if(!hasReason)thought=thought.replace(/^왜 /,'');
  return {result,thought,feeling}
 }
-function normalizeMeaningText(v){
- return String(v||'').replace(/^(그래서|그리고|그 뒤에|그러자|하지만|그런데)\s*/,'').replace(/[.!?\s]/g,'').trim()
-}
-function storyFacts(){
- const joined=(storyDraft||[]).join(' ');
- return {
-  hungry:/배가 고프|배고프/.test(joined),
-  full:/배가 든든|배가 불러|배부르/.test(joined),
-  thirsty:/목이 마르/.test(joined),
-  drank:/마셨어요|물을 마|음료.*마/.test(joined),
-  finished:/끝냈어요|마쳤어요/.test(joined),
-  returned:/돌려주었어요/.test(joined),
-  positive:/기분이 좋|뿌듯|마음이 편/.test(joined)
- }
-}
-function contradictsStory(text){
- const f=storyFacts(),t=String(text||'');
- if(f.full&&/배가 고프|배고프/.test(t))return true;
- if(f.drank&&/목이 마르/.test(t))return true;
- if(f.finished&&/아직.*끝내지|하지 못했|못 끝냈/.test(t))return true;
- if(f.returned&&/아직.*돌려주|돌려주지 못/.test(t))return true;
- return false
-}
-function repeatedStoryMeaning(text){
- const n=normalizeMeaningText(text);
- if(!n)return true;
- return (storyDraft||[]).some(v=>{const p=normalizeMeaningText(v);return p===n||(p.length>8&&n.length>8&&(p.includes(n)||n.includes(p)))})
-}
-function validStoryChoices(list){
- return (list||[]).filter(v=>!repeatedStoryMeaning(v)&&!contradictsStory(v))
-}
+
 function coherentNext(kind,text){
  const prev=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
  let t=text.trim();
