@@ -213,17 +213,31 @@ function extensionChoices(){
  if(/주었|건넸|돌려주/.test(p))result=['그래서 친구가 고마워했어요.','그래서 서로 기분이 좋아졌어요.','그래서 친구를 도울 수 있었어요.'];
  return {result,thought,feeling}
 }
-function showExtension(firstSentence){
- const x=extensionChoices();
- card.innerHTML=`<h1>조금 더 말해 볼까요?</h1><p class="help">첫 문장 뒤에 이어질 내용을 하나 골라 주세요.</p><div class="sentence">${escapeHtml(firstSentence)}</div><div class="extend-box"><div class="extend-title">어떤 이야기를 더 할까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ 그 다음에 어떻게 되었나요?</button><button class="extend-option" data-kind="thought">💭 어떤 생각을 했나요?</button><button class="extend-option" data-kind="feeling">🙂 어떤 기분이 들었나요?</button></div><div id="extendChoices"></div></div><button class="btn next" id="finishOne">한 문장으로 끝내기</button>`;
- card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>finishExtended(firstSentence,q.dataset.v))});
- document.getElementById('finishOne').onclick=()=>showScreen('homeScreen')
+function extensionChoices(round=1){
+ const p=ans.predicate||'',o=stripParticle(ans.object||'');
+ let result=['그래서 다음 일을 시작했어요.','그 뒤에 필요한 일을 계속했어요.','그래서 일을 잘 마칠 수 있었어요.'];
+ let thought=['나는 잘했다고 생각했어요.','나는 다음에는 더 잘하고 싶다고 생각했어요.','나는 이 일이 중요하다고 생각했어요.'];
+ let feeling=['나는 기분이 좋았어요.','나는 뿌듯했어요.','나는 마음이 편해졌어요.'];
+ if(round===1&&/먹|마셨|샀/.test(p))result=['그래서 배가 든든해졌어요.','그래서 필요한 것을 준비할 수 있었어요.','그래서 기분이 좋아졌어요.'];
+ if(round===1&&(/숙제/.test(o)||/했어요|정리했어요/.test(p)))result=['그래서 해야 할 일을 끝냈어요.','그래서 마음이 편해졌어요.','그래서 다음 일을 할 수 있었어요.'];
+ if(round===1&&/주었|건넸|돌려주/.test(p))result=['그래서 친구가 고마워했어요.','그래서 서로 기분이 좋아졌어요.','그래서 친구를 도울 수 있었어요.'];
+ if(round>1){result=['그 다음에는 다른 일도 해 보았어요.','잠시 뒤에 해야 할 일을 마쳤어요.','마지막에는 주변을 정리했어요.'];thought=['나는 오늘 있었던 일을 다시 생각해 보았어요.','나는 다음에는 어떻게 할지 생각했어요.','나는 내가 한 선택이 괜찮았다고 생각했어요.'];feeling=['나는 조금 더 자신감이 생겼어요.','나는 기분이 한결 좋아졌어요.','나는 오늘 한 일이 뿌듯했어요.']}
+ return {result,thought,feeling}
 }
-function finishExtended(first,second){
- const combined=first+' '+second;
- if(state.sentences.length&&state.sentences[state.sentences.length-1].text===first){state.sentences[state.sentences.length-1].text=combined;saveState()}
- card.innerHTML=`<h1>두 문장이 완성됐어요</h1><div class="story-two">${escapeHtml(first)}<br>${escapeHtml(second)}</div><div class="actions" style="margin-top:20px"><button class="btn" id="homeAfter">홈으로</button><button class="btn primary" id="againAfter">새 문장 만들기</button></div>`;
- document.getElementById('homeAfter').onclick=()=>showScreen('homeScreen');document.getElementById('againAfter').onclick=()=>{idx=0;ans={};expanded={};render()}
+let storyDraft=[];
+function renderStoryExtension(){
+ const round=storyDraft.length,x=extensionChoices(round);
+ card.innerHTML=`<h1>${round===1?'조금 더 말해 볼까요?':'이야기를 더 이어 볼까요?'}</h1><p class="help">원하는 내용을 골라 문장을 계속 이어 보세요. 그만하고 싶을 때는 아래의 ‘그만하기’를 누르세요.</p><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="extend-box"><div class="extend-title">다음에는 무엇을 말할까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ 다음 사건</button><button class="extend-option" data-kind="thought">💭 생각</button><button class="extend-option" data-kind="feeling">🙂 감정</button></div><div id="extendChoices"></div></div><button class="btn next" id="stopStory">그만하기 · 글 완성</button>`;
+ card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind].filter(v=>!storyDraft.includes(v));if(!list.length)list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>{storyDraft.push(q.dataset.v);renderStoryExtension()})});
+ document.getElementById('stopStory').onclick=finishStory
 }
+function showExtension(firstSentence){storyDraft=[firstSentence];renderStoryExtension()}
+function finishStory(){
+ const combined=storyDraft.join(' ');
+ if(state.sentences.length&&state.sentences[state.sentences.length-1].text===storyDraft[0]){state.sentences[state.sentences.length-1].text=combined;state.sentences[state.sentences.length-1].kind=storyDraft.length>1?'story':'sentence';saveState()}
+ card.innerHTML=`<h1>${storyDraft.length>1?'나의 글이 완성됐어요':'내 문장이 완성됐어요'}</h1><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="actions" style="margin-top:20px"><button class="btn" id="homeAfter">홈으로</button><button class="btn primary" id="againAfter">새 문장 만들기</button></div>`;
+ document.getElementById('homeAfter').onclick=()=>showScreen('homeScreen');document.getElementById('againAfter').onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()}
+}
+
 function finish(){bar.style.width='100%';let ok=semanticOK();let sentence=buildSentence();let r=ok?rewardSentence(sentence):null;let rewardText=!ok?'':r.duplicate?'이 문장은 이미 저장되어 있어요. 같은 문장에는 보상을 다시 주지 않아요.':`🐟 물고기 1마리를 받았어요!${r.reward?`<br>🎉 특별 보상: ${escapeHtml(r.reward)}`:''}`;card.innerHTML=`<h1>내 문장이 완성됐어요</h1>${ok?'':`<div class='notice'><b>조금 더 알려 주세요.</b><br>고른 ‘무엇’과 ‘행동’이 자연스럽게 이어지지 않을 수 있어요. 아래에서 행동을 다시 골라 보세요.</div>`}<div class='sentence'>${sentence}</div>${rewardText?`<div class='reward'>${rewardText}</div>`:''}<div class='parts'>언제 · 어디에서 · 누가 · 무엇을 · 어떻게 · 왜</div><div class='actions' style='margin-top:22px'><button class='btn' id='back'>고쳐 보기</button><button class='btn primary' id='extend'>조금 더 말하기</button></div><button class='btn more' id='again' style='margin-top:10px'>새 문장 만들기</button>`;document.querySelector('#back').onclick=()=>{idx=4;render()};document.querySelector('#extend').onclick=()=>showExtension(sentence);document.querySelector('#again').onclick=()=>{idx=0;ans={};expanded={};render()}}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(id==='composeScreen')render();window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));document.getElementById('startBtn').onclick=()=>showScreen('composeScreen');document.getElementById('loginBtn').onclick=()=>alert('로그인·회원가입 화면은 다음 단계에서 연결합니다.');document.getElementById('closeModal').onclick=closeTreasure;document.getElementById('treasureModal').onclick=e=>{if(e.target.id==='treasureModal')closeTreasure()};document.getElementById('feedBtn').onclick=()=>{let m=document.getElementById('feedMsg');if(state.fish<1){m.textContent='먼저 새 문장을 만들고 물고기를 받아 주세요.';return}state.fish--;state.fed++;saveState();m.textContent='🐟 냠냠! 펭귄이 물고기를 먹었어요.';setTimeout(()=>m.textContent='',2200)};updateUI();render();</script></body></html>
