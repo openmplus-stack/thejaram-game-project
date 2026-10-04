@@ -231,13 +231,31 @@ function polishSentenceText(s){
  return s.replace(/\s+/g,' ').replace(/에서에서/g,'에서').replace(/은은/g,'은').replace(/는는/g,'는').replace(/이이/g,'이').replace(/가가/g,'가').replace(/을을/g,'을').replace(/를를/g,'를')
  .replace(/때문에\s+때문에/g,'때문에').replace(/하려고\s+위해서/g,'하려고').replace(/\s+([,.!?])/g,'$1').trim()
 }
+function contextualPolish(parts){
+ let s=polishSentenceText(parts.filter(Boolean).join(' '));
+ // 자주 나오는 구어적 입력을 초등 고학년 수준의 자연스러운 문장으로 정리한다.
+ s=s.replace(/화가\s*나서/g,'화가 나서').replace(/기분이\s*좋아서/g,'기분이 좋아서')
+     .replace(/목이\s*말라서/g,'목이 말라서').replace(/배가\s*고파서/g,'배가 고파서')
+     .replace(/친구를\s*도와주려고/g,'친구를 도와주려고')
+     .replace(/잊어버리지\s*않으려고/g,'잊어버리지 않으려고');
+ return s
+}
+function sentenceQualityCheck(sentence){
+ const s=String(sentence||'').trim(),issues=[];
+ if(!s)issues.push('empty');
+ if(/에서에서|은은|는는|을을|를를/.test(s))issues.push('duplicate-particle');
+ if(/때문에\s+때문에|위해서\s+위해서/.test(s))issues.push('duplicate-reason');
+ if(/\s{2,}/.test(s))issues.push('spacing');
+ return {ok:issues.length===0,issues}
+}
 function buildSentence(){
  const time=normalizeTime(ans.time),reason=naturalReason(ans.reason),place=normalizePlace(ans.place),subject=naturalSubject(ans.subject),object=naturalObject(ans.object),predicate=normalizePredicate(ans.predicate);
  // 아동이 고른 의미는 유지하고 한국어 정보 구조만 자연스럽게 배열한다.
  // 주어가 있으면 시간 → 주어 → 이유 → 장소 → 목적어 → 행동,
  // 주어가 생략되면 시간 → 이유 → 장소 → 목적어 → 행동 순서를 기본으로 한다.
  const parts=subject?[time,subject,reason,place,object,predicate]:[time,reason,place,object,predicate];
- let s=polishSentenceText(parts.filter(Boolean).join(' '));
+ let s=contextualPolish(parts);
+ const checked=sentenceQualityCheck(s);if(!checked.ok)s=polishSentenceText(s);
  return s+(s&&/[.!?]$/.test(s)?'':'.')
 }
 function extensionChoices(){
