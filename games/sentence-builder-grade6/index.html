@@ -377,10 +377,21 @@ function showSafeFinishedSentence(sentence){
 }
 function finish(){
  bar.style.width='100%';
- let sentence=buildSentence(),ok=true,rewardText='';
- try{ok=semanticOK()}catch(e){console.warn(e)}
- if(ok){try{rewardText=rewardSummary(rewardSentence(sentence))}catch(e){console.error('reward failed',e)}}
- card.innerHTML=`<h1>내 문장이 완성됐어요</h1>${ok?'':`<div class='notice'><b>조금 더 알려 주세요.</b><br>고른 ‘무엇’과 ‘행동’이 자연스럽게 이어지지 않을 수 있어요. 아래에서 행동을 다시 골라 보세요.</div>`}<div class='sentence'>${escapeHtml(sentence)}</div>${rewardText?`<div class='reward'>${rewardText}</div>`:''}<div class='parts'>언제 · 어디에서 · 누가 · 무엇을 · 어떻게 · 왜</div><div class='actions' style='margin-top:22px'><button type='button' class='btn' id='back'>고쳐 보기</button><button type='button' class='btn primary' id='extend'>조금 더 말하기</button></div><button type='button' class='btn more' id='again' style='margin-top:10px'>새 문장 만들기</button>`;
+ const sentence=buildSentence();
+ // 문장을 완성했다면 의미 추천 규칙과 관계없이 반드시 저장하고 물고기 보상을 지급한다.
+ // semanticOK는 추천/안내에만 사용하며 정답 판정이나 저장 차단에 사용하지 않는다.
+ let rewardText='',saveNotice='';
+ try{rewardText=rewardSummary(rewardSentence(sentence))}catch(e){
+   console.error('reward failed',e);
+   // UI 갱신 오류와 저장 오류를 분리해 한 번 더 최소 저장을 시도한다.
+   try{
+     const normalized=normalizeMeaningText(sentence);
+     if(!state.sentences.some(x=>normalizeMeaningText(x.text)===normalized)){state.sentences.push({text:sentence,kind:'sentence',at:new Date().toISOString()});state.fish+=1}
+     localStorage.setItem(STORE_KEY,JSON.stringify(state));rewardText='🐟 물고기 1마리를 받았어요!';saveNotice='문장도 문장 사전에 저장했어요.';
+     try{updateUI()}catch(uiErr){console.warn('UI refresh failed',uiErr)}
+   }catch(storageErr){console.error('sentence storage failed',storageErr);saveNotice='이 기기에서 저장 공간을 사용할 수 없어 문장을 임시로만 보여드려요.'}
+ }
+ card.innerHTML=`<h1>내 문장이 완성됐어요</h1><div class='sentence'>${escapeHtml(sentence)}</div>${rewardText?`<div class='reward'>${rewardText}${saveNotice?'<br>'+escapeHtml(saveNotice):''}</div>`:''}<div class='parts'>언제 · 어디에서 · 누가 · 무엇을 · 어떻게 · 왜</div><div class='actions' style='margin-top:22px'><button type='button' class='btn' id='back'>고쳐 보기</button><button type='button' class='btn primary' id='extend'>조금 더 말하기</button></div><button type='button' class='btn more' id='again' style='margin-top:10px'>새 문장 만들기</button>`;
  bindFinishedButtons(sentence)
 }
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(id==='composeScreen')render();window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));document.getElementById('startBtn').onclick=startCompose;document.getElementById('loginBtn').onclick=()=>alert('로그인·회원가입 화면은 다음 단계에서 연결합니다.');document.getElementById('closeModal').onclick=closeTreasure;document.getElementById('treasureModal').onclick=e=>{if(e.target.id==='treasureModal')closeTreasure()};function flyFishToPenguin(done){const btn=document.getElementById('feedBtn'),stage=document.getElementById('penguinStage'),a=btn.getBoundingClientRect(),b=stage.getBoundingClientRect(),fish=document.createElement('div');fish.className='flying-fish';fish.textContent='🐟';fish.style.left=(a.left+a.width/2)+'px';fish.style.top=(a.top+a.height/2)+'px';document.body.appendChild(fish);requestAnimationFrame(()=>requestAnimationFrame(()=>{fish.style.left=(b.left+b.width/2)+'px';fish.style.top=(b.top+b.height*.62)+'px';fish.style.transform='translate(-50%,-50%) scale(.65)';fish.style.opacity='0'}));setTimeout(()=>{fish.remove();done()},620)}
