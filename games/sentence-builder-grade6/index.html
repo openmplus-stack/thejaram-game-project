@@ -86,6 +86,15 @@ function timePlaceCheck(){
  if(!rule||rule.times.includes(ans.time))return null;
  return rule.times;
 }
+const subjectObjectRules=[
+ {test:/선생님/,objects:['책을','교과서를','준비물을','공책을','친구의 물건을']},
+ {test:/가게 직원|편의점 직원/,objects:['간식을','과자를','빵을','우유를','음료수를','문구를']},
+ {test:/버스 기사/,objects:['버스 카드를','가방을']},
+ {test:/의사|간호사/,objects:['약을','물을']},
+ {test:/엄마|아빠|할머니|할아버지|친구의 엄마/,objects:['간식을','선물을','가방을','우산을','옷을','약을']},
+ {test:/친구|짝꿍|사촌|형|누나|동생|형제/,objects:['공을','책을','간식을','사진을','게임을','친구의 물건을']},
+ {test:/나|나는/,objects:['숙제를','책을','간식을','물을','가방을','우산을','공을','사진을','준비물을']}
+];
 const placeObjectRules=[
  {test:/편의점|마트/,objects:['간식을','과자를','빵을','우유를','음료수를','아이스크림을','우산을','문구를']},
  {test:/도서관|서점/,objects:['책을','도서관 책을','교과서를','공책을']},
@@ -138,9 +147,17 @@ const actionReasonRules=[
 ];
 function contextItems(s){
  const all=[...s.items,...s.examples];
- if(s.key==='object'&&ans.place){
-  const rule=placeObjectRules.find(r=>r.test.test(ans.place));
-  if(rule){const first=rule.objects.filter(x=>all.includes(x));return {main:first,extra:all.filter(x=>!first.includes(x)),matched:true,restricted:false}}
+ if(s.key==='object'){
+  const placeRule=ans.place&&placeObjectRules.find(r=>r.test.test(ans.place));
+  const subjectRule=ans.subject&&subjectObjectRules.find(r=>r.test.test(ans.subject));
+  let preferred=[];
+  if(placeRule&&subjectRule){
+   const overlap=placeRule.objects.filter(x=>subjectRule.objects.includes(x));
+   preferred=[...overlap,...placeRule.objects.filter(x=>!overlap.includes(x)),...subjectRule.objects.filter(x=>!overlap.includes(x))];
+  }else if(placeRule)preferred=placeRule.objects;
+  else if(subjectRule)preferred=subjectRule.objects;
+  preferred=[...new Set(preferred)].filter(x=>all.includes(x));
+  if(preferred.length)return {main:preferred.slice(0,10),extra:all.filter(x=>!preferred.includes(x)),matched:true,restricted:false}
  }
  if(s.key==='predicate'&&ans.object){
   const rule=objectActionRules.find(r=>r.test.test(stripParticle(ans.object)));
