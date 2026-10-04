@@ -171,13 +171,8 @@ function contextItems(s){
 }
 
 function render(){let s=steps[idx],ci=contextItems(s);stepText.textContent=`${idx+1} / ${steps.length}`;bar.style.width=`${idx/steps.length*100}%`;card.innerHTML=`<h1>${s.q}</h1><p class='help'>${s.help}${ci.matched?(ci.restricted?' 앞에서 고른 것과 자연스럽게 연결되는 행동을 먼저 보여드려요.':' 앞에서 고른 내용과 잘 어울리는 것을 먼저 보여드려요.'):''}</p><div class='choices'>${ci.main.map(x=>`<button class='choice ${ans[s.key]===x?'selected':''}' data-v='${x}'>${x}</button>`).join('')}</div><div class='more-wrap'><button class='btn more' id='more'>${expanded[s.key]?'− 예시 접기':'+ 다른 예시 더 보기'}</button>${expanded[s.key]?`<div class='choices extra'>${ci.extra.map(x=>`<button class='choice ${ans[s.key]===x?'selected':''}' data-v='${x}'>${x}</button>`).join('')}</div>`:''}</div><div class='custom'><label>내가 직접 쓰기</label><div class='custom-row'><input id='custom' placeholder='직접 입력해 보세요'><button class='btn add' id='add'>넣기</button></div></div><button class='btn next' id='next' ${ans[s.key]?'':'disabled'}>${idx===steps.length-1?'문장 만들기':'다음'}</button><div style='clear:both'></div>`;card.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{ans[s.key]=b.dataset.v;render()});card.querySelector('#more').onclick=()=>{expanded[s.key]=!expanded[s.key];render()};card.querySelector('#add').onclick=()=>{let v=card.querySelector('#custom').value.trim();if(v){ans[s.key]=v;render()}};card.querySelector('#next').onclick=()=>{
- if(idx===1){
-  const better=timePlaceCheck();
-  if(better){
-   const chosen=confirm('앞에서 고른 시간과 이 장소가 조금 어색할 수 있어요.\n\n장소에 잘 어울리는 시간으로 다시 골라 볼까요?');
-   if(chosen){idx=0;expanded.time=true;const timeStep=steps[0],all=[...timeStep.items,...timeStep.examples];timeStep.examples=[...better,...all.filter(x=>!better.includes(x)&&!timeStep.items.includes(x))];render();return}
-  }
- }
+ /* 시간과 장소는 폭넓게 결합될 수 있으므로 허용 목록 기반의 경고를 하지 않는다.
+    placeTimeRules는 향후 추천 정렬에만 사용하고 학습자의 선택을 오류로 판정하지 않는다. */
  if(idx<steps.length-1){idx++;render()}else finish()
 }}
 function stripParticle(x){return x.replace(/(은|는|이|가|을|를)$/,'')}function hasBatchim(word){let c=word.charCodeAt(word.length-1);return c>=0xAC00&&c<=0xD7A3&&((c-0xAC00)%28)!==0}function subj(x){if(/(은|는|이|가)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'은':'는')}function obj(x){if(/(을|를)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'을':'를')}
