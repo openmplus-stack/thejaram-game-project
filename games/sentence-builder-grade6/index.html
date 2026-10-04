@@ -220,7 +220,7 @@ function extensionChoices(round=1){
  if(/생각/.test(last)){result=['그 뒤에 생각한 대로 해 보기로 했어요.','그리고 다음 할 일을 시작했어요.'];thought=[];feeling=['생각을 정리하니 마음이 편해졌어요.','앞으로 잘할 수 있을 것 같아 기분이 좋았어요.']}
  if(/마쳤|끝냈|정리했/.test(last)){result=['그리고 집이나 다음 장소로 이동했어요.'];thought=['나는 오늘 한 일을 잘 마쳤다고 생각했어요.'];feeling=['해야 할 일을 끝내서 뿌듯했어요.']}
  const used=new Set((storyDraft||[]).map(v=>v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim()));
- const clean=list=>list.filter(v=>!used.has(v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim()));
+ const clean=list=>validStoryChoices(list.filter(v=>!used.has(v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim())));
  return {result:clean(result),thought:clean(thought),feeling:clean(feeling)}
 }
 function contextualQuestions(){
@@ -234,6 +234,37 @@ function contextualQuestions(){
  if(/기분|뿌듯|마음/.test(last)){thought='왜 그런 기분이 들었다고 생각해요?';feeling='그 기분은 계속되었나요?'}
  if(/생각/.test(last)){result='그렇게 생각한 뒤에는 무엇을 했어요?';thought='다음에는 어떻게 하고 싶어요?'}
  return {result,thought,feeling}
+}
+function normalizeMeaningText(v){
+ return String(v||'').replace(/^(그래서|그리고|그 뒤에|그러자|하지만|그런데)\s*/,'').replace(/[.!?\s]/g,'').trim()
+}
+function storyFacts(){
+ const joined=(storyDraft||[]).join(' ');
+ return {
+  hungry:/배가 고프|배고프/.test(joined),
+  full:/배가 든든|배가 불러|배부르/.test(joined),
+  thirsty:/목이 마르/.test(joined),
+  drank:/마셨어요|물을 마|음료.*마/.test(joined),
+  finished:/끝냈어요|마쳤어요/.test(joined),
+  returned:/돌려주었어요/.test(joined),
+  positive:/기분이 좋|뿌듯|마음이 편/.test(joined)
+ }
+}
+function contradictsStory(text){
+ const f=storyFacts(),t=String(text||'');
+ if(f.full&&/배가 고프|배고프/.test(t))return true;
+ if(f.drank&&/목이 마르/.test(t))return true;
+ if(f.finished&&/아직.*끝내지|하지 못했|못 끝냈/.test(t))return true;
+ if(f.returned&&/아직.*돌려주|돌려주지 못/.test(t))return true;
+ return false
+}
+function repeatedStoryMeaning(text){
+ const n=normalizeMeaningText(text);
+ if(!n)return true;
+ return (storyDraft||[]).some(v=>{const p=normalizeMeaningText(v);return p===n||(p.length>8&&n.length>8&&(p.includes(n)||n.includes(p)))})
+}
+function validStoryChoices(list){
+ return (list||[]).filter(v=>!repeatedStoryMeaning(v)&&!contradictsStory(v))
 }
 function coherentNext(kind,text){
  const prev=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
@@ -250,7 +281,7 @@ let storyDraft=[];
 function renderStoryExtension(){
  const round=storyDraft.length,x=extensionChoices(round),q=contextualQuestions();
  card.innerHTML=`<h1>${round===1?'조금 더 말해 볼까요?':'이야기를 더 이어 볼까요?'}</h1><p class="help">방금 만든 문장을 생각하며 질문 하나를 골라 보세요.</p><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="extend-box"><div class="extend-title">무엇을 더 말해 볼까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ ${escapeHtml(q.result)}</button><button class="extend-option" data-kind="thought">💭 ${escapeHtml(q.thought)}</button><button class="extend-option" data-kind="feeling">🙂 ${escapeHtml(q.feeling)}</button></div><div id="extendChoices"></div></div><button class="btn next" id="stopStory">그만하기 · 글 완성</button>`;
- card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind].filter(v=>!storyDraft.includes(v));if(!list.length)list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>{storyDraft.push(coherentNext(b.dataset.kind,q.dataset.v));renderStoryExtension()})});
+ card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind].filter(v=>!storyDraft.includes(v));if(!list.length)list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>{{const next=coherentNext(b.dataset.kind,q.dataset.v);if(repeatedStoryMeaning(next)||contradictsStory(next)){alert('앞에서 말한 내용과 겹치거나 맞지 않는 문장이에요. 다른 문장을 골라 주세요.');return}storyDraft.push(next);renderStoryExtension()}})});
  document.getElementById('stopStory').onclick=finishStory
 }
 function showExtension(firstSentence){storyDraft=[firstSentence];renderStoryExtension()}
