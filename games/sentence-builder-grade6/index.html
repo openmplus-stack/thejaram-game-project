@@ -232,6 +232,9 @@ function updateUI(){updateVillageTitle();const fishEl=document.getElementById('f
 
 function openTreasure(name){let x=treasureDB.find(t=>t.name===name);if(!x)return;document.getElementById('modalTitle').textContent=x.name;document.getElementById('modalSource').textContent=x.type+' · 「'+x.story+'」';document.getElementById('modalSummary').innerHTML=x.summary.map(s=>escapeHtml(s)).join('<br>');let m=document.getElementById('treasureModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
 function closeTreasure(){let m=document.getElementById('treasureModal');m.classList.remove('open');m.setAttribute('aria-hidden','true')}
+function normalizeMeaningText(text){
+ return String(text||'').toLowerCase().replace(/[\s.,!?'"“”‘’]/g,'').replace(/(은|는|이|가|을|를|에서|에)$/,'');
+}
 function grantCompletionReward(text,kind='sentence'){
  const normalized=normalizeMeaningText(text);
  const existing=state.sentences.find(x=>normalizeMeaningText(x.text)===normalized);
@@ -423,6 +426,45 @@ function render(){
  card.querySelector('#skip').onclick=skipCurrentStep;
  card.querySelector('#next').onclick=()=>{const typed=input.value.trim();if(typed){confirmSpelling(input,typed,v=>{ans[s.key]=v;nextCurrentStep()})}else nextCurrentStep()};
 }
+function editDistance(a,b){
+ a=String(a||'');b=String(b||'');const d=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));
+ for(let i=0;i<=a.length;i++)d[i][0]=i;for(let j=0;j<=b.length;j++)d[0][j]=j;
+ for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+ return d[a.length][b.length]
+}
+function stepVocabulary(key){
+ const s=steps.find(x=>x.key===key);if(!s)return[];
+ return [...(s.items||[]),...(s.examples||[])].map(v=>stripParticle(cleanToken(v))).filter(Boolean)
+}
+function nearestKnownWord(raw,key){
+ const word=stripParticle(cleanToken(raw));if(!word||word.length<2)return raw;
+ const manual={'버수':'버스','뻐스':'버스','교가서':'교과서','교가서':'교과서','학꾜':'학교','칭구':'친구','선생임':'선생님','우유룰':'우유','채':'책'};
+ if(manual[word])return manual[word];
+ let best=null,score=99;for(const v of stepVocabulary(key)){const base=stripParticle(v),n=editDistance(word,base);if(n<score){score=n;best=base}}
+ return score===1&&best?best:raw
+}
+function repairPredicateInput(x){
+ let v=cleanToken(x);if(!v)return'';
+ const map={'먹다':'먹었어요','먹어':'먹었어요','먹음':'먹었어요','마시다':'마셨어요','마셔':'마셨어요','읽다':'읽었어요','읽어':'읽었어요','쓰다':'썼어요','써':'썼어요','가다':'갔어요','가':'갔어요','하다':'했어요','해':'했어요','보다':'봤어요','봐':'봤어요','사다':'샀어요','사':'샀어요','주다':'주었어요','줘':'주었어요','던지다':'던졌어요','던져':'던졌어요','정리하다':'정리했어요','정리해':'정리했어요','도와주다':'도와주었어요','도와줘':'도와주었어요'};
+ if(map[v])return map[v];if(/다$/.test(v)){const stem=v.slice(0,-1);if(stem.endsWith('하'))return stem.slice(0,-1)+'했어요';}
+ return v
+}
+function repairReasonInput(x){
+ let v=cleanToken(x);if(!v)return'';
+ const map={'배고파':'배가 고파서','배고픔':'배가 고파서','목말라':'목이 말라서','목마름':'목이 말라서','화나':'화가 나서','화남':'화가 나서','재밌어':'재미있어서','궁금해':'궁금해서','필요해':'필요해서','수업하려고':'수업을 하려고','공부하려고':'공부를 하려고'};
+ return map[v]||v
+}
+function repairAnswerForRole(key,value){
+ let v=cleanToken(value);if(!v)return'';
+ v=nearestKnownWord(v,key);
+ if(key==='subject'){if(v==='나'||v==='내가')return'나는';return naturalSubject(v)}
+ if(key==='object')return naturalObject(v);
+ if(key==='place')return normalizePlace(v);
+ if(key==='time')return normalizeTime(v);
+ if(key==='predicate')return normalizePredicate(repairPredicateInput(v));
+ if(key==='reason')return naturalReason(repairReasonInput(v));
+ return v
+}
 function stripParticle(x){return x.replace(/(은|는|이|가|을|를)$/,'')}function hasBatchim(word){let c=word.charCodeAt(word.length-1);return c>=0xAC00&&c<=0xD7A3&&((c-0xAC00)%28)!==0}function subj(x){if(/(은|는|이|가)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'은':'는')}function obj(x){if(/(을|를)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'을':'를')}
 function semanticOK(){let o=stripParticle(ans.object||''),p=ans.predicate||'';let rule=objectActionRules.find(r=>r.test.test(o));return !rule||rule.actions.includes(p)}
 function cleanToken(x){return String(x||'').trim().replace(/[.?!,]+$/,'')}
@@ -461,7 +503,7 @@ function sentenceQualityCheck(sentence){
  return {ok:issues.length===0,issues}
 }
 function buildSentence(){
- const time=normalizeTime(ans.time),reason=naturalReason(ans.reason),place=normalizePlace(ans.place),subject=naturalSubject(ans.subject),object=naturalObject(ans.object),predicate=normalizePredicate(ans.predicate);
+ const time=repairAnswerForRole('time',ans.time),reason=repairAnswerForRole('reason',ans.reason),place=repairAnswerForRole('place',ans.place),subject=repairAnswerForRole('subject',ans.subject),object=repairAnswerForRole('object',ans.object),predicate=repairAnswerForRole('predicate',ans.predicate);
  // 아동이 고른 의미는 유지하고 한국어 정보 구조만 자연스럽게 배열한다.
  // 주어가 있으면 시간 → 주어 → 이유 → 장소 → 목적어 → 행동,
  // 주어가 생략되면 시간 → 이유 → 장소 → 목적어 → 행동 순서를 기본으로 한다.
@@ -579,7 +621,7 @@ function commitSentence(sentence){
  if(!Array.isArray(state.specialPenguins))state.specialPenguins=[];
  if(!Number.isFinite(Number(state.fed)))state.fed=0;
  const normalized=normalizeMeaningText(text);
- if(state.sentences.some(x=>x&&normalizeMeaningText(x.text||'')===normalized))
+ if(state.sentences.some(x=>x&&typeof x.text==='string'&&normalizeMeaningText(x.text)===normalized))
    return {duplicate:true,fish:0,reward:null,rewardType:null,persisted:true};
  let grade=1;
  try{grade=drawFishGrade()}catch(e){grade=1}
@@ -607,7 +649,7 @@ function bindFinishedButtons(sentence){
   complete.disabled=true;
   let result;
   try{result=commitSentence(sentence)}
-  catch(e){console.error('completion failed',e);complete.disabled=false;document.getElementById('completeStatus').textContent='완료 처리 중 문제가 생겼어요. 다시 눌러 주세요.';return}
+  catch(e){console.error('completion failed',e);complete.disabled=false;const status=document.getElementById('completeStatus');if(status)status.textContent='저장 기능을 다시 연결하고 있어요. 한 번 더 눌러 주세요.';return}
   const status=document.getElementById('completeStatus');
   if(result.duplicate)status.textContent='이미 문장 사전에 저장된 문장이에요.';
   else status.innerHTML='✅ 문장을 완료했어요.<br>'+rewardSummary(result)+'<br>📖 나의 문장 사전에 저장했어요.'+(result.persisted?'':'<br>⚠️ 이 기기에서 영구 저장을 확인하지 못했어요.');
