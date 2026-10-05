@@ -61,6 +61,12 @@
       "title": "리듬 글자·단어 변별",
       "description": "메트로놈 박자에 맞춰 이미지와 글자의 일치 여부를 O/X로 판단하며 글자·단어 변별을 연습하는 독서인지 학습 앱",
       "status": "published"
+    },
+    {
+      "slug": "country-capital-flag",
+      "title": "리듬 나라 짝꿍",
+      "description": "8개 나라의 국가·수도·국기를 4박 리듬과 O/X 판단으로 연결하는 독서인지 학습 앱",
+      "status": "published"
     }
   ]
 }
