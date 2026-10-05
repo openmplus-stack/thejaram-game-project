@@ -58,9 +58,18 @@
 .simpleBeatDot.on{width:27px;height:27px;top:23px;background:#3f8c73;box-shadow:0 0 0 8px rgba(63,140,115,.14)}
 .simpleMetroBall{position:absolute;top:19px;left:5%;width:36px;height:36px;border-radius:50%;background:#3f8c73;transform:translateX(-50%);box-shadow:0 5px 12px rgba(35,100,78,.25);transition:left .18s ease}
 .simpleBeatNums{position:absolute;left:3%;right:3%;top:58px;display:flex;justify-content:space-between;font-size:18px;font-weight:900;color:#71837c}
+<style>
+/* O/X 화면 상단 겹침 수정: 헤더와 메트로놈을 완전히 분리 */
+#simpleOx .quizTopFix{height:70px;display:grid;grid-template-columns:90px 1fr 110px;align-items:center;position:relative;z-index:3}
+#simpleOx .quizTopFix h2{text-align:center;margin:0;font-size:32px;line-height:1.2}
+#simpleOx .quizTopFix #simpleOxCount{text-align:right;font-size:22px}
+#simpleOxGame{padding-top:4px}
+.simpleMetro{position:relative!important;width:78%!important;height:92px!important;margin:8px auto 18px!important;clear:both}
+#simpleOxGame>div:nth-child(2){margin-top:0!important}
+@media(max-width:700px){#simpleOx .quizTopFix{grid-template-columns:64px 1fr 76px;height:60px}#simpleOx .quizTopFix h2{font-size:24px}.simpleMetro{width:90%!important}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
-<div style="display:flex;justify-content:space-between;align-items:center"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle" style="font-size:32px;margin:8px">문제 풀기</h2><b id="simpleOxCount" style="font-size:22px">준비</b></div>
+<div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">문제 풀기</h2><b id="simpleOxCount">준비</b></div>
 <div id="simpleOxReady" style="min-height:70vh;display:flex;align-items:center;justify-content:center"><button id="simpleOxStart" style="border:0;border-radius:28px;background:#3f8c73;color:white;font-size:34px;font-weight:950;padding:24px 80px;box-shadow:var(--shadow)">시작하기</button></div>
 <div id="simpleOxGame" style="display:none">
 <div class="simpleMetro">
