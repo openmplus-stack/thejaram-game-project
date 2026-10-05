@@ -55,6 +55,12 @@
       "title": "문장 만들기",
       "description": "초등학교 6학년 발달장애 아동이 시간·장소·주어·목적어·서술어·이유를 선택하고 직접 입력하며 의미 있는 한국어 문장을 구성하는 표현 지원 앱",
       "status": "published"
+    },
+    {
+      "slug": "rhythm-word-match",
+      "title": "리듬 글자·단어 변별",
+      "description": "메트로놈 박자에 맞춰 이미지와 글자의 일치 여부를 O/X로 판단하며 글자·단어 변별을 연습하는 독서인지 학습 앱",
+      "status": "published"
     }
   ]
 }
