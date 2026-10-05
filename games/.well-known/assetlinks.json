@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "quest.thejaram.wordroot",
+      "sha256_cert_fingerprints": [
+        "50:D2:72:8A:AE:40:61:51:98:9B:2B:96:C2:84:B2:5C:E0:C5:19:3C:5A:50:B6:48:C1:7C:38:CE:12:AE:82:BD"
+      ]
+    }
+  }
+]
