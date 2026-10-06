@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>지하철을 타요</title><style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:#f4f7fb;color:#1f2937}
+.app{max-width:1100px;margin:auto;min-height:100vh;padding:14px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:clamp(24px,3vw,38px);margin:8px 0}.page{font-weight:800;background:#fff;padding:10px 16px;border-radius:16px}
+.card{background:#fff;border-radius:24px;padding:16px;box-shadow:0 8px 28px #1f293715}
+.scene{width:100%;aspect-ratio:16/9;object-fit:contain;border-radius:18px;background:#eef2f7;display:block}
+.instruction{font-size:clamp(22px,3vw,34px);font-weight:800;text-align:center;margin:18px 0 10px}
+.hint{text-align:center;color:#64748b;margin-bottom:12px}.answer,.bank{min-height:78px;border-radius:18px;padding:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.answer{border:3px dashed #a7b5c8;background:#f8fafc}.bank{margin-top:12px;background:#eef4fa}
+.word{font-size:clamp(20px,2.5vw,30px);font-weight:800;background:#fff;border:2px solid #9db0c7;border-radius:14px;padding:12px 17px;cursor:grab;touch-action:none;box-shadow:0 3px 7px #0001}
+.answer .word{border-color:#4f7cac;background:#edf6ff}.controls{display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-wrap:wrap}
+button{border:0;border-radius:14px;padding:12px 20px;font-size:19px;font-weight:800;cursor:pointer}.clear{background:#e8edf3}.check{background:#356ca5;color:#fff}.next{background:#18845d;color:#fff;display:none}
+.feedback{text-align:center;font-size:23px;font-weight:900;min-height:34px;margin-top:8px}.good{color:#16845b}.bad{color:#d04747}
+.done{text-align:center;padding:35px 10px}.done h2{font-size:36px;line-height:1.45}.score{font-size:64px;font-weight:900;color:#356ca5;margin:20px}.restart{background:#356ca5;color:#fff}
+@media(max-width:650px){.app{padding:8px}.card{padding:10px;border-radius:18px}.word{padding:10px 12px}.controls button{flex:1}}
+</style></head><body><main class="app"><div class="top"><h1>🚇 지하철을 타요</h1><div class="page" id="page"></div></div><section class="card" id="card">
+<img class="scene" id="scene" alt=""><div class="instruction">문장을 순서대로 만들어 보세요.</div><div class="hint">낱말 상자를 눌러 옮기거나 드래그하세요.</div>
+<div class="answer" id="answer"></div><div class="bank" id="bank"></div><div class="feedback" id="feedback"></div>
+<div class="controls"><button class="clear" id="clear">지우기</button><button class="check" id="check">확인</button><button class="next" id="next">다음</button></div></section></main>
+<script>
+const lessons=[
+["subway-01-entrance.png",["나는","지하철을","타기 위해","역 입구로","가요."]],
+["subway-02-card.png",["나는","개찰구에서","교통카드를","단말기에","대요."]],
+["subway-03-direction.png",["나는","안내판을 보고","지하철을 타는","방향을","찾아요."]],
+["subway-04-platform.png",["나는","안내판을 따라","승강장으로","이동해요."]],
+["subway-05-wait.png",["나는","안전선 안쪽에서","지하철이","올 때까지","기다려요."]],
+["subway-06-let-exit.png",["지하철 문이","열리면,","나는","내리는","사람을","기다려요."]],
+["subway-07-board.png",["나는","사람들이","내린 뒤","차례대로","지하철에","타요."]],
+["subway-08-ride.png",["나는","빈자리에","안전하게","앉아요."]],
+["subway-09-check-stop.png",["나는","전광판이나","안내방송을 보며","내릴 역을","확인해요."]],
+["subway-10-find-exit.png",["나는","내릴 역에","도착하면,","필요한","출구를 찾아","나가요."]]
+];
+let idx=0,correct=0;const $=s=>document.querySelector(s),bank=$("#bank"),answer=$("#answer");
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function render(){const [img,words]=lessons[idx];$("#page").textContent=(idx+1)+" / "+lessons.length;$("#scene").src=img;$("#scene").alt=(idx+1)+"번 장면";answer.innerHTML="";bank.innerHTML="";$("#feedback").textContent="";$("#feedback").className="feedback";$("#next").style.display="none";$("#check").style.display="inline-block";shuffle(words).forEach((w,i)=>{const b=document.createElement("div");b.className="word";b.textContent=w;b.draggable=true;b.dataset.key=words.indexOf(w);b.addEventListener("click",()=>{(b.parentElement===bank?answer:bank).appendChild(b)});b.addEventListener("dragstart",e=>e.dataTransfer.setData("text/plain",b.dataset.key));bank.appendChild(b)})}
+[bank,answer].forEach(zone=>{zone.addEventListener("dragover",e=>e.preventDefault());zone.addEventListener("drop",e=>{e.preventDefault();const k=e.dataTransfer.getData("text/plain");const el=[...document.querySelectorAll(".word")].find(x=>x.dataset.key===k);if(el)zone.appendChild(el)})});
+$("#clear").onclick=()=>{[...answer.children].forEach(x=>bank.appendChild(x));$("#feedback").textContent=""};
+$("#check").onclick=()=>{const got=[...answer.children].map(x=>x.textContent),want=lessons[idx][1];if(JSON.stringify(got)===JSON.stringify(want)){correct++;$("#feedback").textContent="참 잘했어요!";$("#feedback").className="feedback good";$("#next").style.display="inline-block";$("#check").style.display="none";try{new Audio("data:audio/wav;base64,UklGRjQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YRAAAACAgICAgICAgICAgICAgIA=").play()}catch(e){}}else{$("#feedback").textContent="다시 한 번 순서를 생각해 보세요.";$("#feedback").className="feedback bad"}};
+$("#next").onclick=()=>{idx++;if(idx<lessons.length)render();else{$("#card").innerHTML='<div class="done"><h2>문제 풀이를 완료했습니다.<br>수고했습니다.</h2><div class="score">'+correct+' / '+lessons.length+'</div><button class="restart" onclick="location.reload()">다시 풀기</button></div>';$("#page").textContent="완료"}};
+render();
+</script></body></html>
