@@ -116,6 +116,8 @@
 .treasurePick{min-height:125px}
 <style>
 #flagCollectionGrid.collectionGrid{display:block;max-height:64vh;overflow:auto;padding:4px 8px 20px}.flagContinentSection{margin:8px 0 28px;text-align:left}.flagContinentHead{display:flex;justify-content:space-between;align-items:center;margin:0 4px 12px;font-size:22px}.flagContinentHead span{font-size:16px;color:#6c7c76;font-weight:800}.flagAlbumGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.flagAlbumCard{border:2px solid #e1ebe7;border-radius:18px;background:#fff;min-height:142px;padding:12px 7px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#344b43}.flagAlbumCard img{width:88px;height:56px;object-fit:cover;border-radius:7px;box-shadow:0 2px 7px #0002}.flagAlbumCard strong{font-size:17px;word-break:keep-all}.flagAlbumCard span{font-size:13px;color:#71817b}.flagAlbumCard.owned{cursor:pointer}.flagAlbumCard.locked{background:#f1f4f3;border-style:dashed;opacity:.7}.lockedFlag{font-size:42px;filter:grayscale(1)}.flagDetailModal{position:fixed;inset:0;z-index:200;background:#20342d99;display:flex;align-items:center;justify-content:center;padding:24px}.flagDetailCard{position:relative;width:min(440px,90vw);background:#fff;border-radius:30px;padding:38px;text-align:center;box-shadow:0 20px 60px #0004}.flagDetailCard img{width:240px;max-width:80%;border-radius:12px;box-shadow:0 4px 18px #0002}.flagDetailCard h3{font-size:34px;margin:22px 0 8px}.flagDetailCard p{font-size:23px;margin:0}.flagDetailClose{position:absolute;right:14px;top:10px;border:0;background:transparent;font-size:38px;color:#667}@media(max-width:850px){.flagAlbumGrid{grid-template-columns:repeat(3,1fr)}}
+<style>
+#treasureCollectionGrid.collectionGrid{display:block;max-height:64vh;overflow:auto;padding:4px 8px 20px}.treasureAlbumCard{min-height:150px}.treasureAlbumIcon{font-size:52px}.treasureBigIcon{font-size:92px;margin:4px 0 12px}.treasureCountry{display:inline-block;background:#e9f6f1;color:#34705d;border-radius:999px;padding:7px 16px;font-weight:900;font-size:17px}.treasureDetailCard h3{margin:14px 0 12px}.treasureDetailCard p{font-size:19px;line-height:1.6;color:#53655f}.treasureMeta{margin-top:20px;padding-top:16px;border-top:1px solid #e4ebe8;font-size:17px;color:#74817c}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
@@ -178,7 +180,27 @@ function openQuizReward(){
  $('#quizRewardHint').textContent='보물을 하나 선택해 주세요.';$('#saveTreasure').disabled=true;showFlow('#quizRewardFlow')
 }
 $('#saveTreasure').onclick=()=>{if(!treasureCode)return;const saved=getTreasureCollection();if(!saved.includes(treasureCode)){saved.push(treasureCode);setTreasureCollection(saved)}renderTreasureCollection();showFlow('#treasureCollectionFlow')};
-function renderTreasureCollection(){const saved=getTreasureCollection(),grid=$('#treasureCollectionGrid');grid.innerHTML='';$('#treasureCollectionCount').textContent=saved.length+'개 모았어요.';if(!saved.length){grid.innerHTML='<div class="emptyCollection">아직 모은 보물이 없어요.<br>문제에서 100%를 달성하면 보물을 받을 수 있어요.</div>';return}saved.map(code=>items.find(x=>x.flag===code)).filter(Boolean).forEach(it=>{const d=document.createElement('div');d.className='collectionCard';d.innerHTML='<div class="treasureCollectionIcon">🎁</div><strong>'+it.country+'의 보물</strong><span>'+it.country+' · '+it.capital+'</span>';grid.appendChild(d)})}
+const treasureInfo={
+ kr:{name:'전통 보물',icon:'🎁',desc:'대한민국을 대표하는 특별한 보물이에요.'},
+ jp:{name:'전통 보물',icon:'🎁',desc:'일본을 대표하는 특별한 보물이에요.'},
+ cn:{name:'전통 보물',icon:'🎁',desc:'중국을 대표하는 특별한 보물이에요.'}
+};
+function treasureData(it){return treasureInfo[it.flag]||{name:'나라의 보물',icon:'🎁',desc:it.country+'을 대표하는 문화·자연·생활 속 보물이에요.'}}
+function renderTreasureCollection(){
+ const saved=getTreasureCollection(),grid=$('#treasureCollectionGrid');grid.innerHTML='';$('#treasureCollectionCount').textContent=saved.length+' / '+items.length+'개 모았어요.';
+ ['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아'].forEach(cont=>{
+  const section=document.createElement('div');section.className='flagContinentSection treasureContinentSection';
+  const list=items.filter(x=>x.continent===cont),owned=list.filter(x=>saved.includes(x.flag)).length;
+  section.innerHTML='<div class="flagContinentHead"><strong>'+cont+'</strong><span>'+owned+' / '+list.length+'</span></div>';
+  const cards=document.createElement('div');cards.className='flagAlbumGrid treasureAlbumGrid';
+  list.forEach(it=>{const got=saved.includes(it.flag),t=treasureData(it),b=document.createElement('button');b.className='flagAlbumCard treasureAlbumCard '+(got?'owned':'locked');b.disabled=!got;b.innerHTML=got?'<div class="treasureAlbumIcon">'+t.icon+'</div><strong>'+it.country+'</strong><span>'+t.name+'</span>':'<div class="lockedFlag">🔒</div><strong>???</strong><span>아직 못 찾았어요</span>';if(got)b.onclick=()=>openTreasureDetail(it);cards.appendChild(b)});
+  section.appendChild(cards);grid.appendChild(section)
+ })
+}
+function openTreasureDetail(it){
+ const t=treasureData(it),old=document.querySelector('.treasureDetailModal');if(old)old.remove();
+ const m=document.createElement('div');m.className='flagDetailModal treasureDetailModal';m.innerHTML='<div class="flagDetailCard treasureDetailCard"><button class="flagDetailClose">×</button><div class="treasureBigIcon">'+t.icon+'</div><div class="treasureCountry">'+it.country+'</div><h3>'+t.name+'</h3><p>'+t.desc+'</p><div class="treasureMeta">수도 · '+it.capital+'</div></div>';document.body.appendChild(m);m.querySelector('.flagDetailClose').onclick=()=>m.remove();m.onclick=x=>{if(x.target===m)m.remove()}
+}
 $('#treasureCollectionBack').onclick=()=>showFlow('#home');
 let rewardFlagCode=null;
 function getFlagCollection(){try{return JSON.parse(localStorage.getItem('countryFlagCollection')||'[]')}catch(e){return[]}}
