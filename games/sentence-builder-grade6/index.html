@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:false,
-  phase:'semantic-links',
+  phase:'meaning-engine',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -441,6 +441,216 @@ function meaningCandidatesV2(rawInput){
     });
   }
   return [];
+}
+
+
+const MEANING_STOPWORDS_V2=['은','는','이','가','을','를','에','에서','와','과','랑','이랑','에게','한테','하고','그리고','그래서'];
+
+function normalizeMeaningTokenV2(token){
+  return String(token||'')
+    .trim()
+    .replace(/[“”"'‘’()[\]{}.,!?]/g,'')
+    .replace(/(은|는|이|가|을|를|에서|에게|한테|와|과|랑|이랑)$/,'');
+}
+
+function tokenizeMeaningInputV2(rawInput){
+  return String(rawInput||'')
+    .trim()
+    .split(/\s+/)
+    .map(normalizeMeaningTokenV2)
+    .filter(Boolean)
+    .filter(t=>!MEANING_STOPWORDS_V2.includes(t));
+}
+
+function predicateFromLooseTokenV2(token){
+  const raw=String(token||'').trim();
+  const direct=getPredicateFrameV2(raw);
+  if(direct)return {key:Object.keys(PREDICATE_FRAMES_V2).find(k=>PREDICATE_FRAMES_V2[k]===direct)||raw,frame:direct,confidence:1};
+  const maps={
+    '했어':'놀다','했다':'놀다','해':'놀다',
+    '갔어':'가다','갔다':'가다',
+    '먹었어':'먹다','먹었다':'먹다',
+    '마셨어':'마시다','마셨다':'마시다',
+    '읽었어':'읽다','읽었다':'읽다',
+    '썼어':'쓰다','썼다':'쓰다',
+    '놀았어':'놀다','놀았다':'놀다',
+    '만났어':'만나다','만났다':'만나다',
+    '줬어':'주다','주었어':'주다','주었다':'주다',
+    '받았어':'받다','받았다':'받다',
+    '만들었어':'만들다','만들었다':'만들다',
+    '도왔어':'돕다','도와줬어':'돕다',
+    '좋아해':'좋아하다','좋아했어':'좋아하다'
+  };
+  const key=maps[raw];
+  return key?{key,frame:PREDICATE_FRAMES_V2[key],confidence:.85}:null;
+}
+
+function inferRoleCandidatesV2(tokens,predicateKey){
+  const frame=getPredicateFrameV2(predicateKey);
+  const candidates=[];
+  tokens.forEach((token,index)=>{
+    const types=semanticTypesForV2(token);
+    const roleScores={};
+    if(types.includes('person')){
+      roleScores.subject=.55;
+      if(frame&&frame.required.includes('recipient'))roleScores.recipient=.7;
+      if(frame&&frame.required.includes('object')&&frame.semantic&&frame.semantic.object&&frame.semantic.object.includes('person'))roleScores.object=.72;
+      if(frame&&frame.optional.includes('companion'))roleScores.companion=.68;
+    }
+    if(types.includes('place')){
+      if(frame&&frame.required.includes('destination'))roleScores.destination=.82;
+      if(frame&&frame.optional.includes('place'))roleScores.place=.72;
+    }
+    if(types.some(t=>['food','drink','reading','writing','thing','toy','sport','activity','craft','animal','topic'].includes(t))){
+      if(frame&&frame.required.includes('object'))roleScores.object=.78;
+      else roleScores.object=.52;
+    }
+    if(token==='나')roleScores.subject=.95;
+    candidates.push({token,index,types,roleScores});
+  });
+  return candidates;
+}
+
+function detectAffectTokensV2(tokens){
+  const emotionMap={
+    '무서워':'무서웠다','무서웠어':'무서웠다','무섭다':'무서웠다',
+    '좋아':'좋았다','좋았어':'좋았다','좋다':'좋았다',
+    '싫어':'싫었다','싫었어':'싫었다','싫다':'싫었다',
+    '기뻐':'기뻤다','기뻤어':'기뻤다',
+    '슬퍼':'슬펐다','슬펐어':'슬펐다',
+    '화나':'화가 났다','화났어':'화가 났다',
+    '재밌어':'재미있었다','재미있어':'재미있었다',
+    '재미있었어':'재미있었다',
+    '궁금해':'궁금했다','궁금했어':'궁금했다'
+  };
+  return tokens.map((t,i)=>emotionMap[t]?{token:t,index:i,normalized:emotionMap[t]}:null).filter(Boolean);
+}
+
+function buildMeaningHypothesesV2(rawInput){
+  const raw=String(rawInput||'').trim();
+  const tokens=tokenizeMeaningInputV2(raw);
+  const result={
+    raw,
+    tokens,
+    status:'needs-meaning',
+    predicate:null,
+    roles:{},
+    affect:detectAffectTokensV2(tokens),
+    ambiguities:[],
+    hypotheses:[],
+    confidence:0
+  };
+  if(!tokens.length)return result;
+
+  let predicateHit=null,predicateIndex=-1;
+  for(let i=0;i<tokens.length;i++){
+    const hit=predicateFromLooseTokenV2(tokens[i]);
+    if(hit){predicateHit=hit;predicateIndex=i;break}
+  }
+  if(predicateHit){
+    result.predicate=predicateHit.key;
+    result.confidence=predicateHit.confidence;
+  }
+
+  const contentTokens=tokens.filter((_,i)=>i!==predicateIndex&&!result.affect.some(a=>a.index===i));
+  if(predicateHit){
+    const roleCandidates=inferRoleCandidatesV2(contentTokens,predicateHit.key);
+    const used=new Set();
+    const frame=predicateHit.frame;
+    frame.required.forEach(role=>{
+      let best=null;
+      roleCandidates.forEach(c=>{
+        if(used.has(c.index))return;
+        const score=c.roleScores[role]||0;
+        if(!best||score>best.score)best={c,score};
+      });
+      if(best&&best.score>=.65){
+        result.roles[role]=best.c.token;used.add(best.c.index);
+      }
+    });
+    contentTokens.forEach((t,i)=>{
+      if(!used.has(i)){
+        const types=semanticTypesForV2(t);
+        if(types.includes('place')&&!result.roles.place&&!result.roles.destination){
+          if(frame.required.includes('destination'))result.roles.destination=t;
+          else result.roles.place=t;
+        }else if(types.includes('person')&&!result.roles.subject){
+          result.roles.subject=t;
+        }else if(!result.roles.object&&types.length){
+          result.roles.object=t;
+        }
+      }
+    });
+  }
+
+  if(!predicateHit){
+    const singleHints=tokens.flatMap(t=>meaningCandidatesV2(t).map(x=>({token:t,text:x})));
+    if(singleHints.length){
+      result.hypotheses=singleHints.slice(0,6).map((x,i)=>({id:'h'+(i+1),text:x.text,sourceToken:x.token,confidence:.55}));
+      result.ambiguities.push({type:'missing-predicate',message:'무엇을 했는지 조금 더 알려 주세요.'});
+    }
+  }else{
+    const frame=predicateHit.frame;
+    const missing=frame.required.filter(role=>!result.roles[role]);
+    if(missing.length){
+      missing.forEach(role=>result.ambiguities.push({
+        type:'missing-role',
+        role,
+        message:(frame.questions&&frame.questions[role])||((MEANING_ROLES_V2[role]&&MEANING_ROLES_V2[role].label)||role)
+      }));
+    }
+    const assigned=Object.entries(result.roles);
+    assigned.forEach(([role,value])=>{
+      const fit=isSemanticFitV2(predicateHit.key,role,value);
+      if(fit===false){
+        result.ambiguities.push({type:'semantic-mismatch',role,value,message:'“'+value+'”의 뜻이 이 행동과 잘 맞는지 확인해 주세요.'});
+      }
+    });
+    if(!result.ambiguities.length){
+      result.status='meaning-ready';
+      result.confidence=Math.max(result.confidence,.8);
+    }
+  }
+
+  if(result.affect.length&&!result.roles.emotion){
+    result.roles.emotion=result.affect[0].normalized;
+  }
+  return result;
+}
+
+function meaningClarificationChoicesV2(analysis){
+  const a=analysis||{};
+  const choices=[];
+  (a.ambiguities||[]).forEach(item=>{
+    if(item.type==='missing-predicate'){
+      (a.tokens||[]).forEach(t=>{
+        meaningCandidatesV2(t).forEach(x=>choices.push({type:'predicate-or-event',label:x}));
+      });
+    }else if(item.type==='missing-role'&&a.predicate){
+      const frame=getPredicateFrameV2(a.predicate);
+      const role=item.role;
+      const allowed=(frame&&frame.semantic&&frame.semantic[role])||[];
+      Object.entries(SEMANTIC_LEXICON_V2).forEach(([type,words])=>{
+        if(allowed.includes(type))words.slice(0,6).forEach(w=>choices.push({type:'role',role,label:w}));
+      });
+    }else if(item.type==='semantic-mismatch'){
+      const preds=predicateCandidatesForNounV2(item.value);
+      preds.slice(0,4).forEach(p=>{
+        const f=getPredicateFrameV2(p);
+        choices.push({type:'repair',role:item.role,label:item.value+' + '+(f?f.display:p)});
+      });
+    }
+  });
+  const seen=new Set();
+  return choices.filter(x=>{const k=(x.role||'')+'|'+x.label;if(seen.has(k))return false;seen.add(k);return true}).slice(0,8);
+}
+
+function recordMeaningAnalysisV2(rawInput){
+  const analysis=buildMeaningHypothesesV2(rawInput);
+  storyV2.rawInputs.push({text:String(rawInput||''),at:new Date().toISOString()});
+  storyV2.meanings.push(analysis);
+  storyV2.learningLog.ambiguityChecks+=(analysis.ambiguities||[]).length;
+  return analysis;
 }
 
 
