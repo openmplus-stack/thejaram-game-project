@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'natural-candidate-choice',
+  phase:'optional-expansion',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1007,6 +1007,176 @@ function renderNaturalCandidateChoiceV2(event){
   };
 }
 
+const EXPANSION_CHOICES_V2={
+  time:['오늘','어제','아침에','점심시간에','오후에','저녁에','주말에','수업 시간에','쉬는 시간에','방과 후에'],
+  manner:['천천히','빠르게','조심해서','열심히','혼자','함께','즐겁게','집중해서'],
+  reason:['재미있어서','궁금해서','필요해서','배가 고파서','목이 말라서','친구를 도와주려고','숙제를 하려고','준비물이 필요해서'],
+  purpose:['공부하려고','책을 읽으려고','친구를 만나려고','물건을 사려고','운동하려고','놀려고','숙제를 하려고','도움을 받으려고']
+};
+
+function expansionRolesForV2(event){
+  const frame=getPredicateFrameV2(event&&event.predicate);
+  if(!frame)return [];
+  const order=(frame.expansionOrder||frame.optional||[]).filter(role=>!event[role]);
+  return order.filter(role=>!frame.required.includes(role));
+}
+
+function expansionChoicePoolV2(event,role){
+  if(EXPANSION_CHOICES_V2[role])return EXPANSION_CHOICES_V2[role].slice();
+  return roleChoicePoolV2(event,role);
+}
+
+function expansionQuestionV2(event,role){
+  const frame=getPredicateFrameV2(event&&event.predicate);
+  if(frame&&frame.questions&&frame.questions[role])return frame.questions[role];
+  const labels={
+    time:'언제였어요?',
+    place:'어디에서 했어요?',
+    companion:'누구와 함께했어요?',
+    manner:'어떻게 했어요?',
+    reason:'왜 그렇게 했어요?',
+    purpose:'무엇을 하려고 했어요?',
+    object:'무엇을 했어요?'
+  };
+  return labels[role]||'조금 더 자세히 말해 볼까요?';
+}
+
+function addExpansionValueV2(event,role,value,source='choice'){
+  if(!event||!role||!value)return;
+  event[role]=stripRoleParticleV2(value);
+  event.confirmedRoles=event.confirmedRoles||{};
+  event.confirmedRoles[role]={value:event[role],source,optional:true};
+  storyV2.learningLog.expansionCount+=1;
+  if(source==='choice')storyV2.support.usedChoices=true;
+  if(source==='typed')storyV2.support.usedTyping=true;
+}
+
+function expandedSentenceV2(event){
+  return composeEventSentenceV2(event,{subjectMode:'topic'});
+}
+
+function renderExpansionMenuV2(event){
+  stepText.textContent='더 자세히';
+  bar.style.width='70%';
+  const roles=expansionRolesForV2(event);
+  const sentence=storyV2.expression.selected||composeEventSentenceV2(event,{subjectMode:'topic'});
+
+  if(!roles.length){
+    renderExpandedSentenceV2(event);
+    return;
+  }
+
+  card.innerHTML=`
+    <h1>무엇을 더 말하고 싶어요?</h1>
+    <p class="help">원하는 것 하나만 골라도 돼요. 모두 말할 필요는 없어요.</p>
+    <div class="story-two" style="margin-top:10px">
+      <div><b>🌱 ${escapeHtml(sentence)}</b></div>
+    </div>
+    <div class="choices" style="margin-top:16px">
+      ${roles.slice(0,4).map(role=>`
+        <button type="button" class="choice expansion-role-v2" data-role="${role}">
+          ${escapeHtml(expansionQuestionV2(event,role))}
+        </button>
+      `).join('')}
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="expansionBackV2">문장 다시 고르기</button>
+      <button type="button" class="btn next" id="expansionStopV2">여기까지</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelectorAll('.expansion-role-v2').forEach(b=>b.onclick=()=>renderExpansionQuestionV2(event,b.dataset.role));
+  card.querySelector('#expansionBackV2').onclick=()=>renderNaturalCandidateChoiceV2(event);
+  card.querySelector('#expansionStopV2').onclick=()=>renderExpandedSentenceV2(event);
+}
+
+function renderExpansionQuestionV2(event,role){
+  stepText.textContent='더 자세히';
+  bar.style.width='74%';
+  const pool=expansionChoicePoolV2(event,role);
+  const first=pool.slice(0,6);
+  const extra=pool.slice(6,18);
+  const question=expansionQuestionV2(event,role);
+
+  card.innerHTML=`
+    <h1>${escapeHtml(question)}</h1>
+    <p class="help">가장 가까운 것을 고르거나 직접 써 주세요.</p>
+    <div class="choices">
+      ${first.map(v=>`<button type="button" class="choice expansion-value-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+    </div>
+    ${extra.length?`
+      <div style="margin-top:12px"><button type="button" class="btn reveal-examples" id="expansionMoreV2">+ 다른 보기</button></div>
+      <div class="choices extra" id="expansionExtraV2" hidden>
+        ${extra.map(v=>`<button type="button" class="choice expansion-value-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>
+    `:''}
+    <div class="custom" style="margin-top:14px">
+      <label for="expansionTypedV2">✏️ 내가 직접 쓰기</label>
+      <div class="custom-row">
+        <input id="expansionTypedV2" placeholder="내 말을 직접 써도 돼요" autocomplete="off">
+        <button type="button" class="btn add" id="expansionTypedAddV2">입력하기</button>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="expansionCancelV2">다른 질문 고르기</button>
+      <button type="button" class="btn next" id="expansionStopHereV2">여기까지</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  const choose=(value,source)=>{
+    addExpansionValueV2(event,role,value,source);
+    const expanded=expandedSentenceV2(event);
+    storyV2.expression.selected=expanded;
+    storyV2.expression.corrected=expanded;
+    renderExpandedSentenceV2(event);
+  };
+
+  card.querySelectorAll('.expansion-value-v2').forEach(b=>b.onclick=()=>choose(b.dataset.v,'choice'));
+  const more=card.querySelector('#expansionMoreV2');
+  if(more)more.onclick=()=>{
+    card.querySelector('#expansionExtraV2').hidden=false;
+    more.style.display='none';
+    storyV2.support.hintCount+=1;
+  };
+  const input=card.querySelector('#expansionTypedV2');
+  const add=()=>{const v=(input.value||'').trim();if(v)choose(v,'typed')};
+  card.querySelector('#expansionTypedAddV2').onclick=add;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+  card.querySelector('#expansionCancelV2').onclick=()=>renderExpansionMenuV2(event);
+  card.querySelector('#expansionStopHereV2').onclick=()=>renderExpandedSentenceV2(event);
+}
+
+function renderExpandedSentenceV2(event){
+  stepText.textContent='자세한 문장';
+  bar.style.width='80%';
+  const sentence=expandedSentenceV2(event);
+  storyV2.expression.selected=sentence;
+  storyV2.expression.corrected=sentence;
+  const more=expansionRolesForV2(event);
+
+  card.innerHTML=`
+    <h1>문장이 더 자세해졌어요.</h1>
+    <p class="help">내가 고른 내용만 더했어요. 원하면 한 가지를 더 말할 수 있어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.3em"><b>🌿 ${escapeHtml(sentence)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      ${more.length?'<button type="button" class="btn" id="expandedMoreV2">조금 더 자세히</button>':''}
+      <button type="button" class="btn next" id="expandedNextV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  const moreBtn=card.querySelector('#expandedMoreV2');
+  if(moreBtn)moreBtn.onclick=()=>renderExpansionMenuV2(event);
+  card.querySelector('#expandedNextV2').onclick=()=>{
+    // Step 10 will connect next-event/story expansion here.
+    renderExpandedSentenceV2(event);
+  };
+}
+
 function renderSelectedCoreV2(event,sentence){
   stepText.textContent='내 문장';
   bar.style.width='64%';
@@ -1024,8 +1194,7 @@ function renderSelectedCoreV2(event,sentence){
   `;
   card.querySelector('#selectedChangeV2').onclick=()=>renderNaturalCandidateChoiceV2(event);
   card.querySelector('#selectedNextV2').onclick=()=>{
-    // Step 9 will connect optional meaning expansion here.
-    renderSelectedCoreV2(event,sentence);
+    renderExpansionMenuV2(event);
   };
 }
 
