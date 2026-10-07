@@ -149,8 +149,8 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 </script></head><body><main class='app shell'><section id='homeScreen' class='screen active'><div class='home-open'><div class='home-topbar'><div class='home-logo brand-image'><img src='assets/branding/logo-sentence-toktok.png' alt='문장 톡톡 - 내 생각을 한 문장씩 모아요'></div><div class='home-stats'><button class='login-mini' id='loginBtn'>로그인</button></div></div><img id='homeGrowthPenguin' class='home-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 성장 펭귄'><div class='home-bottom-actions single'><button type='button' class='home-action start' id='startBtn' onclick='startCompose()'>✏️ 시작하기 <span>→</span></button></div></div></section><section id='composeScreen' class='screen'><div class='top'><div class='badge'>문장 구성</div><div id='stepText'>1 / 6</div></div><div class='progress'><div id='bar' class='bar'></div></div><section id='card' class='card'></section></section><section id='antarcticScreen' class='screen'><h1 class='screen-title'>나의 남극</h1><div id='antarcticWorld' class='antarctic-world day'><div class='antarctic-sky'><div id='penguinVillageTitle'>나의 펭귄 마을</div></div><div class='antarctic-overlay'><div class='antarctic-pill compact-pill'>🐟 <b id='antarcticFish'>0</b></div><div class='antarctic-pill compact-pill'>🎁 <b id='antarcticItems'>0</b></div></div><div class='penguin-habitat'><div id='penguinStage' class='penguin-stage feed-target movable-penguin' title='눌러서 이글루로 보내기'><img id='growthPenguin' class='growth-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='1단계 아기 펭귄'></div></div><div class='feed-area'><div id='feedModeNote' class='feed-mode-note'>먹이를 줄 펭귄을 골라 주세요.</div><button type='button' class='fish-btn fish-only' id='feedBtn' aria-label='물고기 먹이 주기'><span class='fish-image' aria-hidden='true'>🐟</span></button><div class='feed-msg' id='feedMsg'></div></div></div><div class='fish-inventory-wrap'><div class='fish-inventory-head'><h3>물고기 보관함</h3><div class='fish-inventory-total'>보유 <b id='fishInventoryTotal'>0</b>마리</div></div><div class='fish-inventory-viewport' id='fishInventoryViewport' aria-label='보유 물고기 목록. 좌우로 밀어서 볼 수 있습니다.'><div class='fish-inventory-track' id='fishInventoryTrack'></div></div><div class='fish-swipe-help'>← 오른쪽에서 왼쪽으로 밀어 모든 물고기를 볼 수 있어요 →</div></div><div class='penguin-dock-wrap'><h3>나의 펭귄</h3><div class='igloo-dock' id='iglooDock'><div class='igloo-shell'><div class='igloo-lines'></div><div class='igloo-door'></div></div><button type='button' class='stored-penguin' id='storedPenguin' aria-label='아기 펭귄을 남극으로 보내기'><img src='assets/penguins/penguin-01-baby.png.PNG' alt='아기 펭귄'></button><div class='dock-help' id='dockHelp'>펭귄을 눌러 남극으로 보내거나 이글루로 데려올 수 있어요.</div></div></div><div class='home-box antarctic-details'><h3>성장 기록</h3><div class='stat'>먹인 물고기 <b id='fedCount'>0</b>마리<div class='growth-track'><div id='growthFill' class='growth-fill'></div></div><div class='growth' id='nextGrowthText'>다음 성장까지 물고기 5마리</div></div></div></section><section id='dictionaryScreen' class='screen'><h1 class='screen-title'>나의 문장 사전</h1><div id='dictionaryList'></div></section><section id='myScreen' class='screen'><h1 class='screen-title'>마이페이지</h1><div class='home-box'><h3>나의 성장</h3><div class='my-growth'><img id='myGrowthPenguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 펭귄'><div class='stat' id='growthStat'>1단계 · 아기 펭귄</div></div></div><div class='home-box'><h3>나의 이야기 보물</h3><div id='treasureList' class='empty-note'>아직 발견한 보물이 없어요.</div></div><div class='home-box'><h3>특별 펭귄</h3><div id='specialList' class='empty-note'>앞으로 만날 특별 펭귄을 기다려 주세요.</div></div></section><nav class='app-nav'><button class='nav-btn active' data-screen='homeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-01-baby.png.PNG' alt=''></span>홈</button><button class='nav-btn' data-screen='composeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-04-word-collector.png.PNG' alt=''></span>문장 구성</button><button class='nav-btn' data-screen='antarcticScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-06-sentence-explorer.png.PNG' alt=''></span>나의 남극</button><button class='nav-btn' data-screen='dictionaryScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-07-reader.png.PNG' alt=''></span>문장 사전</button><button class='nav-btn' data-screen='myScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-10-graduate.png.PNG' alt=''></span>마이</button></nav></main><div id='treasureModal' class='modal' aria-hidden='true'><div class='modal-card'><h2 id='modalTitle'></h2><div id='modalSource' class='source'></div><p id='modalSummary'></p><button class='close-modal' id='closeModal'>닫기</button></div></div><script>
 const SENTENCE_ENGINE_V2={
   version:2,
-  enabled:false,
-  phase:'role-confirmation',
+  enabled:true,
+  phase:'meaning-input-ui',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -805,6 +805,139 @@ function confirmRoleValueV2(event,role,value,source='choice'){
 }
 
 
+function renderMeaningStartV2(){
+  stepText.textContent='내 생각';
+  bar.style.width='12%';
+  card.innerHTML=`
+    <h1>무슨 이야기를 하고 싶어요?</h1>
+    <p class="help">문장이 아니어도 괜찮아요. 생각나는 말이나 단어를 그대로 써 보세요.</p>
+    <div class="custom">
+      <label for="meaningInputV2">✏️ 내가 말하고 싶은 것</label>
+      <div class="recall-guide">예: 친구 책 줬어 · 엄마 병원 무서워 · 공 했어 · 고양이 좋아</div>
+      <div class="custom-row">
+        <input id="meaningInputV2" placeholder="생각나는 말을 써 보세요" autocomplete="off">
+        <button type="button" class="btn add" id="meaningAnalyzeV2">뜻 찾아보기</button>
+      </div>
+    </div>
+    <div class="examples-panel" style="margin-top:14px">
+      <p class="help" style="margin:0 0 10px">잘 생각나지 않으면 짧게 시작해도 괜찮아요.</p>
+      <div class="choices">
+        <button type="button" class="choice meaning-example-v2" data-v="친구 책 줬어">친구 책 줬어</button>
+        <button type="button" class="choice meaning-example-v2" data-v="공 했어">공 했어</button>
+        <button type="button" class="choice meaning-example-v2" data-v="학교 갔어">학교 갔어</button>
+        <button type="button" class="choice meaning-example-v2" data-v="고양이 좋아">고양이 좋아</button>
+      </div>
+    </div>
+  `;
+  const input=card.querySelector('#meaningInputV2');
+  const go=()=>{
+    const raw=(input.value||'').trim();
+    if(!raw)return;
+    storyV2.support.usedTyping=true;
+    const analysis=recordMeaningAnalysisV2(raw);
+    renderMeaningClarificationV2(analysis);
+  };
+  card.querySelector('#meaningAnalyzeV2').onclick=go;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go()}});
+  card.querySelectorAll('.meaning-example-v2').forEach(b=>b.onclick=()=>{input.value=b.dataset.v;go()});
+}
+
+function renderMeaningClarificationV2(analysis){
+  const model=clarificationModelV2(analysis);
+  stepText.textContent='뜻 확인';
+  bar.style.width='24%';
+
+  let candidates=model.sentenceCandidates||[];
+  if(!candidates.length && analysis.status==='meaning-ready'){
+    candidates=[{
+      id:'meaning-ready-1',
+      predicate:analysis.predicate,
+      roles:cloneRolesV2(analysis.roles),
+      text:previewMeaningSentenceV2(analysis.predicate,analysis.roles),
+      reason:'입력한 뜻',
+      confidence:analysis.confidence||.8
+    }];
+  }
+
+  const wordChoices=(model.wordChoices||[]).slice(0,8);
+  card.innerHTML=`
+    <h1>${escapeHtml(model.title)}</h1>
+    <p class="help">${escapeHtml(model.instruction)}</p>
+    ${candidates.length?`
+      <div class="story-two" style="margin-top:12px">
+        ${candidates.map((x,i)=>`
+          <button type="button" class="choice meaning-sentence-choice-v2" data-i="${i}" style="display:block;width:100%;margin:8px 0;text-align:left">
+            <b>${escapeHtml(x.text)}</b><br>
+            <small>${escapeHtml(x.reason||'가능한 뜻')}</small>
+          </button>
+        `).join('')}
+      </div>`:''}
+    ${wordChoices.length?`
+      <div class="examples-panel" style="margin-top:14px">
+        <p class="help" style="margin:0 0 10px">필요한 말을 하나 골라도 돼요.</p>
+        <div class="choices">
+          ${wordChoices.map((x,i)=>`<button type="button" class="choice meaning-word-choice-v2" data-i="${i}">${escapeHtml(x.label)}</button>`).join('')}
+        </div>
+      </div>`:''}
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="meaningOtherV2">다른 뜻이에요</button>
+      <button type="button" class="btn next" id="meaningRetryV2">내가 다시 말할게요</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelectorAll('.meaning-sentence-choice-v2').forEach(b=>b.onclick=()=>{
+    const chosen=candidates[Number(b.dataset.i)];
+    const event=applyMeaningCandidateV2(chosen);
+    renderMeaningConfirmedV2(event);
+  });
+
+  card.querySelectorAll('.meaning-word-choice-v2').forEach(b=>b.onclick=()=>{
+    const chosen=wordChoices[Number(b.dataset.i)];
+    if(chosen&&chosen.type==='role'&&chosen.role&&analysis.predicate){
+      analysis.roles=analysis.roles||{};
+      analysis.roles[chosen.role]=chosen.label;
+      const refreshed=buildMeaningHypothesesV2(
+        [analysis.roles.subject,analysis.roles.object,analysis.roles.recipient,analysis.roles.destination,analysis.predicate]
+          .filter(Boolean).join(' ')
+      );
+      renderMeaningClarificationV2(refreshed);
+      return;
+    }
+    renderMeaningStartV2();
+  });
+
+  card.querySelector('#meaningOtherV2').onclick=()=>{
+    storyV2.learningLog.meaningRepairs+=1;
+    renderMeaningStartV2();
+  };
+  card.querySelector('#meaningRetryV2').onclick=renderMeaningStartV2;
+}
+
+function renderMeaningConfirmedV2(event){
+  stepText.textContent='뜻 확인 완료';
+  bar.style.width='32%';
+  const sentence=event?previewMeaningSentenceV2(event.predicate,event):'';
+  card.innerHTML=`
+    <h1>이 뜻이 맞아요.</h1>
+    <p class="help">이제 이 뜻을 바탕으로 자연스러운 문장을 만들어 갈 거예요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.25em"><b>${escapeHtml(sentence)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="meaningBackV2">뜻 다시 고르기</button>
+      <button type="button" class="btn next" id="meaningContinueV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#meaningBackV2').onclick=renderMeaningStartV2;
+  card.querySelector('#meaningContinueV2').onclick=()=>{
+    // Step 7 will connect adaptive scaffolding and required-role completion here.
+    renderMeaningStartV2();
+  };
+}
+
+
 
 /* v1 sentence flow remains active during rebuild.
    v2 will replace only the sentence-composition engine after staged validation. */
@@ -1050,7 +1183,7 @@ function contextItems(s){
  return {main:s.items,extra:s.examples,matched:false,restricted:false}
 }
 
-function startCompose(){idx=0;ans={};expanded={};storyDraft=[];showScreen('composeScreen');render()}
+function startCompose(){idx=0;ans={};expanded={};storyDraft=[];storyV2=createEmptyStoryV2();showScreen('composeScreen');if(SENTENCE_ENGINE_V2.enabled){renderMeaningStartV2();return}render()}
 function skipCurrentStep(){const s=steps[idx];if(!s||s.key==='predicate')return;delete ans[s.key];if(idx<steps.length-1){idx++;render()}else finish()}
 let finishing=false;
 function nextCurrentStep(){
