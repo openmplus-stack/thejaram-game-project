@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:false,
-  phase:'foundation',
+  phase:'predicate-frames',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -193,6 +193,159 @@ function createEmptyStoryV2(){
 }
 
 let storyV2=createEmptyStoryV2();
+
+const MEANING_ROLES_V2={
+  subject:{label:'누가/무엇이',kind:'entity',particle:'topicOrSubject'},
+  predicate:{label:'무엇을 했어',kind:'action'},
+  object:{label:'무엇을',kind:'entity',particle:'object'},
+  recipient:{label:'누구에게',kind:'person',particle:'recipient'},
+  companion:{label:'누구와',kind:'person',particle:'companion'},
+  destination:{label:'어디에',kind:'place',particle:'destination'},
+  place:{label:'어디에서',kind:'place',particle:'place'},
+  time:{label:'언제',kind:'time'},
+  manner:{label:'어떻게',kind:'manner'},
+  reason:{label:'왜',kind:'reason'},
+  purpose:{label:'무엇을 하려고',kind:'purpose'},
+  result:{label:'그래서 어떻게 되었어',kind:'event'},
+  thought:{label:'무슨 생각이 들었어',kind:'thought'},
+  emotion:{label:'어떤 기분이었어',kind:'emotion'}
+};
+
+const PREDICATE_FRAMES_V2={
+  '가다':{
+    id:'go',display:'갔다',required:['subject','destination'],
+    optional:['time','companion','purpose','manner'],
+    semantic:{destination:['place'],companion:['person']},
+    questions:{destination:'어디에 갔어요?',time:'언제 갔어요?',companion:'누구와 갔어요?',purpose:'무엇을 하려고 갔어요?',manner:'어떻게 갔어요?'},
+    expansionOrder:['companion','purpose','time','manner'],
+    followUps:['그곳에서 무엇을 했어요?','그다음에는 무슨 일이 있었어요?']
+  },
+  '먹다':{
+    id:'eat',display:'먹었다',required:['subject','object'],
+    optional:['time','place','companion','manner','reason'],
+    semantic:{object:['food'],place:['place'],companion:['person']},
+    questions:{object:'무엇을 먹었어요?',time:'언제 먹었어요?',place:'어디에서 먹었어요?',companion:'누구와 먹었어요?',manner:'어떻게 먹었어요?',reason:'왜 먹었어요?'},
+    expansionOrder:['object','place','companion','time','reason','manner'],
+    followUps:['먹어 보니 어땠어요?','먹고 나서 어떻게 되었어요?']
+  },
+  '마시다':{
+    id:'drink',display:'마셨다',required:['subject','object'],
+    optional:['time','place','companion','reason'],
+    semantic:{object:['drink'],place:['place'],companion:['person']},
+    questions:{object:'무엇을 마셨어요?',time:'언제 마셨어요?',place:'어디에서 마셨어요?',companion:'누구와 마셨어요?',reason:'왜 마셨어요?'},
+    expansionOrder:['object','place','time','reason','companion'],
+    followUps:['마시고 나서 어땠어요?']
+  },
+  '읽다':{
+    id:'read',display:'읽었다',required:['subject','object'],
+    optional:['time','place','companion','manner','reason','purpose'],
+    semantic:{object:['reading'],place:['place'],companion:['person']},
+    questions:{object:'무엇을 읽었어요?',time:'언제 읽었어요?',place:'어디에서 읽었어요?',companion:'누구와 읽었어요?',manner:'어떻게 읽었어요?',reason:'왜 읽었어요?',purpose:'무엇을 알고 싶어서 읽었어요?'},
+    expansionOrder:['object','place','reason','purpose','time','manner','companion'],
+    followUps:['읽고 새롭게 알게 된 것이 있어요?','읽고 어떤 생각이 들었어요?']
+  },
+  '쓰다':{
+    id:'write',display:'썼다',required:['subject','object'],
+    optional:['time','place','purpose','manner'],
+    semantic:{object:['writing'],place:['place']},
+    questions:{object:'무엇을 썼어요?',time:'언제 썼어요?',place:'어디에서 썼어요?',purpose:'왜 썼어요?',manner:'어떻게 썼어요?'},
+    expansionOrder:['object','purpose','place','time','manner'],
+    followUps:['쓰고 나서 무엇을 했어요?','쓴 내용에서 가장 중요한 것은 무엇이에요?']
+  },
+  '놀다':{
+    id:'play',display:'놀았다',required:['subject'],
+    optional:['companion','place','object','time','manner'],
+    semantic:{companion:['person'],place:['place'],object:['activity','toy','sport']},
+    questions:{companion:'누구와 놀았어요?',place:'어디에서 놀았어요?',object:'무엇을 하며 놀았어요?',time:'언제 놀았어요?',manner:'어떻게 놀았어요?'},
+    expansionOrder:['companion','place','object','time','manner'],
+    followUps:['놀다가 무슨 일이 있었어요?','가장 재미있었던 것은 무엇이었어요?']
+  },
+  '만나다':{
+    id:'meet',display:'만났다',required:['subject','object'],
+    optional:['place','time','reason'],
+    semantic:{object:['person'],place:['place']},
+    questions:{object:'누구를 만났어요?',place:'어디에서 만났어요?',time:'언제 만났어요?',reason:'왜 만났어요?'},
+    expansionOrder:['object','place','time','reason'],
+    followUps:['만나서 무엇을 했어요?','그다음에는 무슨 일이 있었어요?']
+  },
+  '주다':{
+    id:'give',display:'주었다',required:['subject','recipient','object'],
+    optional:['time','place','reason','manner'],
+    semantic:{recipient:['person'],object:['thing','food','drink','reading','writing'],place:['place']},
+    questions:{recipient:'누구에게 주었어요?',object:'무엇을 주었어요?',time:'언제 주었어요?',place:'어디에서 주었어요?',reason:'왜 주었어요?',manner:'어떻게 주었어요?'},
+    expansionOrder:['recipient','object','reason','place','time','manner'],
+    followUps:['받은 사람은 어떻게 했어요?','그 뒤에 무슨 일이 있었어요?']
+  },
+  '받다':{
+    id:'receive',display:'받았다',required:['subject','object'],
+    optional:['recipient','time','place','reason'],
+    semantic:{recipient:['person'],object:['thing','food','drink','reading','writing'],place:['place']},
+    questions:{object:'무엇을 받았어요?',recipient:'누구에게 받았어요?',time:'언제 받았어요?',place:'어디에서 받았어요?',reason:'왜 받았어요?'},
+    expansionOrder:['object','recipient','reason','place','time'],
+    followUps:['받고 나서 어떻게 했어요?','받았을 때 어떤 기분이었어요?']
+  },
+  '만들다':{
+    id:'make',display:'만들었다',required:['subject','object'],
+    optional:['place','time','companion','manner','purpose'],
+    semantic:{object:['thing','craft','food'],place:['place'],companion:['person']},
+    questions:{object:'무엇을 만들었어요?',place:'어디에서 만들었어요?',time:'언제 만들었어요?',companion:'누구와 만들었어요?',manner:'어떻게 만들었어요?',purpose:'무엇을 하려고 만들었어요?'},
+    expansionOrder:['object','companion','manner','purpose','place','time'],
+    followUps:['만든 것은 어떻게 되었어요?','만들면서 어려웠던 점이 있었어요?']
+  },
+  '돕다':{
+    id:'help',display:'도왔다',required:['subject','object'],
+    optional:['place','time','reason','manner'],
+    semantic:{object:['person'],place:['place']},
+    questions:{object:'누구를 도왔어요?',place:'어디에서 도왔어요?',time:'언제 도왔어요?',reason:'왜 도왔어요?',manner:'어떻게 도왔어요?'},
+    expansionOrder:['object','reason','manner','place','time'],
+    followUps:['어떻게 도와주었어요?','도와준 뒤에 어떻게 되었어요?']
+  },
+  '좋아하다':{
+    id:'like',display:'좋아한다',required:['subject','object'],
+    optional:['reason','manner'],
+    semantic:{object:['person','animal','food','thing','activity','place','topic']},
+    questions:{object:'무엇을 또는 누구를 좋아해요?',reason:'어떤 점이 좋아요?',manner:'얼마나 또는 어떻게 좋아해요?'},
+    expansionOrder:['object','reason','manner'],
+    followUps:['좋아하게 된 계기가 있어요?','다음에는 무엇을 해 보고 싶어요?']
+  }
+};
+
+const PREDICATE_ALIASES_V2={
+  '갔다':'가다','가요':'가다','가':'가다',
+  '먹었다':'먹다','먹었어요':'먹다','먹어':'먹다',
+  '마셨다':'마시다','마셨어요':'마시다','마셔':'마시다',
+  '읽었다':'읽다','읽었어요':'읽다','읽어':'읽다',
+  '썼다':'쓰다','썼어요':'쓰다','써':'쓰다',
+  '놀았다':'놀다','놀았어요':'놀다','놀아':'놀다',
+  '만났다':'만나다','만났어요':'만나다','만나':'만나다',
+  '주었다':'주다','주었어요':'주다','줘':'주다',
+  '받았다':'받다','받았어요':'받다','받아':'받다',
+  '만들었다':'만들다','만들었어요':'만들다','만들어':'만들다',
+  '도왔다':'돕다','도와주었어요':'돕다','도와줘':'돕다',
+  '좋아한다':'좋아하다','좋아해요':'좋아하다','좋아해':'좋아하다'
+};
+
+function getPredicateFrameV2(value){
+  const raw=String(value||'').trim().replace(/[.?!,]+$/,'');
+  const key=PREDICATE_FRAMES_V2[raw]?raw:(PREDICATE_ALIASES_V2[raw]||raw);
+  return PREDICATE_FRAMES_V2[key]||null;
+}
+
+function requiredRolesForV2(predicate){
+  const frame=getPredicateFrameV2(predicate);
+  return frame?frame.required.slice():[];
+}
+
+function nextRequiredRoleV2(event){
+  const e=event||{};
+  const frame=getPredicateFrameV2(e.predicate);
+  if(!frame)return null;
+  return frame.required.find(role=>{
+    const v=e[role];
+    return Array.isArray(v)?v.length===0:!v;
+  })||null;
+}
+
 
 /* v1 sentence flow remains active during rebuild.
    v2 will replace only the sentence-composition engine after staged validation. */
