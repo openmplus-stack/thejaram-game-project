@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'adaptive-role-completion',
+  phase:'natural-candidate-choice',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -909,6 +909,126 @@ function renderRequiredRoleV2(event,role){
   card.querySelector('#roleBackV2').onclick=renderMeaningStartV2;
 }
 
+function withTopicParticleV2(value){
+  const w=stripRoleParticleV2(value);
+  if(!w)return '';
+  return w+(hasBatchim(w)?'은':'는');
+}
+
+function composeEventSentenceV2(event,options={}){
+  const e=event||{};
+  const parts=[];
+  const subjectMode=options.subjectMode||'topic';
+  const omitSubject=!!options.omitSubject;
+  const frontPlace=!!options.frontPlace;
+
+  if(e.reason)parts.push(String(e.reason));
+  if(e.time)parts.push(String(e.time));
+  if(frontPlace){
+    if(e.destination)parts.push(withRoleParticleV2(e.destination,'destination'));
+    if(e.place)parts.push(withRoleParticleV2(e.place,'place'));
+  }
+
+  if(e.subject&&!omitSubject){
+    parts.push(subjectMode==='focus'?withRoleParticleV2(e.subject,'subject'):withTopicParticleV2(e.subject));
+  }
+
+  if(e.companion)parts.push(withRoleParticleV2(e.companion,'companion'));
+
+  if(!frontPlace){
+    if(e.destination)parts.push(withRoleParticleV2(e.destination,'destination'));
+    if(e.place)parts.push(withRoleParticleV2(e.place,'place'));
+  }
+
+  if(e.recipient)parts.push(withRoleParticleV2(e.recipient,'recipient'));
+  if(e.object)parts.push(withRoleParticleV2(e.object,'object'));
+  if(e.manner)parts.push(String(e.manner));
+  parts.push(predicateDisplayV2(e.predicate));
+
+  return parts.filter(Boolean).join(' ').replace(/\s+/g,' ').trim().replace(/[.?!]+$/,'')+'.';
+}
+
+function naturalSentenceCandidatesV2(event){
+  const list=[];
+  const push=(text,label)=>{
+    if(!text||list.some(x=>x.text===text))return;
+    list.push({text,label});
+  };
+
+  push(composeEventSentenceV2(event,{subjectMode:'topic'}),'가장 자연스러운 기본 표현');
+  push(composeEventSentenceV2(event,{subjectMode:'focus'}),'누가 했는지 또렷하게 말하는 표현');
+
+  const subject=stripRoleParticleV2(event&&event.subject);
+  if(subject==='나'){
+    push(composeEventSentenceV2(event,{omitSubject:true}),'주어를 자연스럽게 생략한 표현');
+  }else if(event&&(event.place||event.destination)){
+    push(composeEventSentenceV2(event,{subjectMode:'topic',frontPlace:true}),'장소를 먼저 말하는 표현');
+  }
+
+  return list.slice(0,3);
+}
+
+function renderNaturalCandidateChoiceV2(event){
+  stepText.textContent='내 문장 고르기';
+  bar.style.width='58%';
+  const candidates=naturalSentenceCandidatesV2(event);
+  storyV2.expression.candidates=candidates.map(x=>x.text);
+
+  card.innerHTML=`
+    <h1>어떤 문장이 내 말과 가장 가까워요?</h1>
+    <p class="help">뜻은 같지만 말하는 방법이 조금씩 달라요. 내가 말하고 싶은 문장을 골라 주세요.</p>
+    <div class="story-two" style="margin-top:12px">
+      ${candidates.map((x,i)=>`
+        <button type="button" class="choice natural-candidate-v2" data-i="${i}" style="display:block;width:100%;margin:10px 0;text-align:left">
+          <b>${escapeHtml(x.text)}</b><br>
+          <small>${escapeHtml(x.label)}</small>
+        </button>
+      `).join('')}
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="candidateBackV2">문장 다시 보기</button>
+      <button type="button" class="btn next" id="candidateKeepV2">첫 문장 그대로</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelectorAll('.natural-candidate-v2').forEach(b=>b.onclick=()=>{
+    const chosen=candidates[Number(b.dataset.i)];
+    storyV2.expression.selected=chosen.text;
+    storyV2.expression.corrected=chosen.text;
+    renderSelectedCoreV2(event,chosen.text);
+  });
+  card.querySelector('#candidateBackV2').onclick=()=>renderCoreSentenceV2(event);
+  card.querySelector('#candidateKeepV2').onclick=()=>{
+    const first=candidates[0]&&candidates[0].text?candidates[0].text:composeEventSentenceV2(event,{subjectMode:'topic'});
+    storyV2.expression.selected=first;
+    storyV2.expression.corrected=first;
+    renderSelectedCoreV2(event,first);
+  };
+}
+
+function renderSelectedCoreV2(event,sentence){
+  stepText.textContent='내 문장';
+  bar.style.width='64%';
+  card.innerHTML=`
+    <h1>내가 고른 문장이에요.</h1>
+    <p class="help">이 문장을 그대로 완성해도 되고, 다음 단계에서 더 자세하게 만들 수 있어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.3em"><b>🌱 ${escapeHtml(sentence)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="selectedChangeV2">다른 문장 고르기</button>
+      <button type="button" class="btn next" id="selectedNextV2">더 자세히</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#selectedChangeV2').onclick=()=>renderNaturalCandidateChoiceV2(event);
+  card.querySelector('#selectedNextV2').onclick=()=>{
+    // Step 9 will connect optional meaning expansion here.
+    renderSelectedCoreV2(event,sentence);
+  };
+}
+
 function renderCoreSentenceV2(event){
   stepText.textContent='핵심문장';
   bar.style.width='50%';
@@ -929,8 +1049,7 @@ function renderCoreSentenceV2(event){
   `;
   card.querySelector('#coreChangeV2').onclick=renderMeaningStartV2;
   card.querySelector('#coreNextV2').onclick=()=>{
-    // Step 8 will add natural sentence candidates and expansion choices here.
-    renderCoreSentenceV2(event);
+    renderNaturalCandidateChoiceV2(event);
   };
 }
 
