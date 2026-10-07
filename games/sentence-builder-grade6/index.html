@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'correction-levels',
+  phase:'thought-growth-view',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1624,6 +1624,87 @@ function renderReviewChoiceResultV2(text,label){
   };
 }
 
+function firstCoreSentenceV2(){
+  const first=(storyV2.events||[]).find(e=>e&&e.confirmed);
+  return first?composeEventSentenceV2(first,{subjectMode:'topic'}):'';
+}
+
+function detailedFirstSentenceV2(){
+  const first=(storyV2.events||[]).find(e=>e&&e.confirmed);
+  if(!first)return '';
+  return expandedSentenceV2(first);
+}
+
+function confirmedMeaningSummaryV2(){
+  const first=(storyV2.events||[]).find(e=>e&&e.confirmed);
+  if(!first)return '';
+  const frame=getPredicateFrameV2(first.predicate);
+  const labels=[];
+  if(first.subject)labels.push('누가: '+stripRoleParticleV2(first.subject));
+  if(first.object)labels.push('무엇을: '+stripRoleParticleV2(first.object));
+  if(first.recipient)labels.push('누구에게: '+stripRoleParticleV2(first.recipient));
+  if(first.destination)labels.push('어디에: '+stripRoleParticleV2(first.destination));
+  if(first.place)labels.push('어디에서: '+stripRoleParticleV2(first.place));
+  if(frame)labels.push('행동: '+predicateDisplayV2(first.predicate));
+  return labels.join(' · ');
+}
+
+function thoughtGrowthStepsV2(finalText){
+  const original=originalExpressionV2();
+  const meaning=confirmedMeaningSummaryV2();
+  const core=firstCoreSentenceV2();
+  const detailed=detailedFirstSentenceV2();
+  const story=currentStoryTextV2();
+  const finalValue=String(finalText||storyV2.expression.selected||storyV2.expression.corrected||story||'').trim();
+  return [
+    {icon:'🗣️',title:'처음 말한 것',text:original},
+    {icon:'🔎',title:'뜻을 찾아본 것',text:meaning},
+    {icon:'🌱',title:'핵심문장',text:core},
+    {icon:'🌿',title:'자세한 문장',text:detailed},
+    {icon:'🌳',title:'나의 이야기',text:story},
+    {icon:'✨',title:'최종 표현',text:finalValue}
+  ].filter(x=>x.text);
+}
+
+function renderThoughtGrowthV2(finalText){
+  stepText.textContent='나의 생각 성장';
+  bar.style.width='100%';
+  const steps=thoughtGrowthStepsV2(finalText);
+  storyV2.expression.growthSteps=steps;
+  storyV2.expression.selected=String(finalText||storyV2.expression.selected||'').trim();
+
+  card.innerHTML=`
+    <h1>내 생각이 이렇게 자랐어요.</h1>
+    <p class="help">처음 떠올린 말이 뜻을 찾고, 문장이 되고, 이야기로 자란 과정을 볼 수 있어요.</p>
+    <div class="story-two" style="margin-top:14px">
+      ${steps.map((x,i)=>`
+        <div style="padding:14px 0;${i<steps.length-1?'border-bottom:1px solid rgba(0,0,0,.08);':''}">
+          <div class="help" style="margin-bottom:5px">${x.icon} ${escapeHtml(x.title)}</div>
+          <div style="font-size:${x.title==='최종 표현'?'1.25em':'1.08em'};line-height:1.6">
+            <b>${escapeHtml(x.text)}</b>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="examples-panel" style="margin-top:14px">
+      <p class="help" style="margin:0">
+        길게 쓴 것이 목표가 아니라, 내가 말하고 싶었던 뜻을 더 정확하고 자연스럽게 표현한 과정이에요.
+      </p>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="growthReviewV2">표현 다시 보기</button>
+      <button type="button" class="btn next" id="growthFinishV2">완성</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelector('#growthReviewV2').onclick=renderExpressionReviewV2;
+  card.querySelector('#growthFinishV2').onclick=()=>{
+    // Step 15 will connect v2 save/reward/dictionary integration.
+    renderThoughtGrowthV2(finalText);
+  };
+}
+
 function renderCorrectionSummaryV2(text){
   stepText.textContent='교정 완료';
   bar.style.width='100%';
@@ -1650,8 +1731,7 @@ function renderCorrectionSummaryV2(text){
   `;
   card.querySelector('#correctionAgainV2').onclick=renderExpressionReviewV2;
   card.querySelector('#correctionNextV2').onclick=()=>{
-    // Step 14 will connect final thought-growth view.
-    renderCorrectionSummaryV2(text);
+    renderThoughtGrowthV2(text);
   };
 }
 
