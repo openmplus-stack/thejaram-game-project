@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'reflection-layer',
+  phase:'expression-review',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1438,6 +1438,115 @@ function renderReflectionQuestionV2(kind){
   card.querySelector('#reflectionCancelV2').onclick=renderReflectionMenuV2;
 }
 
+function originalExpressionV2(){
+  return (storyV2.rawInputs||[])
+    .map(x=>String((x&&x.text)||'').trim())
+    .filter(Boolean)
+    .join(' / ');
+}
+
+function tokenizeForCompareV2(text){
+  return String(text||'')
+    .replace(/[.?!]/g,'')
+    .split(/\s+/)
+    .map(x=>x.trim())
+    .filter(Boolean);
+}
+
+function diffWordsV2(original,polished){
+  const a=tokenizeForCompareV2(original);
+  const b=tokenizeForCompareV2(polished);
+  const rows=[];
+  const max=Math.max(a.length,b.length);
+  for(let i=0;i<max;i++){
+    const before=a[i]||'';
+    const after=b[i]||'';
+    rows.push({before,after,changed:before!==after});
+  }
+  return rows;
+}
+
+function renderDiffLineV2(original,polished){
+  const rows=diffWordsV2(original,polished);
+  if(!rows.length)return '';
+  return rows.map(r=>{
+    const shown=r.after||r.before;
+    if(!shown)return '';
+    return r.changed
+      ?'<span style="display:inline-block;padding:3px 6px;margin:2px;border-radius:8px;background:#fff2b8"><b>'+escapeHtml(shown)+'</b></span>'
+      :'<span style="display:inline-block;padding:3px 4px;margin:2px">'+escapeHtml(shown)+'</span>';
+  }).join(' ');
+}
+
+function renderExpressionReviewV2(){
+  stepText.textContent='표현 비교';
+  bar.style.width='100%';
+
+  const original=originalExpressionV2();
+  const polished=reflectionStoryTextV2()||storyV2.expression.corrected||storyV2.expression.selected||'';
+  storyV2.expression.original=original;
+  storyV2.expression.corrected=polished;
+
+  card.innerHTML=`
+    <h1>처음 말한 것과 비교해 볼까요?</h1>
+    <p class="help">뜻은 그대로 두고, 조사·어순·문장 끝맺음을 자연스럽게 다듬었어요. 노란색은 달라진 부분이에요.</p>
+
+    <div class="story-two" style="margin-top:12px">
+      <div style="margin-bottom:14px">
+        <div class="help" style="margin-bottom:6px">🗣️ 처음 말한 표현</div>
+        <div style="font-size:1.12em"><b>${escapeHtml(original||'처음 입력한 말이 없어요.')}</b></div>
+      </div>
+      <div>
+        <div class="help" style="margin-bottom:6px">✨ 다듬은 표현</div>
+        <div style="font-size:1.12em;line-height:1.8">${renderDiffLineV2(original,polished)}</div>
+      </div>
+    </div>
+
+    <div class="examples-panel" style="margin-top:14px">
+      <p class="help" style="margin:0">다듬은 표현이 내 뜻과 다르면 처음 표현을 선택해도 괜찮아요.</p>
+    </div>
+
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="reviewKeepOriginalV2">처음 표현 유지</button>
+      <button type="button" class="btn next" id="reviewChoosePolishedV2">다듬은 표현 선택</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelector('#reviewKeepOriginalV2').onclick=()=>{
+    storyV2.expression.selected=original;
+    storyV2.expression.finalChoice='original';
+    renderReviewChoiceResultV2(original,'처음 표현');
+  };
+  card.querySelector('#reviewChoosePolishedV2').onclick=()=>{
+    storyV2.expression.selected=polished;
+    storyV2.expression.finalChoice='polished';
+    renderReviewChoiceResultV2(polished,'다듬은 표현');
+  };
+}
+
+function renderReviewChoiceResultV2(text,label){
+  stepText.textContent='최종 표현';
+  bar.style.width='100%';
+  card.innerHTML=`
+    <h1>내가 고른 표현이에요.</h1>
+    <p class="help">${escapeHtml(label)}을 최종 표현으로 골랐어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.25em"><b>🌳 ${escapeHtml(text)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="reviewAgainV2">다시 비교하기</button>
+      <button type="button" class="btn next" id="reviewNextV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#reviewAgainV2').onclick=renderExpressionReviewV2;
+  card.querySelector('#reviewNextV2').onclick=()=>{
+    // Step 13 will connect safe automatic corrections and final growth view.
+    renderReviewChoiceResultV2(text,label);
+  };
+}
+
 function renderReflectionResultV2(){
   stepText.textContent='나의 이야기';
   bar.style.width='99%';
@@ -1459,8 +1568,7 @@ function renderReflectionResultV2(){
   `;
   card.querySelector('#reflectionAddMoreV2').onclick=renderReflectionMenuV2;
   card.querySelector('#reflectionNextV2').onclick=()=>{
-    // Step 12 will connect original-vs-polished review and finalization.
-    renderReflectionResultV2();
+    renderExpressionReviewV2();
   };
 }
 
