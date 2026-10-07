@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'thought-growth-view',
+  phase:'reward-dictionary-integration',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1666,6 +1666,116 @@ function thoughtGrowthStepsV2(finalText){
   ].filter(x=>x.text);
 }
 
+function snapshotStoryV2(){
+  return {
+    version:2,
+    original:storyV2.expression.original||originalExpressionV2(),
+    final:storyV2.expression.selected||'',
+    growthSteps:Array.isArray(storyV2.expression.growthSteps)?storyV2.expression.growthSteps.map(x=>({...x})):[],
+    events:(storyV2.events||[]).map(e=>JSON.parse(JSON.stringify(e))),
+    relations:(storyV2.relations||[]).map(r=>({...r})),
+    reflection:{...(storyV2.reflection||{})},
+    support:{...(storyV2.support||{})},
+    learningLog:JSON.parse(JSON.stringify(storyV2.learningLog||{}))
+  };
+}
+
+function commitV2Story(finalText){
+  const text=String(finalText||storyV2.expression.selected||'').trim();
+  if(!text)return {ok:false,error:'empty'};
+
+  if(!state||typeof state!=='object')state={};
+  if(!Array.isArray(state.sentences))state.sentences=[];
+  if(!Array.isArray(state.fishInventory))state.fishInventory=[];
+  if(!Array.isArray(state.treasures))state.treasures=[];
+  if(!Array.isArray(state.specialPenguins))state.specialPenguins=[];
+
+  const normalized=normalizeMeaningText(text);
+  const existing=state.sentences.find(x=>x&&typeof x.text==='string'&&normalizeMeaningText(x.text)===normalized);
+  if(existing)return {ok:true,duplicate:true,fish:0,persisted:true,reward:null,rewardType:null};
+
+  let grade=1;
+  try{grade=drawFishGrade()}catch(_){grade=1}
+
+  let reward=null,rewardType=null;
+  const roll=Math.random();
+  if(roll<.18){
+    const locked=treasurePool.filter(x=>!state.treasures.includes(x));
+    if(locked.length){
+      reward=locked[Math.floor(Math.random()*locked.length)];
+      rewardType='treasure';
+      state.treasures.push(reward);
+    }
+  }else if(roll<.23){
+    const locked=specialPool.filter(x=>!state.specialPenguins.includes(x));
+    if(locked.length){
+      reward=locked[Math.floor(Math.random()*locked.length)];
+      rewardType='penguin';
+      state.specialPenguins.push(reward);
+    }
+  }
+
+  const snapshot=snapshotStoryV2();
+  const kind=(storyV2.events||[]).filter(e=>e&&e.confirmed).length>1?'story':'sentence';
+  state.sentences.push({
+    text,
+    kind,
+    at:new Date().toISOString(),
+    version:2,
+    original:snapshot.original,
+    growthSteps:snapshot.growthSteps,
+    storyData:snapshot
+  });
+
+  state.fishInventory.push(grade);
+  state.fish=state.fishInventory.length;
+
+  let persisted=false;
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify(state));
+    persisted=true;
+  }catch(err){
+    console.error('v2 save failed',err);
+    return {ok:false,error:'storage',persisted:false};
+  }
+
+  try{updateUI()}catch(err){console.warn(err)}
+  return {ok:true,duplicate:false,fish:1,fishGrade:grade,reward,rewardType,persisted};
+}
+
+function renderV2CompletionV2(finalText,result){
+  stepText.textContent='완성';
+  bar.style.width='100%';
+  const duplicate=!!(result&&result.duplicate);
+  let rewardHtml='';
+  if(duplicate){
+    rewardHtml='📖 이미 나의 문장 사전에 저장된 글이에요.';
+  }else{
+    rewardHtml='✅ 나의 문장 사전에 저장했어요.<br>🐟 '+escapeHtml(result.fishGrade)+'등급 물고기 1마리를 받았어요!';
+    if(result.rewardType==='treasure')rewardHtml+='<br>🎁 이야기 보물을 발견했어요: '+escapeHtml(result.reward);
+    if(result.rewardType==='penguin')rewardHtml+='<br>🐧 특별 펭귄을 만났어요!';
+  }
+
+  card.innerHTML=`
+    <h1>내 문장이 완성됐어요.</h1>
+    <p class="help">내가 선택한 최종 표현을 저장했어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.25em"><b>✨ ${escapeHtml(finalText)}</b></div>
+    </div>
+    <div class="reward" style="margin-top:14px">${rewardHtml}</div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="v2DictionaryAfter">📖 문장 사전</button>
+      <button type="button" class="btn" id="v2AntarcticAfter">🐧 나의 남극</button>
+      <button type="button" class="btn next" id="v2AgainAfter">새 문장 만들기</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelector('#v2DictionaryAfter').onclick=()=>showScreen('dictionaryScreen');
+  card.querySelector('#v2AntarcticAfter').onclick=()=>showScreen('antarcticScreen');
+  card.querySelector('#v2AgainAfter').onclick=startCompose;
+}
+
 function renderThoughtGrowthV2(finalText){
   stepText.textContent='나의 생각 성장';
   bar.style.width='100%';
@@ -1700,8 +1810,15 @@ function renderThoughtGrowthV2(finalText){
 
   card.querySelector('#growthReviewV2').onclick=renderExpressionReviewV2;
   card.querySelector('#growthFinishV2').onclick=()=>{
-    // Step 15 will connect v2 save/reward/dictionary integration.
-    renderThoughtGrowthV2(finalText);
+    const btn=card.querySelector('#growthFinishV2');
+    if(btn)btn.disabled=true;
+    const result=commitV2Story(finalText);
+    if(!result||!result.ok){
+      if(btn)btn.disabled=false;
+      alert('저장하지 못했어요. 다시 눌러 주세요.');
+      return;
+    }
+    renderV2CompletionV2(finalText,result);
   };
 }
 
@@ -2112,7 +2229,7 @@ function updateAntarctic(){
 }
 function currentDisplayName(){try{const keys=['sentenceTokTokUser','userProfile','profile','currentUser'];for(const k of keys){const v=JSON.parse(localStorage.getItem(k)||'null');if(v&&typeof v==='object'){const n=v.name||v.nickname||v.username||v.userId||v.id;if(n)return String(n).trim()}}const direct=localStorage.getItem('userName')||localStorage.getItem('username')||localStorage.getItem('userId');if(direct)return String(direct).trim()}catch(e){}return ''}
 function updateVillageTitle(){const el=document.getElementById('penguinVillageTitle');if(!el)return;const n=currentDisplayName();el.textContent=n?n+'의 펭귄 마을':'나의 펭귄 마을'}
-function updateUI(){updateVillageTitle();const fishEl=document.getElementById('fishCount'),sentenceEl=document.getElementById('sentenceCount'),treasureEl=document.getElementById('treasureCount');if(fishEl)fishEl.textContent=state.fish;if(sentenceEl)sentenceEl.textContent=state.sentences.length;if(treasureEl)treasureEl.textContent=state.treasures.length;const hp=document.getElementById('homeGrowthPenguin');if(hp){const hl=growthLevel();hp.src='assets/penguins/'+growthPenguinFiles[hl-1];hp.alt=(growthNames[hl-1]||'성장 펭귄');}document.getElementById('antarcticFish').textContent=state.fish;document.getElementById('fedCount').textContent=state.fed;document.getElementById('growthStat').textContent=growthLevel()+'단계 · '+(growthNames[growthLevel()-1]||'성장 중인 펭귄');updateAntarctic();let d=document.getElementById('dictionaryList');d.innerHTML=state.sentences.length?state.sentences.slice().reverse().map((x,i)=>`<div class="dict-item"><b>${state.sentences.length-i}번째 문장</b><br>${escapeHtml(x.text)}</div>`).join(''):`<div class="card empty-note">아직 저장한 문장이 없어요.<br>새 문장을 만들어 보세요.</div>`;let t=document.getElementById('treasureList');t.className=state.treasures.length?'':'empty-note';t.innerHTML=state.treasures.length?state.treasures.map(x=>`<button class="treasure-btn" data-treasure="${escapeHtml(x)}">🎁 ${escapeHtml(x)}<br><small>이야기 보기 ›</small></button>`).join(''):'아직 발견한 보물이 없어요.';let sp=document.getElementById('specialList');sp.className=state.specialPenguins.length?'':'empty-note';sp.innerHTML=state.specialPenguins.length?state.specialPenguins.map(x=>`<div class="dict-item">🐧 특별 펭귄 ${escapeHtml(x.split('-').pop())}</div>`).join('') :'앞으로 만날 특별 펭귄을 기다려 주세요.';document.querySelectorAll('.treasure-btn').forEach(b=>b.onclick=()=>openTreasure(b.dataset.treasure))}
+function updateUI(){updateVillageTitle();const fishEl=document.getElementById('fishCount'),sentenceEl=document.getElementById('sentenceCount'),treasureEl=document.getElementById('treasureCount');if(fishEl)fishEl.textContent=state.fish;if(sentenceEl)sentenceEl.textContent=state.sentences.length;if(treasureEl)treasureEl.textContent=state.treasures.length;const hp=document.getElementById('homeGrowthPenguin');if(hp){const hl=growthLevel();hp.src='assets/penguins/'+growthPenguinFiles[hl-1];hp.alt=(growthNames[hl-1]||'성장 펭귄');}document.getElementById('antarcticFish').textContent=state.fish;document.getElementById('fedCount').textContent=state.fed;document.getElementById('growthStat').textContent=growthLevel()+'단계 · '+(growthNames[growthLevel()-1]||'성장 중인 펭귄');updateAntarctic();let d=document.getElementById('dictionaryList');d.innerHTML=state.sentences.length?state.sentences.slice().reverse().map((x,i)=>`<div class="dict-item"><b>${state.sentences.length-i}번째 문장${x.version===2?' · 생각 성장':''}</b><br>${escapeHtml(x.text)}${x.version===2&&x.original?`<br><small>처음 말: ${escapeHtml(x.original)}</small>`:''}</div>`).join(''):`<div class="card empty-note">아직 저장한 문장이 없어요.<br>새 문장을 만들어 보세요.</div>`;let t=document.getElementById('treasureList');t.className=state.treasures.length?'':'empty-note';t.innerHTML=state.treasures.length?state.treasures.map(x=>`<button class="treasure-btn" data-treasure="${escapeHtml(x)}">🎁 ${escapeHtml(x)}<br><small>이야기 보기 ›</small></button>`).join(''):'아직 발견한 보물이 없어요.';let sp=document.getElementById('specialList');sp.className=state.specialPenguins.length?'':'empty-note';sp.innerHTML=state.specialPenguins.length?state.specialPenguins.map(x=>`<div class="dict-item">🐧 특별 펭귄 ${escapeHtml(x.split('-').pop())}</div>`).join('') :'앞으로 만날 특별 펭귄을 기다려 주세요.';document.querySelectorAll('.treasure-btn').forEach(b=>b.onclick=()=>openTreasure(b.dataset.treasure))}
 
 function openTreasure(name){let x=treasureDB.find(t=>t.name===name);if(!x)return;document.getElementById('modalTitle').textContent=x.name;document.getElementById('modalSource').textContent=x.type+' · 「'+x.story+'」';document.getElementById('modalSummary').innerHTML=x.summary.map(s=>escapeHtml(s)).join('<br>');let m=document.getElementById('treasureModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
 function closeTreasure(){let m=document.getElementById('treasureModal');m.classList.remove('open');m.setAttribute('aria-hidden','true')}
