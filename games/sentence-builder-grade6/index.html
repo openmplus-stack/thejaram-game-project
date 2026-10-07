@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const steps=[
 {key:'time',q:'언제 일어난 일이에요?',help:'시간을 하나 골라 주세요.',items:['오늘 아침에','오늘 점심에','오늘 오후에','오늘 저녁에','어제','주말에','쉬는 시간에','수업 시간에','방과 후에','저녁을 먹고 나서'],examples:['학교에 가기 전에','학교에 도착한 뒤에','점심을 먹기 전에','점심을 먹고 나서','체육 시간에','하교할 때','집에 돌아온 뒤에','숙제를 하기 전에','잠자기 전에','지난 주말에','아침을 먹고 나서','등교하는 길에','1교시가 끝난 뒤에','점심시간에','청소 시간에','학원이 끝난 뒤에','저녁 식사 전에','샤워를 하고 나서','지난 금요일에','휴일 오후에']},
 {key:'place',q:'어디에서 있었어요?',help:'장소를 하나 골라 주세요.',items:['교실에서','학교 운동장에서','급식실에서','도서관에서','집에서','학원에서','편의점에서','공원에서','버스 안에서','놀이터에서'],examples:['학교 복도에서','보건실에서','음악실에서','체육관에서','학교 앞에서','마트에서','식당에서','지하철에서','친구 집에서','동네 길에서','미술실에서','과학실에서','학교 화장실에서','버스 정류장에서','카페에서','문구점에서','서점에서','병원에서','수영장에서','집 앞에서']},
-{key:'subject',q:'누가 했어요?',help:'사람을 하나 골라 주세요.',items:['나는','친구는','선생님은','엄마는','아빠는','형은','누나는','동생은','반 친구는','우리 가족은'],examples:['짝꿍은','친한 친구는','우리 반 친구들은','담임 선생님은','체육 선생님은','할머니는','할아버지는','사촌은','가게 직원은','버스 기사님은','동생과 나는','친구와 나는','우리 반은','교장 선생님은','학원 선생님은','편의점 직원은','의사 선생님은','간호사 선생님은','친구의 엄마는','우리 형제는']},
+{key:'subject',q:'누가 했어요?',help:'사람을 한 명 또는 두 명 골라 주세요. 두 명을 고르면 선택한 순서대로 함께 문장을 만들어요.',items:['나는','친구는','선생님은','엄마는','아빠는','형은','누나는','동생은','반 친구는','우리 가족은'],examples:['짝꿍은','친한 친구는','우리 반 친구들은','담임 선생님은','체육 선생님은','할머니는','할아버지는','사촌은','가게 직원은','버스 기사님은','동생과 나는','친구와 나는','우리 반은','교장 선생님은','학원 선생님은','편의점 직원은','의사 선생님은','간호사 선생님은','친구의 엄마는','우리 형제는']},
 {key:'object',q:'무엇을 했어요?',help:'사물을 하나 골라 주세요.',items:['책을','숙제를','공을','휴대전화를','가방을','우산을','물을','간식을','사진을','선물을'],examples:['연필을','공책을','교과서를','급식판을','옷을','신발을','자전거를','음료수를','게임을','준비물을','과자를','빵을','우유를','아이스크림을','문구를','약을','버스 카드를','쓰레기를','친구의 물건을','도서관 책을']},
 {key:'predicate',q:'어떻게 했어요?',help:'행동을 하나 골라 주세요.',items:['읽었어요','했어요','던졌어요','사용했어요','챙겼어요','마셨어요','먹었어요','찍었어요','주었어요','찾았어요'],examples:['썼어요','열었어요','닫았어요','들었어요','옮겼어요','샀어요','빌렸어요','돌려주었어요','정리했어요','만들었어요','골랐어요','건넸어요','버렸어요','씻었어요','입었어요','신었어요','기다렸어요','도와주었어요','가져왔어요','꺼냈어요']},
 {key:'reason',q:'왜 그렇게 했어요?',help:'이유를 하나 골라 주세요.',items:['필요했기 때문에','재미있어서','궁금해서','배가 고파서','목이 말라서','친구를 도와주려고','잊어버리지 않으려고','선생님이 부탁하셔서','비가 왔기 때문에','기분이 좋아서'],examples:['수업에 필요해서','숙제를 끝내려고','약속을 지키기 위해서','친구가 부탁했기 때문에','엄마가 말씀하셔서','시간이 부족해서','날씨가 더워서','추웠기 때문에','준비물이 없어서','다음 날 사용하려고','배가 고파서','목이 말라서','친구에게 주려고','집에 가져가려고','잃어버려서','깨끗하게 하려고','늦지 않으려고','다쳐서','비가 올 것 같아서','필요한 물건이어서']}
@@ -431,18 +431,19 @@ function render(){
  let s=steps[idx],ci=contextItems(s),showExamples=!!expanded['examples_'+s.key];
  stepText.textContent=`${idx+1} / ${steps.length}`;bar.style.width=`${idx/steps.length*100}%`;
  const selected=ans[s.key]||'';
+ const subjectSelections=s.key==='subject'?(Array.isArray(ans.subject)?ans.subject:(ans.subject?[ans.subject]:[])):[];
  card.innerHTML=`<h1>${s.q}</h1>
  <p class='help'>${s.help}</p>
  <div class='custom'>
    <label for='custom'>✏️ 내가 직접 쓰기</label>
    <div class='recall-guide'>먼저 기억나는 내용을 직접 써 보세요. 잘 생각나지 않을 때만 아래의 보기를 확인해도 괜찮아요.</div>
-   <div class='custom-row'><input id='custom' value="${escapeHtml(selected)}" placeholder='여기에 직접 써 보세요' autocomplete='off'><button type='button' class='btn add' id='add'>입력하기</button></div>
+   <div class='custom-row'><input id='custom' value="${escapeHtml(Array.isArray(selected)?selected.join(' + '):selected)}" placeholder='여기에 직접 써 보세요' autocomplete='off'><button type='button' class='btn add' id='add'>입력하기</button></div>
  </div>
  <div style='margin-top:12px'><button type='button' class='btn reveal-examples' id='revealExamples'>${showExamples?'보기 숨기기':'👀 보기 확인하기'}</button></div>
  <div class='examples-panel' id='examplesPanel' ${showExamples?'':'hidden'}>
    <p class='help' style='margin:0 0 10px'>${ci.matched?(ci.restricted?'앞에서 고른 내용과 자연스럽게 연결되는 보기를 먼저 보여드려요.':'앞에서 고른 내용과 잘 어울리는 보기를 먼저 보여드려요.'):'필요한 보기를 골라도 돼요.'}</p>
-   <div class='choices'>${ci.main.map(x=>`<button type='button' class='choice ${ans[s.key]===x?'selected':''}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>
-   ${ci.extra.length?`<div class='more-wrap'><button type='button' class='btn more' id='more'>${expanded[s.key]?'− 다른 보기 접기':'+ 다른 보기 더 보기'}</button>${expanded[s.key]?`<div class='choices extra'>${ci.extra.map(x=>`<button type='button' class='choice ${ans[s.key]===x?'selected':''}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>`:''}</div>`:''}
+   <div class='choices'>${ci.main.map(x=>`<button type='button' class='choice ${s.key==='subject'?(subjectSelections.includes(x)?'selected':''):(ans[s.key]===x?'selected':'')}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>
+   ${ci.extra.length?`<div class='more-wrap'><button type='button' class='btn more' id='more'>${expanded[s.key]?'− 다른 보기 접기':'+ 다른 보기 더 보기'}</button>${expanded[s.key]?`<div class='choices extra'>${ci.extra.map(x=>`<button type='button' class='choice ${s.key==='subject'?(subjectSelections.includes(x)?'selected':''):(ans[s.key]===x?'selected':'')}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>`:''}</div>`:''}
  </div>
  <div class='actions' style='margin-top:18px'><button type='button' class='btn' id='skip' ${s.key==='predicate'?'disabled':''}>${s.key==='predicate'?'행동은 꼭 써 주세요':'건너뛰기'}</button><button type='button' class='btn next' id='next' ${ans[s.key]?'':'disabled'}>${idx===steps.length-1?'문장 만들기':'다음'}</button></div><div style='clear:both'></div>`;
  const input=card.querySelector('#custom');
@@ -452,7 +453,17 @@ function render(){
  input.addEventListener('input',()=>{const n=card.querySelector('#next');if(n)n.disabled=!input.value.trim()});
  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();acceptCustom()}});
  card.querySelector('#revealExamples').onclick=()=>{expanded['examples_'+s.key]=!showExamples;render()};
- card.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{ans[s.key]=b.dataset.v;render()});
+ card.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+   if(s.key==='subject'){
+     let list=Array.isArray(ans.subject)?[...ans.subject]:(ans.subject?[ans.subject]:[]);
+     const v=b.dataset.v,at=list.indexOf(v);
+     if(at>=0)list.splice(at,1);
+     else if(list.length<2)list.push(v);
+     else { alert('주어는 두 개까지 선택할 수 있어요.'); return; }
+     ans.subject=list;render();return;
+   }
+   ans[s.key]=b.dataset.v;render()
+ });
  const more=card.querySelector('#more');if(more)more.onclick=()=>{expanded[s.key]=!expanded[s.key];render()};
  card.querySelector('#skip').onclick=skipCurrentStep;
  card.querySelector('#next').onclick=()=>{const typed=input.value.trim();if(typed){confirmSpelling(input,typed,v=>{ans[s.key]=v;nextCurrentStep()})}else nextCurrentStep()};
@@ -486,6 +497,7 @@ function repairReasonInput(x){
  return map[v]||v
 }
 function repairAnswerForRole(key,value){
+ if(key==='subject'&&Array.isArray(value))return joinSubjects(value);
  let v=cleanToken(value);if(!v)return'';
  v=nearestKnownWord(v,key);
  if(key==='subject'){if(v==='나'||v==='내가')return'나는';return naturalSubject(v)}
@@ -509,7 +521,15 @@ function naturalReason(r){let x=cleanToken(r);if(!x)return '';const map={
 '늦지 않기 위해서':'늦지 않으려고','다음 날 사용하기 위해서':'다음 날 사용하려고'};
  return map[x]||x.replace(/하기 위해서$/,'하려고').replace(/기 때문에$/,'어서')
 }
-function naturalSubject(x){let v=cleanToken(x);if(!v)return '';if(v==='나')return '나는';if(v==='내가')return '나는';if(/(은|는|이|가)$/.test(v))return v;return subj(v)}
+function subjectBase(x){let v=cleanToken(x);return v.replace(/(은|는|이|가)$/,'')}
+function joinSubjects(values){
+ const list=(Array.isArray(values)?values:[values]).map(subjectBase).filter(Boolean);
+ if(!list.length)return '';
+ if(list.length===1)return naturalSubject(list[0]);
+ const a=list[0],b=list[1];
+ return a+(hasBatchim(a)?'과 ':'와 ')+b+(hasBatchim(b)?'은':'는');
+}
+function naturalSubject(x){if(Array.isArray(x))return joinSubjects(x);let v=cleanToken(x);if(!v)return '';if(v==='나')return '나는';if(v==='내가')return '나는';if(/(은|는|이|가)$/.test(v))return v;return subj(v)}
 function naturalObject(x){let v=cleanToken(x);if(!v)return '';if(/(을|를)$/.test(v))return v;v=v.replace(/(은|는|이|가)$/,'');return obj(v)}
 function normalizePredicate(x){let v=cleanToken(x);if(!v)return '';const map={'구매했어요':'샀어요','섭취했어요':'먹었어요','음용했어요':'마셨어요','사용 하였어요':'사용했어요','정리 하였어요':'정리했어요'};return map[v]||v.replace(/\s+했어요$/,'했어요')}
 function polishSentenceText(s){
