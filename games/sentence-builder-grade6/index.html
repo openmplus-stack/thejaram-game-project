@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:false,
-  phase:'meaning-engine',
+  phase:'role-confirmation',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -651,6 +651,157 @@ function recordMeaningAnalysisV2(rawInput){
   storyV2.meanings.push(analysis);
   storyV2.learningLog.ambiguityChecks+=(analysis.ambiguities||[]).length;
   return analysis;
+}
+
+
+function stripRoleParticleV2(value){
+  return String(value||'').trim().replace(/[.?!,]+$/,'').replace(/(은|는|이|가|을|를|에게|한테|와|과|랑|이랑|에|에서)$/,'');
+}
+
+function withRoleParticleV2(value,role){
+  const w=stripRoleParticleV2(value);
+  if(!w)return '';
+  if(role==='subject')return w+(hasBatchim(w)?'이':'가');
+  if(role==='object')return w+(hasBatchim(w)?'을':'를');
+  if(role==='recipient')return w+'에게';
+  if(role==='companion')return w+(hasBatchim(w)?'과':'와');
+  if(role==='destination')return w+'에';
+  if(role==='place')return w+'에서';
+  return w;
+}
+
+function predicateDisplayV2(predicate){
+  const frame=getPredicateFrameV2(predicate);
+  return frame?frame.display:String(predicate||'');
+}
+
+function previewMeaningSentenceV2(predicate,roles){
+  const r=roles||{};
+  const p=predicateDisplayV2(predicate);
+  const parts=[];
+  if(r.time)parts.push(String(r.time));
+  if(r.subject)parts.push(withRoleParticleV2(r.subject,'subject'));
+  if(r.companion)parts.push(withRoleParticleV2(r.companion,'companion'));
+  if(r.destination)parts.push(withRoleParticleV2(r.destination,'destination'));
+  if(r.place)parts.push(withRoleParticleV2(r.place,'place'));
+  if(r.recipient)parts.push(withRoleParticleV2(r.recipient,'recipient'));
+  if(r.object)parts.push(withRoleParticleV2(r.object,'object'));
+  if(r.manner)parts.push(String(r.manner));
+  if(r.reason)parts.unshift(String(r.reason));
+  parts.push(p);
+  return parts.filter(Boolean).join(' ').replace(/\s+/g,' ').trim()+'.';
+}
+
+function cloneRolesV2(roles){
+  return JSON.parse(JSON.stringify(roles||{}));
+}
+
+function pushMeaningCandidateV2(list,predicate,roles,reason,confidence){
+  const text=previewMeaningSentenceV2(predicate,roles);
+  if(!text||list.some(x=>x.text===text))return;
+  list.push({
+    id:'meaning-'+(list.length+1),
+    predicate,
+    roles:cloneRolesV2(roles),
+    text,
+    reason:reason||'가능한 뜻',
+    confidence:Number(confidence||.5)
+  });
+}
+
+function roleConfirmationCandidatesV2(analysis){
+  const a=analysis||{};
+  const predicate=a.predicate;
+  const frame=getPredicateFrameV2(predicate);
+  if(!predicate||!frame)return [];
+  const base=cloneRolesV2(a.roles);
+  const list=[];
+  const tokens=(a.tokens||[]).map(stripRoleParticleV2).filter(Boolean);
+  const people=tokens.filter(t=>semanticTypesForV2(t).includes('person'));
+  const objects=tokens.filter(t=>semanticTypesForV2(t).some(type=>['food','drink','reading','writing','thing','toy','sport','activity','craft','animal','topic'].includes(type)));
+
+  // 현재 분석 결과를 첫 후보로 둔다. 빠진 주어만 있으면 화자 '나'를 임시 후보로 보완한다.
+  const current=cloneRolesV2(base);
+  if(frame.required.includes('subject')&&!current.subject)current.subject='나';
+  const currentMissing=frame.required.filter(role=>!current[role]);
+  if(!currentMissing.length){
+    pushMeaningCandidateV2(list,predicate,current,'입력한 말의 가장 가까운 뜻',.78);
+  }
+
+  // 주다/받다는 행위자와 상대가 뒤바뀌기 쉬우므로 방향을 반드시 확인한다.
+  if(predicate==='주다'){
+    const person=people[0]||base.recipient||base.subject;
+    const thing=base.object||objects[0];
+    if(person&&thing){
+      pushMeaningCandidateV2(list,'주다',{subject:'나',recipient:person,object:thing},'내가 그 사람에게 준 뜻',.72);
+      pushMeaningCandidateV2(list,'주다',{subject:person,recipient:'나',object:thing},'그 사람이 나에게 준 뜻',.72);
+    }
+  }
+  if(predicate==='받다'){
+    const person=people[0]||base.recipient||base.subject;
+    const thing=base.object||objects[0];
+    if(person&&thing){
+      pushMeaningCandidateV2(list,'받다',{subject:'나',recipient:person,object:thing},'내가 그 사람에게서 받은 뜻',.72);
+      pushMeaningCandidateV2(list,'받다',{subject:person,recipient:'나',object:thing},'그 사람이 나에게서 받은 뜻',.62);
+    }
+  }
+
+  // 사람 대상 동사는 '내가 그 사람을' / '그 사람이 나를' 두 방향을 확인한다.
+  if(['만나다','돕다','좋아하다'].includes(predicate)&&people.length){
+    const person=people[0];
+    pushMeaningCandidateV2(list,predicate,{...base,subject:'나',object:person},'내가 그 사람에게 한 뜻',.7);
+    pushMeaningCandidateV2(list,predicate,{...base,subject:person,object:'나'},'그 사람이 나에게 한 뜻',.62);
+  }
+
+  // 장소+감정처럼 동사가 빠진 입력은 사건과 감정을 분리하는 후보를 만든다.
+  const emotion=(a.affect&&a.affect[0])?a.affect[0].normalized:(base.emotion||'');
+  const place=tokens.find(t=>semanticTypesForV2(t).includes('place'));
+  if(emotion&&place&&!list.some(x=>x.roles&&x.roles.destination===place)){
+    pushMeaningCandidateV2(list,'가다',{subject:'나',destination:place},'그 장소에 간 사건',.48);
+  }
+
+  return list.slice(0,4);
+}
+
+function clarificationModelV2(rawInput){
+  const analysis=typeof rawInput==='string'?buildMeaningHypothesesV2(rawInput):(rawInput||{});
+  const roleCandidates=roleConfirmationCandidatesV2(analysis);
+  const lexicalChoices=meaningClarificationChoicesV2(analysis);
+  const needsRoleChoice=roleCandidates.length>1;
+  return {
+    title:needsRoleChoice?'혹시 이런 뜻이에요?':'조금만 더 알려 주세요.',
+    instruction:needsRoleChoice?'내가 말하고 싶은 뜻에 가장 가까운 문장을 골라 주세요.':'맞는 뜻을 고르거나 직접 말해 주세요.',
+    analysis,
+    sentenceCandidates:roleCandidates,
+    wordChoices:lexicalChoices,
+    allowOther:true,
+    otherLabel:'다른 뜻이에요',
+    allowTyped:true,
+    typedLabel:'내가 직접 말할게요'
+  };
+}
+
+function applyMeaningCandidateV2(candidate){
+  if(!candidate)return null;
+  const event={
+    id:'event-'+(storyV2.events.length+1),
+    predicate:candidate.predicate,
+    ...cloneRolesV2(candidate.roles),
+    source:'meaning-confirmation',
+    confirmed:true
+  };
+  storyV2.events.push(event);
+  storyV2.expression.selected=candidate.text||previewMeaningSentenceV2(candidate.predicate,candidate.roles);
+  storyV2.learningLog.meaningRepairs+=1;
+  return event;
+}
+
+function confirmRoleValueV2(event,role,value,source='choice'){
+  if(!event||!role)return event;
+  event[role]=stripRoleParticleV2(value);
+  event.confirmedRoles=event.confirmedRoles||{};
+  event.confirmedRoles[role]={value:event[role],source};
+  return event;
 }
 
 
