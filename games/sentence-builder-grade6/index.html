@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:false,
-  phase:'predicate-frames',
+  phase:'semantic-links',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -345,6 +345,104 @@ function nextRequiredRoleV2(event){
     return Array.isArray(v)?v.length===0:!v;
   })||null;
 }
+
+const SEMANTIC_LEXICON_V2={
+  person:['나','엄마','아빠','친구','선생님','동생','형','누나','할머니','할아버지','짝꿍','사촌','의사 선생님','간호사 선생님'],
+  animal:['고양이','강아지','토끼','햄스터','새','물고기'],
+  place:['학교','교실','운동장','도서관','공원','마트','편의점','병원','집','학원','놀이터','식당','카페','서점','지하철역','버스 정류장'],
+  food:['밥','김밥','떡볶이','빵','과자','사과','바나나','라면','급식','아이스크림','피자','치킨','사료','생선'],
+  drink:['물','우유','주스','음료수','차','코코아'],
+  reading:['책','동화책','만화책','과학책','교과서','도서관 책','설명문','안내문','기사'],
+  writing:['글','일기','편지','숙제','답','문장','메모','보고서'],
+  activity:['축구','농구','게임','공놀이','숨바꼭질','그림 그리기','독서','산책'],
+  sport:['축구','농구','야구','배드민턴','수영','달리기'],
+  toy:['공','그네','블록','인형','퍼즐','장난감'],
+  craft:['카드','모형','종이접기','작품','장식','자동차'],
+  thing:['우산','가방','연필','공책','선물','휴대전화','준비물','옷','신발','자전거','사진','약','버스 카드'],
+  topic:['공룡','우주','자동차','고양이','역사','과학','친구','학교','게임','동물']
+};
+
+const NOUN_PREDICATE_LINKS_V2={
+  '책':['읽다','받다','주다','좋아하다'],
+  '동화책':['읽다','받다','주다','좋아하다'],
+  '만화책':['읽다','받다','주다','좋아하다'],
+  '과학책':['읽다','받다','좋아하다'],
+  '교과서':['읽다','쓰다','받다'],
+  '글':['쓰다','읽다'],
+  '일기':['쓰다','읽다'],
+  '편지':['쓰다','읽다','주다','받다'],
+  '물':['마시다','주다','받다'],
+  '우유':['마시다','먹다','주다','받다'],
+  '주스':['마시다','주다','받다'],
+  '밥':['먹다','만들다','좋아하다'],
+  '빵':['먹다','만들다','주다','받다','좋아하다'],
+  '사과':['먹다','주다','받다','좋아하다'],
+  '과자':['먹다','주다','받다','좋아하다'],
+  '공':['놀다','주다','받다'],
+  '그네':['놀다','좋아하다'],
+  '축구':['놀다','좋아하다'],
+  '게임':['놀다','좋아하다'],
+  '선물':['주다','받다','만들다','좋아하다'],
+  '카드':['주다','받다','만들다','쓰다'],
+  '우산':['주다','받다','좋아하다'],
+  '친구':['만나다','돕다','좋아하다','놀다'],
+  '엄마':['만나다','돕다','좋아하다','놀다'],
+  '아빠':['만나다','돕다','좋아하다','놀다'],
+  '동생':['만나다','돕다','좋아하다','놀다','주다','받다'],
+  '고양이':['좋아하다','만나다','돕다'],
+  '강아지':['좋아하다','만나다','돕다'],
+  '도서관':['가다','좋아하다'],
+  '공원':['가다','놀다','좋아하다'],
+  '학교':['가다','좋아하다'],
+  '마트':['가다'],
+  '병원':['가다']
+};
+
+const AMBIGUOUS_INPUT_HINTS_V2={
+  '공':['공을 찼어요','공을 던졌어요','공으로 놀았어요','공을 주웠어요'],
+  '책':['책을 읽었어요','책을 받았어요','책을 주었어요','책을 찾았어요'],
+  '친구':['친구를 만났어요','친구와 놀았어요','친구를 도왔어요','친구에게 주었어요'],
+  '학교':['학교에 갔어요','학교에서 놀았어요','학교에서 읽었어요','학교에서 썼어요'],
+  '병원':['병원에 갔어요','병원에서 기다렸어요','병원에서 치료를 받았어요'],
+  '엄마':['엄마와 갔어요','엄마를 만났어요','엄마를 도왔어요','엄마에게 받았어요'],
+  '고양이':['고양이를 좋아해요','고양이를 만났어요','고양이를 도왔어요']
+};
+
+function semanticTypesForV2(value){
+  const raw=String(value||'').trim().replace(/(은|는|이|가|을|를|에|에서|와|과|에게)$/,'');
+  const types=[];
+  Object.entries(SEMANTIC_LEXICON_V2).forEach(([type,words])=>{if(words.includes(raw))types.push(type)});
+  return types;
+}
+
+function predicateCandidatesForNounV2(value){
+  const raw=String(value||'').trim().replace(/(은|는|이|가|을|를|에|에서|와|과|에게)$/,'');
+  return (NOUN_PREDICATE_LINKS_V2[raw]||[]).slice();
+}
+
+function isSemanticFitV2(predicate,role,value){
+  const frame=getPredicateFrameV2(predicate);
+  if(!frame||!frame.semantic||!frame.semantic[role])return true;
+  const allowed=frame.semantic[role];
+  const types=semanticTypesForV2(value);
+  if(!types.length)return null;
+  return types.some(t=>allowed.includes(t));
+}
+
+function meaningCandidatesV2(rawInput){
+  const raw=String(rawInput||'').trim().replace(/[.?!,]+$/,'');
+  if(!raw)return [];
+  if(AMBIGUOUS_INPUT_HINTS_V2[raw])return AMBIGUOUS_INPUT_HINTS_V2[raw].slice();
+  const predicates=predicateCandidatesForNounV2(raw);
+  if(predicates.length){
+    return predicates.slice(0,4).map(p=>{
+      const f=getPredicateFrameV2(p);
+      return f?raw+' + '+f.display:raw+' + '+p;
+    });
+  }
+  return [];
+}
+
 
 
 /* v1 sentence flow remains active during rebuild.
