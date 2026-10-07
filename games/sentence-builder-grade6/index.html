@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'expression-review',
+  phase:'correction-levels',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1438,6 +1438,57 @@ function renderReflectionQuestionV2(kind){
   card.querySelector('#reflectionCancelV2').onclick=renderReflectionMenuV2;
 }
 
+const SAFE_CORRECTION_RULES_V2=[
+  {type:'spelling',from:/버수/g,to:'버스',label:'맞춤법'},
+  {type:'spelling',from:/뻐스/g,to:'버스',label:'맞춤법'},
+  {type:'spelling',from:/선생임/g,to:'선생님',label:'맞춤법'},
+  {type:'spelling',from:/선생닝/g,to:'선생님',label:'맞춤법'},
+  {type:'spelling',from:/먹엇/g,to:'먹었',label:'활용'},
+  {type:'spelling',from:/마셧/g,to:'마셨',label:'활용'},
+  {type:'spelling',from:/읽엇/g,to:'읽었',label:'활용'},
+  {type:'spelling',from:/햇/g,to:'했',label:'활용'},
+  {type:'spacing',from:/배가고파/g,to:'배가 고파',label:'띄어쓰기'},
+  {type:'spacing',from:/목이말라/g,to:'목이 말라',label:'띄어쓰기'},
+  {type:'spacing',from:/화가나/g,to:'화가 나',label:'띄어쓰기'}
+];
+
+function safeCorrectionV2(text){
+  let out=String(text||'').trim();
+  const changes=[];
+  SAFE_CORRECTION_RULES_V2.forEach(rule=>{
+    const before=out;
+    out=out.replace(rule.from,rule.to);
+    if(out!==before)changes.push({level:'safe',type:rule.type,label:rule.label,before,after:out});
+  });
+  out=out.replace(/\s+/g,' ').trim();
+  if(out && !/[.?!]$/.test(out))out+='.';
+  return {text:out,changes};
+}
+
+function semanticSuggestionChangesV2(original,polished){
+  const safe=safeCorrectionV2(original).text;
+  if(!polished||safe===polished)return [];
+  return [{
+    level:'choice',
+    type:'expression',
+    label:'표현 다듬기',
+    before:safe,
+    after:polished,
+    reason:'조사·어순·문장 구성을 더 자연스럽게 만든 표현입니다. 뜻이 같은지 확인한 뒤 선택해 주세요.'
+  }];
+}
+
+function correctionPlanV2(original,polished){
+  const safe=safeCorrectionV2(original);
+  return {
+    original:String(original||''),
+    safeText:safe.text,
+    safeChanges:safe.changes,
+    suggestedChanges:semanticSuggestionChangesV2(original,polished),
+    polished:String(polished||'')
+  };
+}
+
 function originalExpressionV2(){
   return (storyV2.rawInputs||[])
     .map(x=>String((x&&x.text)||'').trim())
@@ -1484,44 +1535,71 @@ function renderExpressionReviewV2(){
 
   const original=originalExpressionV2();
   const polished=reflectionStoryTextV2()||storyV2.expression.corrected||storyV2.expression.selected||'';
+  const plan=correctionPlanV2(original,polished);
+
   storyV2.expression.original=original;
+  storyV2.expression.safeCorrected=plan.safeText;
   storyV2.expression.corrected=polished;
+  storyV2.expression.correctionPlan=plan;
+  storyV2.learningLog.grammarRepairs=plan.safeChanges.map(x=>({type:x.type,label:x.label,before:x.before,after:x.after,automatic:true}));
 
   card.innerHTML=`
-    <h1>처음 말한 것과 비교해 볼까요?</h1>
-    <p class="help">뜻은 그대로 두고, 조사·어순·문장 끝맺음을 자연스럽게 다듬었어요. 노란색은 달라진 부분이에요.</p>
+    <h1>어떻게 달라졌는지 볼까요?</h1>
+    <p class="help">뜻을 바꾸지 않는 작은 오류는 바로 고치고, 뜻이나 표현이 달라질 수 있는 수정은 내가 직접 고릅니다.</p>
 
     <div class="story-two" style="margin-top:12px">
       <div style="margin-bottom:14px">
         <div class="help" style="margin-bottom:6px">🗣️ 처음 말한 표현</div>
-        <div style="font-size:1.12em"><b>${escapeHtml(original||'처음 입력한 말이 없어요.')}</b></div>
+        <div style="font-size:1.1em"><b>${escapeHtml(original||'처음 입력한 말이 없어요.')}</b></div>
       </div>
+
+      <div style="margin-bottom:14px">
+        <div class="help" style="margin-bottom:6px">✅ 뜻이 바뀌지 않는 자동 교정</div>
+        <div style="font-size:1.1em"><b>${escapeHtml(plan.safeText||original)}</b></div>
+        <div class="help" style="margin-top:6px">
+          ${plan.safeChanges.length
+            ? plan.safeChanges.map(x=>'• '+escapeHtml(x.label)).join(' &nbsp; ')
+            : '자동으로 고칠 작은 오류가 없어요.'}
+        </div>
+      </div>
+
       <div>
-        <div class="help" style="margin-bottom:6px">✨ 다듬은 표현</div>
-        <div style="font-size:1.12em;line-height:1.8">${renderDiffLineV2(original,polished)}</div>
+        <div class="help" style="margin-bottom:6px">✨ 더 자연스럽게 다듬은 표현</div>
+        <div style="font-size:1.12em;line-height:1.8">${renderDiffLineV2(plan.safeText,polished)}</div>
       </div>
     </div>
 
     <div class="examples-panel" style="margin-top:14px">
-      <p class="help" style="margin:0">다듬은 표현이 내 뜻과 다르면 처음 표현을 선택해도 괜찮아요.</p>
+      <p class="help" style="margin:0">
+        맞춤법·띄어쓰기처럼 뜻이 변하지 않는 수정은 자동으로 반영해요.
+        어순·서술어·문장 나누기처럼 뜻이 달라질 수 있는 수정은 자동으로 확정하지 않아요.
+      </p>
     </div>
 
     <div class="actions" style="margin-top:18px">
-      <button type="button" class="btn" id="reviewKeepOriginalV2">처음 표현 유지</button>
+      <button type="button" class="btn" id="reviewKeepSafeV2">자동 교정까지만</button>
       <button type="button" class="btn next" id="reviewChoosePolishedV2">다듬은 표현 선택</button>
     </div>
     <div style="clear:both"></div>
   `;
 
-  card.querySelector('#reviewKeepOriginalV2').onclick=()=>{
-    storyV2.expression.selected=original;
-    storyV2.expression.finalChoice='original';
-    renderReviewChoiceResultV2(original,'처음 표현');
+  card.querySelector('#reviewKeepSafeV2').onclick=()=>{
+    storyV2.expression.selected=plan.safeText||original;
+    storyV2.expression.finalChoice='safe-only';
+    renderReviewChoiceResultV2(storyV2.expression.selected,'자동 교정까지만 반영한 표현');
   };
   card.querySelector('#reviewChoosePolishedV2').onclick=()=>{
     storyV2.expression.selected=polished;
     storyV2.expression.finalChoice='polished';
-    renderReviewChoiceResultV2(polished,'다듬은 표현');
+    storyV2.learningLog.grammarRepairs.push({
+      type:'expression',
+      label:'표현 다듬기',
+      before:plan.safeText,
+      after:polished,
+      automatic:false,
+      accepted:true
+    });
+    renderReviewChoiceResultV2(polished,'내가 선택한 다듬은 표현');
   };
 }
 
@@ -1542,8 +1620,38 @@ function renderReviewChoiceResultV2(text,label){
   `;
   card.querySelector('#reviewAgainV2').onclick=renderExpressionReviewV2;
   card.querySelector('#reviewNextV2').onclick=()=>{
-    // Step 13 will connect safe automatic corrections and final growth view.
-    renderReviewChoiceResultV2(text,label);
+    renderCorrectionSummaryV2(text);
+  };
+}
+
+function renderCorrectionSummaryV2(text){
+  stepText.textContent='교정 완료';
+  bar.style.width='100%';
+  const repairs=storyV2.learningLog.grammarRepairs||[];
+  const autoCount=repairs.filter(x=>x.automatic).length;
+  const chosenCount=repairs.filter(x=>x.automatic===false&&x.accepted).length;
+
+  card.innerHTML=`
+    <h1>내 뜻을 지키면서 문장을 다듬었어요.</h1>
+    <p class="help">자동으로 고친 것과 내가 선택한 수정을 구분해서 기록했어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.25em"><b>🌳 ${escapeHtml(text)}</b></div>
+    </div>
+    <div class="examples-panel" style="margin-top:14px">
+      <p class="help" style="margin:0">
+        자동 교정 ${autoCount}개 · 내가 선택한 표현 수정 ${chosenCount}개
+      </p>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="correctionAgainV2">다시 비교하기</button>
+      <button type="button" class="btn next" id="correctionNextV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#correctionAgainV2').onclick=renderExpressionReviewV2;
+  card.querySelector('#correctionNextV2').onclick=()=>{
+    // Step 14 will connect final thought-growth view.
+    renderCorrectionSummaryV2(text);
   };
 }
 
