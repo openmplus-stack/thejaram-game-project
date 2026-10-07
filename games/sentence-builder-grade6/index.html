@@ -716,12 +716,26 @@ function showSentencePreview(sentence){
 }
 function finish(){bar.style.width='100%';showSentencePreview(buildSentence())}
 function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(id==='composeScreen')render();window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));document.getElementById('startBtn').onclick=startCompose;document.getElementById('loginBtn').onclick=()=>alert('로그인·회원가입 화면은 다음 단계에서 연결합니다.');document.getElementById('closeModal').onclick=closeTreasure;document.getElementById('treasureModal').onclick=e=>{if(e.target.id==='treasureModal')closeTreasure()};function flyFishToPenguin(done){const btn=document.getElementById('feedBtn'),stage=document.getElementById('penguinStage'),a=btn.getBoundingClientRect(),b=stage.getBoundingClientRect(),fish=document.createElement('div');fish.className='flying-fish';fish.textContent='🐟';fish.style.left=(a.left+a.width/2)+'px';fish.style.top=(a.top+a.height/2)+'px';document.body.appendChild(fish);requestAnimationFrame(()=>requestAnimationFrame(()=>{fish.style.left=(b.left+b.width/2)+'px';fish.style.top=(b.top+b.height*.62)+'px';fish.style.transform='translate(-50%,-50%) scale(.65)';fish.style.opacity='0'}));setTimeout(()=>{fish.remove();done()},620)}
+let lastEatingVoice=-1;
+const eatingVoices=['냠냠~','냠!','음~ 맛있다!','아~ 맛있어!','냠냠냠~','맛있다~','또 먹고 싶어!'];
+function playEatingVoice(){
+ if(!('speechSynthesis' in window))return '';
+ let choices=eatingVoices.map((v,i)=>({v,i})).filter(x=>x.i!==lastEatingVoice);
+ let pick=choices[Math.floor(Math.random()*choices.length)];lastEatingVoice=pick.i;
+ try{
+   speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(pick.v);u.lang='ko-KR';u.rate=.92;u.pitch=1.35;u.volume=1;
+   const voices=speechSynthesis.getVoices();const ko=voices.find(v=>/^ko/i.test(v.lang));if(ko)u.voice=ko;
+   speechSynthesis.speak(u);
+ }catch(_){}
+ return pick.v;
+}
 let feedMode=false;
 function giveFishTo(stage){
  const m=document.getElementById('feedMsg'),btn=document.getElementById('feedBtn'),note=document.getElementById('feedModeNote');
  if(state.fish<1){m.textContent='먼저 새 문장을 만들고 물고기를 받아 주세요.';return}
  feedMode=false;note.style.display='none';btn.disabled=true;m.textContent='🐟 물고기를 주고 있어요.';
- flyFishToPenguin(()=>{let before=growthLevel();ensureFishInventory();state.fishInventory.sort((a,b)=>a-b);state.fishInventory.shift();state.fish=state.fishInventory.length;state.fed++;saveState();let after=growthLevel();stage.classList.add('eating');let h=document.createElement('div');h.className='heart-burst';h.textContent='❤️';stage.appendChild(h);if(after>before){updateUI();let gp=document.getElementById('growthPenguin');gp.classList.add('level-change');setTimeout(()=>gp.classList.remove('level-change'),760);m.textContent='🎉 펭귄이 '+after+'단계로 성장했어요!'}else{updateUI();m.textContent='🐟 냠냠! 펭귄이 맛있게 먹었어요.'}setTimeout(()=>{stage.classList.remove('eating');h.remove()},1150);setTimeout(()=>{m.textContent='';updateUI()},2400)})
+ flyFishToPenguin(()=>{let before=growthLevel();ensureFishInventory();state.fishInventory.sort((a,b)=>a-b);state.fishInventory.shift();state.fish=state.fishInventory.length;state.fed++;saveState();let after=growthLevel();stage.classList.add('eating');const eatingVoice=playEatingVoice();let h=document.createElement('div');h.className='heart-burst';h.textContent='❤️';stage.appendChild(h);if(after>before){updateUI();let gp=document.getElementById('growthPenguin');gp.classList.add('level-change');setTimeout(()=>gp.classList.remove('level-change'),760);m.textContent='🎉 펭귄이 '+after+'단계로 성장했어요!'}else{updateUI();m.textContent='🐟 '+(eatingVoice||'냠냠!')+' 펭귄이 맛있게 먹었어요.'}setTimeout(()=>{stage.classList.remove('eating');h.remove()},1150);setTimeout(()=>{m.textContent='';updateUI()},2400)})
 }
 function movePenguin(toHabitat){state.penguinInHabitat=toHabitat;try{localStorage.setItem(STORE_KEY,JSON.stringify(state))}catch(e){}updateAntarctic();const msg=document.getElementById('dockHelp');if(msg)msg.textContent=toHabitat?'아기 펭귄이 남극에서 놀고 있어요. 눌러서 이글루로 데려올 수 있어요.':'아기 펭귄이 이글루에서 쉬고 있어요. 눌러서 남극으로 보내 보세요.'}
 const stageMove=document.getElementById('penguinStage'),storedMove=document.getElementById('storedPenguin');if(stageMove)stageMove.onclick=()=>movePenguin(false);if(storedMove)storedMove.onclick=()=>movePenguin(true);
