@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'midcheck-single-word-progress-fix',
+  phase:'midcheck-like-predicate-fix',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -322,7 +322,7 @@ const PREDICATE_ALIASES_V2={
   '받았다':'받다','받았어요':'받다','받아':'받다',
   '만들었다':'만들다','만들었어요':'만들다','만들어':'만들다',
   '도왔다':'돕다','도와주었어요':'돕다','도와줘':'돕다',
-  '좋아한다':'좋아하다','좋아해요':'좋아하다','좋아해':'좋아하다'
+  '좋아한다':'좋아하다','좋아해요':'좋아하다','좋아해':'좋아하다','좋아':'좋아하다','좋아요':'좋아하다','좋다':'좋아하다'
 };
 
 function getPredicateFrameV2(value){
@@ -479,7 +479,8 @@ function predicateFromLooseTokenV2(token){
     '받았어':'받다','받았다':'받다',
     '만들었어':'만들다','만들었다':'만들다',
     '도왔어':'돕다','도와줬어':'돕다',
-    '좋아해':'좋아하다','좋아했어':'좋아하다'
+    '좋아':'좋아하다','좋아요':'좋아하다','좋다':'좋아하다',
+    '좋아해':'좋아하다','좋아했어':'좋아하다','좋아한다':'좋아하다'
   };
   const key=maps[raw];
   return key?{key,frame:PREDICATE_FRAMES_V2[key],confidence:.85}:null;
