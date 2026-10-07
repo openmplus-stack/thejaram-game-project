@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'meaning-input-ui',
+  phase:'adaptive-role-completion',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -804,6 +804,136 @@ function confirmRoleValueV2(event,role,value,source='choice'){
   return event;
 }
 
+function inferredSubjectFromInputV2(event,analysis){
+  if(!event||event.subject)return event;
+  const tokens=((analysis&&analysis.tokens)||[]).map(stripRoleParticleV2).filter(Boolean);
+  const people=tokens.filter(t=>semanticTypesForV2(t).includes('person'));
+  if(people.length===0){
+    event.subject='나';
+    event.confirmedRoles=event.confirmedRoles||{};
+    event.confirmedRoles.subject={value:'나',source:'implied-korean-subject'};
+  }
+  return event;
+}
+
+function roleChoicePoolV2(event,role){
+  const frame=getPredicateFrameV2(event&&event.predicate);
+  const allowed=(frame&&frame.semantic&&frame.semantic[role])||[];
+  let words=[];
+  if(role==='subject'){
+    words=[...SEMANTIC_LEXICON_V2.person,...SEMANTIC_LEXICON_V2.animal];
+  }else if(role==='recipient'||role==='companion'){
+    words=[...SEMANTIC_LEXICON_V2.person];
+  }else if(role==='destination'||role==='place'){
+    words=[...SEMANTIC_LEXICON_V2.place];
+  }else{
+    allowed.forEach(type=>{words.push(...(SEMANTIC_LEXICON_V2[type]||[]))});
+    if(!words.length&&role==='object'){
+      ['food','drink','reading','writing','thing','toy','sport','activity','craft','animal','topic'].forEach(type=>words.push(...(SEMANTIC_LEXICON_V2[type]||[])));
+    }
+  }
+  return [...new Set(words)].filter(Boolean);
+}
+
+function roleQuestionV2(event,role){
+  const frame=getPredicateFrameV2(event&&event.predicate);
+  if(frame&&frame.questions&&frame.questions[role])return frame.questions[role];
+  return (MEANING_ROLES_V2[role]&&MEANING_ROLES_V2[role].label)||'조금 더 알려 주세요.';
+}
+
+function renderRequiredRoleOrCoreV2(event,analysis){
+  if(!event)return renderMeaningStartV2();
+  inferredSubjectFromInputV2(event,analysis);
+  const nextRole=nextRequiredRoleV2(event);
+  if(nextRole){renderRequiredRoleV2(event,nextRole);return}
+  renderCoreSentenceV2(event);
+}
+
+function renderRequiredRoleV2(event,role){
+  stepText.textContent='한 가지만 더';
+  bar.style.width='42%';
+  const all=roleChoicePoolV2(event,role);
+  const level=Math.max(1,Math.min(4,Number(storyV2.support.level)||1));
+  const firstCount=level===1?6:level===2?4:0;
+  const first=firstCount?all.slice(0,firstCount):[];
+  const extra=firstCount?all.slice(firstCount,firstCount+12):all.slice(0,12);
+  const question=roleQuestionV2(event,role);
+
+  card.innerHTML=`
+    <h1>${escapeHtml(question)}</h1>
+    <p class="help">지금 문장에 꼭 필요한 것 하나만 더 알려 주세요.</p>
+    ${first.length?`
+      <div class="choices" id="roleFirstChoicesV2">
+        ${first.map(v=>`<button type="button" class="choice role-choice-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>
+      <div style="margin-top:12px">
+        <button type="button" class="btn reveal-examples" id="roleMoreV2">+ 다른 보기</button>
+      </div>
+      <div class="choices extra" id="roleExtraChoicesV2" hidden>
+        ${extra.map(v=>`<button type="button" class="choice role-choice-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>
+    `:''}
+    <div class="custom" style="margin-top:14px">
+      <label for="roleTypedV2">✏️ 내가 직접 쓰기</label>
+      <div class="custom-row">
+        <input id="roleTypedV2" placeholder="보기에 없으면 직접 써도 돼요" autocomplete="off">
+        <button type="button" class="btn add" id="roleTypedAddV2">입력하기</button>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="roleBackV2">앞으로</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  const choose=(value,source)=>{
+    confirmRoleValueV2(event,role,value,source);
+    if(source==='choice')storyV2.support.usedChoices=true;
+    if(source==='typed')storyV2.support.usedTyping=true;
+    renderRequiredRoleOrCoreV2(event);
+  };
+
+  card.querySelectorAll('.role-choice-v2').forEach(b=>b.onclick=()=>choose(b.dataset.v,'choice'));
+  const more=card.querySelector('#roleMoreV2');
+  if(more)more.onclick=()=>{
+    const box=card.querySelector('#roleExtraChoicesV2');
+    box.hidden=false;
+    more.style.display='none';
+    storyV2.support.hintCount+=1;
+    storyV2.support.level=Math.max(1,Math.min(4,(Number(storyV2.support.level)||1)+1));
+  };
+  const input=card.querySelector('#roleTypedV2');
+  const addTyped=()=>{const v=(input.value||'').trim();if(v)choose(v,'typed')};
+  card.querySelector('#roleTypedAddV2').onclick=addTyped;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addTyped()}});
+  card.querySelector('#roleBackV2').onclick=renderMeaningStartV2;
+}
+
+function renderCoreSentenceV2(event){
+  stepText.textContent='핵심문장';
+  bar.style.width='50%';
+  const sentence=previewMeaningSentenceV2(event.predicate,event);
+  storyV2.expression.candidates=[sentence];
+  storyV2.expression.selected=sentence;
+  card.innerHTML=`
+    <h1>첫 문장이 만들어졌어요.</h1>
+    <p class="help">내가 말한 뜻으로 만든 핵심문장이에요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.3em"><b>🌱 ${escapeHtml(sentence)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="coreChangeV2">다시 말하기</button>
+      <button type="button" class="btn next" id="coreNextV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#coreChangeV2').onclick=renderMeaningStartV2;
+  card.querySelector('#coreNextV2').onclick=()=>{
+    // Step 8 will add natural sentence candidates and expansion choices here.
+    renderCoreSentenceV2(event);
+  };
+}
+
 
 function renderMeaningStartV2(){
   stepText.textContent='내 생각';
@@ -932,8 +1062,8 @@ function renderMeaningConfirmedV2(event){
   `;
   card.querySelector('#meaningBackV2').onclick=renderMeaningStartV2;
   card.querySelector('#meaningContinueV2').onclick=()=>{
-    // Step 7 will connect adaptive scaffolding and required-role completion here.
-    renderMeaningStartV2();
+    const latest=storyV2.meanings.length?storyV2.meanings[storyV2.meanings.length-1]:null;
+    renderRequiredRoleOrCoreV2(event,latest);
   };
 }
 
