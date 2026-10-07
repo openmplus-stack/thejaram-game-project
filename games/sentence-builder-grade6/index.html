@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'reward-dictionary-integration',
+  phase:'midcheck-clarification-fix',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -763,21 +763,68 @@ function roleConfirmationCandidatesV2(analysis){
   return list.slice(0,4);
 }
 
+function concreteClarificationPromptV2(analysis){
+  const a=analysis||{};
+  const first=(a.ambiguities||[])[0];
+  if(first&&first.message)return first.message;
+  if(!a.predicate)return '무엇을 했는지 알려 주세요.';
+  const frame=getPredicateFrameV2(a.predicate);
+  if(frame){
+    const missing=frame.required.find(role=>!(a.roles||{})[role]);
+    if(missing&&frame.questions&&frame.questions[missing])return frame.questions[missing];
+  }
+  return '내가 말하려는 뜻과 가장 가까운 것을 골라 주세요.';
+}
+
+function alternateMeaningCandidatesV2(analysis,currentCandidates=[]){
+  const a=analysis||{};
+  const seen=new Set((currentCandidates||[]).map(x=>normalizeMeaningText(x.text||x.label||'')));
+  const list=[];
+  const addText=(text,reason='다른 가능한 뜻')=>{
+    const key=normalizeMeaningText(text);
+    if(!text||seen.has(key)||list.some(x=>normalizeMeaningText(x.text)===key))return;
+    list.push({id:'alt-'+(list.length+1),text,reason,rawOnly:true});
+  };
+
+  (a.tokens||[]).forEach(token=>{
+    const raw=stripRoleParticleV2(token);
+    const hints=AMBIGUOUS_INPUT_HINTS_V2[raw]||[];
+    hints.forEach(x=>addText(x,'같은 말에서 생각할 수 있는 다른 뜻'));
+    const preds=predicateCandidatesForNounV2(raw);
+    preds.forEach(p=>{
+      const f=getPredicateFrameV2(p);
+      if(!f)return;
+      if(semanticTypesForV2(raw).includes('place')&&p==='가다')addText('나는 '+raw+'에 '+f.display+'.');
+      else if(semanticTypesForV2(raw).includes('place'))addText('나는 '+raw+'에서 '+f.display+'.');
+      else addText('나는 '+withRoleParticleV2(raw,'object')+' '+f.display+'.');
+    });
+  });
+
+  return list.slice(0,6);
+}
+
+function analysisFromAlternativeTextV2(text){
+  const raw=String(text||'').replace(/[.?!]+$/,'').trim();
+  return buildMeaningHypothesesV2(raw);
+}
+
 function clarificationModelV2(rawInput){
   const analysis=typeof rawInput==='string'?buildMeaningHypothesesV2(rawInput):(rawInput||{});
   const roleCandidates=roleConfirmationCandidatesV2(analysis);
   const lexicalChoices=meaningClarificationChoicesV2(analysis);
-  const needsRoleChoice=roleCandidates.length>1;
+  const hasSentenceCandidate=roleCandidates.length>0;
   return {
-    title:needsRoleChoice?'혹시 이런 뜻이에요?':'조금만 더 알려 주세요.',
-    instruction:needsRoleChoice?'내가 말하고 싶은 뜻에 가장 가까운 문장을 골라 주세요.':'맞는 뜻을 고르거나 직접 말해 주세요.',
+    title:hasSentenceCandidate?'혹시 이런 뜻이에요?':concreteClarificationPromptV2(analysis),
+    instruction:hasSentenceCandidate
+      ?'맞으면 문장을 눌러 주세요. 아니면 ‘다른 뜻 보기’를 눌러 주세요.'
+      :'아래 보기에서 고르거나 직접 말해 주세요.',
     analysis,
     sentenceCandidates:roleCandidates,
     wordChoices:lexicalChoices,
     allowOther:true,
-    otherLabel:'다른 뜻이에요',
+    otherLabel:'다른 뜻 보기',
     allowTyped:true,
-    typedLabel:'내가 직접 말할게요'
+    typedLabel:'내가 다시 말할게요'
   };
 }
 
@@ -2018,7 +2065,7 @@ function renderMeaningStartV2(){
   card.querySelectorAll('.meaning-example-v2').forEach(b=>b.onclick=()=>{input.value=b.dataset.v;go()});
 }
 
-function renderMeaningClarificationV2(analysis){
+function renderMeaningClarificationV2(analysis,options={}){
   const model=clarificationModelV2(analysis);
   stepText.textContent='뜻 확인';
   bar.style.width='24%';
@@ -2035,13 +2082,23 @@ function renderMeaningClarificationV2(analysis){
     }];
   }
 
+  const showingAlternatives=!!options.showAlternatives;
+  const altCandidates=showingAlternatives?alternateMeaningCandidatesV2(analysis,candidates):[];
+  const shownCandidates=showingAlternatives&&altCandidates.length?altCandidates:candidates;
   const wordChoices=(model.wordChoices||[]).slice(0,8);
+  const title=showingAlternatives
+    ?(altCandidates.length?'다른 뜻도 있어요.':'다른 뜻을 찾으려면 무엇을 했는지 알려 주세요.')
+    :(shownCandidates.length?'혹시 이런 뜻이에요?':concreteClarificationPromptV2(analysis));
+  const instruction=showingAlternatives
+    ?(altCandidates.length?'내가 말하려던 뜻과 가까운 문장을 골라 주세요.':'아래에서 행동을 고르거나 직접 다시 말해 주세요.')
+    :(shownCandidates.length?'맞으면 문장을 눌러 주세요. 아니면 다른 뜻을 볼 수 있어요.':'아래 보기에서 고르거나 직접 말해 주세요.');
+
   card.innerHTML=`
-    <h1>${escapeHtml(model.title)}</h1>
-    <p class="help">${escapeHtml(model.instruction)}</p>
-    ${candidates.length?`
+    <h1>${escapeHtml(title)}</h1>
+    <p class="help">${escapeHtml(instruction)}</p>
+    ${shownCandidates.length?`
       <div class="story-two" style="margin-top:12px">
-        ${candidates.map((x,i)=>`
+        ${shownCandidates.map((x,i)=>`
           <button type="button" class="choice meaning-sentence-choice-v2" data-i="${i}" style="display:block;width:100%;margin:8px 0;text-align:left">
             <b>${escapeHtml(x.text)}</b><br>
             <small>${escapeHtml(x.reason||'가능한 뜻')}</small>
@@ -2050,20 +2107,25 @@ function renderMeaningClarificationV2(analysis){
       </div>`:''}
     ${wordChoices.length?`
       <div class="examples-panel" style="margin-top:14px">
-        <p class="help" style="margin:0 0 10px">필요한 말을 하나 골라도 돼요.</p>
+        <p class="help" style="margin:0 0 10px">${escapeHtml(concreteClarificationPromptV2(analysis))}</p>
         <div class="choices">
           ${wordChoices.map((x,i)=>`<button type="button" class="choice meaning-word-choice-v2" data-i="${i}">${escapeHtml(x.label)}</button>`).join('')}
         </div>
       </div>`:''}
     <div class="actions" style="margin-top:18px">
-      <button type="button" class="btn" id="meaningOtherV2">다른 뜻이에요</button>
+      <button type="button" class="btn" id="meaningOtherV2">${showingAlternatives?'처음 뜻 보기':'다른 뜻 보기'}</button>
       <button type="button" class="btn next" id="meaningRetryV2">내가 다시 말할게요</button>
     </div>
     <div style="clear:both"></div>
   `;
 
   card.querySelectorAll('.meaning-sentence-choice-v2').forEach(b=>b.onclick=()=>{
-    const chosen=candidates[Number(b.dataset.i)];
+    const chosen=shownCandidates[Number(b.dataset.i)];
+    if(chosen&&chosen.rawOnly){
+      const altAnalysis=analysisFromAlternativeTextV2(chosen.text);
+      renderMeaningClarificationV2(altAnalysis);
+      return;
+    }
     const event=applyMeaningCandidateV2(chosen);
     renderMeaningConfirmedV2(event);
   });
@@ -2073,19 +2135,19 @@ function renderMeaningClarificationV2(analysis){
     if(chosen&&chosen.type==='role'&&chosen.role&&analysis.predicate){
       analysis.roles=analysis.roles||{};
       analysis.roles[chosen.role]=chosen.label;
-      const refreshed=buildMeaningHypothesesV2(
-        [analysis.roles.subject,analysis.roles.object,analysis.roles.recipient,analysis.roles.destination,analysis.predicate]
-          .filter(Boolean).join(' ')
-      );
-      renderMeaningClarificationV2(refreshed);
+      renderMeaningClarificationV2(analysis);
       return;
     }
-    renderMeaningStartV2();
+    if(chosen&&chosen.label){
+      const altAnalysis=analysisFromAlternativeTextV2(chosen.label);
+      renderMeaningClarificationV2(altAnalysis);
+      return;
+    }
   });
 
   card.querySelector('#meaningOtherV2').onclick=()=>{
     storyV2.learningLog.meaningRepairs+=1;
-    renderMeaningStartV2();
+    renderMeaningClarificationV2(analysis,{showAlternatives:!showingAlternatives});
   };
   card.querySelector('#meaningRetryV2').onclick=renderMeaningStartV2;
 }
