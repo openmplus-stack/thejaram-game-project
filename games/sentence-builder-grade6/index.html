@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'midcheck-input-view-flow',
+  phase:'midcheck-single-word-progress-fix',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -581,6 +581,21 @@ function buildMeaningHypothesesV2(rawInput){
         }
       }
     });
+
+    // 한국어에서는 화자가 주어인 경우 주어를 자주 생략한다.
+    // 다른 사람/동물이 주어라고 볼 근거가 없고, 필요한 나머지 역할이 잡혔다면 '나'를 보완한다.
+    if(frame.required.includes('subject')&&!result.roles.subject){
+      const explicitActor=contentTokens.some(t=>{
+        const types=semanticTypesForV2(t);
+        return types.includes('person') || (types.includes('animal') && !result.roles.object);
+      });
+      const otherRequired=frame.required.filter(role=>role!=='subject');
+      const otherReady=otherRequired.every(role=>!!result.roles[role]);
+      if(!explicitActor&&otherReady){
+        result.roles.subject='나';
+        result.inferredSubject=true;
+      }
+    }
   }
 
   if(!predicateHit){
@@ -2062,6 +2077,12 @@ function renderMeaningStartV2(){
     if(!raw)return;
     storyV2.support.usedTyping=true;
     const analysis=recordMeaningAnalysisV2(raw);
+    const complete=completeMeaningCandidateV2(analysis);
+    if(complete){
+      const event=applyMeaningCandidateV2(complete);
+      renderMeaningConfirmedV2(event);
+      return;
+    }
     renderMeaningClarificationV2(analysis);
   };
   card.querySelector('#meaningAnalyzeV2').onclick=go;
@@ -2076,6 +2097,23 @@ function mergeClarificationInputV2(analysis,typed){
   if(!add)return base;
   if(normalizeMeaningText(base).includes(normalizeMeaningText(add)))return base;
   return (base+' '+add).replace(/\s+/g,' ').trim();
+}
+
+function completeMeaningCandidateV2(analysis){
+  if(!analysis||!analysis.predicate)return null;
+  const frame=getPredicateFrameV2(analysis.predicate);
+  if(!frame)return null;
+  const roles=cloneRolesV2(analysis.roles);
+  const missing=frame.required.filter(role=>!roles[role]);
+  if(missing.length)return null;
+  return {
+    id:'complete-typed',
+    predicate:analysis.predicate,
+    roles,
+    text:previewMeaningSentenceV2(analysis.predicate,roles),
+    reason:'입력한 뜻',
+    confidence:analysis.confidence||.8
+  };
 }
 
 function renderMeaningClarificationV2(analysis,options={}){
@@ -2160,6 +2198,12 @@ function renderMeaningClarificationV2(analysis,options={}){
     storyV2.support.usedTyping=true;
     const merged=mergeClarificationInputV2(analysis,typed);
     const nextAnalysis=recordMeaningAnalysisV2(merged);
+    const complete=completeMeaningCandidateV2(nextAnalysis);
+    if(complete){
+      const event=applyMeaningCandidateV2(complete);
+      renderMeaningConfirmedV2(event);
+      return;
+    }
     renderMeaningClarificationV2(nextAnalysis);
   };
   card.querySelector('#meaningMoreAddV2').onclick=submitTyped;
