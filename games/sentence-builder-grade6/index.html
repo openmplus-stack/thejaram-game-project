@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'multi-event-story',
+  phase:'reflection-layer',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -1335,6 +1335,135 @@ function renderStoryRequiredRoleV2(event,analysis,role){
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
 }
 
+const REFLECTION_CHOICES_V2={
+  emotion:['기뻤다','재미있었다','뿌듯했다','신기했다','편안했다','걱정됐다','무서웠다','속상했다','화가 났다','아쉬웠다'],
+  thought:['잘했다고 생각했다','다음에도 하고 싶다고 생각했다','더 알고 싶다고 생각했다','친구에게 고마웠다','다음에는 더 잘하고 싶었다','조심해야겠다고 생각했다']
+};
+
+function normalizeReflectionTextV2(kind,value){
+  let v=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!v)return '';
+  if(kind==='emotion'){
+    if(/(했다|났다|됐다|있었다|없었다|웠다|았다|었다)$/.test(v))return '나는 '+v+'.';
+    return '나는 '+v+'고 느꼈다.';
+  }
+  if(kind==='thought'){
+    if(/생각했다$/.test(v))return '나는 '+v+'.';
+    return '나는 '+v+'고 생각했다.';
+  }
+  return v+'.';
+}
+
+function reflectionStoryTextV2(){
+  const base=currentStoryTextV2();
+  const extras=[];
+  if(storyV2.reflection&&storyV2.reflection.thought)extras.push(normalizeReflectionTextV2('thought',storyV2.reflection.thought));
+  if(storyV2.reflection&&storyV2.reflection.emotion)extras.push(normalizeReflectionTextV2('emotion',storyV2.reflection.emotion));
+  return [base,...extras].filter(Boolean).join(' ');
+}
+
+function renderReflectionMenuV2(){
+  stepText.textContent='생각과 기분';
+  bar.style.width='96%';
+  const base=currentStoryTextV2();
+
+  card.innerHTML=`
+    <h1>생각이나 기분도 말하고 싶어요?</h1>
+    <p class="help">원할 때만 골라 주세요. 이야기만으로 끝내도 괜찮아요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div><b>🌳 ${escapeHtml(base)}</b></div>
+    </div>
+    <div class="choices" style="margin-top:16px">
+      <button type="button" class="choice reflection-kind-v2" data-kind="emotion">🙂 어떤 기분이었어요?</button>
+      <button type="button" class="choice reflection-kind-v2" data-kind="thought">💭 무슨 생각이 들었어요?</button>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="reflectionBackV2">이야기 다시 보기</button>
+      <button type="button" class="btn next" id="reflectionSkipV2">여기까지</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  card.querySelectorAll('.reflection-kind-v2').forEach(b=>b.onclick=()=>renderReflectionQuestionV2(b.dataset.kind));
+  card.querySelector('#reflectionBackV2').onclick=renderStorySoFarV2;
+  card.querySelector('#reflectionSkipV2').onclick=renderReflectionResultV2;
+}
+
+function renderReflectionQuestionV2(kind){
+  stepText.textContent=kind==='emotion'?'기분':'생각';
+  bar.style.width='97%';
+  const question=kind==='emotion'?'어떤 기분이었어요?':'무슨 생각이 들었어요?';
+  const choices=(REFLECTION_CHOICES_V2[kind]||[]).slice();
+
+  card.innerHTML=`
+    <h1>${escapeHtml(question)}</h1>
+    <p class="help">가장 가까운 것을 고르거나 직접 써 주세요.</p>
+    <div class="choices">
+      ${choices.slice(0,6).map(v=>`<button type="button" class="choice reflection-value-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+    </div>
+    ${choices.length>6?`
+      <div style="margin-top:12px"><button type="button" class="btn reveal-examples" id="reflectionMoreV2">+ 다른 보기</button></div>
+      <div class="choices extra" id="reflectionExtraV2" hidden>
+        ${choices.slice(6).map(v=>`<button type="button" class="choice reflection-value-v2" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>`:''}
+    <div class="custom" style="margin-top:14px">
+      <label for="reflectionTypedV2">✏️ 내가 직접 쓰기</label>
+      <div class="custom-row">
+        <input id="reflectionTypedV2" placeholder="내 생각이나 기분을 직접 써도 돼요" autocomplete="off">
+        <button type="button" class="btn add" id="reflectionTypedAddV2">입력하기</button>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="reflectionCancelV2">다른 것 고르기</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  const save=(value,source)=>{
+    if(!value)return;
+    storyV2.reflection[kind]=String(value).trim();
+    storyV2.learningLog.expansionCount+=1;
+    if(source==='choice')storyV2.support.usedChoices=true;
+    if(source==='typed')storyV2.support.usedTyping=true;
+    renderReflectionResultV2();
+  };
+
+  card.querySelectorAll('.reflection-value-v2').forEach(b=>b.onclick=()=>save(b.dataset.v,'choice'));
+  const more=card.querySelector('#reflectionMoreV2');
+  if(more)more.onclick=()=>{card.querySelector('#reflectionExtraV2').hidden=false;more.style.display='none';storyV2.support.hintCount+=1};
+  const input=card.querySelector('#reflectionTypedV2');
+  const add=()=>{const v=(input.value||'').trim();if(v)save(v,'typed')};
+  card.querySelector('#reflectionTypedAddV2').onclick=add;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+  card.querySelector('#reflectionCancelV2').onclick=renderReflectionMenuV2;
+}
+
+function renderReflectionResultV2(){
+  stepText.textContent='나의 이야기';
+  bar.style.width='99%';
+  const story=reflectionStoryTextV2();
+  storyV2.expression.selected=story;
+  storyV2.expression.corrected=story;
+
+  card.innerHTML=`
+    <h1>내 생각까지 이야기로 만들었어요.</h1>
+    <p class="help">내가 직접 말한 사건과 생각·기분만 넣었어요.</p>
+    <div class="story-two" style="margin-top:12px">
+      <div style="font-size:1.2em"><b>🌳 ${escapeHtml(story)}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="reflectionAddMoreV2">생각·기분 더하기</button>
+      <button type="button" class="btn next" id="reflectionNextV2">다음</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#reflectionAddMoreV2').onclick=renderReflectionMenuV2;
+  card.querySelector('#reflectionNextV2').onclick=()=>{
+    // Step 12 will connect original-vs-polished review and finalization.
+    renderReflectionResultV2();
+  };
+}
+
 function renderStorySoFarV2(){
   stepText.textContent='나의 이야기';
   bar.style.width='94%';
@@ -1361,8 +1490,7 @@ function renderStorySoFarV2(){
   const add=card.querySelector('#storyAddAnotherV2');
   if(add)add.onclick=()=>renderNextEventPromptV2(sentences[sentences.length-1].event);
   card.querySelector('#storyContinueV2').onclick=()=>{
-    // Step 11 will connect thoughts/emotions or finalization.
-    renderStorySoFarV2();
+    renderReflectionMenuV2();
   };
 }
 
