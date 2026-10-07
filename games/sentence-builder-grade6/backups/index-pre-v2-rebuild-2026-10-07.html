@@ -1,0 +1,744 @@
+<!doctype html><html lang='ko'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta name="description" content="초등학교 6학년 발달장애 아동의 한국어 문장 구성과 표현을 돕는 단계형 학습 앱"><!-- build: 2026-10-05-completion-v4 -->
+<title>문장 톡톡</title><style>
+:root{color-scheme:only light;--green:#2788c7;--deep:#175b87;--cream:#eef9ff;--card:rgba(255,255,255,.94);--shadow:0 10px 30px rgba(38,103,145,.14)}
+*{box-sizing:border-box}html{background:#dff3ff;color-scheme:only light}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;color:#254457;background:#dff3ff}button,input{font:inherit;color-scheme:light}
+.app{max-width:560px;margin:auto;min-height:100dvh;padding:20px 18px 42px;background:linear-gradient(180deg,#eaf8ff 0%,#dff3ff 56%,#d5effb 100%);position:relative;overflow:hidden}
+.app:before,.app:after{content:"";position:absolute;border-radius:50%;pointer-events:none}.app:before{width:240px;height:240px;right:-100px;top:80px;background:rgba(255,255,255,.35)}.app:after{width:320px;height:130px;left:-90px;bottom:-40px;background:rgba(120,164,101,.10)}
+.top{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;margin:2px 2px 14px}.badge{font-size:19px;font-weight:950;color:var(--deep)}#stepText{font-size:13px;font-weight:900;color:var(--green);background:rgba(255,255,255,.78);padding:7px 11px;border-radius:999px}
+.progress{position:relative;z-index:1;height:9px;background:#d4dfcc;border-radius:99px;overflow:hidden}.bar{height:100%;background:var(--green);width:0;transition:.3s;border-radius:99px}
+.card{position:relative;z-index:1;background:var(--card);backdrop-filter:blur(7px);border:1px solid rgba(255,255,255,.75);border-radius:24px;padding:22px;margin-top:18px;box-shadow:var(--shadow)}
+h1{font-size:27px;line-height:1.35;margin:0 0 8px;color:#314033;word-break:keep-all}p.help{font-size:16px;line-height:1.55;color:#657064;margin:0 0 20px}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{min-height:58px;border:1px solid #d9dfd4;border-bottom-width:3px;background:#fff;border-radius:16px;padding:13px 10px;font-size:17px;line-height:1.35;font-weight:800;color:#40513f;cursor:pointer;box-shadow:0 2px 0 rgba(70,90,65,.04)}.choice:hover,.choice.selected{border-color:#6e9a75;background:#edf6e9;color:var(--deep);box-shadow:0 3px 10px rgba(70,105,67,.12)}
+.more-wrap{margin-top:14px}.btn{border:0;border-radius:16px;padding:14px 16px;font-size:16px;font-weight:850;cursor:pointer}.more{width:100%;background:#edf4e8;color:var(--deep)}.extra{margin-top:10px}
+.custom{margin-top:16px;padding:16px;border:2px solid #cfe2c9;border-radius:18px;background:#f8fcf6}.custom label{display:block;font-size:16px!important;font-weight:950!important;color:var(--deep)!important}.recall-guide{font-size:13px;color:#6b786a;margin-top:5px;line-height:1.45}.spell-check{margin-top:10px;padding:12px 13px;border-radius:14px;background:#fff8e8;border:1px solid #ead9ae;color:#625b43;font-size:14px;line-height:1.5}.spell-check b{color:#314033}.spell-actions{display:flex;gap:8px;margin-top:9px}.spell-actions button{flex:1;border:0;border-radius:12px;padding:10px;font-weight:900}.spell-fix{background:#3d7b4c;color:#fff}.spell-keep{background:#edf1e9;color:#526052}.examples-panel{margin-top:14px;padding-top:14px;border-top:1px solid #e1e6dc}.examples-panel[hidden]{display:none!important}.reveal-examples{width:100%;background:#eef5e9;color:var(--deep);border:2px solid #d4e5ce}.custom-row{display:flex;gap:8px;margin-top:10px}.custom label{font-size:14px;font-weight:900;color:var(--green)}.custom-row{display:flex;gap:8px;margin-top:9px}.custom input{min-width:0;flex:1;border:1px solid #d9dfd4;border-radius:14px;padding:13px 14px;background:#fff;font-size:17px;outline:none}.custom input:focus{border-color:#6e9a75;box-shadow:0 0 0 3px rgba(61,123,76,.08)}.add{background:#edf4e8;color:var(--deep);white-space:nowrap}
+.next{width:100%;background:var(--green);color:#fff;margin-top:18px;box-shadow:0 6px 14px rgba(61,123,76,.18)}.next:disabled{opacity:.35;box-shadow:none}
+.sentence{font-size:23px;line-height:1.75;font-weight:850;color:#314033;background:#f1f7ed;border:1px solid #dbe8d5;border-radius:18px;padding:19px;margin:17px 0;word-break:keep-all}.parts{font-size:13px;color:#71806f;text-align:center}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions .btn{background:#edf4e8;color:var(--deep);width:100%;margin-top:0;min-height:52px;display:flex;align-items:center;justify-content:center}.actions .next{margin-top:0}.actions #skip,.actions #next{height:52px}.actions .primary{background:var(--green);color:#fff}.notice{background:#fff8e8;border:1px solid #ead9ae;border-radius:16px;padding:14px;margin:14px 0;font-size:16px;line-height:1.55;color:#665b3e}
+@media(max-width:430px){.app{padding:16px 14px 34px}.card{padding:18px}.choices{grid-template-columns:1fr 1fr;gap:8px}.choice{font-size:16px;padding:11px 7px}h1{font-size:24px}.custom-row{flex-wrap:wrap}.custom input{flex-basis:100%}.add{width:100%}}
+.shell{padding-bottom:88px}.app-nav{position:fixed;z-index:20;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);border-top:1px solid #dce7d6;box-shadow:0 -8px 24px rgba(40,90,55,.10)}.nav-btn{border:0;background:transparent;color:#667468;font-size:11px;font-weight:850;padding:7px 2px;border-radius:12px;line-height:1.25}.nav-btn span{display:block;font-size:20px;margin-bottom:2px}.nav-btn.active{background:#edf6e9;color:var(--deep)}.screen{display:none}.screen.active{display:block}.home-hero,.antarctic-hero{min-height:360px;border-radius:26px;padding:22px;margin-top:14px;background:linear-gradient(#bfe9ff 0 42%,#eefcff 42% 65%,#d7f2fa 65%);box-shadow:var(--shadow);position:relative;overflow:hidden;text-align:center}.home-hero:after,.antarctic-hero:after{content:'';position:absolute;left:-10%;right:-10%;bottom:-50px;height:150px;background:#fff;border-radius:50% 50% 0 0}.brand{font-size:32px;font-weight:950;color:#174f67;text-shadow:0 2px #fff}.brand small{display:block;font-size:14px;color:#477482;margin-top:4px}.penguin-placeholder{width:155px;height:155px;margin:30px auto 12px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.78);font-size:76px;position:relative;z-index:2}.start-btn{position:relative;z-index:3;border:0;border-radius:18px;background:#3d7b4c;color:white;font-size:20px;font-weight:900;padding:15px 34px;box-shadow:0 7px 16px rgba(61,123,76,.22)}.home-box{background:var(--card);border-radius:22px;padding:17px;margin-top:14px;box-shadow:var(--shadow)}.home-box h3{margin:0 0 8px;color:var(--deep)}.stat-row{display:flex;gap:9px}.stat{flex:1;background:#f2f8ef;border-radius:15px;padding:12px;text-align:center;font-weight:850;color:#40513f}.screen-title{font-size:26px;color:var(--deep);margin:4px 0 14px}.empty-note{padding:24px;text-align:center;color:#71806f}.fish-btn{border:0;border-radius:18px;background:#dff4ff;padding:13px 20px;font-size:18px;font-weight:900;color:#23627a}.login-mini{border:0;background:white;color:var(--deep);border-radius:999px;padding:8px 13px;font-weight:900;box-shadow:0 3px 10px rgba(40,90,55,.12)}.reward{margin:14px 0;padding:15px;border-radius:18px;background:#fff8df;border:1px solid #efd78d;text-align:center;font-weight:900;color:#65562c}.dict-item{background:#fff;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 3px 12px rgba(40,90,55,.08);line-height:1.55}.feed-msg{position:relative;z-index:3;margin:10px auto 0;min-height:24px;font-weight:900;color:#23627a}.growth{font-size:13px;color:#667468;margin-top:8px}
+.treasure-btn{width:100%;border:0;text-align:left;background:#fff;border-radius:16px;padding:14px;margin:10px 0;box-shadow:0 3px 12px rgba(40,90,55,.08);font-weight:850;color:#40513f}.modal{position:fixed;z-index:50;inset:0;background:rgba(25,40,38,.48);display:none;align-items:center;justify-content:center;padding:22px}.modal.open{display:flex}.modal-card{width:min(480px,100%);max-height:80vh;overflow:auto;background:#fffdf7;border-radius:24px;padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.22)}.modal-card h2{margin:0 0 4px;color:var(--deep)}.modal-card .source{font-size:14px;font-weight:900;color:#71806f;margin-bottom:14px}.modal-card p{line-height:1.75;word-break:keep-all}.close-modal{width:100%;border:0;border-radius:15px;padding:13px;background:var(--green);color:#fff;font-weight:900;margin-top:10px}.extend-box{margin-top:16px;padding:16px;background:#f4f8ff;border:1px solid #dce8f4;border-radius:18px}.extend-title{font-weight:950;color:#355b72;margin-bottom:10px}.extend-options{display:grid;gap:8px}.extend-option{border:1px solid #d8e3ea;background:#fff;border-radius:14px;padding:12px;text-align:left;font-weight:800;color:#40515c}.story-two{margin-top:12px;padding:15px;border-radius:16px;background:#fff8df;border:1px solid #efd78d;font-size:18px;line-height:1.7;font-weight:800}.antarctic-world{min-height:430px;border-radius:28px;padding:18px;position:relative;overflow:hidden;box-shadow:var(--shadow);transition:background .5s}.antarctic-world.morning{background:linear-gradient(#aee1ff 0 44%,#eafaff 44% 66%,#d6f2fa 66%)}.antarctic-world.day{background:linear-gradient(#78c9f2 0 44%,#e7fbff 44% 66%,#cceef7 66%)}.antarctic-world.evening{background:linear-gradient(#d9b6dc 0 42%,#f7d8c3 42% 62%,#d9edf4 62%)}.antarctic-world.night{background:linear-gradient(#18385f 0 44%,#315779 44% 62%,#c6e0eb 62%)}.antarctic-world:after{content:'';position:absolute;left:-12%;right:-12%;bottom:-65px;height:190px;background:rgba(255,255,255,.94);border-radius:50% 50% 0 0}.antarctic-sky{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;color:#174f67;font-weight:900}.night .antarctic-sky{color:#fff}.time-chip{background:rgba(255,255,255,.78);padding:7px 11px;border-radius:999px;font-size:13px}.penguin-stage{position:relative;z-index:3;width:190px;height:190px;margin:42px auto 2px;display:grid;place-items:center}.penguin-stage .penguin-placeholder{margin:0;transition:transform .28s}.growth-penguin{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 10px 12px rgba(30,65,80,.16))}.penguin-stage.eating .penguin-placeholder,.penguin-stage.eating .growth-penguin{transform:scale(1.12) rotate(-3deg)}.heart-burst{position:absolute;z-index:5;left:50%;top:30%;font-size:28px;animation:heartUp 1.1s ease-out forwards;pointer-events:none}@keyframes heartUp{0%{opacity:0;transform:translate(-50%,20px) scale(.7)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,-95px) scale(1.35)}}.antarctic-status{position:relative;z-index:4;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}.antarctic-pill{background:rgba(255,255,255,.86);border-radius:16px;padding:10px;font-weight:900;color:#31586a}.level-line{font-size:14px;margin-top:4px}.feed-area{position:relative;z-index:5;margin-top:12px}.fish-btn:disabled{opacity:.45}.growth-track{height:10px;background:#dce9ec;border-radius:99px;overflow:hidden;margin-top:9px}.growth-fill{height:100%;background:#5ca8bd;border-radius:99px;transition:width .3s}.flying-fish{position:fixed;z-index:9999;font-size:34px;pointer-events:none;transform:translate(-50%,-50%);transition:left .58s cubic-bezier(.2,.8,.35,1),top .58s cubic-bezier(.2,.8,.35,1),transform .58s ease,opacity .2s .48s}.growth-penguin{transition:transform .28s,opacity .22s}.growth-penguin.level-change{animation:penguinGrow .72s ease}@keyframes penguinGrow{0%{transform:scale(.88);opacity:.45}45%{transform:scale(1.18)}100%{transform:scale(1);opacity:1}}
+/* 문장 톡톡 공용 빙하 배경 — 기존 GitHub 자산 재사용 */
+body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82)),url('assets/backgrounds/bg-antarctic-world.png');background-size:cover;background-position:center;background-attachment:fixed;background-repeat:no-repeat}
+#homeScreen,#composeScreen{background:transparent}
+
+/* 넓게 펼쳐지는 나의 남극 */
+.antarctic-world{min-height:650px;padding:20px 22px;background-image:linear-gradient(rgba(215,242,255,.08),rgba(255,255,255,.05)),url('assets/backgrounds/bg-antarctic-world.png')!important;background-size:cover!important;background-position:center 55%!important}
+.antarctic-world:after{display:none}
+.antarctic-sky{z-index:8}
+.penguin-habitat{position:absolute;inset:58px 18px 18px;z-index:3}
+.penguin-stage{position:absolute;left:7%;bottom:4%;width:220px;height:220px;margin:0;cursor:pointer;z-index:6}
+.habitat-penguin{position:absolute;width:118px;height:118px;display:grid;place-items:center;font-size:76px;filter:drop-shadow(0 9px 10px rgba(20,65,90,.2));animation:wanderBob 3.4s ease-in-out infinite;cursor:pointer}
+.habitat-penguin:nth-child(2){left:40%;bottom:26%;animation-delay:-1s}.habitat-penguin:nth-child(3){right:8%;bottom:12%;animation-delay:-2s}.habitat-penguin:nth-child(4){right:29%;top:14%;animation-delay:-.4s}.habitat-penguin:nth-child(5){left:25%;top:8%;animation-delay:-1.7s}
+@keyframes wanderBob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+.antarctic-overlay{position:absolute;right:18px;top:66px;z-index:8;display:flex;gap:8px}.antarctic-overlay .antarctic-pill{min-width:112px;background:rgba(255,255,255,.9);box-shadow:0 5px 15px rgba(20,60,80,.12)}
+.feed-area{position:absolute;right:22px;bottom:22px;z-index:10;width:230px;margin:0}.fish-btn{width:100%;min-height:58px;font-size:18px;font-weight:900;opacity:1!important}.fish-btn:disabled{opacity:.7!important;background:#e6edf0;color:#71818a}
+.feed-mode-note{background:rgba(255,251,225,.94);border:2px solid #f0d37b;border-radius:16px;padding:9px 11px;margin-bottom:8px;font-weight:800;font-size:13px;color:#66552c;display:none}
+.antarctic-details{margin-top:18px}
+@media(max-width:720px){.antarctic-world{min-height:560px}.penguin-stage{width:165px;height:165px}.habitat-penguin{width:88px;height:88px;font-size:58px}.antarctic-overlay{left:16px;right:16px;top:62px}.feed-area{right:16px;bottom:16px;width:200px}}
+
+/* 말씀 루트처럼 개방감 있는 홈 */
+#homeScreen{min-height:calc(100vh - 130px)}
+.home-open{min-height:690px;border-radius:30px;position:relative;overflow:hidden;background-image:linear-gradient(180deg,rgba(255,255,255,.04) 0%,rgba(230,249,255,.04) 68%,rgba(244,252,255,.18) 100%),url('assets/backgrounds/bg-antarctic-world.png');background-size:cover;background-position:center;box-shadow:0 14px 38px rgba(34,91,113,.14);isolation:isolate}
+.home-open:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.13),transparent 42%);z-index:-1}
+.home-topbar{display:flex;justify-content:space-between;align-items:center;padding:20px 22px;position:relative;z-index:5}.home-title{font-size:28px;font-weight:950;color:#164d67;text-shadow:0 2px 10px rgba(255,255,255,.9)}.home-title small{display:block;font-size:13px;margin-top:3px;color:#426f7f}
+.home-stats{display:flex;gap:8px}.home-stat-chip{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-radius:999px;padding:10px 14px;font-weight:900;color:#31596c;box-shadow:0 5px 15px rgba(34,91,113,.12);white-space:nowrap}
+.home-penguin{position:absolute;left:5%;bottom:3%;width:min(31vw,285px);height:min(31vw,285px);z-index:4;filter:drop-shadow(0 15px 15px rgba(30,70,90,.18));object-fit:contain}
+.home-cta-wrap{position:absolute;left:50%;top:53%;transform:translate(-35%,-50%);z-index:6;text-align:center}.home-speech{background:rgba(255,255,255,.92);border:3px solid rgba(73,154,190,.35);border-radius:28px;padding:15px 22px;margin-bottom:12px;font-size:18px;font-weight:900;color:#245a70;box-shadow:0 10px 25px rgba(35,85,110,.13);white-space:nowrap}.home-start{border:0;border-radius:22px;padding:18px 34px;background:#fffdf6;color:#183e54;font-size:23px;font-weight:950;box-shadow:0 10px 25px rgba(31,85,110,.2);cursor:pointer}.home-start span{display:inline-grid;place-items:center;width:36px;height:36px;margin-left:10px;border-radius:50%;background:#318bd2;color:white}
+.home-enter-antarctic{position:absolute;right:22px;bottom:22px;z-index:6;border:0;border-radius:18px;padding:12px 17px;background:rgba(255,255,255,.88);color:#31596c;font-weight:900;box-shadow:0 6px 18px rgba(35,85,110,.14)}
+@media(max-width:720px){.home-open{min-height:590px}.home-topbar{align-items:flex-start}.home-title{font-size:24px}.home-stats{flex-direction:column;gap:5px}.home-stat-chip{padding:7px 10px;font-size:13px}.home-penguin{width:190px;height:190px;left:1%;bottom:6%}.home-cta-wrap{top:49%;left:53%}.home-speech{font-size:14px;padding:11px 14px}.home-start{font-size:18px;padding:14px 20px}.home-enter-antarctic{right:14px;bottom:14px}}
+
+/* 홈 펭귄을 가리지 않는 하단 액션 */
+.home-cta-wrap,.home-speech,.home-start,.home-enter-antarctic{display:none!important}
+.home-bottom-actions{position:absolute;right:22px;bottom:22px;z-index:7;display:flex;gap:10px;align-items:center}
+.home-action{border:0;border-radius:20px;padding:14px 20px;background:rgba(255,255,255,.93);color:#244f63;font-size:17px;font-weight:950;box-shadow:0 7px 20px rgba(32,83,108,.16);backdrop-filter:blur(8px);white-space:nowrap}
+.home-action.start{background:#fffdf6;font-size:19px}.home-action.start span{display:inline-grid;place-items:center;width:30px;height:30px;margin-left:7px;border-radius:50%;background:#318bd2;color:#fff}
+@media(max-width:720px){.home-bottom-actions{right:14px;bottom:14px;gap:7px}.home-action{padding:11px 13px;font-size:14px}.home-action.start{font-size:15px}}
+
+/* 실제 PNG 펭귄을 사용하는 브랜드/내비게이션 */
+.home-logo{display:flex;align-items:center;gap:10px;color:#164d67}.home-logo img{width:66px;height:66px;object-fit:contain;filter:drop-shadow(0 5px 8px rgba(30,70,90,.14))}.home-logo strong{display:block;font-size:30px;font-weight:950;line-height:1}.home-logo small{display:block;margin-top:7px;font-size:13px;font-weight:850;color:#426f7f}
+.nav-penguin{height:42px!important;display:grid!important;place-items:center}.nav-penguin img{width:46px;height:46px;object-fit:contain;display:block;filter:drop-shadow(0 3px 4px rgba(30,70,90,.12))}
+.habitat-penguin{font-size:0}.habitat-penguin img{width:100%;height:100%;object-fit:contain;display:block}
+.home-open{min-height:720px;background-position:center 60%}.home-penguin{width:min(35vw,320px);height:min(35vw,320px);left:4%;bottom:5%}
+.home-bottom-actions{bottom:26px}.home-action.start{background:#fff2bf;border:2px solid rgba(245,195,76,.55)}.home-action.antarctic{background:rgba(242,250,255,.95);border:2px solid rgba(104,187,230,.35)}
+@media(max-width:720px){.home-logo img{width:52px;height:52px}.home-logo strong{font-size:25px}.nav-penguin img{width:39px;height:39px}.home-open{min-height:650px}}
+
+.home-bottom-actions.single{right:22px;left:auto}.home-bottom-actions.single .home-action.start{min-width:220px;padding:16px 26px}@media(max-width:720px){.home-bottom-actions.single{right:14px}.home-bottom-actions.single .home-action.start{min-width:190px}}
+
+/* 새 공식 로고와 남극 월드 배경 */
+.home-logo.brand-image{display:block;width:min(48%,460px);padding:0}
+.home-logo.brand-image img{width:100%;height:auto;max-height:135px;object-fit:contain;object-position:left center;filter:drop-shadow(0 5px 9px rgba(18,72,100,.16))}
+.home-open{background-image:url('assets/backgrounds/bg-antarctic-world.png')!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+.antarctic-world{background-image:url('assets/backgrounds/bg-antarctic-world.png')!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important}
+@media(max-width:720px){.home-logo.brand-image{width:min(56%,360px)}.home-logo.brand-image img{max-height:105px}}
+
+/* 시원한 블루 앱 프레임 */
+.app:before{background:rgba(145,218,255,.22)}.app:after{background:rgba(79,174,219,.10)}
+/* 홈: 펭귄은 좌측, 시작 버튼은 우측으로 완전히 분리 */
+.home-penguin{left:3%!important;right:auto!important;bottom:3%!important;width:min(34vw,300px)!important;height:min(34vw,300px)!important}
+.home-bottom-actions.single{right:24px!important;left:auto!important;bottom:24px!important}
+.home-bottom-actions.single .home-action.start{min-width:205px!important}
+@media(max-width:720px){.home-penguin{left:0!important;width:175px!important;height:175px!important;bottom:5%!important}.home-bottom-actions.single{right:12px!important;bottom:18px!important}.home-bottom-actions.single .home-action.start{min-width:165px!important;padding:13px 16px!important}}
+/* 마이페이지 실제 성장 펭귄 */
+.my-growth{display:flex;align-items:center;gap:18px}.my-growth img{width:105px;height:105px;object-fit:contain;filter:drop-shadow(0 7px 8px rgba(35,91,125,.16))}
+/* 먹이 버튼: 글자 없이 물고기만 */
+.fish-btn.fish-only{width:72px!important;height:72px!important;min-height:72px!important;border-radius:50%!important;padding:0!important;margin-left:auto!important;display:grid!important;place-items:center!important;background:rgba(255,255,255,.95)!important;border:3px solid #8ed7f6!important;box-shadow:0 7px 18px rgba(30,117,164,.2)!important;opacity:1!important}
+.fish-btn.fish-only .fish-image{font-size:40px;line-height:1;filter:drop-shadow(0 3px 3px rgba(25,80,110,.14))}
+.fish-btn.fish-only:disabled{opacity:.48!important;filter:grayscale(.45)}
+
+/* 남극에는 보유/배치한 펭귄만 표시 */
+.penguin-habitat .special-roamer{display:none!important}
+.penguin-stage.movable-penguin{cursor:pointer}
+/* 먹이 물고기를 오른쪽 아래로 */
+.feed-area{right:10px!important;bottom:10px!important;width:92px!important;display:flex;flex-direction:column;align-items:flex-end}
+.feed-area .feed-msg{position:absolute;right:0;bottom:78px;width:210px;text-align:right}
+.fish-btn.fish-only{margin:0!important}
+/* 이글루형 펭귄 보관함 */
+.penguin-dock-wrap{margin-top:18px;background:rgba(236,249,255,.96);border:1px solid rgba(126,204,238,.55);border-radius:28px;padding:18px 20px;box-shadow:0 10px 25px rgba(39,116,157,.12)}
+.penguin-dock-wrap h3{margin:0 0 12px;color:#245c78}
+.igloo-dock{height:205px;position:relative;overflow:hidden;border-radius:22px;background:linear-gradient(180deg,#bfeaff 0%,#e9f9ff 58%,#f9fdff 59%,#d9f4ff 100%);border:2px solid #a6dcf2}
+.igloo-shell{position:absolute;left:28px;bottom:16px;width:175px;height:126px;border-radius:90px 90px 20px 20px;background:linear-gradient(145deg,#f9feff,#bce9fb);border:4px solid rgba(111,193,229,.65);box-shadow:inset -14px -10px 20px rgba(72,168,211,.14),0 9px 16px rgba(40,110,145,.12)}
+.igloo-lines{position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(0deg,transparent 0 28px,rgba(92,177,216,.25) 29px 32px)}
+.igloo-door{position:absolute;right:18px;bottom:-3px;width:58px;height:70px;border-radius:30px 30px 8px 8px;background:#6fc6eb;border:4px solid #dff7ff;box-shadow:inset 8px 0 12px rgba(28,105,145,.18)}
+.stored-penguin{position:absolute;right:42px;bottom:18px;width:105px;height:105px;border:0;background:transparent;padding:0;display:none;place-items:center;cursor:pointer;z-index:4}.stored-penguin img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 7px 7px rgba(25,83,115,.18))}
+.dock-help{position:absolute;right:18px;top:20px;width:210px;padding:10px 12px;border-radius:15px;background:rgba(255,255,255,.84);font-size:13px;font-weight:800;color:#416a7d;line-height:1.45}
+@media(max-width:720px){.feed-area{right:7px!important;bottom:7px!important}.igloo-shell{left:14px;width:145px;height:108px}.stored-penguin{right:20px;width:88px;height:88px}.dock-help{right:10px;width:175px;font-size:12px}}
+
+/* 남극 월드와 이글루 사이: 획득 물고기 보관함 */
+.fish-inventory-wrap{margin-top:18px;background:rgba(239,250,255,.97);border:1px solid rgba(112,196,234,.58);border-radius:28px;padding:16px 16px 14px;box-shadow:0 10px 25px rgba(39,116,157,.12)}
+.fish-inventory-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.fish-inventory-head h3{margin:0;color:#245c78}.fish-inventory-total{font-size:13px;font-weight:900;color:#4d7182;background:#fff;border-radius:999px;padding:7px 10px}
+.fish-inventory-viewport{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;cursor:grab;touch-action:pan-x;padding:3px 2px 7px}.fish-inventory-viewport::-webkit-scrollbar{display:none}.fish-inventory-viewport.dragging{cursor:grabbing;scroll-snap-type:none}
+.fish-inventory-track{display:flex;gap:10px;width:max-content;min-width:100%}.fish-card{scroll-snap-align:start;width:112px;min-width:112px;height:126px;border:0;border-radius:20px;padding:8px;background:linear-gradient(180deg,#fff 0%,#e8f8ff 100%);box-shadow:0 4px 12px rgba(37,112,148,.11);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}.fish-card img{width:88px;height:78px;object-fit:contain;display:block}.fish-card .fish-fallback{font-size:45px;line-height:1}.fish-grade{font-size:12px;font-weight:950;color:#32667e;margin-top:2px}.fish-qty{position:absolute;right:7px;top:7px;min-width:25px;height:25px;padding:0 6px;border-radius:999px;display:grid;place-items:center;background:#277fc0;color:#fff;font-size:12px;font-weight:950;box-shadow:0 3px 8px rgba(31,96,135,.18)}
+.fish-empty{width:100%;min-height:108px;border:2px dashed #b7ddeb;border-radius:20px;display:grid;place-items:center;text-align:center;color:#63808d;font-size:14px;font-weight:800;line-height:1.55;padding:18px}.fish-swipe-help{margin-top:6px;text-align:center;color:#678493;font-size:12px;font-weight:800}
+@media(max-width:720px){.fish-inventory-wrap{padding:14px 12px}.fish-card{width:98px;min-width:98px;height:116px}.fish-card img{width:78px;height:69px}}
+
+/* 나의 남극 상단: 이름 + 우측 모서리 자원 */
+.antarctic-sky{top:18px!important;left:20px!important;right:auto!important;font-size:20px!important;font-weight:950!important;color:#174f6c!important;text-shadow:0 2px 8px rgba(255,255,255,.9)}
+.time-chip{display:none!important}
+.antarctic-overlay{left:auto!important;right:12px!important;top:12px!important;gap:7px!important;align-items:flex-start}
+.antarctic-overlay .antarctic-pill.compact-pill{min-width:0!important;padding:9px 13px!important;border-radius:18px!important;font-size:17px!important;line-height:1!important;background:rgba(255,255,255,.92)!important;backdrop-filter:blur(7px)}
+@media(max-width:720px){.antarctic-sky{top:14px!important;left:14px!important;font-size:17px!important}.antarctic-overlay{left:auto!important;right:8px!important;top:8px!important}.antarctic-overlay .antarctic-pill.compact-pill{padding:8px 10px!important;font-size:15px!important}}
+
+/* 실제 이글루 휴식 공간 배경 이미지 */
+.igloo-dock{
+  height:205px;
+  background-image:url('assets/backgrounds/bg-antarctic-world.png')!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  border:0!important;
+}
+.igloo-dock .igloo-shell{display:none!important}
+.igloo-dock .stored-penguin{z-index:5}
+.igloo-dock .dock-help{z-index:6}
+</style><script>
+/* asset recovery: keep this app self-contained and retry images from the repository source if CDN deployment misses a binary asset */
+(function(){
+  const RAW='https://raw.githubusercontent.com/openmplus-stack/thejaram-game-project/main/games/sentence-builder-grade6/';
+  function recover(img){
+    if(!img || img.dataset.assetRecovery==='1') return;
+    const src=img.getAttribute('src')||'';
+    if(!src || /^data:|^blob:|^https:\/\/raw\.githubusercontent\.com/.test(src)) return;
+    let rel=src.replace(/^\.\//,'');
+    if(rel.startsWith('../munjang-talktalk/assets/')) rel='assets/'+rel.split('/assets/')[1];
+    if(rel.startsWith('assets/')){
+      img.dataset.assetRecovery='1';
+      img.src=RAW+rel;
+    }
+  }
+  document.addEventListener('error',e=>{ if(e.target && e.target.tagName==='IMG') recover(e.target); },true);
+})();
+</script></head><body><main class='app shell'><section id='homeScreen' class='screen active'><div class='home-open'><div class='home-topbar'><div class='home-logo brand-image'><img src='assets/branding/logo-sentence-toktok.png' alt='문장 톡톡 - 내 생각을 한 문장씩 모아요'></div><div class='home-stats'><button class='login-mini' id='loginBtn'>로그인</button></div></div><img id='homeGrowthPenguin' class='home-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 성장 펭귄'><div class='home-bottom-actions single'><button type='button' class='home-action start' id='startBtn' onclick='startCompose()'>✏️ 시작하기 <span>→</span></button></div></div></section><section id='composeScreen' class='screen'><div class='top'><div class='badge'>문장 구성</div><div id='stepText'>1 / 6</div></div><div class='progress'><div id='bar' class='bar'></div></div><section id='card' class='card'></section></section><section id='antarcticScreen' class='screen'><h1 class='screen-title'>나의 남극</h1><div id='antarcticWorld' class='antarctic-world day'><div class='antarctic-sky'><div id='penguinVillageTitle'>나의 펭귄 마을</div></div><div class='antarctic-overlay'><div class='antarctic-pill compact-pill'>🐟 <b id='antarcticFish'>0</b></div><div class='antarctic-pill compact-pill'>🎁 <b id='antarcticItems'>0</b></div></div><div class='penguin-habitat'><div id='penguinStage' class='penguin-stage feed-target movable-penguin' title='눌러서 이글루로 보내기'><img id='growthPenguin' class='growth-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='1단계 아기 펭귄'></div></div><div class='feed-area'><div id='feedModeNote' class='feed-mode-note'>먹이를 줄 펭귄을 골라 주세요.</div><button type='button' class='fish-btn fish-only' id='feedBtn' aria-label='물고기 먹이 주기'><span class='fish-image' aria-hidden='true'>🐟</span></button><div class='feed-msg' id='feedMsg'></div></div></div><div class='fish-inventory-wrap'><div class='fish-inventory-head'><h3>물고기 보관함</h3><div class='fish-inventory-total'>보유 <b id='fishInventoryTotal'>0</b>마리</div></div><div class='fish-inventory-viewport' id='fishInventoryViewport' aria-label='보유 물고기 목록. 좌우로 밀어서 볼 수 있습니다.'><div class='fish-inventory-track' id='fishInventoryTrack'></div></div><div class='fish-swipe-help'>← 오른쪽에서 왼쪽으로 밀어 모든 물고기를 볼 수 있어요 →</div></div><div class='penguin-dock-wrap'><h3>나의 펭귄</h3><div class='igloo-dock' id='iglooDock'><div class='igloo-shell'><div class='igloo-lines'></div><div class='igloo-door'></div></div><button type='button' class='stored-penguin' id='storedPenguin' aria-label='아기 펭귄을 남극으로 보내기'><img src='assets/penguins/penguin-01-baby.png.PNG' alt='아기 펭귄'></button><div class='dock-help' id='dockHelp'>펭귄을 눌러 남극으로 보내거나 이글루로 데려올 수 있어요.</div></div></div><div class='home-box antarctic-details'><h3>성장 기록</h3><div class='stat'>먹인 물고기 <b id='fedCount'>0</b>마리<div class='growth-track'><div id='growthFill' class='growth-fill'></div></div><div class='growth' id='nextGrowthText'>다음 성장까지 물고기 5마리</div></div></div></section><section id='dictionaryScreen' class='screen'><h1 class='screen-title'>나의 문장 사전</h1><div id='dictionaryList'></div></section><section id='myScreen' class='screen'><h1 class='screen-title'>마이페이지</h1><div class='home-box'><h3>나의 성장</h3><div class='my-growth'><img id='myGrowthPenguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 펭귄'><div class='stat' id='growthStat'>1단계 · 아기 펭귄</div></div></div><div class='home-box'><h3>나의 이야기 보물</h3><div id='treasureList' class='empty-note'>아직 발견한 보물이 없어요.</div></div><div class='home-box'><h3>특별 펭귄</h3><div id='specialList' class='empty-note'>앞으로 만날 특별 펭귄을 기다려 주세요.</div></div></section><nav class='app-nav'><button class='nav-btn active' data-screen='homeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-01-baby.png.PNG' alt=''></span>홈</button><button class='nav-btn' data-screen='composeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-04-word-collector.png.PNG' alt=''></span>문장 구성</button><button class='nav-btn' data-screen='antarcticScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-06-sentence-explorer.png.PNG' alt=''></span>나의 남극</button><button class='nav-btn' data-screen='dictionaryScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-07-reader.png.PNG' alt=''></span>문장 사전</button><button class='nav-btn' data-screen='myScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-10-graduate.png.PNG' alt=''></span>마이</button></nav></main><div id='treasureModal' class='modal' aria-hidden='true'><div class='modal-card'><h2 id='modalTitle'></h2><div id='modalSource' class='source'></div><p id='modalSummary'></p><button class='close-modal' id='closeModal'>닫기</button></div></div><script>
+const steps=[
+{key:'time',q:'언제 일어난 일이에요?',help:'시간을 하나 골라 주세요.',items:['오늘 아침에','오늘 점심에','오늘 오후에','오늘 저녁에','어제','주말에','쉬는 시간에','수업 시간에','방과 후에','저녁을 먹고 나서'],examples:['학교에 가기 전에','학교에 도착한 뒤에','점심을 먹기 전에','점심을 먹고 나서','체육 시간에','하교할 때','집에 돌아온 뒤에','숙제를 하기 전에','잠자기 전에','지난 주말에','아침을 먹고 나서','등교하는 길에','1교시가 끝난 뒤에','점심시간에','청소 시간에','학원이 끝난 뒤에','저녁 식사 전에','샤워를 하고 나서','지난 금요일에','휴일 오후에']},
+{key:'place',q:'어디에서 있었어요?',help:'장소를 하나 골라 주세요.',items:['교실에서','학교 운동장에서','급식실에서','도서관에서','집에서','학원에서','편의점에서','공원에서','버스 안에서','놀이터에서'],examples:['학교 복도에서','보건실에서','음악실에서','체육관에서','학교 앞에서','마트에서','식당에서','지하철에서','친구 집에서','동네 길에서','미술실에서','과학실에서','학교 화장실에서','버스 정류장에서','카페에서','문구점에서','서점에서','병원에서','수영장에서','집 앞에서']},
+{key:'subject',q:'누가 했어요?',help:'사람을 한 명 또는 두 명 골라 주세요. 두 명을 고르면 선택한 순서대로 함께 문장을 만들어요.',items:['나는','친구는','선생님은','엄마는','아빠는','형은','누나는','동생은','반 친구는','우리 가족은'],examples:['짝꿍은','친한 친구는','우리 반 친구들은','담임 선생님은','체육 선생님은','할머니는','할아버지는','사촌은','가게 직원은','버스 기사님은','동생과 나는','친구와 나는','우리 반은','교장 선생님은','학원 선생님은','편의점 직원은','의사 선생님은','간호사 선생님은','친구의 엄마는','우리 형제는']},
+{key:'object',q:'무엇을 했어요?',help:'사물을 하나 골라 주세요.',items:['책을','숙제를','공을','휴대전화를','가방을','우산을','물을','간식을','사진을','선물을'],examples:['연필을','공책을','교과서를','급식판을','옷을','신발을','자전거를','음료수를','게임을','준비물을','과자를','빵을','우유를','아이스크림을','문구를','약을','버스 카드를','쓰레기를','친구의 물건을','도서관 책을']},
+{key:'predicate',q:'어떻게 했어요?',help:'행동을 하나 골라 주세요.',items:['읽었어요','했어요','던졌어요','사용했어요','챙겼어요','마셨어요','먹었어요','찍었어요','주었어요','찾았어요'],examples:['썼어요','열었어요','닫았어요','들었어요','옮겼어요','샀어요','빌렸어요','돌려주었어요','정리했어요','만들었어요','골랐어요','건넸어요','버렸어요','씻었어요','입었어요','신었어요','기다렸어요','도와주었어요','가져왔어요','꺼냈어요']},
+{key:'reason',q:'왜 그렇게 했어요?',help:'이유를 하나 골라 주세요.',items:['필요했기 때문에','재미있어서','궁금해서','배가 고파서','목이 말라서','친구를 도와주려고','잊어버리지 않으려고','선생님이 부탁하셔서','비가 왔기 때문에','기분이 좋아서'],examples:['수업에 필요해서','숙제를 끝내려고','약속을 지키기 위해서','친구가 부탁했기 때문에','엄마가 말씀하셔서','시간이 부족해서','날씨가 더워서','추웠기 때문에','준비물이 없어서','다음 날 사용하려고','배가 고파서','목이 말라서','친구에게 주려고','집에 가져가려고','잃어버려서','깨끗하게 하려고','늦지 않으려고','다쳐서','비가 올 것 같아서','필요한 물건이어서']}
+];
+const STORE_KEY='sentenceTokTokRewardV1';
+function normalizeState(raw){
+ const x=(raw&&typeof raw==='object')?raw:{};
+ return {
+  fish:Number.isFinite(Number(x.fish))?Math.max(0,Number(x.fish)):0,
+  fed:Number.isFinite(Number(x.fed))?Math.max(0,Number(x.fed)):0,
+  sentences:Array.isArray(x.sentences)?x.sentences.filter(v=>v&&typeof v.text==='string'):[],
+  treasures:Array.isArray(x.treasures)?x.treasures:[],
+  specialPenguins:Array.isArray(x.specialPenguins)?x.specialPenguins:[],
+  fishInventory:Array.isArray(x.fishInventory)?x.fishInventory.map(Number).filter(n=>n>=1&&n<=10):[],
+  penguinInHabitat:x.penguinInHabitat!==false
+ }
+}
+let state=(()=>{try{return normalizeState(JSON.parse(localStorage.getItem(STORE_KEY)||'{}'))}catch(e){return normalizeState({})}})();
+const treasureDB=[
+{id:'treasure-01',name:'박 속 금은보화',story:'흥부와 놀부',type:'한국 전래동화',summary:['착한 흥부는 다친 제비를 정성껏 치료해 주었어요.','제비가 가져온 박씨에서 큰 박이 자라고, 박 속에서 보물이 나왔어요.','욕심을 부린 놀부는 흥부의 행동을 따라 했지만 다른 결과를 맞았어요.']},
+{id:'treasure-02',name:'동아줄',story:'해와 달이 된 오누이',type:'한국 전래동화',summary:['호랑이를 피해 오누이는 높은 나무 위로 올라갔어요.','오누이는 하늘에 살려 달라고 빌었고 튼튼한 동아줄이 내려왔어요.','오누이는 하늘로 올라가 해와 달이 되었다고 전해져요.']},
+{id:'treasure-03',name:'팥죽 그릇',story:'팥죽 할멈과 호랑이',type:'한국 전래동화',summary:['호랑이가 팥죽 할멈을 잡아먹으러 오겠다고 했어요.','할멈에게 팥죽을 얻어먹은 여러 친구들이 힘을 합쳐 호랑이에 맞섰어요.','작은 존재들도 서로 도우면 큰 어려움을 이겨 낼 수 있었어요.']},
+{id:'treasure-04',name:'금도끼',story:'금도끼 은도끼',type:'한국 전래동화',summary:['나무꾼이 연못에 쇠도끼를 빠뜨리고 슬퍼했어요.','산신령이 금도끼와 은도끼를 보여 주었지만 나무꾼은 자기 쇠도끼만 골랐어요.','산신령은 정직한 나무꾼에게 세 도끼를 모두 주었어요.']},
+{id:'treasure-05',name:'날개옷',story:'선녀와 나무꾼',type:'한국 전래동화',summary:['나무꾼은 연못에서 목욕하던 선녀의 날개옷을 숨겼어요.','날개옷이 없어진 선녀는 하늘로 돌아가지 못하고 땅에 머물렀어요.','나중에 선녀는 날개옷을 되찾아 아이들과 하늘로 올라갔어요.']},
+{id:'treasure-06',name:'도깨비 방망이',story:'혹부리 영감',type:'한국 전래동화',summary:['착한 혹부리 영감은 도깨비들 앞에서 노래를 불렀어요.','도깨비들은 노래가 혹에서 나온다고 생각하고 보물을 주고 혹을 떼어 갔어요.','욕심 많은 영감은 그대로 따라 했다가 오히려 혹이 하나 더 생겼어요.']},
+{id:'treasure-07',name:'토끼의 간',story:'토끼와 자라',type:'한국 전래동화',summary:['자라는 용왕의 병을 고치려고 토끼의 간을 구하러 육지로 갔어요.','토끼는 용궁에 도착한 뒤 간을 육지에 두고 왔다고 재치 있게 말했어요.','토끼는 위기를 벗어나 다시 육지로 돌아왔어요.']},
+{id:'treasure-08',name:'빨간 부채',story:'요술 부채',type:'한국 전래동화',summary:['신기한 부채는 부치면 코가 길어지거나 다시 짧아지는 힘이 있었어요.','주인공은 부채의 힘을 이용하면서 뜻밖의 일을 겪었어요.','신기한 물건도 욕심내어 사용하면 어려움이 생길 수 있어요.']},
+{id:'treasure-09',name:'은혜 갚은 구슬',story:'은혜 갚은 까치',type:'한국 전래동화',summary:['한 사람이 위험에 처한 까치를 구해 주었어요.','나중에 그 사람이 위험해지자 까치가 자신을 희생하며 은혜를 갚았어요.','이야기는 받은 도움을 기억하고 갚는 마음을 전해요.']},
+{id:'treasure-10',name:'장화 한 짝',story:'콩쥐팥쥐',type:'한국 전래동화',summary:['콩쥐는 힘든 일을 맡았지만 여러 존재의 도움으로 일을 해냈어요.','잔치에 간 콩쥐는 돌아오는 길에 신발 한 짝을 잃어버렸어요.','신발을 계기로 콩쥐를 찾게 되면서 삶에 새로운 변화가 생겼어요.']},
+{id:'treasure-11',name:'마법콩',story:'잭과 콩나무',type:'세계명작',summary:['잭은 소와 바꾼 신기한 콩을 땅에 심었어요.','콩나무는 하늘까지 자랐고 잭은 그 위 거인의 성을 발견했어요.','잭은 위험을 겪은 뒤 거인에게서 벗어나 집으로 돌아왔어요.']},
+{id:'treasure-12',name:'과자집',story:'헨젤과 그레텔',type:'세계명작',summary:['헨젤과 그레텔은 숲에서 길을 잃고 과자로 만든 집을 발견했어요.','그 집에는 아이들을 잡으려는 마녀가 살고 있었어요.','두 아이는 지혜와 용기로 마녀에게서 벗어나 집으로 돌아갔어요.']},
+{id:'treasure-13',name:'빨간 벽돌',story:'아기 돼지 삼형제',type:'세계명작',summary:['아기 돼지 삼형제는 각각 다른 재료로 집을 지었어요.','늑대는 짚집과 나무집을 무너뜨렸지만 벽돌집은 무너지지 않았어요.','튼튼하게 준비한 막내 돼지의 집에서 형제들은 안전할 수 있었어요.']},
+{id:'treasure-14',name:'유리 구두',story:'신데렐라',type:'세계명작',summary:['신데렐라는 요정의 도움으로 멋진 모습이 되어 무도회에 갔어요.','자정이 되어 급히 돌아오다가 유리 구두 한 짝을 남겼어요.','왕자는 구두의 주인을 찾아 신데렐라와 다시 만났어요.']},
+{id:'treasure-15',name:'빨간 모자',story:'빨간 모자',type:'세계명작',summary:['빨간 모자는 아픈 할머니에게 음식을 가져다주러 숲길을 걸었어요.','늑대는 빨간 모자보다 먼저 할머니 집에 도착해 위험한 일을 꾸몄어요.','빨간 모자는 낯선 이의 말을 쉽게 믿으면 위험할 수 있다는 일을 겪었어요.']},
+{id:'treasure-16',name:'황금알',story:'황금알을 낳는 거위',type:'이솝우화',summary:['한 농부의 거위는 날마다 황금알 하나를 낳았어요.','농부는 한꺼번에 더 많은 금을 얻고 싶어 욕심을 부렸어요.','지나친 욕심 때문에 농부는 매일 얻던 황금알까지 잃었어요.']},
+{id:'treasure-17',name:'포도송이',story:'여우와 포도',type:'이솝우화',summary:['여우는 높은 곳에 달린 포도를 먹으려고 여러 번 뛰었어요.','아무리 해도 포도에 닿지 않자 여우는 포기했어요.','여우는 포도가 시어서 먹지 않는 것이라고 말하며 돌아갔어요.']},
+{id:'treasure-18',name:'치즈 조각',story:'여우와 까마귀',type:'이솝우화',summary:['까마귀는 치즈를 물고 나뭇가지에 앉아 있었어요.','여우는 까마귀의 목소리가 아름다울 것이라며 노래를 부탁했어요.','까마귀가 입을 여는 순간 치즈가 떨어져 여우가 가져갔어요.']},
+{id:'treasure-19',name:'토끼의 운동화',story:'토끼와 거북이',type:'이솝우화',summary:['빠른 토끼와 느린 거북이가 달리기 경주를 시작했어요.','토끼는 자신만만해서 중간에 잠이 들었지만 거북이는 계속 걸었어요.','꾸준히 간 거북이가 먼저 결승선에 도착했어요.']},
+{id:'treasure-20',name:'개미의 곡식',story:'개미와 베짱이',type:'이솝우화',summary:['개미는 여름 동안 겨울에 먹을 곡식을 부지런히 모았어요.','베짱이는 노래하며 지내다가 겨울이 오자 먹을 것이 부족해졌어요.','앞날을 생각하고 미리 준비하는 태도의 중요성을 보여 주는 이야기예요.']},
+{id:'treasure-21',name:'양치기 지팡이',story:'양치기 소년',type:'이솝우화',summary:['양치기 소년은 심심해서 늑대가 나타났다고 여러 번 거짓말했어요.','사람들은 소년의 거짓말에 속아 계속 달려왔어요.','정말 늑대가 나타났을 때에는 아무도 소년의 말을 믿지 않았어요.']},
+{id:'treasure-22',name:'사자의 가시',story:'사자와 생쥐',type:'이솝우화',summary:['사자는 작은 생쥐를 잡았다가 살려 주었어요.','나중에 사자가 그물에 걸리자 생쥐가 이로 그물을 갉아 주었어요.','작은 친구도 큰 도움을 줄 수 있다는 것을 보여 주었어요.']},
+{id:'treasure-23',name:'성냥',story:'성냥팔이 소녀',type:'세계명작',summary:['추운 겨울밤 소녀는 거리에서 성냥을 팔고 있었어요.','소녀가 성냥을 켤 때마다 따뜻하고 행복한 모습이 눈앞에 나타났어요.','이야기는 외롭고 어려운 사람을 돌아보게 해요.']},
+{id:'treasure-24',name:'장미',story:'미녀와 야수',type:'세계명작',summary:['아버지의 일로 미녀는 야수가 사는 성에서 지내게 되었어요.','미녀는 겉모습과 달리 야수에게 따뜻한 마음이 있다는 것을 알게 되었어요.','진심 어린 사랑으로 야수에게 걸린 마법이 풀렸어요.']},
+{id:'treasure-25',name:'피노키오의 코',story:'피노키오',type:'세계명작',summary:['나무 인형 피노키오는 진짜 아이가 되고 싶어 했어요.','거짓말을 하면 코가 길어지는 일을 겪으며 여러 실수를 했어요.','피노키오는 책임과 정직을 배우며 성장했어요.']},
+{id:'treasure-26',name:'마법 램프',story:'알라딘과 요술 램프',type:'세계명작',summary:['알라딘은 신비한 램프를 손에 넣었어요.','램프를 문지르자 소원을 들어주는 거인이 나타났어요.','알라딘은 여러 위험을 겪으며 소중한 것을 지키려고 노력했어요.']},
+{id:'treasure-27',name:'인어의 조개',story:'인어공주',type:'세계명작',summary:['바다에 사는 인어공주는 인간 세상과 왕자를 동경했어요.','인어공주는 인간이 되기 위해 자신의 목소리를 내주는 선택을 했어요.','사랑과 선택에는 기쁨뿐 아니라 책임과 아픔도 따른다는 이야기예요.']},
+{id:'treasure-28',name:'백설공주의 사과',story:'백설공주',type:'세계명작',summary:['백설공주는 숲에서 일곱 난쟁이와 함께 살게 되었어요.','왕비는 변장한 채 찾아와 백설공주에게 독이 든 사과를 건넸어요.','백설공주는 큰 위험을 겪지만 마침내 다시 깨어났어요.']},
+{id:'treasure-29',name:'브레멘 당나귀',story:'브레멘 음악대',type:'세계명작',summary:['늙은 당나귀는 음악대가 되기 위해 브레멘으로 길을 떠났어요.','길에서 개와 고양이와 수탉을 만나 함께 여행했어요.','네 동물은 힘을 합쳐 도둑들을 물리치고 새로운 보금자리를 찾았어요.']},
+{id:'treasure-30',name:'임금님의 왕관',story:'벌거벗은 임금님',type:'세계명작',summary:['새 옷을 좋아하는 임금님에게 두 사기꾼이 특별한 옷을 만들겠다고 했어요.','사람들은 보이지 않는 옷을 보고도 어리석어 보일까 봐 멋지다고 말했어요.','한 아이가 임금님이 아무것도 입지 않았다고 말하며 진실을 드러냈어요.']}
+];
+const treasurePool=treasureDB.map(x=>x.name);
+const specialPool=['special-penguin-01','special-penguin-02','special-penguin-03','special-penguin-04','special-penguin-05','special-penguin-06'];
+function saveState(){localStorage.setItem(STORE_KEY,JSON.stringify(state));updateUI()}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function growthLevel(){return Math.min(10,1+Math.floor(state.fed/5))}
+function antarcticTime(){
+ const h=new Date().getHours();
+ if(h>=5&&h<10)return {cls:'morning',label:'아침'};
+ if(h>=10&&h<17)return {cls:'day',label:'낮'};
+ if(h>=17&&h<20)return {cls:'evening',label:'저녁'};
+ return {cls:'night',label:'밤'};
+}
+const growthNames=['아기 펭귄','첫걸음 펭귄','호기심 펭귄','단어 수집가','생각 탐험가','넓게 보는 펭귄','문장 연결가','이야기 탐험가','표현 전문가','사각모 펭귄'];
+const growthPenguinFiles=['penguin-01-baby.png.PNG','penguin-02-little.png.PNG','penguin-03-curious.png.PNG','penguin-04-word-collector.png.PNG','penguin-05-thought-explorer.png.PNG','penguin-06-sentence-explorer.png.PNG','penguin-07-reader.png.PNG','penguin-08-expression-researcher.png.PNG','penguin-09-sentence-researcher.png.PNG','penguin-10-graduate.png.PNG'];
+const fishFiles=Array.from({length:10},(_,i)=>'fish-'+String(i+1).padStart(2,'0')+'.png');
+function ensureFishInventory(){
+ if(!Array.isArray(state.fishInventory))state.fishInventory=[];
+ state.fishInventory=state.fishInventory.map(Number).filter(n=>n>=1&&n<=10);
+ const missing=Math.max(0,(Number(state.fish)||0)-state.fishInventory.length);
+ for(let i=0;i<missing;i++)state.fishInventory.push(1);
+ state.fish=state.fishInventory.length;
+}
+function drawFishGrade(){
+ const r=Math.random();
+ if(r<.40)return 1;if(r<.62)return 2;if(r<.76)return 3;if(r<.85)return 4;if(r<.91)return 5;
+ if(r<.95)return 6;if(r<.975)return 7;if(r<.99)return 8;if(r<.997)return 9;return 10;
+}
+function addFishReward(){ensureFishInventory();const grade=drawFishGrade();state.fishInventory.push(grade);state.fish=state.fishInventory.length;return grade}
+function renderFishInventory(){
+ ensureFishInventory();
+ const total=document.getElementById('fishInventoryTotal'),track=document.getElementById('fishInventoryTrack');
+ if(total)total.textContent=state.fishInventory.length;if(!track)return;
+ const counts=Array(10).fill(0);state.fishInventory.forEach(g=>counts[g-1]++);
+ const owned=counts.map((qty,i)=>({grade:i+1,qty})).filter(x=>x.qty>0);
+ if(!owned.length){track.innerHTML='<div class="fish-empty">아직 보관한 물고기가 없어요.<br>새 문장을 완성하면 물고기를 받을 수 있어요.</div>';return}
+ track.innerHTML=owned.map(x=>`<div class="fish-card"><span class="fish-qty">×${x.qty}</span><img src="assets/fish/${fishFiles[x.grade-1]}" alt="${x.grade}등급 물고기" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="fish-fallback" style="display:none">🐟</span><div class="fish-grade">${x.grade}등급</div></div>`).join('');
+}
+function bindFishInventoryDrag(){
+ const el=document.getElementById('fishInventoryViewport');if(!el||el.dataset.dragBound)return;el.dataset.dragBound='1';
+ let down=false,startX=0,startScroll=0,moved=false;
+ el.addEventListener('pointerdown',e=>{down=true;moved=false;startX=e.clientX;startScroll=el.scrollLeft;el.classList.add('dragging');try{el.setPointerCapture(e.pointerId)}catch(_){}});
+ el.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-startX;if(Math.abs(dx)>4)moved=true;el.scrollLeft=startScroll-dx});
+ const end=e=>{down=false;el.classList.remove('dragging');try{el.releasePointerCapture(e.pointerId)}catch(_){}};
+ el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('pointerleave',e=>{if(down&&e.buttons===0)end(e)});
+ el.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation()}},true);
+}
+function updateAntarctic(){
+ ensureFishInventory();renderFishInventory();bindFishInventoryDrag();
+ const lv=growthLevel(),tm=antarcticTime(),world=document.getElementById('antarcticWorld');
+ if(!world)return;
+ world.className='antarctic-world '+tm.cls;
+ const itemEl=document.getElementById('antarcticItems');if(itemEl)itemEl.textContent=(state.treasures.length+state.specialPenguins.length);const myp=document.getElementById('myGrowthPenguin');if(myp){myp.src='assets/penguins/'+growthPenguinFiles[lv-1];myp.alt=(growthNames[lv-1]||'나의 펭귄')}const gp=document.getElementById('growthPenguin');if(gp){gp.src='assets/penguins/'+growthPenguinFiles[lv-1];gp.alt=lv+'단계 '+(growthNames[lv-1]||'성장 펭귄')}
+ const inLevel=state.fed%5,fill=lv>=10?100:inLevel/5*100;document.getElementById('growthFill').style.width=fill+'%';
+ document.getElementById('nextGrowthText').textContent=lv>=10?'최고 성장 단계에 도착했어요!':'다음 성장까지 물고기 '+(5-inLevel)+'마리';
+ const feed=document.getElementById('feedBtn');feed.disabled=state.fish<1;const stage=document.getElementById('penguinStage'),stored=document.getElementById('storedPenguin');if(stage)stage.style.display=state.penguinInHabitat?'block':'none';if(stored)stored.style.display=state.penguinInHabitat?'none':'grid';
+}
+function currentDisplayName(){try{const keys=['sentenceTokTokUser','userProfile','profile','currentUser'];for(const k of keys){const v=JSON.parse(localStorage.getItem(k)||'null');if(v&&typeof v==='object'){const n=v.name||v.nickname||v.username||v.userId||v.id;if(n)return String(n).trim()}}const direct=localStorage.getItem('userName')||localStorage.getItem('username')||localStorage.getItem('userId');if(direct)return String(direct).trim()}catch(e){}return ''}
+function updateVillageTitle(){const el=document.getElementById('penguinVillageTitle');if(!el)return;const n=currentDisplayName();el.textContent=n?n+'의 펭귄 마을':'나의 펭귄 마을'}
+function updateUI(){updateVillageTitle();const fishEl=document.getElementById('fishCount'),sentenceEl=document.getElementById('sentenceCount'),treasureEl=document.getElementById('treasureCount');if(fishEl)fishEl.textContent=state.fish;if(sentenceEl)sentenceEl.textContent=state.sentences.length;if(treasureEl)treasureEl.textContent=state.treasures.length;const hp=document.getElementById('homeGrowthPenguin');if(hp){const hl=growthLevel();hp.src='assets/penguins/'+growthPenguinFiles[hl-1];hp.alt=(growthNames[hl-1]||'성장 펭귄');}document.getElementById('antarcticFish').textContent=state.fish;document.getElementById('fedCount').textContent=state.fed;document.getElementById('growthStat').textContent=growthLevel()+'단계 · '+(growthNames[growthLevel()-1]||'성장 중인 펭귄');updateAntarctic();let d=document.getElementById('dictionaryList');d.innerHTML=state.sentences.length?state.sentences.slice().reverse().map((x,i)=>`<div class="dict-item"><b>${state.sentences.length-i}번째 문장</b><br>${escapeHtml(x.text)}</div>`).join(''):`<div class="card empty-note">아직 저장한 문장이 없어요.<br>새 문장을 만들어 보세요.</div>`;let t=document.getElementById('treasureList');t.className=state.treasures.length?'':'empty-note';t.innerHTML=state.treasures.length?state.treasures.map(x=>`<button class="treasure-btn" data-treasure="${escapeHtml(x)}">🎁 ${escapeHtml(x)}<br><small>이야기 보기 ›</small></button>`).join(''):'아직 발견한 보물이 없어요.';let sp=document.getElementById('specialList');sp.className=state.specialPenguins.length?'':'empty-note';sp.innerHTML=state.specialPenguins.length?state.specialPenguins.map(x=>`<div class="dict-item">🐧 특별 펭귄 ${escapeHtml(x.split('-').pop())}</div>`).join('') :'앞으로 만날 특별 펭귄을 기다려 주세요.';document.querySelectorAll('.treasure-btn').forEach(b=>b.onclick=()=>openTreasure(b.dataset.treasure))}
+
+function openTreasure(name){let x=treasureDB.find(t=>t.name===name);if(!x)return;document.getElementById('modalTitle').textContent=x.name;document.getElementById('modalSource').textContent=x.type+' · 「'+x.story+'」';document.getElementById('modalSummary').innerHTML=x.summary.map(s=>escapeHtml(s)).join('<br>');let m=document.getElementById('treasureModal');m.classList.add('open');m.setAttribute('aria-hidden','false')}
+function closeTreasure(){let m=document.getElementById('treasureModal');m.classList.remove('open');m.setAttribute('aria-hidden','true')}
+function normalizeMeaningText(text){
+ return String(text||'').toLowerCase().replace(/[\s.,!?'"“”‘’]/g,'').replace(/(은|는|이|가|을|를|에서|에)$/,'');
+}
+function grantCompletionReward(text,kind='sentence'){
+ const normalized=normalizeMeaningText(text);
+ const existing=state.sentences.find(x=>normalizeMeaningText(x.text)===normalized);
+ if(existing)return {duplicate:true,fish:0,reward:null,rewardType:null};
+ state.sentences.push({text,kind,at:new Date().toISOString()});state.fish+=1;
+ let reward=null,rewardType=null,roll=Math.random();
+ if(roll<.18){let locked=treasurePool.filter(x=>!state.treasures.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='treasure';state.treasures.push(reward)}}
+ else if(roll<.23){let locked=specialPool.filter(x=>!state.specialPenguins.includes(x));if(locked.length){reward=locked[Math.floor(Math.random()*locked.length)];rewardType='penguin';state.specialPenguins.push(reward)}}
+ saveState();return {duplicate:false,fish:1,reward,rewardType}
+}
+function rewardSentence(sentence){return grantCompletionReward(sentence,'sentence')}
+function rewardSummary(r){
+ if(!r)return '';
+ if(r.duplicate)return '이 글은 이미 저장되어 있어요. 같은 글에는 보상을 다시 주지 않아요.';
+ let s='🐟 '+(r.fishGrade?r.fishGrade+'등급 ':'')+'물고기 1마리를 받았어요!';
+ if(r.rewardType==='treasure')s+='<br>🎁 이야기 보물을 발견했어요: '+escapeHtml(r.reward);
+ if(r.rewardType==='penguin')s+='<br>🐧 특별 펭귄을 만났어요!';
+ return s
+}
+let idx=0, ans={}, expanded={};const card=document.querySelector('#card'),bar=document.querySelector('#bar'),stepText=document.querySelector('#stepText');
+const placeTimeRules=[
+ {test:/교실|학교 복도|과학실|미술실|음악실|체육관/,times:['수업 시간에','쉬는 시간에','오늘 아침에','오늘 오후에','학교에 도착한 뒤에','1교시가 끝난 뒤에','청소 시간에']},
+ {test:/급식실/,times:['오늘 점심에','점심을 먹기 전에','점심시간에']},
+ {test:/학교 운동장|놀이터/,times:['쉬는 시간에','체육 시간에','오늘 오후에','방과 후에','하교할 때']},
+ {test:/학원/,times:['방과 후에','학원이 끝난 뒤에','오늘 오후에','오늘 저녁에']},
+ {test:/편의점|마트|문구점|서점/,times:['방과 후에','하교할 때','집에 돌아온 뒤에','오늘 오후에','오늘 저녁에','주말에']},
+ {test:/도서관/,times:['쉬는 시간에','방과 후에','오늘 오후에','주말에']},
+ {test:/집|친구 집/,times:['오늘 아침에','오늘 저녁에','집에 돌아온 뒤에','숙제를 하기 전에','잠자기 전에','주말에']},
+ {test:/버스|지하철|버스 정류장/,times:['등교하는 길에','하교할 때','방과 후에','오늘 아침에','오늘 오후에']},
+ {test:/식당|카페/,times:['오늘 점심에','오늘 오후에','오늘 저녁에','주말에']},
+ {test:/병원|보건실/,times:['수업 시간에','쉬는 시간에','오늘 아침에','오늘 오후에']},
+ {test:/공원|수영장|동네 길|집 앞/,times:['오늘 오후에','방과 후에','주말에','휴일 오후에']}
+];
+function timePlaceCheck(){
+ if(!ans.time||!ans.place)return null;
+ const rule=placeTimeRules.find(r=>r.test.test(ans.place));
+ if(!rule||rule.times.includes(ans.time))return null;
+ return rule.times;
+}
+const subjectObjectRules=[
+ {test:/선생님/,objects:['책을','교과서를','준비물을','공책을','친구의 물건을']},
+ {test:/가게 직원|편의점 직원/,objects:['간식을','과자를','빵을','우유를','음료수를','문구를']},
+ {test:/버스 기사/,objects:['버스 카드를','가방을']},
+ {test:/의사|간호사/,objects:['약을','물을']},
+ {test:/엄마|아빠|할머니|할아버지|친구의 엄마/,objects:['간식을','선물을','가방을','우산을','옷을','약을']},
+ {test:/친구|짝꿍|사촌|형|누나|동생|형제/,objects:['공을','책을','간식을','사진을','게임을','친구의 물건을']},
+ {test:/나|나는/,objects:['숙제를','책을','간식을','물을','가방을','우산을','공을','사진을','준비물을']}
+];
+const placeObjectRules=[
+ {test:/편의점|마트/,objects:['간식을','과자를','빵을','우유를','음료수를','아이스크림을','우산을','문구를']},
+ {test:/도서관|서점/,objects:['책을','도서관 책을','교과서를','공책을']},
+ {test:/교실|수업|과학실|미술실|음악실/,objects:['책을','숙제를','연필을','공책을','교과서를','준비물을']},
+ {test:/학교 운동장|놀이터|체육관/,objects:['공을','물을','신발을','사진을']},
+ {test:/급식실/,objects:['급식판을','물을','우유를']},
+ {test:/집|친구 집/,objects:['숙제를','책을','휴대전화를','가방을','간식을','게임을','옷을']},
+ {test:/학원/,objects:['책을','숙제를','연필을','공책을','교과서를','준비물을']},
+ {test:/공원|동네 길|집 앞/,objects:['자전거를','공을','물을','사진을','우산을']},
+ {test:/버스|지하철|버스 정류장/,objects:['버스 카드를','휴대전화를','가방을','우산을']},
+ {test:/식당|카페/,objects:['물을','음료수를','간식을','빵을']},
+ {test:/문구점/,objects:['연필을','공책을','문구를','준비물을']},
+ {test:/병원|보건실/,objects:['약을','물을']},
+ {test:/수영장/,objects:['물을','가방을','옷을','신발을']},
+ {test:/학교 복도|학교 앞/,objects:['가방을','우산을','준비물을','친구의 물건을']}
+];
+const objectActionRules=[
+ {test:/책|교과서|도서관 책/,actions:['읽었어요','빌렸어요','돌려주었어요','가져왔어요','찾았어요']},
+ {test:/숙제/,actions:['했어요','가져왔어요','정리했어요']},
+ {test:/공/,actions:['던졌어요','찾았어요','가져왔어요','옮겼어요']},
+ {test:/휴대전화/,actions:['사용했어요','찾았어요','가져왔어요','꺼냈어요']},
+ {test:/가방|준비물/,actions:['챙겼어요','찾았어요','가져왔어요','옮겼어요','정리했어요']},
+ {test:/우산/,actions:['챙겼어요','사용했어요','찾았어요','가져왔어요']},
+ {test:/물|음료수|우유/,actions:['마셨어요','샀어요','가져왔어요','골랐어요']},
+ {test:/간식|과자|빵|아이스크림/,actions:['먹었어요','샀어요','골랐어요','가져왔어요','주었어요']},
+ {test:/사진/,actions:['찍었어요','골랐어요']},
+ {test:/선물/,actions:['주었어요','샀어요','골랐어요','가져왔어요']},
+ {test:/연필|공책/,actions:['썼어요','샀어요','빌렸어요','가져왔어요','정리했어요']},
+ {test:/급식판/,actions:['들었어요','옮겼어요','정리했어요']},
+ {test:/옷/,actions:['입었어요','샀어요','골랐어요','정리했어요']},
+ {test:/신발/,actions:['신었어요','샀어요','골랐어요','정리했어요']},
+ {test:/자전거/,actions:['옮겼어요','가져왔어요','찾았어요']},
+ {test:/게임/,actions:['했어요','골랐어요']},
+ {test:/문구/,actions:['샀어요','골랐어요','가져왔어요']},
+ {test:/약/,actions:['먹었어요','샀어요','가져왔어요']},
+ {test:/버스 카드/,actions:['사용했어요','찾았어요','가져왔어요']},
+ {test:/쓰레기/,actions:['버렸어요','옮겼어요']},
+ {test:/친구의 물건/,actions:['돌려주었어요','가져왔어요','찾았어요','건넸어요']}
+];
+const actionReasonRules=[
+ {test:/먹었어요/,reasons:['배가 고파서','필요했기 때문에','기분이 좋아서']},
+ {test:/마셨어요/,reasons:['목이 말라서','날씨가 더워서','필요했기 때문에']},
+ {test:/샀어요/,reasons:['배가 고파서','목이 말라서','필요했기 때문에','친구에게 주려고','집에 가져가려고']},
+ {test:/읽었어요|빌렸어요/,reasons:['궁금해서','수업에 필요해서','숙제를 끝내려고']},
+ {test:/챙겼어요|가져왔어요/,reasons:['잊어버리지 않으려고','수업에 필요해서','다음 날 사용하려고','비가 올 것 같아서']},
+ {test:/주었어요|건넸어요|돌려주었어요/,reasons:['친구를 도와주려고','친구에게 주려고','약속을 지키기 위해서','친구가 부탁했기 때문에']},
+ {test:/정리했어요|버렸어요/,reasons:['선생님이 부탁하셔서','필요했기 때문에']},
+ {test:/찾았어요/,reasons:['필요했기 때문에','잃어버려서','수업에 필요해서']},
+ {test:/찍었어요/,reasons:['잊어버리지 않으려고','기분이 좋아서']}
+];
+function contextItems(s){
+ const all=[...s.items,...s.examples];
+ if(s.key==='object'){
+  const placeRule=ans.place&&placeObjectRules.find(r=>r.test.test(ans.place));
+  const subjectRule=ans.subject&&subjectObjectRules.find(r=>r.test.test(ans.subject));
+  let preferred=[];
+  if(placeRule&&subjectRule){
+   const overlap=placeRule.objects.filter(x=>subjectRule.objects.includes(x));
+   preferred=[...overlap,...placeRule.objects.filter(x=>!overlap.includes(x)),...subjectRule.objects.filter(x=>!overlap.includes(x))];
+  }else if(placeRule)preferred=placeRule.objects;
+  else if(subjectRule)preferred=subjectRule.objects;
+  preferred=[...new Set(preferred)].filter(x=>all.includes(x));
+  if(preferred.length)return {main:preferred.slice(0,10),extra:all.filter(x=>!preferred.includes(x)),matched:true,restricted:false}
+ }
+ if(s.key==='predicate'&&ans.object){
+  const rule=objectActionRules.find(r=>r.test.test(stripParticle(ans.object)));
+  if(rule){const valid=rule.actions.filter(x=>all.includes(x));return {main:valid,extra:all.filter(x=>!valid.includes(x)),matched:true,restricted:true}}
+ }
+ if(s.key==='reason'&&ans.predicate){
+  const rule=actionReasonRules.find(r=>r.test.test(ans.predicate));
+  if(rule){const first=rule.reasons.filter(x=>all.includes(x));return {main:first,extra:all.filter(x=>!first.includes(x)),matched:true,restricted:false}}
+ }
+ return {main:s.items,extra:s.examples,matched:false,restricted:false}
+}
+
+function startCompose(){idx=0;ans={};expanded={};storyDraft=[];showScreen('composeScreen');render()}
+function skipCurrentStep(){const s=steps[idx];if(!s||s.key==='predicate')return;delete ans[s.key];if(idx<steps.length-1){idx++;render()}else finish()}
+let finishing=false;
+function nextCurrentStep(){
+ const s=steps[idx];if(!s||!ans[s.key]||finishing)return;
+ if(idx<steps.length-1){idx++;render();return}
+ finishing=true;
+ try{finish()}catch(err){
+   console.error('sentence finish failed',err);
+   let sentence='';try{sentence=buildSentence()}catch(e){sentence=Object.values(ans).filter(Boolean).join(' ')}
+   showSafeFinishedSentence(sentence)
+ }finally{finishing=false}
+}
+const commonSpellingCorrections={
+ '버수':'버스','뻐스':'버스','학교애':'학교에','학교예':'학교에','집애':'집에','친구랑가':'친구랑','선생임':'선생님','선생닝':'선생님',
+ '우유룰':'우유를','물을를':'물을','책을를':'책을','먹엇어요':'먹었어요','먹었어여':'먹었어요','마셧어요':'마셨어요','마셨서요':'마셨어요',
+ '갔서요':'갔어요','갓어요':'갔어요','했서요':'했어요','햇어요':'했어요','읽엇어요':'읽었어요','읽었서요':'읽었어요','샀서요':'샀어요',
+ '던젔어요':'던졌어요','던졋어요':'던졌어요','도와줫어요':'도와줬어요','재밋어서':'재미있어서','궁굼해서':'궁금해서','필요헤서':'필요해서',
+ '화가나서':'화가 나서','배가고파서':'배가 고파서','목이말라서':'목이 말라서'
+};
+function spellingSuggestion(value){
+ const raw=String(value||'').trim();if(!raw)return null;
+ if(commonSpellingCorrections[raw])return commonSpellingCorrections[raw];
+ // 문장/구 안에서도 자주 나타나는 명확한 오류만 제안한다. 이름·새 단어는 임의 교정하지 않는다.
+ for(const [wrong,right] of Object.entries(commonSpellingCorrections)){
+  if(raw.includes(wrong)){const fixed=raw.replace(wrong,right);if(fixed!==raw)return fixed}
+ }
+ return null
+}
+function confirmSpelling(input,value,onAccepted){
+ const suggested=spellingSuggestion(value),old=document.getElementById('spellCheckBox');if(old)old.remove();
+ if(!suggested||suggested===value){onAccepted(value);return}
+ const box=document.createElement('div');box.id='spellCheckBox';box.className='spell-check';
+ box.innerHTML=`혹시 <b>“${escapeHtml(suggested)}”</b>를 쓰려고 했나요?<div class="spell-actions"><button type="button" class="spell-fix">고쳐 쓰기</button><button type="button" class="spell-keep">그대로 쓰기</button></div>`;
+ input.closest('.custom').appendChild(box);
+ box.querySelector('.spell-fix').onclick=()=>{input.value=suggested;onAccepted(suggested)};
+ box.querySelector('.spell-keep').onclick=()=>onAccepted(value);
+}
+function render(){
+ let s=steps[idx],ci=contextItems(s),showExamples=!!expanded['examples_'+s.key];
+ stepText.textContent=`${idx+1} / ${steps.length}`;bar.style.width=`${idx/steps.length*100}%`;
+ const selected=ans[s.key]||'';
+ const subjectSelections=s.key==='subject'?(Array.isArray(ans.subject)?ans.subject:(ans.subject?[ans.subject]:[])):[];
+ card.innerHTML=`<h1>${s.q}</h1>
+ <p class='help'>${s.help}</p>
+ <div class='custom'>
+   <label for='custom'>✏️ 내가 직접 쓰기</label>
+   <div class='recall-guide'>먼저 기억나는 내용을 직접 써 보세요. 잘 생각나지 않을 때만 아래의 보기를 확인해도 괜찮아요.</div>
+   <div class='custom-row'><input id='custom' value="${escapeHtml(Array.isArray(selected)?selected.join(' + '):selected)}" placeholder='여기에 직접 써 보세요' autocomplete='off'><button type='button' class='btn add' id='add'>입력하기</button></div>
+ </div>
+ <div style='margin-top:12px'><button type='button' class='btn reveal-examples' id='revealExamples'>${showExamples?'보기 숨기기':'👀 보기 확인하기'}</button></div>
+ <div class='examples-panel' id='examplesPanel' ${showExamples?'':'hidden'}>
+   <p class='help' style='margin:0 0 10px'>${ci.matched?(ci.restricted?'앞에서 고른 내용과 자연스럽게 연결되는 보기를 먼저 보여드려요.':'앞에서 고른 내용과 잘 어울리는 보기를 먼저 보여드려요.'):'필요한 보기를 골라도 돼요.'}</p>
+   <div class='choices'>${ci.main.map(x=>`<button type='button' class='choice ${s.key==='subject'?(subjectSelections.includes(x)?'selected':''):(ans[s.key]===x?'selected':'')}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>
+   ${ci.extra.length?`<div class='more-wrap'><button type='button' class='btn more' id='more'>${expanded[s.key]?'− 다른 보기 접기':'+ 다른 보기 더 보기'}</button>${expanded[s.key]?`<div class='choices extra'>${ci.extra.map(x=>`<button type='button' class='choice ${s.key==='subject'?(subjectSelections.includes(x)?'selected':''):(ans[s.key]===x?'selected':'')}' data-v='${escapeHtml(x)}'>${escapeHtml(x)}</button>`).join('')}</div>`:''}</div>`:''}
+ </div>
+ <div class='actions' style='margin-top:18px'><button type='button' class='btn' id='skip' ${s.key==='predicate'?'disabled':''}>${s.key==='predicate'?'행동은 꼭 써 주세요':'건너뛰기'}</button><button type='button' class='btn next' id='next' ${ans[s.key]?'':'disabled'}>${idx===steps.length-1?'문장 만들기':'다음'}</button></div><div style='clear:both'></div>`;
+ const input=card.querySelector('#custom');
+ const acceptValue=v=>{ans[s.key]=v;if(idx<steps.length-1){idx++;render()}else finish()};
+ const acceptCustom=()=>{let v=input.value.trim();if(!v)return;confirmSpelling(input,v,acceptValue)};
+ card.querySelector('#add').onclick=acceptCustom;
+ input.addEventListener('input',()=>{const n=card.querySelector('#next');if(n)n.disabled=!input.value.trim()});
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();acceptCustom()}});
+ card.querySelector('#revealExamples').onclick=()=>{expanded['examples_'+s.key]=!showExamples;render()};
+ card.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+   if(s.key==='subject'){
+     let list=Array.isArray(ans.subject)?[...ans.subject]:(ans.subject?[ans.subject]:[]);
+     const v=b.dataset.v,at=list.indexOf(v);
+     if(at>=0)list.splice(at,1);
+     else if(list.length<2)list.push(v);
+     else { alert('주어는 두 개까지 선택할 수 있어요.'); return; }
+     ans.subject=list;render();return;
+   }
+   ans[s.key]=b.dataset.v;render()
+ });
+ const more=card.querySelector('#more');if(more)more.onclick=()=>{expanded[s.key]=!expanded[s.key];render()};
+ card.querySelector('#skip').onclick=skipCurrentStep;
+ card.querySelector('#next').onclick=()=>{const typed=input.value.trim();if(typed){confirmSpelling(input,typed,v=>{ans[s.key]=v;nextCurrentStep()})}else nextCurrentStep()};
+}
+function editDistance(a,b){
+ a=String(a||'');b=String(b||'');const d=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));
+ for(let i=0;i<=a.length;i++)d[i][0]=i;for(let j=0;j<=b.length;j++)d[0][j]=j;
+ for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+ return d[a.length][b.length]
+}
+function stepVocabulary(key){
+ const s=steps.find(x=>x.key===key);if(!s)return[];
+ return [...(s.items||[]),...(s.examples||[])].map(v=>stripParticle(cleanToken(v))).filter(Boolean)
+}
+function nearestKnownWord(raw,key){
+ const word=stripParticle(cleanToken(raw));if(!word||word.length<2)return raw;
+ const manual={'버수':'버스','뻐스':'버스','교가서':'교과서','교가서':'교과서','학꾜':'학교','칭구':'친구','선생임':'선생님','우유룰':'우유','채':'책'};
+ if(manual[word])return manual[word];
+ let best=null,score=99;for(const v of stepVocabulary(key)){const base=stripParticle(v),n=editDistance(word,base);if(n<score){score=n;best=base}}
+ return score===1&&best?best:raw
+}
+function repairPredicateInput(x){
+ let v=cleanToken(x);if(!v)return'';
+ const map={'먹다':'먹었어요','먹어':'먹었어요','먹음':'먹었어요','마시다':'마셨어요','마셔':'마셨어요','읽다':'읽었어요','읽어':'읽었어요','쓰다':'썼어요','써':'썼어요','가다':'갔어요','가':'갔어요','하다':'했어요','해':'했어요','보다':'봤어요','봐':'봤어요','사다':'샀어요','사':'샀어요','주다':'주었어요','줘':'주었어요','던지다':'던졌어요','던져':'던졌어요','정리하다':'정리했어요','정리해':'정리했어요','도와주다':'도와주었어요','도와줘':'도와주었어요'};
+ if(map[v])return map[v];if(/다$/.test(v)){const stem=v.slice(0,-1);if(stem.endsWith('하'))return stem.slice(0,-1)+'했어요';}
+ return v
+}
+function repairReasonInput(x){
+ let v=cleanToken(x);if(!v)return'';
+ const map={'배고파':'배가 고파서','배고픔':'배가 고파서','목말라':'목이 말라서','목마름':'목이 말라서','화나':'화가 나서','화남':'화가 나서','재밌어':'재미있어서','궁금해':'궁금해서','필요해':'필요해서','수업하려고':'수업을 하려고','공부하려고':'공부를 하려고'};
+ return map[v]||v
+}
+function repairAnswerForRole(key,value){
+ if(key==='subject'&&Array.isArray(value))return joinSubjects(value);
+ let v=cleanToken(value);if(!v)return'';
+ v=nearestKnownWord(v,key);
+ if(key==='subject'){if(v==='나'||v==='내가')return'나는';return naturalSubject(v)}
+ if(key==='object')return naturalObject(v);
+ if(key==='place')return normalizePlace(v);
+ if(key==='time')return normalizeTime(v);
+ if(key==='predicate')return normalizePredicate(repairPredicateInput(v));
+ if(key==='reason')return naturalReason(repairReasonInput(v));
+ return v
+}
+function stripParticle(x){return x.replace(/(은|는|이|가|을|를)$/,'')}function hasBatchim(word){let c=word.charCodeAt(word.length-1);return c>=0xAC00&&c<=0xD7A3&&((c-0xAC00)%28)!==0}function subj(x){if(/(은|는|이|가)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'은':'는')}function obj(x){if(/(을|를)$/.test(x))return x;let w=stripParticle(x);return w+(hasBatchim(w)?'을':'를')}
+function semanticOK(){let o=stripParticle(ans.object||''),p=ans.predicate||'';let rule=objectActionRules.find(r=>r.test.test(o));return !rule||rule.actions.includes(p)}
+function cleanToken(x){return String(x||'').trim().replace(/[.?!,]+$/,'')}
+function normalizeTime(x){let v=cleanToken(x);if(!v)return '';const map={'오늘 아침':'오늘 아침에','오늘 점심':'오늘 점심에','오늘 오후':'오늘 오후에','오늘 저녁':'오늘 저녁에','쉬는 시간':'쉬는 시간에','수업 시간':'수업 시간에','방과 후':'방과 후에','주말':'주말에'};return map[v]||v}
+function normalizePlace(x){let v=cleanToken(x);if(!v)return '';if(/(에서|에게서|앞에서|안에서|밖에서)$/.test(v))return v;v=v.replace(/(은|는|이|가|을|를)$/,'');return v+'에서'}
+function naturalReason(r){let x=cleanToken(r);if(!x)return '';const map={
+'배가 고프기 때문에':'배가 고파서','목이 마르기 때문에':'목이 말라서','비가 오기 때문에':'비가 와서','비가 왔기 때문에':'비가 와서',
+'필요하기 때문에':'필요해서','필요했기 때문에':'필요해서','재미있기 때문에':'재미있어서','궁금하기 때문에':'궁금해서',
+'기분이 좋기 때문에':'기분이 좋아서','친구를 도와주기 위해서':'친구를 도와주려고','잊어버리지 않기 위해서':'잊어버리지 않으려고',
+'숙제를 끝내기 위해서':'숙제를 끝내려고','집에 가져가기 위해서':'집에 가져가려고','깨끗하게 하기 위해서':'깨끗하게 하려고',
+'늦지 않기 위해서':'늦지 않으려고','다음 날 사용하기 위해서':'다음 날 사용하려고'};
+ return map[x]||x.replace(/하기 위해서$/,'하려고').replace(/기 때문에$/,'어서')
+}
+function subjectBase(x){let v=cleanToken(x);return v.replace(/(은|는|이|가)$/,'')}
+function joinSubjects(values){
+ const list=(Array.isArray(values)?values:[values]).map(subjectBase).filter(Boolean);
+ if(!list.length)return '';
+ if(list.length===1)return naturalSubject(list[0]);
+ const a=list[0],b=list[1];
+ return a+(hasBatchim(a)?'과 ':'와 ')+b+(hasBatchim(b)?'은':'는');
+}
+function naturalSubject(x){if(Array.isArray(x))return joinSubjects(x);let v=cleanToken(x);if(!v)return '';if(v==='나')return '나는';if(v==='내가')return '나는';if(/(은|는|이|가)$/.test(v))return v;return subj(v)}
+function naturalObject(x){let v=cleanToken(x);if(!v)return '';if(/(을|를)$/.test(v))return v;v=v.replace(/(은|는|이|가)$/,'');return obj(v)}
+function normalizePredicate(x){let v=cleanToken(x);if(!v)return '';const map={'구매했어요':'샀어요','섭취했어요':'먹었어요','음용했어요':'마셨어요','사용 하였어요':'사용했어요','정리 하였어요':'정리했어요'};return map[v]||v.replace(/\s+했어요$/,'했어요')}
+function polishSentenceText(s){
+ return s.replace(/\s+/g,' ').replace(/에서에서/g,'에서').replace(/은은/g,'은').replace(/는는/g,'는').replace(/이이/g,'이').replace(/가가/g,'가').replace(/을을/g,'을').replace(/를를/g,'를')
+ .replace(/때문에\s+때문에/g,'때문에').replace(/하려고\s+위해서/g,'하려고').replace(/\s+([,.!?])/g,'$1').trim()
+}
+function contextualPolish(parts){
+ let s=polishSentenceText(parts.filter(Boolean).join(' '));
+ // 자주 나오는 구어적 입력을 초등 고학년 수준의 자연스러운 문장으로 정리한다.
+ s=s.replace(/화가\s*나서/g,'화가 나서').replace(/기분이\s*좋아서/g,'기분이 좋아서')
+     .replace(/목이\s*말라서/g,'목이 말라서').replace(/배가\s*고파서/g,'배가 고파서')
+     .replace(/친구를\s*도와주려고/g,'친구를 도와주려고')
+     .replace(/잊어버리지\s*않으려고/g,'잊어버리지 않으려고');
+ return s
+}
+function sentenceQualityCheck(sentence){
+ const s=String(sentence||'').trim(),issues=[];
+ if(!s)issues.push('empty');
+ if(/에서에서|은은|는는|을을|를를/.test(s))issues.push('duplicate-particle');
+ if(/때문에\s+때문에|위해서\s+위해서/.test(s))issues.push('duplicate-reason');
+ if(/\s{2,}/.test(s))issues.push('spacing');
+ return {ok:issues.length===0,issues}
+}
+function buildSentence(){
+ const time=repairAnswerForRole('time',ans.time),reason=repairAnswerForRole('reason',ans.reason),place=repairAnswerForRole('place',ans.place),subject=repairAnswerForRole('subject',ans.subject),object=repairAnswerForRole('object',ans.object),predicate=repairAnswerForRole('predicate',ans.predicate);
+ // 아동이 고른 의미는 유지하고 한국어 정보 구조만 자연스럽게 배열한다.
+ // 주어가 있으면 시간 → 주어 → 이유 → 장소 → 목적어 → 행동,
+ // 주어가 생략되면 시간 → 이유 → 장소 → 목적어 → 행동 순서를 기본으로 한다.
+ const parts=subject?[time,subject,reason,place,object,predicate]:[time,reason,place,object,predicate];
+ let s=contextualPolish(parts);
+ const checked=sentenceQualityCheck(s);if(!checked.ok)s=polishSentenceText(s);
+ return s+(s&&/[.!?]$/.test(s)?'':'.')
+}
+function extensionChoices(){
+ const p=ans.predicate||'',o=stripParticle(ans.object||'');
+ let result=['그래서 기분이 좋았어요.','그래서 필요한 일을 끝낼 수 있었어요.','그래서 다음에도 다시 해 보고 싶어요.'];
+ let thought=['나는 잘했다고 생각했어요.','나는 다음에는 더 잘하고 싶다고 생각했어요.','나는 이 일이 중요하다고 생각했어요.'];
+ let feeling=['나는 기분이 좋았어요.','나는 뿌듯했어요.','나는 마음이 편해졌어요.'];
+ if(/먹|마셨|샀/.test(p))result=['그래서 배가 든든해졌어요.','그래서 필요한 것을 준비할 수 있었어요.','그래서 기분이 좋아졌어요.'];
+ if(/숙제/.test(o)||/했어요|정리했어요/.test(p))result=['그래서 해야 할 일을 끝냈어요.','그래서 마음이 편해졌어요.','그래서 다음 일을 할 수 있었어요.'];
+ if(/주었|건넸|돌려주/.test(p))result=['그래서 친구가 고마워했어요.','그래서 서로 기분이 좋아졌어요.','그래서 친구를 도울 수 있었어요.'];
+ return {result,thought,feeling}
+}
+function extensionChoices(round=1){
+ const p=ans.predicate||'',o=stripParticle(ans.object||''),last=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
+ let result=['그 뒤에 해야 할 일을 계속했어요.','그래서 필요한 일을 잘 마칠 수 있었어요.','그리고 주변을 정리했어요.'];
+ let thought=['나는 내가 한 일을 다시 생각해 보았어요.','다음에는 더 잘할 수 있다고 생각했어요.','나는 이 일이 중요하다고 생각했어요.'];
+ let feeling=['그래서 기분이 좋았어요.','나는 뿌듯한 마음이 들었어요.','마음이 한결 편해졌어요.'];
+ if(round===1&&/먹|마셨|샀/.test(p))result=['그 뒤에 산 것을 먹거나 마셨어요.','그래서 필요한 것을 준비할 수 있었어요.','먹고 나니 배가 든든해졌어요.'];
+ if(round===1&&(/숙제/.test(o)||/했어요|정리했어요/.test(p)))result=['그래서 해야 할 일을 끝냈어요.','그 뒤에 다음 할 일을 준비했어요.','그리고 사용한 물건을 정리했어요.'];
+ if(round===1&&/주었|건넸|돌려주/.test(p))result=['그러자 친구가 고마워했어요.','그래서 친구를 도울 수 있었어요.','그 뒤에 우리는 다시 하던 일을 했어요.'];
+ if(/기분|뿌듯|마음/.test(last)){result=['그 뒤에 다음 할 일을 시작했어요.','그리고 오늘 있었던 일을 떠올려 보았어요.'];thought=['나는 왜 그런 기분이 들었는지 생각해 보았어요.','다음에도 이렇게 해 보고 싶다고 생각했어요.'];feeling=[]}
+ if(/생각/.test(last)){result=['그 뒤에 생각한 대로 해 보기로 했어요.','그리고 다음 할 일을 시작했어요.'];thought=[];feeling=['생각을 정리하니 마음이 편해졌어요.','앞으로 잘할 수 있을 것 같아 기분이 좋았어요.']}
+ if(/마쳤|끝냈|정리했/.test(last)){result=['그리고 집이나 다음 장소로 이동했어요.'];thought=['나는 오늘 한 일을 잘 마쳤다고 생각했어요.'];feeling=['해야 할 일을 끝내서 뿌듯했어요.']}
+ const used=new Set((storyDraft||[]).map(v=>v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim()));
+ const clean=list=>validStoryChoices(list.filter(v=>!used.has(v.replace(/^(그래서|그리고|그 뒤에|그러자)\s*/,'').trim())));
+ return {result:clean(result),thought:clean(thought),feeling:clean(feeling)}
+}
+function contextualQuestions(){
+ const last=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
+ const p=ans.predicate||'',rawObject=ans.object||'',o=rawObject?stripParticle(rawObject):'';
+ const hasObject=!!rawObject,hasPlace=!!ans.place,hasSubject=!!ans.subject,hasReason=!!ans.reason;
+ let result='그 다음에는 어떻게 되었어요?',thought='그 일에 대해 어떤 생각을 했어요?',feeling='그때 어떤 기분이 들었어요?';
+
+ // 구체적인 정보가 실제로 선택되었을 때만 그 정보를 질문에 사용한다.
+ if(hasObject&&(/샀어요|골랐어요/.test(last)||(/샀어요|골랐어요/.test(p)&&storyDraft.length===1)))result=o+'을(를) 고른 다음에는 무엇을 했어요?';
+ else if(!hasObject&&/샀어요|골랐어요/.test(p))result='그 다음에는 무엇을 했어요?';
+
+ if(/먹었어요|마셨어요|든든/.test(last))result='그 다음에는 어떻게 되었어요?';
+ if(hasSubject&&(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p)))result='그 사람은 어떻게 반응했어요?';
+ else if(/주었어요|건넸어요|돌려주었어요/.test(last)||/주었어요|건넸어요|돌려주었어요/.test(p))result='그 다음에는 어떻게 되었어요?';
+ if(hasObject&&(/숙제/.test(o)||/해야 할 일|끝냈어요|마쳤어요/.test(last)))result='그 일을 끝낸 다음에는 무엇을 했어요?';
+ if(hasObject&&(/찾았어요/.test(last)||/찾았어요/.test(p)))result='찾은 다음에는 그것을 어떻게 했어요?';
+ else if(!hasObject&&(/찾았어요/.test(last)||/찾았어요/.test(p)))result='찾은 다음에는 무엇을 했어요?';
+
+ if(/기분|뿌듯|마음/.test(last)){thought=hasReason?'왜 그런 기분이 들었다고 생각해요?':'그 기분에 대해 어떤 생각을 했어요?';feeling='그 기분은 계속되었나요?'}
+ if(/생각/.test(last)){result='그렇게 생각한 뒤에는 무엇을 했어요?';thought='다음에는 어떻게 하고 싶어요?'}
+
+ // 장소·주어·이유가 없으면 후속 질문이 이를 새 사실처럼 전제하지 않는다.
+ if(!hasPlace)thought=thought.replace(/그곳에서[^?]*\?/g,'그 일에 대해 어떤 생각을 했어요?');
+ if(!hasSubject)result=result.replace(/친구|상대방|그 사람/g,'그 다음');
+ if(!hasReason)thought=thought.replace(/^왜 /,'');
+ return {result,thought,feeling}
+}
+
+function coherentNext(kind,text){
+ const prev=(storyDraft&&storyDraft.length)?storyDraft[storyDraft.length-1]:'';
+ let t=text.trim();
+ if(kind==='result'&&!/^(그래서|그리고|그 뒤에|그러자|하지만|그런데)/.test(t)){
+   t=(/했어요|샀어요|먹었어요|마셨어요|주었어요|끝냈어요/.test(prev)?'그 뒤에 ':'그리고 ')+t;
+ }
+ if(kind==='thought'&&!/^(그래서|그리고|그 뒤에|그러자|하지만|그런데)/.test(t)&&storyDraft.length>1)t='그리고 '+t;
+ if(kind==='feeling'&&!/^(그래서|그리고|그 뒤에|그러자|하지만|그런데)/.test(t))t='그래서 '+t;
+ return t.replace(/그래서 그래서/g,'그래서').replace(/그리고 그리고/g,'그리고').replace(/그 뒤에 그 뒤에/g,'그 뒤에')
+}
+
+let storyDraft=[];
+function renderStoryExtension(){
+ const round=storyDraft.length,x=extensionChoices(round),q=contextualQuestions();
+ card.innerHTML=`<h1>${round===1?'조금 더 말해 볼까요?':'이야기를 더 이어 볼까요?'}</h1><p class="help">방금 만든 문장을 생각하며 질문 하나를 골라 보세요.</p><div class="story-two">${storyDraft.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div><div class="extend-box"><div class="extend-title">무엇을 더 말해 볼까요?</div><div class="extend-options"><button class="extend-option" data-kind="result">➡️ ${escapeHtml(q.result)}</button><button class="extend-option" data-kind="thought">💭 ${escapeHtml(q.thought)}</button><button class="extend-option" data-kind="feeling">🙂 ${escapeHtml(q.feeling)}</button></div><div id="extendChoices"></div></div><button class="btn next" id="stopStory">그만하기 · 글 완성</button>`;
+ card.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{let list=x[b.dataset.kind].filter(v=>!storyDraft.includes(v));if(!list.length)list=x[b.dataset.kind];document.getElementById('extendChoices').innerHTML='<div class="choices extra" style="margin-top:12px">'+list.map(v=>`<button class="choice extend-sentence" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')+'</div>';card.querySelectorAll('.extend-sentence').forEach(q=>q.onclick=()=>{{const next=coherentNext(b.dataset.kind,q.dataset.v);if(repeatedStoryMeaning(next)||contradictsStory(next)){alert('앞에서 말한 내용과 겹치거나 맞지 않는 문장이에요. 다른 문장을 골라 주세요.');return}storyDraft.push(next);renderStoryExtension()}})});
+ document.getElementById('stopStory').onclick=finishStory
+}
+function showExtension(firstSentence){storyDraft=[firstSentence];renderStoryExtension()}
+function polishStory(lines){
+ let out=(lines||[]).map((v,i)=>{
+  let s=String(v||'').trim().replace(/\s+/g,' ');
+  s=s.replace(/에서에서/g,'에서').replace(/은은|는는/g,m=>m[0]).replace(/을을|를를/g,m=>m[0]);
+  // 첫 문장에서 주어가 이미 분명하면 뒤 문장의 반복되는 '나는'은 생략한다.
+  if(i>0&&/^나는\s+/.test(s))s=s.replace(/^나는\s+/,'');
+  // 연결어가 중복된 경우 하나만 남긴다.
+  s=s.replace(/^(그래서|그리고|그 뒤에|그러자)\s+\1\s+/,'$1 ');
+  // 문장부호는 하나로 정리한다.
+  s=s.replace(/[.?!]+$/,'')+'.';
+  return s;
+ }).filter(Boolean);
+ // 같은 의미의 문장이 연속되는 경우 뒤 문장을 제거한다.
+ out=out.filter((v,i,a)=>i===0||normalizeMeaningText(v)!==normalizeMeaningText(a[i-1]));
+ return out
+}
+function finishStory(){
+ const polished=polishStory(storyDraft),combined=polished.join(' ');
+ // 첫 문장 단계에서 이미 지급된 보상이 있다면 글 전체 보상으로 승격하고 추가 지급하지 않는다.
+ let last=state.sentences[state.sentences.length-1],r;
+ if(last&&normalizeMeaningText(last.text)===normalizeMeaningText(storyDraft[0])){
+   last.text=combined;last.kind=polished.length>1?'story':'sentence';saveState();r={duplicate:false,fish:0,reward:null,rewardType:null,upgraded:true}
+ }else r=grantCompletionReward(combined,polished.length>1?'story':'sentence');
+ storyDraft=polished;
+ const msg=r.upgraded?'🐟 처음 문장을 만들 때 받은 물고기 보상이 이 글의 완성 보상으로 저장됐어요.':rewardSummary(r);
+ card.innerHTML=`<h1>${polished.length>1?'나의 글이 완성됐어요':'내 문장이 완성됐어요'}</h1><p class="help">내가 고른 내용은 그대로 두고 문장이 자연스럽게 이어지도록 정리했어요.</p><div class="story-two">${polished.map((v,i)=>`<div><b>${i+1}.</b> ${escapeHtml(v)}</div>`).join('')}</div>${msg?`<div class="reward">${msg}</div>`:''}<div class="actions" style="margin-top:20px"><button class="btn" id="antarcticAfter">🐧 나의 남극</button><button class="btn primary" id="againAfter">새 문장 만들기</button></div><button class="btn more" id="homeAfter" style="margin-top:10px">홈으로</button>`;
+ document.getElementById('antarcticAfter').onclick=()=>showScreen('antarcticScreen');document.getElementById('homeAfter').onclick=()=>showScreen('homeScreen');document.getElementById('againAfter').onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()}
+}
+function commitSentence(sentence){
+ const text=String(sentence||'').trim();
+ if(!text)return {ok:false,error:'empty'};
+ // 핵심 완료 처리: 다른 기능에 의존하지 않는다.
+ if(!state||typeof state!=='object')state={};
+ if(!Array.isArray(state.sentences))state.sentences=[];
+ if(!Array.isArray(state.fishInventory))state.fishInventory=[];
+ if(!Array.isArray(state.treasures))state.treasures=[];
+ if(!Array.isArray(state.specialPenguins))state.specialPenguins=[];
+ const key=text.replace(/\s+/g,'').replace(/[.?!]/g,'');
+ const duplicate=state.sentences.some(x=>x&&typeof x.text==='string'&&x.text.replace(/\s+/g,'').replace(/[.?!]/g,'')===key);
+ if(duplicate)return {ok:true,duplicate:true,fish:0,persisted:true};
+ let grade=1;try{grade=drawFishGrade()}catch(_){}
+ state.sentences.push({text,kind:'sentence',at:new Date().toISOString()});
+ state.fishInventory.push(grade);
+ state.fish=state.fishInventory.length;
+ let persisted=false;
+ try{localStorage.setItem(STORE_KEY,JSON.stringify(state));persisted=true}catch(_){}
+ return {ok:true,duplicate:false,fish:1,fishGrade:grade,persisted}
+}
+function bindFinishedButtons(sentence){
+ const back=document.getElementById('back'),complete=document.getElementById('completeSentence');
+ if(back)back.onclick=()=>{idx=steps.length-1;render()};
+ if(!complete)return;
+ complete.onclick=()=>{
+   complete.disabled=true;
+   const status=document.getElementById('completeStatus');
+   let result;
+   try{result=commitSentence(sentence)}catch(err){console.error(err);result={ok:false}}
+   if(!result||!result.ok){
+     complete.disabled=false;
+     if(status)status.textContent='저장하지 못했어요. 다시 눌러 주세요.';
+     return;
+   }
+   if(result.duplicate){
+     if(status)status.innerHTML='📖 이미 나의 문장 사전에 저장된 문장이에요.';
+   }else{
+     if(status)status.innerHTML='✅ 문장을 완료했어요.<br>🐟 '+result.fishGrade+'등급 물고기 1마리를 받았어요!<br>📖 나의 문장 사전에 저장했어요.';
+   }
+   complete.textContent='✓ 완료됨';
+   const after=document.getElementById('afterComplete');if(after)after.style.display='block';
+   try{updateUI()}catch(err){console.warn(err)}
+   const extend=document.getElementById('extend'),again=document.getElementById('again');
+   if(extend)extend.onclick=()=>showExtension(sentence);
+   if(again)again.onclick=()=>{idx=0;ans={};expanded={};storyDraft=[];render()};
+ }
+}
+function showSafeFinishedSentence(sentence){bar.style.width='100%';showSentencePreview(sentence||'문장을 다시 확인해 주세요.')}
+function showSentencePreview(sentence){
+ card.innerHTML=`<h1>문장을 확인해 주세요</h1><p class='help'>문장이 마음에 들면 아래의 <b>문장 완료</b>를 눌러 주세요.</p><div class='sentence'>${escapeHtml(sentence)}</div><div class='actions' style='margin-top:22px'><button type='button' class='btn' id='back'>고쳐 보기</button><button type='button' class='btn primary' id='completeSentence'>✓ 문장 완료</button></div><div id='completeStatus' class='reward' style='margin-top:12px'></div><div id='afterComplete' style='display:none'><div class='actions' style='margin-top:12px'><button type='button' class='btn primary' id='extend'>조금 더 말하기</button><button type='button' class='btn' id='again'>새 문장 만들기</button></div></div>`;
+ bindFinishedButtons(sentence)
+}
+function finish(){bar.style.width='100%';showSentencePreview(buildSentence())}
+function showScreen(id){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));if(id==='composeScreen')render();window.scrollTo({top:0,behavior:'smooth'})}document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>showScreen(b.dataset.screen));document.getElementById('startBtn').onclick=startCompose;document.getElementById('loginBtn').onclick=()=>alert('로그인·회원가입 화면은 다음 단계에서 연결합니다.');document.getElementById('closeModal').onclick=closeTreasure;document.getElementById('treasureModal').onclick=e=>{if(e.target.id==='treasureModal')closeTreasure()};function flyFishToPenguin(done){const btn=document.getElementById('feedBtn'),stage=document.getElementById('penguinStage'),a=btn.getBoundingClientRect(),b=stage.getBoundingClientRect(),fish=document.createElement('div');fish.className='flying-fish';fish.textContent='🐟';fish.style.left=(a.left+a.width/2)+'px';fish.style.top=(a.top+a.height/2)+'px';document.body.appendChild(fish);requestAnimationFrame(()=>requestAnimationFrame(()=>{fish.style.left=(b.left+b.width/2)+'px';fish.style.top=(b.top+b.height*.62)+'px';fish.style.transform='translate(-50%,-50%) scale(.65)';fish.style.opacity='0'}));setTimeout(()=>{fish.remove();done()},620)}
+let lastEatingVoice=-1;
+const eatingVoices=['냠냠~','냠!','음~ 맛있다!','아~ 맛있어!','냠냠냠~','맛있다~','또 먹고 싶어!'];
+function playEatingVoice(){
+ if(!('speechSynthesis' in window))return '';
+ let choices=eatingVoices.map((v,i)=>({v,i})).filter(x=>x.i!==lastEatingVoice);
+ let pick=choices[Math.floor(Math.random()*choices.length)];lastEatingVoice=pick.i;
+ try{
+   speechSynthesis.cancel();
+   const u=new SpeechSynthesisUtterance(pick.v);u.lang='ko-KR';u.rate=.92;u.pitch=1.35;u.volume=1;
+   const voices=speechSynthesis.getVoices();const ko=voices.find(v=>/^ko/i.test(v.lang));if(ko)u.voice=ko;
+   speechSynthesis.speak(u);
+ }catch(_){}
+ return pick.v;
+}
+let feedMode=false;
+function giveFishTo(stage){
+ const m=document.getElementById('feedMsg'),btn=document.getElementById('feedBtn'),note=document.getElementById('feedModeNote');
+ if(state.fish<1){m.textContent='먼저 새 문장을 만들고 물고기를 받아 주세요.';return}
+ feedMode=false;note.style.display='none';btn.disabled=true;m.textContent='🐟 물고기를 주고 있어요.';
+ flyFishToPenguin(()=>{let before=growthLevel();ensureFishInventory();state.fishInventory.sort((a,b)=>a-b);state.fishInventory.shift();state.fish=state.fishInventory.length;state.fed++;saveState();let after=growthLevel();stage.classList.add('eating');const eatingVoice=playEatingVoice();let h=document.createElement('div');h.className='heart-burst';h.textContent='❤️';stage.appendChild(h);if(after>before){updateUI();let gp=document.getElementById('growthPenguin');gp.classList.add('level-change');setTimeout(()=>gp.classList.remove('level-change'),760);m.textContent='🎉 펭귄이 '+after+'단계로 성장했어요!'}else{updateUI();m.textContent='🐟 '+(eatingVoice||'냠냠!')+' 펭귄이 맛있게 먹었어요.'}setTimeout(()=>{stage.classList.remove('eating');h.remove()},1150);setTimeout(()=>{m.textContent='';updateUI()},2400)})
+}
+function movePenguin(toHabitat){state.penguinInHabitat=toHabitat;try{localStorage.setItem(STORE_KEY,JSON.stringify(state))}catch(e){}updateAntarctic();const msg=document.getElementById('dockHelp');if(msg)msg.textContent=toHabitat?'아기 펭귄이 남극에서 놀고 있어요. 눌러서 이글루로 데려올 수 있어요.':'아기 펭귄이 이글루에서 쉬고 있어요. 눌러서 남극으로 보내 보세요.'}
+const stageMove=document.getElementById('penguinStage'),storedMove=document.getElementById('storedPenguin');if(stageMove)stageMove.onclick=()=>movePenguin(false);if(storedMove)storedMove.onclick=()=>movePenguin(true);
+document.getElementById('feedBtn').onclick=()=>{const m=document.getElementById('feedMsg'),note=document.getElementById('feedModeNote');if(state.fish<1){m.textContent='먼저 새 문장을 만들고 물고기를 받아 주세요.';return}feedMode=true;note.style.display='block';m.textContent='';};
+document.getElementById('penguinStage').onclick=()=>{if(feedMode)giveFishTo(document.getElementById('penguinStage'))};
+document.querySelectorAll('.special-roamer').forEach(p=>p.onclick=()=>{if(feedMode)giveFishTo(document.getElementById('penguinStage'))});ensureFishInventory();try{localStorage.setItem(STORE_KEY,JSON.stringify(state))}catch(e){}updateUI();render();</script></body></html>
