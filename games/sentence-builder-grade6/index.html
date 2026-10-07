@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'midcheck-clarification-fix',
+  phase:'midcheck-input-view-flow',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -765,15 +765,19 @@ function roleConfirmationCandidatesV2(analysis){
 
 function concreteClarificationPromptV2(analysis){
   const a=analysis||{};
+  const rawTokens=(a.tokens||[]).filter(Boolean);
+  if(!a.predicate&&rawTokens.length===1){
+    return '“'+rawTokens[0]+'”에 대해 무엇을 말하고 싶어요?';
+  }
   const first=(a.ambiguities||[])[0];
   if(first&&first.message)return first.message;
-  if(!a.predicate)return '무엇을 했는지 알려 주세요.';
+  if(!a.predicate)return '무엇을 했는지 써 주세요.';
   const frame=getPredicateFrameV2(a.predicate);
   if(frame){
     const missing=frame.required.find(role=>!(a.roles||{})[role]);
     if(missing&&frame.questions&&frame.questions[missing])return frame.questions[missing];
   }
-  return '내가 말하려는 뜻과 가장 가까운 것을 골라 주세요.';
+  return '조금 더 써 주세요.';
 }
 
 function alternateMeaningCandidatesV2(analysis,currentCandidates=[]){
@@ -1231,7 +1235,7 @@ function renderNextEventPromptV2(previousEvent){
       <label for="nextEventInputV2">✏️ 다음 일을 말해 주세요</label>
       <div class="custom-row">
         <input id="nextEventInputV2" placeholder="예: 친구가 고맙다고 했어" autocomplete="off">
-        <button type="button" class="btn add" id="nextEventAddV2">뜻 찾아보기</button>
+        <button type="button" class="btn add" id="nextEventAddV2">입력</button>
       </div>
     </div>
     <div class="actions" style="margin-top:18px">
@@ -2039,7 +2043,7 @@ function renderMeaningStartV2(){
       <div class="recall-guide">예: 친구 책 줬어 · 엄마 병원 무서워 · 공 했어 · 고양이 좋아</div>
       <div class="custom-row">
         <input id="meaningInputV2" placeholder="생각나는 말을 써 보세요" autocomplete="off">
-        <button type="button" class="btn add" id="meaningAnalyzeV2">뜻 찾아보기</button>
+        <button type="button" class="btn add" id="meaningAnalyzeV2">입력</button>
       </div>
     </div>
     <div class="examples-panel" style="margin-top:14px">
@@ -2065,12 +2069,33 @@ function renderMeaningStartV2(){
   card.querySelectorAll('.meaning-example-v2').forEach(b=>b.onclick=()=>{input.value=b.dataset.v;go()});
 }
 
+function mergeClarificationInputV2(analysis,typed){
+  const base=String((analysis&&analysis.raw)||'').trim();
+  const add=String(typed||'').trim();
+  if(!base)return add;
+  if(!add)return base;
+  if(normalizeMeaningText(base).includes(normalizeMeaningText(add)))return base;
+  return (base+' '+add).replace(/\s+/g,' ').trim();
+}
+
 function renderMeaningClarificationV2(analysis,options={}){
-  const model=clarificationModelV2(analysis);
   stepText.textContent='뜻 확인';
   bar.style.width='24%';
 
+  const model=clarificationModelV2(analysis);
   let candidates=model.sentenceCandidates||[];
+
+  if(!analysis.predicate){
+    const rawHints=(analysis.hypotheses||[]).map((x,i)=>({
+      id:'hint-'+i,
+      text:x.text,
+      reason:'이런 뜻으로 말할 수 있어요.',
+      rawOnly:true
+    }));
+    if(rawHints.length)candidates=rawHints;
+    if(!candidates.length)candidates=alternateMeaningCandidatesV2(analysis,[]);
+  }
+
   if(!candidates.length && analysis.status==='meaning-ready'){
     candidates=[{
       id:'meaning-ready-1',
@@ -2082,48 +2107,74 @@ function renderMeaningClarificationV2(analysis,options={}){
     }];
   }
 
-  const showingAlternatives=!!options.showAlternatives;
-  const altCandidates=showingAlternatives?alternateMeaningCandidatesV2(analysis,candidates):[];
-  const shownCandidates=showingAlternatives&&altCandidates.length?altCandidates:candidates;
+  const showChoices=!!options.showChoices;
+  const question=concreteClarificationPromptV2(analysis);
   const wordChoices=(model.wordChoices||[]).slice(0,8);
-  const title=showingAlternatives
-    ?(altCandidates.length?'다른 뜻도 있어요.':'다른 뜻을 찾으려면 무엇을 했는지 알려 주세요.')
-    :(shownCandidates.length?'혹시 이런 뜻이에요?':concreteClarificationPromptV2(analysis));
-  const instruction=showingAlternatives
-    ?(altCandidates.length?'내가 말하려던 뜻과 가까운 문장을 골라 주세요.':'아래에서 행동을 고르거나 직접 다시 말해 주세요.')
-    :(shownCandidates.length?'맞으면 문장을 눌러 주세요. 아니면 다른 뜻을 볼 수 있어요.':'아래 보기에서 고르거나 직접 말해 주세요.');
 
   card.innerHTML=`
-    <h1>${escapeHtml(title)}</h1>
-    <p class="help">${escapeHtml(instruction)}</p>
-    ${shownCandidates.length?`
-      <div class="story-two" style="margin-top:12px">
-        ${shownCandidates.map((x,i)=>`
-          <button type="button" class="choice meaning-sentence-choice-v2" data-i="${i}" style="display:block;width:100%;margin:8px 0;text-align:left">
-            <b>${escapeHtml(x.text)}</b><br>
-            <small>${escapeHtml(x.reason||'가능한 뜻')}</small>
-          </button>
-        `).join('')}
-      </div>`:''}
-    ${wordChoices.length?`
-      <div class="examples-panel" style="margin-top:14px">
-        <p class="help" style="margin:0 0 10px">${escapeHtml(concreteClarificationPromptV2(analysis))}</p>
-        <div class="choices">
-          ${wordChoices.map((x,i)=>`<button type="button" class="choice meaning-word-choice-v2" data-i="${i}">${escapeHtml(x.label)}</button>`).join('')}
-        </div>
-      </div>`:''}
+    <h1>${escapeHtml(question)}</h1>
+    <p class="help">생각나는 말을 써서 <b>입력</b>을 누르세요. 잘 모르겠으면 <b>보기</b>를 눌러도 돼요.</p>
+
+    <div class="custom">
+      <label for="meaningMoreInputV2">✏️ 내가 말하기</label>
+      <div class="custom-row">
+        <input id="meaningMoreInputV2" placeholder="여기에 써 주세요" autocomplete="off">
+        <button type="button" class="btn add" id="meaningMoreAddV2">입력</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <button type="button" class="btn reveal-examples" id="meaningShowChoicesV2">${showChoices?'보기 닫기':'보기'}</button>
+    </div>
+
+    <div id="meaningChoicesBoxV2" ${showChoices?'':'hidden'} style="margin-top:12px">
+      ${candidates.length?`
+        <div class="story-two">
+          ${candidates.slice(0,6).map((x,i)=>`
+            <button type="button" class="choice meaning-sentence-choice-v2" data-i="${i}" style="display:block;width:100%;margin:8px 0;text-align:left">
+              <b>${escapeHtml(x.text)}</b>
+            </button>
+          `).join('')}
+        </div>`:''}
+
+      ${wordChoices.length?`
+        <div class="examples-panel" style="margin-top:10px">
+          <div class="choices">
+            ${wordChoices.map((x,i)=>`<button type="button" class="choice meaning-word-choice-v2" data-i="${i}">${escapeHtml(x.label)}</button>`).join('')}
+          </div>
+        </div>`:''}
+
+      ${!candidates.length&&!wordChoices.length?'<p class="help">보기가 없어요. 위 칸에 직접 써 주세요.</p>':''}
+    </div>
+
     <div class="actions" style="margin-top:18px">
-      <button type="button" class="btn" id="meaningOtherV2">${showingAlternatives?'처음 뜻 보기':'다른 뜻 보기'}</button>
-      <button type="button" class="btn next" id="meaningRetryV2">내가 다시 말할게요</button>
+      <button type="button" class="btn" id="meaningBackV2">이전</button>
     </div>
     <div style="clear:both"></div>
   `;
 
+  const input=card.querySelector('#meaningMoreInputV2');
+  const submitTyped=()=>{
+    const typed=(input.value||'').trim();
+    if(!typed)return;
+    storyV2.support.usedTyping=true;
+    const merged=mergeClarificationInputV2(analysis,typed);
+    const nextAnalysis=recordMeaningAnalysisV2(merged);
+    renderMeaningClarificationV2(nextAnalysis);
+  };
+  card.querySelector('#meaningMoreAddV2').onclick=submitTyped;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submitTyped()}});
+
+  card.querySelector('#meaningShowChoicesV2').onclick=()=>{
+    renderMeaningClarificationV2(analysis,{showChoices:!showChoices});
+  };
+
   card.querySelectorAll('.meaning-sentence-choice-v2').forEach(b=>b.onclick=()=>{
-    const chosen=shownCandidates[Number(b.dataset.i)];
-    if(chosen&&chosen.rawOnly){
-      const altAnalysis=analysisFromAlternativeTextV2(chosen.text);
-      renderMeaningClarificationV2(altAnalysis);
+    const chosen=candidates[Number(b.dataset.i)];
+    if(!chosen)return;
+    if(chosen.rawOnly){
+      const nextAnalysis=recordMeaningAnalysisV2(chosen.text);
+      renderMeaningClarificationV2(nextAnalysis);
       return;
     }
     const event=applyMeaningCandidateV2(chosen);
@@ -2132,24 +2183,33 @@ function renderMeaningClarificationV2(analysis,options={}){
 
   card.querySelectorAll('.meaning-word-choice-v2').forEach(b=>b.onclick=()=>{
     const chosen=wordChoices[Number(b.dataset.i)];
-    if(chosen&&chosen.type==='role'&&chosen.role&&analysis.predicate){
+    if(!chosen)return;
+    if(chosen.type==='role'&&chosen.role&&analysis.predicate){
       analysis.roles=analysis.roles||{};
       analysis.roles[chosen.role]=chosen.label;
-      renderMeaningClarificationV2(analysis);
+      const eventCandidate={
+        predicate:analysis.predicate,
+        roles:cloneRolesV2(analysis.roles),
+        text:previewMeaningSentenceV2(analysis.predicate,analysis.roles),
+        reason:'선택한 뜻'
+      };
+      const frame=getPredicateFrameV2(analysis.predicate);
+      const missing=frame?frame.required.filter(r=>!analysis.roles[r]):[];
+      if(!missing.length){
+        const event=applyMeaningCandidateV2(eventCandidate);
+        renderMeaningConfirmedV2(event);
+      }else{
+        renderMeaningClarificationV2(analysis);
+      }
       return;
     }
-    if(chosen&&chosen.label){
-      const altAnalysis=analysisFromAlternativeTextV2(chosen.label);
-      renderMeaningClarificationV2(altAnalysis);
-      return;
+    if(chosen.label){
+      const nextAnalysis=recordMeaningAnalysisV2(mergeClarificationInputV2(analysis,chosen.label));
+      renderMeaningClarificationV2(nextAnalysis);
     }
   });
 
-  card.querySelector('#meaningOtherV2').onclick=()=>{
-    storyV2.learningLog.meaningRepairs+=1;
-    renderMeaningClarificationV2(analysis,{showAlternatives:!showingAlternatives});
-  };
-  card.querySelector('#meaningRetryV2').onclick=renderMeaningStartV2;
+  card.querySelector('#meaningBackV2').onclick=renderMeaningStartV2;
 }
 
 function renderMeaningConfirmedV2(event){
