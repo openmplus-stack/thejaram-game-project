@@ -3084,10 +3084,23 @@ function verbPredicateV27(verb){
  if(/(?:리다|기다|치다|지다|니다)$/.test(v))return v.slice(0,-1).replace(/다$/,'')+'었다';
  return v;
 }
+function verbRepresentativePolishV28(verb,answers,base){
+ const a=answers||{}, raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
+ if(verb==='비교하다'&&a.pair){
+   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'나는';
+   const first=[subject,verbFirstObjectTextV3(a.pair),'비교했다.'].join(' ');
+   const facts=[];
+   if(a.similarity)facts.push('같은 점은 '+raw(a.similarity)+(verbChoiceKindV25(a.similarity)==='sentence'?'.':'이다.'));
+   if(a.differenceCore)facts.push('다른 점은 '+raw(a.differenceCore)+(verbChoiceKindV25(a.differenceCore)==='sentence'?'.':'이다.'));
+   if(a.learning)facts.push(verbChoiceKindV25(a.learning)==='sentence'?raw(a.learning)+'.':'비교하면서 '+raw(a.learning)+' 알게 되었다.');
+   return [first,...facts].join(' ');
+ }
+ return base;
+}
 function verbUnifiedGenerateV26(verb,answers,base,localExtras){
  const a=answers||{};
  const extension=verbSentenceExtensionV19(verb,a);
- return verbUnifiedSurfaceV26([base,...(localExtras||[]),extension].filter(Boolean).join(' '));
+ return verbUnifiedSurfaceV26([verbRepresentativePolishV28(verb,a,base),...(localExtras||[]),extension].filter(Boolean).join(' '));
 }
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
@@ -3199,24 +3212,24 @@ function verbFirstBuildSentenceV3(){
   }
 
   if(a.result&&v==='만들다'){
-    let text='완성한 것은 '+String(a.result).replace(/[.]+$/,'').trim();
+    let text=verbNaturalNounClauseV25('완성한 것은 ',a.result);
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
 
   if(a.feature&&v==='좋아하다'){
-    let text='좋아하는 점은 '+String(a.feature).replace(/[.]+$/,'').trim();
+    let text=verbNaturalNounClauseV25('좋아하는 점은 ',a.feature);
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
 
   if(a.favorite){
-    let text=String(a.favorite).replace(/[.]+$/,'').trim()+'이 가장 재미있었다.';
+    let text=verbFirstSubjectTextV3(a.favorite)+' 가장 재미있었다.';
     sentences.push(text);
   }
 
   if(a.content){
-    let text='기억나는 내용은 '+String(a.content).replace(/[.]+$/,'').trim();
+    let text=verbNaturalNounClauseV25('기억나는 내용은 ',a.content);
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
@@ -3233,7 +3246,7 @@ function verbFirstBuildSentenceV3(){
   }
 
   if(a.activity&&v==='좋아하다'){
-    let text=String(a.activity).replace(/[.]+$/,'').trim();
+    let text='나는 '+String(a.activity).replace(/[.]+$/,'').trim()+'을 즐긴다';
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
