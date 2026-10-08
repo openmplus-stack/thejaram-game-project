@@ -560,6 +560,7 @@ const VERB_SELECTION_FALLBACK_V10={
  result:['잘 끝났다','문제가 해결되었다','기분이 좋아졌다','시간이 더 걸렸다','다시 시도했다','새로운 사실을 알았다','생각이 달라졌다','완성했다','도움이 되었다','결과가 달랐다','어려웠다','아직 끝나지 않았다']
 };
 function verbFirstChoicesForV3(verb,role){
+  if(verb==='가다'&&VERB_GO_CHOICES_V12[role])return VERB_GO_CHOICES_V12[role].slice();
   if(VERB_AUDIT_CHOICES_V9[role])return VERB_AUDIT_CHOICES_V9[role].slice();
   if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
   if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
@@ -611,6 +612,12 @@ const VERB_QUESTION_FAMILY_V7={
 };
 const VERB_FAMILY_BY_NAME_V7={};
 for(const [type,verbs] of Object.entries(VERB_QUESTION_FAMILY_V7))for(const v of verbs)VERB_FAMILY_BY_NAME_V7[v]=type;
+const VERB_GO_EXTRA_V12=[['visitMemory','그곳에서 무엇이 기억에 남았어요?'],['visitFeeling','그곳에서 기분이 어땠어요?'],['visitAgain','다음에도 그곳에 가고 싶어요?']];
+const VERB_GO_CHOICES_V12={
+ visitMemory:['책','친구','건물','운동장','나무','꽃','풍경','놀이기구','동물','맛있는 음식','사람들','즐거웠던 시간'],
+ visitFeeling:['즐거웠다','행복했다','신났다','편안했다','뿌듯했다','재미있었다','놀랐다','긴장했다','아쉬웠다','피곤했다','무서웠다','심심했다'],
+ visitAgain:['다음에도 가고 싶다','친구와 다시 가고 싶다','가족과 다시 가고 싶다','주말에 다시 가고 싶다','더 오래 있고 싶다','다른 곳도 가 보고 싶다','다음에는 다른 일을 하고 싶다','혼자 다시 가고 싶다','당분간 쉬고 싶다','다음에는 준비해서 가고 싶다','다음에는 가지 않겠다','아직 모르겠다']
+};
 const VERB_EXPANSION_QUESTIONS_V7={
  sensory:[['detail','무엇이 가장 눈에 띄었어요?'],['discovery','새롭게 알게 된 것은 무엇이에요?'],['reflection','다음에는 무엇을 더 알아보고 싶어요?']],
  movement:[['method','어떻게 이동했어요?'],['result','도착한 다음에는 무엇을 했어요?'],['reflection','그 경험에서 무엇이 기억에 남아요?']],
@@ -743,7 +750,7 @@ function verbQuestionPlanV7(verb){
  if(!def)return [];
  const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
  const core=verbAuditQuestionPlanV9(verb);
- const extra=(VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
  return core.concat(extra);
 }
 
@@ -2765,6 +2772,9 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
+ if(a.visitMemory)extra.push('그곳에서는 '+verbFirstSubjectTextV3(a.visitMemory)+' 기억에 남았다.');
+ if(a.visitFeeling)extra.push('그곳에서 '+verbV7EndSentence(a.visitFeeling));
+ if(a.visitAgain)extra.push('나는 '+verbV7EndSentence(a.visitAgain));
  return extra.join(' ');
 }
 function verbAuditExtraSentenceV9(a){
