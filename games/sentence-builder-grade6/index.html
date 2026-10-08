@@ -817,6 +817,25 @@ function verbQuestionPlanV7(verb){
  return core.concat(extra);
 }
 
+function verbQuestionAuditV20(){
+ const rows=GRADE6_GROUP_VERBS_V5.map(verb=>{
+  const questions=verbQuestionPlanV7(verb);
+  const problems=[];
+  if(questions.length!==8)problems.push('question-count:'+questions.length);
+  const seen=new Set();
+  for(let i=0;i<questions.length;i++){
+   const q=questions[i];
+   if(!q.q||!q.role)problems.push('missing-question:'+i);
+   if(seen.has(q.role))problems.push('duplicate-role:'+q.role);
+   seen.add(q.role);
+   const choices=verbFirstChoicesForV3(verb,q.role);
+   if(choices.length!==12)problems.push('choice-count:'+q.role+':'+choices.length);
+   if(new Set(choices).size!==choices.length)problems.push('repeated-options:'+q.role);
+  }
+  return {verb,questionCount:questions.length,problems};
+ });
+ return {total:rows.length,passed:rows.filter(r=>!r.problems.length).length,issues:rows.filter(r=>r.problems.length)};
+}
 function verbFirstQuestionPlanV3(verb){
   const def=verbFirstDefinitionV3(verb);
   if(!def)return [];
