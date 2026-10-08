@@ -563,6 +563,7 @@ function verbFirstChoicesForV3(verb,role){
   if(verb==='가다'&&VERB_GO_CHOICES_V12[role])return VERB_GO_CHOICES_V12[role].slice();
   if(VERB_MOVE_EXTRA_V13[verb]&&VERB_MOVE_CHOICES_V13[role])return VERB_MOVE_CHOICES_V13[role].slice();
   if(VERB_DAILY_CHOICES_V14[verb]&&VERB_DAILY_CHOICES_V14[verb][role])return VERB_DAILY_CHOICES_V14[verb][role].slice();
+  if(VERB_COMM_EXTRA_V15[verb]&&VERB_COMM_CHOICES_V15[role])return VERB_COMM_CHOICES_V15[role].slice();
   if(VERB_AUDIT_CHOICES_V9[role])return VERB_AUDIT_CHOICES_V9[role].slice();
   if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
   if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
@@ -663,6 +664,11 @@ const VERB_DAILY_CHOICES_V14={
  '연습하다':{dailyDetail:['발음','읽기','글쓰기','계산','달리기','줄넘기','발표','악기 연주','그림 그리기','노래','자전거 타기','인사하기'],dailyResult:['속도가 빨라졌다','실수가 줄었다','더 정확해졌다','자신감이 생겼다','혼자 할 수 있었다','어려운 부분을 알았다','조금 늘었다','친구에게 보여 주었다','아직 어려웠다','계속 연습해야 한다','잘 기억하게 되었다','기분이 뿌듯했다'],dailyNext:['읽기','글쓰기','발표','악기','그림','달리기','줄넘기','계산','노래','요리','자전거','한자']},
  '외우다':{dailyDetail:['첫 문장','중요한 단어','핵심 내용','마지막 부분','단어의 뜻','순서','이름','숫자','공식','날짜','노래 가사','약속'],dailyResult:['소리 내어 말했다','다시 써 보았다','빈칸을 채웠다','친구에게 들려주었다','혼자 반복했다','순서를 확인했다','선생님께 말했다','틀린 부분을 고쳤다','처음부터 다시 말했다','퀴즈를 풀었다','암기 카드를 사용했다','기억이 잘 나지 않았다'],dailyNext:['시','노래 가사','영어 단어','한자','구구단','이름','날짜','공식','중요한 문장','역사 연표','전화번호','규칙']}
 };
+const VERB_COMM_EXTRA_V15={"말하다":[["commPoint","말한 내용 중 무엇이 중요했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"묻다":[["commPoint","어떤 답이 궁금했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"대답하다":[["commPoint","대답할 때 무엇을 생각했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"질문하다":[["commPoint","무엇을 더 알고 싶었어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"설명하다":[["commPoint","설명할 때 어떤 예를 들었어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"알려주다":[["commPoint","어떤 정보를 가장 중요하게 알려주었어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"전달하다":[["commPoint","전달할 때 무엇을 확인했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"소개하다":[["commPoint","소개할 때 무엇을 강조했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"발표하다":[["commPoint","발표에서 어떤 내용이 중요했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"이야기하다":[["commPoint","이야기 중 무엇이 기억에 남아요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"대화하다":[["commPoint","대화에서 무엇을 알게 되었어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"부탁하다":[["commPoint","어떤 도움을 부탁했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"요청하다":[["commPoint","어떤 도움을 요청했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"제안하다":[["commPoint","어떤 방법을 제안했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"약속하다":[["commPoint","무엇을 지키기로 약속했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"의논하다":[["commPoint","어떤 의견을 함께 생각했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"토론하다":[["commPoint","어떤 근거를 중요하게 생각했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"설득하다":[["commPoint","어떤 이유를 들어 설득했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"주장하다":[["commPoint","주장을 뒷받침한 근거는 무엇이에요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"사과하다":[["commPoint","사과하면서 어떤 말을 했어요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]],"감사하다":[["commPoint","감사한 이유는 무엇이에요?"],["commResponse","상대방은 어떤 반응을 보였어요?"],["commAfter","말을 주고받은 뒤 무엇을 했어요?"]]};
+const VERB_COMM_CHOICES_V15={
+commPoint:['중요한 내용을 말했다','방법을 설명했다','도움을 부탁했다','질문을 했다','생각을 전달했다','이유를 말했다','예를 들었다','주의할 점을 말했다','친구의 의견을 들었다','약속을 확인했다','순서를 설명했다','다른 방법을 제안했다'],
+commResponse:['고개를 끄덕였다','알겠다고 말했다','다시 질문했다','고맙다고 말했다','웃었다','놀랐다','동의했다','다른 의견을 말했다','도와주겠다고 했다','생각해 보겠다고 했다','거절했다','아무 말도 하지 않았다'],
+commAfter:['내용을 다시 확인했다','함께 계획을 세웠다','친구를 도왔다','자료를 찾아보았다','메모했다','약속을 지켰다','문제를 해결했다','다시 설명했다','선생님께 물었다','서로 인사했다','활동을 시작했다','잠시 쉬었다']};
 const VERB_EXPANSION_QUESTIONS_V7={
  sensory:[['detail','무엇이 가장 눈에 띄었어요?'],['discovery','새롭게 알게 된 것은 무엇이에요?'],['reflection','다음에는 무엇을 더 알아보고 싶어요?']],
  movement:[['method','어떻게 이동했어요?'],['result','도착한 다음에는 무엇을 했어요?'],['reflection','그 경험에서 무엇이 기억에 남아요?']],
@@ -795,7 +801,7 @@ function verbQuestionPlanV7(verb){
  if(!def)return [];
  const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
  const core=verbAuditQuestionPlanV9(verb);
- const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_MOVE_EXTRA_V13[verb]||VERB_DAILY_EXTRA_V14[verb]||VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_MOVE_EXTRA_V13[verb]||VERB_DAILY_EXTRA_V14[verb]||VERB_COMM_EXTRA_V15[verb]||VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
  return core.concat(extra);
 }
 
@@ -2817,6 +2823,9 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
+ if(a.commPoint)extra.push('중요한 내용은 '+verbV7EndSentence(a.commPoint));
+ if(a.commResponse)extra.push('상대방은 '+verbV7EndSentence(a.commResponse));
+ if(a.commAfter)extra.push('대화를 마친 뒤 '+verbV7EndSentence(a.commAfter));
  if(a.dailyDetail){
   const v=verbFirstStateV3.verb;
   const detail=String(a.dailyDetail).trim().replace(/[.!?]+$/,'');
