@@ -549,6 +549,16 @@ const VERB_AUDIT_CHOICES_V9={
  cause:['시간이 부족해서','준비가 부족해서','방법을 몰라서','의견이 달라서','규칙을 몰라서','실수해서','정보가 부족해서','약속을 잊어서','너무 서둘러서','계획이 바뀌어서','도움을 받지 못해서','예상하지 못한 일이 생겨서']
 };
 
+const VERB_SELECTION_FALLBACK_V10={
+ topic:['학교','가족','친구','동물','운동','공부','여행','자연','음식','책','게임','환경'],
+ object:['책','그림','사진','친구','공','동물','자료','물건','과제','문제','작품','계획'],
+ place:['학교','집','교실','공원','운동장','도서관','마트','놀이터','식당','병원','학원','체육관'],
+ destination:['학교','집','교실','공원','운동장','도서관','마트','놀이터','식당','병원','학원','체육관'],
+ recipient:['친구','엄마','아빠','동생','선생님','형','누나','할머니','할아버지','짝꿍','이웃','우리 가족'],
+ method:['말로 설명했다','글로 썼다','그림으로 보여 주었다','직접 해 보였다','도구를 사용했다','도움을 요청했다','함께 했다','순서대로 했다','자료를 찾아보았다','연습했다','다른 방법을 시도했다','천천히 했다'],
+ thought:['다시 확인해야겠다','잘했다고 생각했다','더 연습해야겠다','친구에게 알려 주고 싶다','방법을 바꾸고 싶다','이유가 궁금하다','다른 방법을 찾고 싶다','재미있었다','어렵다고 느꼈다','중요하다고 생각했다','도움이 필요하다고 생각했다','잘 모르겠다'],
+ result:['잘 끝났다','문제가 해결되었다','기분이 좋아졌다','시간이 더 걸렸다','다시 시도했다','새로운 사실을 알았다','생각이 달라졌다','완성했다','도움이 되었다','결과가 달랐다','어려웠다','아직 끝나지 않았다']
+};
 function verbFirstChoicesForV3(verb,role){
   if(VERB_AUDIT_CHOICES_V9[role])return VERB_AUDIT_CHOICES_V9[role].slice();
   if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
@@ -573,7 +583,8 @@ function verbFirstChoicesForV3(verb,role){
   if(role==='topic')return ['학교','가족','친구','고양이','강아지','여행','게임','책','운동','음식','꿈','주말'];
 
   const key=VERB_FIRST_ROLE_CHOICE_MAP_V3[role];
-  return key&&VERB_FIRST_CHOICES_V3[key]?VERB_FIRST_CHOICES_V3[key].slice():[];
+  const values=key&&VERB_FIRST_CHOICES_V3[key]?VERB_FIRST_CHOICES_V3[key]:VERB_SELECTION_FALLBACK_V10[role]||VERB_SELECTION_FALLBACK_V10.thought;
+  return values.slice(0,12);
 }
 
 function verbFirstChoicePagesV3(verb,role){
@@ -2777,8 +2788,8 @@ function verbV8SpecialSentence(v,a){
  const raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
  const extras=[];
  let first='';
- if(v==='비교하다'&&a.pair)first=[sub,raw(a.pair)+'를 비교했다.'].filter(Boolean).join(' ');
- else if(v==='해결하다'&&a.problem)first=[sub,raw(a.problem)+'라는 문제를 해결했다.'].filter(Boolean).join(' ');
+ if(v==='비교하다'&&a.pair)first=[sub,verbFirstObjectTextV3(a.pair),'비교했다.'].filter(Boolean).join(' ');
+ else if(v==='해결하다'&&a.problem)first=[sub,raw(a.problem)+'는 문제를 해결했다.'].filter(Boolean).join(' ');
  else if(a.object)first=[sub,object,grade6PastV5(v)+'.'].filter(Boolean).join(' ');
  else if(v==='설명하다'&&a.recipient)first=[sub,verbFirstRecipientTextV3(a.recipient,'recipient'),'설명했다.'].filter(Boolean).join(' ');
  if(!first)return '';
