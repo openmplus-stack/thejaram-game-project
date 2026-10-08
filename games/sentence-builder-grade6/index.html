@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'verb-first-stage-2',
+  phase:'verb-first-stage-4-adaptive',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -163,8 +163,8 @@ const SENTENCE_ENGINE_V2={
 
 const VERB_FIRST_ENGINE_V3={
   version:'3.0',
-  enabled:false,
-  phase:'verb-first-stage-1',
+  enabled:true,
+  phase:'verb-first-stage-4-adaptive',
   maxQuestions:5,
   principle:'verb-first-question-tree'
 };
@@ -2261,6 +2261,8 @@ function createVerbFirstStateV3(){
     answers:{},
     history:[],
     sentence:'',
+    pendingClarification:null,
+    sentence:'',
     completed:false
   };
 }
@@ -2308,7 +2310,7 @@ function verbFirstCompanionTextV3(value){
 function verbFirstRecipientTextV3(value,kind){
   const raw=String(value||'').trim().replace(/[.?!]+$/,'');
   if(!raw)return '';
-  if(kind==='source')return raw+'에게';
+  if(kind==='source')return raw+'에게서';
   return raw+'에게';
 }
 
@@ -2367,7 +2369,11 @@ function verbFirstBuildSentenceV3(){
   if(a.reaction)extras.push('상대방은 '+String(a.reaction).replace(/[.]+$/,'')+'.');
   if(a.result&&v==='만들다')extras.push('완성한 것은 '+String(a.result).replace(/[.]+$/,'')+'.');
   if(a.feature&&v==='좋아하다')extras.push(String(a.object||'그것')+'의 '+String(a.feature).replace(/[.]+$/,'')+'.');
-  if(a.nextAction)extras.push(String(a.nextAction).replace(/[.]+$/,'')+'.');
+  if(a.nextAction){
+    const action=normalizeShortActionV3(a.nextAction);
+    const actor=a.nextActionSubject?subjectPhraseForNextActionV3(a.nextActionSubject):'';
+    extras.push((actor?actor+' ':'')+action.replace(/[.]+$/,'')+'.');
+  }
   if(a.favorite)extras.push(String(a.favorite).replace(/[.]+$/,'')+'이 가장 재미있었다.');
   if(a.content)extras.push(String(a.content).replace(/[.]+$/,'')+'.');
   if(a.topic&&v==='쓰다')extras.push(String(a.topic)+'에 대해 썼다.');
@@ -2396,7 +2402,126 @@ function renderVerbSelectV3(){
   });
 }
 
+function normalizeShortActionV3(value){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  const map={
+    '달렸어':'달렸다','달렸다':'달렸다','뛰었어':'뛰었다','뛰었다':'뛰었다',
+    '사진을 찍었어':'사진을 찍었다','사진 찍었어':'사진을 찍었다','사진을 찍었다':'사진을 찍었다',
+    '놀았어':'놀았다','놀았다':'놀았다','먹었어':'먹었다','먹었다':'먹었다',
+    '마셨어':'마셨다','마셨다':'마셨다','집에 갔어':'집에 갔다','집에 갔다':'집에 갔다',
+    '안았어':'안았다','안았다':'안았다','만졌어':'만졌다','만졌다':'만졌다',
+    '도망갔어':'도망갔다','도망갔다':'도망갔다','따라갔어':'따라갔다','따라갔다':'따라갔다'
+  };
+  return map[raw]||raw.replace(/했어$/,'했다').replace(/었어$/,'었다').replace(/았어$/,'았다');
+}
+
+function shortActionNeedsSubjectV3(value){
+  const raw=String(value||'').trim();
+  if(!raw)return false;
+  // 주어 표지가 이미 있으면 다시 묻지 않는다.
+  if(/(^|\s)(나는|내가|엄마가|아빠가|친구가|선생님이|강아지가|고양이가|동생이|형이|누나가|할머니가|할아버지가|우리가|우리 가족이)(\s|$)/.test(raw))return false;
+  if(/(은|는|이|가)\s/.test(raw))return false;
+  const actionHints=['달렸','뛰었','찍었','놀았','먹었','마셨','갔','왔','안았','만졌','도망갔','따라갔','주었','받았','만들었'];
+  return actionHints.some(x=>raw.includes(x));
+}
+
+function makeAdaptiveClarificationV3(question,value){
+  if(!question)return null;
+  if(question.kind==='next-event'&&shortActionNeedsSubjectV3(value)){
+    return {
+      role:'nextActionSubject',
+      q:'누가 '+normalizeShortActionV3(value).replace(/다$/,'어요?'),
+      fallbackQ:'누가 그 행동을 했어요?',
+      sourceRole:question.role,
+      value:String(value||'').trim()
+    };
+  }
+  return null;
+}
+
+function subjectPhraseForNextActionV3(value){
+  let raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  raw=raw
+    .replace(/^나랑\s*/,'나와 ')
+    .replace(/^나하고\s*/,'나와 ')
+    .replace(/\s*랑\s*/g,'와 ')
+    .replace(/\s*하고\s*/g,'와 ');
+  if(raw==='나')return '나는';
+  if(raw.includes('와 ')){
+    raw=raw.replace(/(이|가|은|는)$/,'');
+    return raw+'가 함께';
+  }
+  if(/(이|가|은|는)$/.test(raw))return raw;
+  return raw+(hasBatchim(raw)?'이':'가');
+}
+
+function renderAdaptiveClarificationV3(){
+  const pending=verbFirstStateV3.pendingClarification;
+  if(!pending)return renderVerbQuestionV3();
+  const pages=verbFirstChoicePagesV3(verbFirstStateV3.verb,'subject');
+  const sentence=verbFirstBuildSentenceV3();
+  stepText.textContent='한 가지만 더';
+  bar.style.width='92%';
+
+  const qText=(pending.q&&pending.q.length<28)?pending.q:pending.fallbackQ;
+  card.innerHTML=`
+    <h1>${escapeHtml(qText)}</h1>
+    ${sentence?`<div class="story-two" style="margin:12px 0"><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
+    <p class="help">방금 말한 행동을 누가 했는지만 알려 주세요.</p>
+
+    <div class="choices">
+      ${pages.first.map(v=>`<button type="button" class="choice adaptive-subject-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+    </div>
+
+    ${pages.more.length?`
+      <div style="margin-top:12px"><button type="button" class="btn reveal-examples" id="adaptiveMoreV3">+ 더 보기</button></div>
+      <div class="choices extra" id="adaptiveMoreChoicesV3" hidden>
+        ${pages.more.map(v=>`<button type="button" class="choice adaptive-subject-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>
+    `:''}
+
+    <div class="custom" style="margin-top:14px">
+      <label for="adaptiveTypedV3">✏️ 직접 입력</label>
+      <div class="custom-row">
+        <input id="adaptiveTypedV3" placeholder="예: 나랑 강아지" autocomplete="off">
+        <button type="button" class="btn add" id="adaptiveTypedAddV3">입력</button>
+      </div>
+    </div>
+  `;
+
+  const accept=(value,source)=>{
+    const clean=String(value||'').trim();
+    if(!clean)return;
+    verbFirstStateV3.answers.nextActionSubject=clean;
+    verbFirstStateV3.history.push({
+      step:verbFirstStateV3.step,
+      verb:verbFirstStateV3.verb,
+      role:'nextActionSubject',
+      q:qText,
+      value:clean,
+      source,
+      adaptive:true
+    });
+    verbFirstStateV3.pendingClarification=null;
+    verbFirstBuildSentenceV3();
+    renderVerbQuestionV3();
+  };
+
+  card.querySelectorAll('.adaptive-subject-v3').forEach(b=>b.onclick=()=>accept(b.dataset.v,'choice'));
+  const more=card.querySelector('#adaptiveMoreV3');
+  if(more)more.onclick=()=>{
+    card.querySelector('#adaptiveMoreChoicesV3').hidden=false;
+    more.style.display='none';
+  };
+  const input=card.querySelector('#adaptiveTypedV3');
+  const add=()=>accept(input.value,'typed');
+  card.querySelector('#adaptiveTypedAddV3').onclick=add;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+}
+
 function renderVerbQuestionV3(){
+  if(verbFirstStateV3.pendingClarification)return renderAdaptiveClarificationV3();
   const verb=verbFirstStateV3.verb;
   const plan=verbFirstQuestionPlanV3(verb);
   const step=verbFirstStateV3.step;
@@ -2448,6 +2573,8 @@ function renderVerbQuestionV3(){
     verbFirstStateV3.history.push({step,verb,role:q.role,q:q.q,value:clean,source});
     verbFirstBuildSentenceV3();
     verbFirstStateV3.step+=1;
+    const adaptive=makeAdaptiveClarificationV3(q,clean);
+    if(adaptive)verbFirstStateV3.pendingClarification=adaptive;
     renderVerbQuestionV3();
   };
 
