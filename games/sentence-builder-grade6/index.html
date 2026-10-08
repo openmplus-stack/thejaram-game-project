@@ -444,7 +444,7 @@ function grade6ExtendedSentenceV5(verb,a){
  else if(a.object)parts.push(verbFirstObjectTextV3(a.object));
  parts.push(grade6PastV5(verb));
  const story=[parts.filter(Boolean).join(' ')+'.'];
- if(a.reason)story.push('그 이유는 '+String(a.reason).replace(/[.]+$/,'')+'.');
+ if(a.reason)story.push(verbSentenceReasonV19(a.reason));
  if(a.thought)story.push(String(a.thought).replace(/[.]+$/,'')+'.');
  if(a.result)story.push(String(a.result).replace(/[.]+$/,'')+'.');
  if(a.feeling)story.push('기분은 '+String(a.feeling).replace(/[.]+$/,'')+'.');
@@ -2876,8 +2876,33 @@ function verbAuditExtraSentenceV9(a){
  for(const [role,prefix]of fields)if(a[role])fragments.push(prefix+raw(a[role])+'.');
  return fragments.join(' ');
 }
-function verbV7CombineSentence(base,a){
- return [String(base||'').trim(),verbV7ExpansionText(a),verbAuditExtraSentenceV9(a)].filter(Boolean).join(' ');
+function verbSentenceCleanV19(value){return String(value||'').trim().replace(/[.!?]+$/,'');}
+function verbSentenceNominalV19(value){
+ const s=verbSentenceCleanV19(value);
+ if(!s)return '';
+ if(/(?:이다|이었다|였다)$/.test(s))return s;
+ if(/(?:다|었다|았다|했다|겠다|싶다)$/.test(s))return s;
+ return s+(hasBatchim(s)?'이다':'이다');
+}
+function verbSentenceReasonV19(value){
+ const s=verbSentenceCleanV19(value);
+ if(!s)return '';
+ if(/(?:어서|아서|해서|려고|때문에|니까)$/.test(s))return s+' 그 일을 했다.';
+ if(/(?:다|었다|았다|했다)$/.test(s))return '그 이유는 '+s+'.';
+ return '그 이유는 '+s+' 때문이다.';
+}
+function verbSentenceExtensionV19(verb,a){
+ const source=a||{}, copy={...source};
+ // Complex predicates already render these semantic slots in their own main composer.
+ if(VERB_CORE_OVERRIDES_V8[verb]){
+  for(const role of ['learning','method','result','purpose','evidence','reflection','difference','cause'])delete copy[role];
+ }
+ const s=verbV7ExpansionText(copy);
+ const audit=verbAuditExtraSentenceV9(copy);
+ return [s,audit].filter(Boolean).join(' ');
+}
+function verbV7CombineSentence(base,a,verb){
+ return [String(base||'').trim(),verbSentenceExtensionV19(verb||verbFirstStateV3.verb,a)].filter(Boolean).join(' ');
 }
 function verbV8SpecialSentence(v,a){
  const sub=a.subject?verbFirstSubjectTextV3(a.subject):'';
@@ -2898,8 +2923,8 @@ function verbV8SpecialSentence(v,a){
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
-  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV7CombineSentence(verbV8SpecialSentence(v,a),a);return verbFirstStateV3.sentence;}
-  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a);return verbFirstStateV3.sentence;}
+  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV7CombineSentence(verbV8SpecialSentence(v,a),a,v);return verbFirstStateV3.sentence;}
+  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a,v);return verbFirstStateV3.sentence;}
 
   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
   const time=a.time?String(a.time).trim():'';
@@ -2913,7 +2938,7 @@ function verbFirstBuildSentenceV3(){
 
   const isBasicExtra=!!GRADE6_BASIC_V4.defs[v];
   const coreParts=[];
-  if(a.reason&&!(v==='주다'&&a.reason==='재미있어서'))coreParts.push(verbFirstReasonTextV3(a.reason));
+  if(a.reason&&!(v==='주다'&&a.reason==='재미있어서')&&!VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5)coreParts.push(verbFirstReasonTextV3(a.reason));
   if(time)coreParts.push(time);
   if(subject)coreParts.push(subject);
   if(companion)coreParts.push(companion);
