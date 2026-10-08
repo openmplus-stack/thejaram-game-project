@@ -3246,7 +3246,7 @@ function verbFirstBuildSentenceV3(){
   }
 
   if(a.activity&&v==='좋아하다'){
-    let text='나는 '+String(a.activity).replace(/[.]+$/,'').trim()+'을 즐긴다';
+    let text='나는 '+verbFirstObjectTextV3(a.activity)+' 즐긴다';
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
