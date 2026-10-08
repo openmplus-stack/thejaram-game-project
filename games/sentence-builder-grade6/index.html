@@ -3084,6 +3084,14 @@ function verbPredicateV27(verb){
  if(/(?:리다|기다|치다|지다|니다)$/.test(v))return v.slice(0,-1).replace(/다$/,'')+'었다';
  return v;
 }
+function verbInstrumentParticleV29(value){
+ const raw=String(value||'').trim().replace(/[.!?]+$/,'');
+ if(!raw)return '';
+ if(/(으로|로)$/.test(raw))return raw;
+ const last=raw.charCodeAt(raw.length-1);
+ const jong=last>=0xAC00&&last<=0xD7A3?(last-0xAC00)%28:0;
+ return raw+(jong&&jong!==8?'으로':'로');
+}
 function verbRepresentativePolishV28(verb,answers,base){
  const a=answers||{},raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
  const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
@@ -3101,7 +3109,7 @@ function verbRepresentativePolishV28(verb,answers,base){
   return [a.time,subject,a.companion?verbFirstCompanionTextV3(a.companion):'',a.place?verbFirstPlaceTextV3(a.place):'',verbFirstObjectTextV3(a.object),'먹었다.'].filter(Boolean).join(' ');
  }
  if(verb==='만들다'&&a.object){
-  return [subject,a.place?verbFirstPlaceTextV3(a.place):'',a.material?raw(a.material)+'으로':'',verbFirstObjectTextV3(a.object),'만들었다.'].filter(Boolean).join(' ');
+  return [subject,a.place?verbFirstPlaceTextV3(a.place):'',a.material?verbInstrumentParticleV29(a.material):'',verbFirstObjectTextV3(a.object),'만들었다.'].filter(Boolean).join(' ');
  }
  if(verb==='좋아하다'&&a.object){
   return [subject,verbFirstObjectTextV3(a.object),'좋아한다.'].filter(Boolean).join(' ');
