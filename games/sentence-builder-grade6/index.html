@@ -2395,6 +2395,29 @@ function verbFirstPredicatePastV3(verb){
   return map[verb]||verb;
 }
 
+function verbFirstNominativeV3(raw){
+ const s=String(raw||'').trim();
+ if(!s)return '';
+ if(s==='나')return '내가';
+ if(/(은|는)$/.test(s))return s.slice(0,-1)+(hasBatchim(s.slice(0,-1))?'이':'가');
+ if(/(이|가)$/.test(s))return s;
+ return s+(hasBatchim(s)?'이':'가');
+}
+function verbFirstTopicV3(raw){
+ const s=String(raw||'').trim();
+ if(!s)return '';
+ if(s==='나')return '나는';
+ if(/(은|는)$/.test(s))return s;
+ if(/(이|가)$/.test(s))return s.slice(0,-1)+(hasBatchim(s.slice(0,-1))?'은':'는');
+ return s+(hasBatchim(s)?'은':'는');
+}
+function verbFirstReasonTextV3(raw){
+ const s=String(raw||'').trim().replace(/[.]+$/,'');
+ if(!s)return '';
+ if(/(서|려고|때문에)$/.test(s))return s;
+ if(/했다$/.test(s))return s.slice(0,-2)+'해서';
+ return s+'서';
+}
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
@@ -2404,12 +2427,13 @@ function verbFirstBuildSentenceV3(){
   const place=a.place?verbFirstPlaceTextV3(a.place):'';
   const destination=a.destination?verbFirstDestinationTextV3(a.destination):'';
   const companion=a.companion?verbFirstCompanionTextV3(a.companion):'';
-  const object=a.object?verbFirstObjectTextV3(a.object):'';
+  let object=a.object?verbFirstObjectTextV3(a.object):'';
+  if(v==='주다'&&a.reason==='재미있어서'&&a.object==='책')object='재미있는 책을';
   const recipient=a.recipient?verbFirstRecipientTextV3(a.recipient,'recipient'):'';
   const source=a.source?verbFirstRecipientTextV3(a.source,'source'):'';
 
   const coreParts=[];
-  if(a.reason)coreParts.push(String(a.reason).replace(/[.]+$/,''));
+  if(a.reason&&!(v==='주다'&&a.reason==='재미있어서'))coreParts.push(verbFirstReasonTextV3(a.reason));
   if(time)coreParts.push(time);
   if(subject)coreParts.push(subject);
   if(companion)coreParts.push(companion);
@@ -2475,7 +2499,9 @@ function verbFirstBuildSentenceV3(){
   }
 
   if(a.reaction){
-    let text='받은 사람은 '+String(a.reaction).replace(/[.]+$/,'').trim();
+    const who=v==='주다'&&a.recipient?verbFirstTopicV3(a.recipient):'받은 사람은';
+    const response=String(a.reaction).replace(/[.]+$/,'').trim();
+    let text=who+' '+(response==='고맙다고 했다'?'고맙다고 인사했다':response);
     if(text&&!/[.!?]$/.test(text))text+='.';
     sentences.push(text);
   }
@@ -2626,6 +2652,7 @@ function renderAdaptiveClarificationV3(){
       </div>
     `:''}
 
+    <button type="button" class="btn next" id="adaptiveConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>
     <div class="custom" style="margin-top:14px">
       <label for="adaptiveTypedV3">✏️ 직접 입력</label>
       <div class="custom-row">
@@ -2635,6 +2662,7 @@ function renderAdaptiveClarificationV3(){
     </div>
   `;
 
+  let pendingChoice='';
   const accept=(value,source)=>{
     const clean=String(value||'').trim();
     if(!clean)return;
@@ -2653,7 +2681,8 @@ function renderAdaptiveClarificationV3(){
     renderVerbQuestionV3();
   };
 
-  card.querySelectorAll('.adaptive-subject-v3').forEach(b=>b.onclick=()=>accept(b.dataset.v,'choice'));
+  card.querySelectorAll('.adaptive-subject-v3').forEach(b=>b.onclick=()=>{pendingChoice=b.dataset.v;card.querySelectorAll('.adaptive-subject-v3').forEach(x=>x.classList.toggle('subject-picked-v3',x===b));card.querySelector('#adaptiveConfirmV3').disabled=false});
+  card.querySelector('#adaptiveConfirmV3').onclick=()=>accept(pendingChoice,'choice');
   const more=card.querySelector('#adaptiveMoreV3');
   if(more)more.onclick=()=>{
     card.querySelector('#adaptiveMoreChoicesV3').hidden=false;
@@ -2677,6 +2706,7 @@ function renderVerbQuestionV3(){
   const pages=verbFirstChoicePagesV3(verb,q.role);
   const sentence=verbFirstBuildSentenceV3();
   const subjectMulti=q.role==='subject';
+  let currentSelection='';
   const picked=subjectMulti?(Array.isArray(verbFirstStateV3.answers.subject)?verbFirstStateV3.answers.subject:[]):[];
   const choiceButtons=arr=>arr.map(v=>`<button type="button" class="choice verb-answer-v3 ${subjectMulti&&picked.includes(v)?'subject-picked-v3':''}" aria-pressed="${subjectMulti&&picked.includes(v)?'true':'false'}" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('');
   stepText.textContent=(step+1)+'/5';
@@ -2700,6 +2730,7 @@ function renderVerbQuestionV3(){
       </div>
     `:''}
 
+    ${!subjectMulti?`<button type="button" class="btn next" id="verbConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>`:''}
     ${subjectMulti?`<p class="help" style="margin-top:12px">여러 명을 선택할 수 있어요. 선택한 순서대로 문장에 들어가요.</p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>선택 완료 (${picked.length}) →</button>`:''}
     <div class="custom" style="margin-top:14px">
       <label for="verbTypedV3">✏️ 직접 입력</label>
@@ -2741,8 +2772,14 @@ function renderVerbQuestionV3(){
       verbFirstStateV3.answers.subject=list;
       card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=list.includes(x.dataset.v);x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
       const next=card.querySelector('#verbSubjectNextV3');if(next){next.disabled=!list.length;next.textContent='선택 완료 ('+list.length+') →';}
-    }else accept(b.dataset.v,'choice');
+    }else{
+      currentSelection=b.dataset.v;
+      card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=x===b;x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
+      const confirm=card.querySelector('#verbConfirmV3');if(confirm)confirm.disabled=false;
+      card.querySelector('#verbTypedV3').value='';
+    }
   });
+  const confirm=card.querySelector('#verbConfirmV3');if(confirm)confirm.onclick=()=>accept(currentSelection,'choice');
   const subjectNext=card.querySelector('#verbSubjectNextV3');
   if(subjectNext)subjectNext.onclick=()=>{if(!(verbFirstStateV3.answers.subject||[]).length)return;verbFirstStateV3.step+=1;renderVerbQuestionV3()};
   const more=card.querySelector('#verbMoreV3');
@@ -2752,7 +2789,13 @@ function renderVerbQuestionV3(){
     more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=true;more.textContent='＋ 더 보기';more.setAttribute('aria-expanded','false');more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=false;more.textContent='− 접기';more.setAttribute('aria-expanded','true')}};
   };
   const input=card.querySelector('#verbTypedV3');
-  const add=()=>accept(input.value,'typed');
+  const add=()=>{
+    const value=input.value.trim();if(!value)return;
+    if(subjectMulti){accept(value,'typed');return;}
+    currentSelection=value;
+    card.querySelectorAll('.verb-answer-v3').forEach(x=>{x.classList.remove('subject-picked-v3');x.setAttribute('aria-pressed','false')});
+    if(confirm)confirm.disabled=false;
+  };
   card.querySelector('#verbTypedAddV3').onclick=add;
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
 
