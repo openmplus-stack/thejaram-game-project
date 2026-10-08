@@ -3227,24 +3227,17 @@ function contextItems(s){
 }
 
 function startCompose(){
-  selected=[];
-  custom={};
-  cur=0;
-  resetStoryV2();
+  // V3-only entry: do not reference deleted legacy globals or functions.
   resetVerbFirstV3();
-
-  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
   const compose=document.getElementById('composeScreen');
-  if(compose)compose.classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.screen==='composeScreen'));
-  window.scrollTo({top:0,behavior:'auto'});
-
-  if(VERB_FIRST_ENGINE_V3&&VERB_FIRST_ENGINE_V3.enabled){
-    renderVerbSelectV3();
-    return;
-  }
-  renderMeaningStartV2();
+  if(!compose)return;
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  compose.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.screen==='composeScreen'));
+  renderVerbSelectV3();
+  window.scrollTo(0,0);
 }
+
 const commonSpellingCorrections={
  '버수':'버스','뻐스':'버스','학교애':'학교에','학교예':'학교에','집애':'집에','친구랑가':'친구랑','선생임':'선생님','선생닝':'선생님',
  '우유룰':'우유를','물을를':'물을','책을를':'책을','먹엇어요':'먹었어요','먹었어여':'먹었어요','마셧어요':'마셨어요','마셨서요':'마셨어요',
