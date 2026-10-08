@@ -2631,7 +2631,7 @@ function renderVerbSelectV3(){
   const verbs=GRADE6_BASIC_VERBS_V4.filter(v=>!!VERB_FIRST_DEFINITIONS_V3[v]);
   card.innerHTML=`
     <h1>무엇을 했어요?</h1>
-    <p class="help">먼저 하고 싶은 말의 중심 동사를 골라 주세요.</p>
+    
     <div class="choices" style="margin-top:14px">
       ${verbs.map(v=>`<button type="button" class="choice verb-pick-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
     </div>
@@ -2709,7 +2709,7 @@ function renderAdaptiveClarificationV3(){
   card.innerHTML=`
     <h1>${escapeHtml(qText)}</h1>
     ${sentence?`<div class="story-two" style="margin:12px 0"><div class="help" style="margin-bottom:6px">지금까지 만든 문장</div><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
-    <p class="help">방금 말한 행동을 누가 했는지만 알려 주세요.</p>
+    
 
     <div class="choices">
       ${pages.first.map(v=>`<button type="button" class="choice adaptive-subject-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
@@ -2723,6 +2723,7 @@ function renderAdaptiveClarificationV3(){
     `:''}
 
     <button type="button" class="btn next" id="adaptiveConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>
+    <div class="actions" style="margin-top:12px"><button type="button" class="btn" id="adaptiveSkipV3">건너뛰기</button><button type="button" class="btn next" id="adaptiveFinishV3">완료</button></div>
     <div class="custom" style="margin-top:14px">
       <label for="adaptiveTypedV3">✏️ 직접 입력</label>
       <div class="custom-row">
@@ -2758,6 +2759,8 @@ function renderAdaptiveClarificationV3(){
     card.querySelector('#adaptiveMoreChoicesV3').hidden=false;
     more.style.display='none';
   };
+  card.querySelector('#adaptiveSkipV3').onclick=()=>{verbFirstStateV3.pendingClarification=null;renderVerbQuestionV3()};
+  card.querySelector('#adaptiveFinishV3').onclick=()=>{verbFirstStateV3.pendingClarification=null;renderVerbResultV3()};
   const input=card.querySelector('#adaptiveTypedV3');
   const add=()=>accept(input.value,'typed');
   card.querySelector('#adaptiveTypedAddV3').onclick=add;
@@ -2784,8 +2787,7 @@ function renderVerbQuestionV3(){
 
   card.innerHTML=`
     <h1>${escapeHtml(q.q)}</h1>
-    ${sentence?`<div class="story-two" style="margin:12px 0"><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
-    <p class="help">보기에서 고르거나 직접 입력할 수 있어요.</p>
+    <div class="story-two" style="margin:12px 0;min-height:74px"><b>📝 ${escapeHtml(sentence||'아직 문장을 만들고 있어요.')}</b></div>
 
     <div class="choices" id="verbFirstChoices1V3">
       ${choiceButtons(pages.first)}
@@ -2801,7 +2803,7 @@ function renderVerbQuestionV3(){
     `:''}
 
     ${!subjectMulti?`<button type="button" class="btn next" id="verbConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>`:''}
-    ${subjectMulti?`<p class="help" style="margin-top:12px">여러 명을 선택할 수 있어요. 선택한 순서대로 문장에 들어가요.</p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>확인 (${picked.length})</button>`:''}
+    ${subjectMulti?`<p class="help" style="margin-top:12px"></p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>확인 (${picked.length})</button>`:''}
     <div class="custom" style="margin-top:14px">
       <label for="verbTypedV3">✏️ 직접 입력</label>
       <div class="custom-row">
@@ -2811,7 +2813,9 @@ function renderVerbQuestionV3(){
     </div>
 
     <div class="actions" style="margin-top:18px">
-      <button type="button" class="btn" id="verbBackV3">${step===0?'동사 다시 고르기':'이전'}</button>
+      <button type="button" class="btn" id="verbBackV3">${step===0?'처음부터':'이전'}</button>
+      <button type="button" class="btn" id="verbSkipV3">건너뛰기</button>
+      <button type="button" class="btn next" id="verbFinishV3" ${sentence?'':'disabled'}>완료</button>
     </div>
     <div style="clear:both"></div>
   `;
@@ -2869,6 +2873,8 @@ function renderVerbQuestionV3(){
   card.querySelector('#verbTypedAddV3').onclick=add;
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
 
+  card.querySelector('#verbSkipV3').onclick=()=>{delete verbFirstStateV3.answers[q.role];verbFirstStateV3.step+=1;renderVerbQuestionV3()};
+  card.querySelector('#verbFinishV3').onclick=()=>{if(verbFirstBuildSentenceV3())renderVerbResultV3()};
   card.querySelector('#verbBackV3').onclick=()=>{
     if(step===0)return renderVerbSelectV3();
     verbFirstStateV3.step=Math.max(0,step-1);
