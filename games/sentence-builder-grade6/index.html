@@ -3097,8 +3097,8 @@ function verbRepresentativePolishV28(verb,answers,base){
  const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
  if(verb==='비교하다'&&a.pair){
   const sentences=[[subject||'나는',verbFirstObjectTextV3(a.pair),'비교했다.'].join(' ')];
-  if(a.similarity)sentences.push('같은 점은 '+raw(a.similarity)+(verbChoiceKindV25(a.similarity)==='sentence'?'.':'이다.'));
-  if(a.differenceCore)sentences.push('다른 점은 '+raw(a.differenceCore)+(verbChoiceKindV25(a.differenceCore)==='sentence'?'.':'이다.'));
+  if(a.similarity)sentences.push('같은 점은 '+raw(a.similarity)+(/(?:다|이다|었다|았다)$/.test(raw(a.similarity))?'.':'이다.'));
+  if(a.differenceCore)sentences.push('다른 점은 '+raw(a.differenceCore)+(/(?:다|이다|었다|았다)$/.test(raw(a.differenceCore))?'.':'이다.'));
   if(a.learning)sentences.push(raw(a.learning)+'.');
   return sentences.join(' ');
  }
