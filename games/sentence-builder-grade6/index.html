@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'midcheck-like-predicate-fix',
+  phase:'verb-first-stage-1',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -160,6 +160,187 @@ const SENTENCE_ENGINE_V2={
     noInventedFacts:true
   }
 };
+
+const VERB_FIRST_ENGINE_V3={
+  version:'3.0',
+  enabled:false,
+  phase:'verb-first-stage-1',
+  maxQuestions:5,
+  principle:'verb-first-question-tree'
+};
+
+const VERB_FIRST_DEFINITIONS_V3={
+  '가다':{
+    display:'가다',
+    firstQuestion:'어디에 갔어요?',
+    coreRole:'destination',
+    required:['destination'],
+    followUps:[
+      {role:'time',q:'언제 갔어요?',kind:'context'},
+      {role:'companion',q:'누구와 갔어요?',kind:'context'},
+      {role:'reason',q:'왜 갔어요?',kind:'reason'},
+      {role:'nextAction',q:'거기에서 무엇을 했어요?',kind:'next-event'}
+    ],
+    sentencePattern:'[time] [subject] [companion] [destination] 갔다.'
+  },
+  '보다':{
+    display:'보다',
+    firstQuestion:'무엇을 보았어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 보았어요?',kind:'context'},
+      {role:'place',q:'어디에서 보았어요?',kind:'context'},
+      {role:'nextAction',q:'보고 무엇을 했어요?',kind:'next-event'},
+      {role:'thought',q:'무슨 생각이 들었어요?',kind:'thought'}
+    ],
+    sentencePattern:'[time] [subject] [place] [object] 보았다.'
+  },
+  '먹다':{
+    display:'먹다',
+    firstQuestion:'무엇을 먹었어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 먹었어요?',kind:'context'},
+      {role:'place',q:'어디에서 먹었어요?',kind:'context'},
+      {role:'companion',q:'누구와 먹었어요?',kind:'context'},
+      {role:'result',q:'먹고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[time] [subject] [companion] [place] [object] 먹었다.'
+  },
+  '마시다':{
+    display:'마시다',
+    firstQuestion:'무엇을 마셨어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 마셨어요?',kind:'context'},
+      {role:'place',q:'어디에서 마셨어요?',kind:'context'},
+      {role:'reason',q:'왜 마셨어요?',kind:'reason'},
+      {role:'result',q:'마시고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[reason] [time] [subject] [place] [object] 마셨다.'
+  },
+  '읽다':{
+    display:'읽다',
+    firstQuestion:'무엇을 읽었어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 읽었어요?',kind:'context'},
+      {role:'place',q:'어디에서 읽었어요?',kind:'context'},
+      {role:'reason',q:'왜 읽었어요?',kind:'reason'},
+      {role:'thought',q:'읽고 무슨 생각이 들었어요?',kind:'thought'}
+    ],
+    sentencePattern:'[time] [subject] [place] [object] 읽었다.'
+  },
+  '쓰다':{
+    display:'쓰다',
+    firstQuestion:'무엇을 썼어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 썼어요?',kind:'context'},
+      {role:'place',q:'어디에서 썼어요?',kind:'context'},
+      {role:'reason',q:'왜 썼어요?',kind:'reason'},
+      {role:'content',q:'무슨 내용을 썼어요?',kind:'detail'}
+    ],
+    sentencePattern:'[time] [subject] [place] [object] 썼다.'
+  },
+  '놀다':{
+    display:'놀다',
+    firstQuestion:'무엇을 하며 놀았어요?',
+    coreRole:'activity',
+    required:['activity'],
+    followUps:[
+      {role:'time',q:'언제 놀았어요?',kind:'context'},
+      {role:'place',q:'어디에서 놀았어요?',kind:'context'},
+      {role:'companion',q:'누구와 놀았어요?',kind:'context'},
+      {role:'result',q:'놀고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[time] [subject] [companion] [place] [activity] 하며 놀았다.'
+  },
+  '만나다':{
+    display:'만나다',
+    firstQuestion:'누구를 만났어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 만났어요?',kind:'context'},
+      {role:'place',q:'어디에서 만났어요?',kind:'context'},
+      {role:'reason',q:'왜 만났어요?',kind:'reason'},
+      {role:'nextAction',q:'만나서 무엇을 했어요?',kind:'next-event'}
+    ],
+    sentencePattern:'[time] [subject] [place] [object] 만났다.'
+  },
+  '주다':{
+    display:'주다',
+    firstQuestion:'무엇을 주었어요?',
+    coreRole:'object',
+    required:['object','recipient'],
+    followUps:[
+      {role:'recipient',q:'누구에게 주었어요?',kind:'core'},
+      {role:'time',q:'언제 주었어요?',kind:'context'},
+      {role:'reason',q:'왜 주었어요?',kind:'reason'},
+      {role:'result',q:'주고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[time] [subject] [recipient] [object] 주었다.'
+  },
+  '받다':{
+    display:'받다',
+    firstQuestion:'무엇을 받았어요?',
+    coreRole:'object',
+    required:['object','source'],
+    followUps:[
+      {role:'source',q:'누구에게 받았어요?',kind:'core'},
+      {role:'time',q:'언제 받았어요?',kind:'context'},
+      {role:'reason',q:'왜 받았어요?',kind:'reason'},
+      {role:'result',q:'받고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[time] [subject] [source] [object] 받았다.'
+  },
+  '만들다':{
+    display:'만들다',
+    firstQuestion:'무엇을 만들었어요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'time',q:'언제 만들었어요?',kind:'context'},
+      {role:'place',q:'어디에서 만들었어요?',kind:'context'},
+      {role:'material',q:'무엇으로 만들었어요?',kind:'detail'},
+      {role:'result',q:'만들고 나서 어땠어요?',kind:'result'}
+    ],
+    sentencePattern:'[time] [subject] [place] [material] [object] 만들었다.'
+  },
+  '좋아하다':{
+    display:'좋아하다',
+    firstQuestion:'무엇을 좋아해요?',
+    coreRole:'object',
+    required:['object'],
+    followUps:[
+      {role:'reason',q:'왜 좋아해요?',kind:'reason'},
+      {role:'time',q:'언제부터 좋아했어요?',kind:'context'},
+      {role:'activity',q:'좋아하는 것과 무엇을 해요?',kind:'next-event'},
+      {role:'thought',q:'좋아하는 것에 대해 무슨 생각을 해요?',kind:'thought'}
+    ],
+    sentencePattern:'[subject] [object] 좋아한다.'
+  }
+};
+
+function verbFirstDefinitionV3(verb){
+  return VERB_FIRST_DEFINITIONS_V3[String(verb||'').trim()]||null;
+}
+
+function verbFirstQuestionPlanV3(verb){
+  const def=verbFirstDefinitionV3(verb);
+  if(!def)return [];
+  return [
+    {role:def.coreRole,q:def.firstQuestion,kind:'core'},
+    ...(def.followUps||[])
+  ].slice(0,VERB_FIRST_ENGINE_V3.maxQuestions);
+}
+
 
 function createEmptyStoryV2(){
   return {
