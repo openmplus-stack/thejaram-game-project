@@ -2731,7 +2731,7 @@ function renderVerbQuestionV3(){
     `:''}
 
     ${!subjectMulti?`<button type="button" class="btn next" id="verbConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>`:''}
-    ${subjectMulti?`<p class="help" style="margin-top:12px">여러 명을 선택할 수 있어요. 선택한 순서대로 문장에 들어가요.</p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>선택 완료 (${picked.length}) →</button>`:''}
+    ${subjectMulti?`<p class="help" style="margin-top:12px">여러 명을 선택할 수 있어요. 선택한 순서대로 문장에 들어가요.</p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>확인 (${picked.length})</button>`:''}
     <div class="custom" style="margin-top:14px">
       <label for="verbTypedV3">✏️ 직접 입력</label>
       <div class="custom-row">
@@ -2771,7 +2771,7 @@ function renderVerbQuestionV3(){
       if(at>=0)list.splice(at,1);else list.push(v);
       verbFirstStateV3.answers.subject=list;
       card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=list.includes(x.dataset.v);x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
-      const next=card.querySelector('#verbSubjectNextV3');if(next){next.disabled=!list.length;next.textContent='선택 완료 ('+list.length+') →';}
+      const next=card.querySelector('#verbSubjectNextV3');if(next){next.disabled=!list.length;next.textContent='확인 ('+list.length+')';}
     }else{
       currentSelection=b.dataset.v;
       card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=x===b;x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
