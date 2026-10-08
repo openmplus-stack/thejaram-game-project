@@ -898,6 +898,55 @@ function verbQuestionPlanV7(verb){
  return core.concat(extra).map(q=>({...q,q:(VERB_EASY_QUESTION_V21[verb]||{})[q.q]||q.q}));
 }
 
+// Step 2: explicit question-to-answer semantic contracts (metadata only).
+// These contracts do not change displayed questions or options until step 3.
+const VERB_ANSWER_TYPES_V32={
+ subject:'person',companion:'person',recipient:'person',source:'person',
+ destination:'destination',place:'location',time:'time',goTransport:'transport',goPurpose:'purpose',
+ object:'object',pair:'comparison_pair',material:'material',instrument:'instrument',
+ reason:'reason',purpose:'purpose',cause:'cause',method:'method',methodExtra:'method',
+ taste:'taste',feeling:'emotion',moveFeeling:'emotion',visitFeeling:'emotion',
+ nextAction:'completed_action',actionExtra:'completed_action',firstAction:'completed_action',
+ result:'outcome',resultExtra:'outcome',planOutcome:'outcome',dailyResult:'outcome',
+ discovery:'finding',learning:'learning',evidence:'evidence',evidenceCore:'evidence',
+ difference:'difference',differenceCore:'difference',similarity:'similarity',
+ criterion:'criterion',conclusion:'conclusion',reflection:'reflection',judgment:'judgment',
+ activity:'activity',content:'content',thought:'thought',problem:'problem',
+ visitMemory:'memory',visitAgain:'future_intent',detail:'detail',observation:'observation',
+ reaction:'reaction',reactionExtra:'reaction',commResponse:'reaction',
+};
+const VERB_FAMILY_OBJECT_TYPES_V32={
+ clothing:'wearable',food:'food_or_drink',transport:'vehicle',
+ movement:'movement_target',transfer:'transfer_item',learning:'learning_material',
+ sensory:'perceivable_item',everyday:'everyday_item',emotion:'emotion_target',
+ communication:'communication_content',creation:'made_item',
+ cognition:'thinking_content',planning:'task_or_goal',comparison:'comparison_target'
+};
+const VERB_OBJECT_TYPE_OVERRIDES_V32={
+ '입다':'clothing_to_wear','벗다':'wearable_to_remove','먹다':'edible_food',
+ '마시다':'drinkable_liquid','타다':'boardable_vehicle','내리다':'vehicle_to_exit',
+ '읽다':'readable_material','쓰다':'writable_content','외우다':'memorizable_content',
+ '만들다':'makeable_product','주다':'giveable_item','받다':'receivable_item',
+ '사다':'purchasable_item','팔다':'saleable_item','좋아하다':'liked_target',
+ '싫어하다':'disliked_target','비교하다':'comparison_target'
+};
+function verbAnswerContractV32(verb,role){
+ const family=VERB_SEMANTIC_BY_VERB_V31[verb]||'everyday';
+ let type=VERB_ANSWER_TYPES_V32[role]||role;
+ if(role==='object')type=VERB_OBJECT_TYPE_OVERRIDES_V32[verb]||VERB_FAMILY_OBJECT_TYPES_V32[family]||'object';
+ if(role==='pair')type='comparison_pair';
+ return {verb,role,family,type,source:role==='object'&&VERB_OBJECT_TYPE_OVERRIDES_V32[verb]?'verb':role==='object'?'family':'question'};
+}
+function verbQuestionContractsV32(verb){
+ return verbQuestionPlanV7(verb).map(q=>({...q,answer:verbAnswerContractV32(verb,q.role)}));
+}
+function verbQuestionContractsAuditV32(){
+ const all=GRADE6_GROUP_VERBS_V5.map(verb=>({verb,questions:verbQuestionContractsV32(verb)}));
+ return {verbCount:all.length,mappedQuestions:all.reduce((n,v)=>n+v.questions.length,0),
+  missingFamily:all.filter(v=>!VERB_SEMANTIC_BY_VERB_V31[v.verb]).map(v=>v.verb),
+  missingType:all.flatMap(v=>v.questions.filter(q=>!q.answer.type).map(q=>v.verb+':'+q.role)),
+  emptyQuestionSets:all.filter(v=>!v.questions.length).map(v=>v.verb)};
+}
 function verbQuestionAuditV20(){
  const rows=GRADE6_GROUP_VERBS_V5.map(verb=>{
   const questions=verbQuestionPlanV7(verb);
