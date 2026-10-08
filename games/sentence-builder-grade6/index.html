@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'verb-first-stage-5-specific-choices',
+  phase:'verb-first-stage-6-live-sentence',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -2380,61 +2380,134 @@ function verbFirstPredicatePastV3(verb){
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
-  const chunks=[];
-  if(a.reason)chunks.push(String(a.reason).replace(/서$/,'서'));
-  if(a.time)chunks.push(String(a.time));
-  if(a.subject)chunks.push(verbFirstSubjectTextV3(a.subject));
-  if(a.companion)chunks.push(verbFirstCompanionTextV3(a.companion));
-  if(a.place)chunks.push(verbFirstPlaceTextV3(a.place));
-  if(a.destination)chunks.push(verbFirstDestinationTextV3(a.destination));
-  if(a.source)chunks.push(verbFirstRecipientTextV3(a.source,'source'));
-  if(a.recipient)chunks.push(verbFirstRecipientTextV3(a.recipient,'recipient'));
 
-  if(a.object){
-    if(v==='좋아하다'){
-      chunks.push(verbFirstObjectTextV3(a.object));
-    }else{
-      chunks.push(verbFirstObjectTextV3(a.object));
+  const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
+  const time=a.time?String(a.time).trim():'';
+  const place=a.place?verbFirstPlaceTextV3(a.place):'';
+  const destination=a.destination?verbFirstDestinationTextV3(a.destination):'';
+  const companion=a.companion?verbFirstCompanionTextV3(a.companion):'';
+  const object=a.object?verbFirstObjectTextV3(a.object):'';
+  const recipient=a.recipient?verbFirstRecipientTextV3(a.recipient,'recipient'):'';
+  const source=a.source?verbFirstRecipientTextV3(a.source,'source'):'';
+
+  const coreParts=[];
+  if(a.reason)coreParts.push(String(a.reason).replace(/[.]+$/,''));
+  if(time)coreParts.push(time);
+  if(subject)coreParts.push(subject);
+  if(companion)coreParts.push(companion);
+  if(place)coreParts.push(place);
+  if(destination)coreParts.push(destination);
+  if(source)coreParts.push(source);
+  if(recipient)coreParts.push(recipient);
+
+  let coreReady=false;
+
+  if(v==='가다'){
+    if(destination){coreParts.push('갔다');coreReady=true}
+  }else if(v==='놀다'){
+    if(a.activity){
+      coreParts.push(String(a.activity).replace(/[.]+$/,'')+'을 하며 놀았다');
+      coreReady=true;
+    }
+  }else if(v==='좋아하다'){
+    if(object){coreParts.push(object,'좋아한다');coreReady=true}
+  }else if(['보다','먹다','마시다','읽다','쓰다','만나다','주다','받다','만들다'].includes(v)){
+    if(object){
+      if(v==='만들다'&&a.material)coreParts.push(String(a.material).replace(/[.]+$/,'')+'으로');
+      coreParts.push(object,verbFirstPredicatePastV3(v));
+      coreReady=true;
     }
   }
 
-  if(a.activity&&v==='놀다')chunks.push(String(a.activity)+'을 하며');
-  if(a.material&&v==='만들다')chunks.push(String(a.material)+'으로');
-
-  let base='';
-  const canFormCore=!!(a.subject && (
-    (v==='가다'&&a.destination) ||
-    (['보다','먹다','마시다','읽다','쓰다','만나다','주다','받다','만들다','좋아하다'].includes(v)&&a.object) ||
-    (v==='놀다'&&a.activity)
-  ));
-
-  if(canFormCore){
-    base=chunks.filter(Boolean).join(' ').replace(/\s+/g,' ').trim()+' '+verbFirstPredicatePastV3(v)+'.';
-    base=base.replace(/\s+([.])/g,'$1');
+  const sentences=[];
+  if(coreReady){
+    let core=coreParts.filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+    if(core&&!/[.!?]$/.test(core))core+='.';
+    sentences.push(core);
   }
 
-  const extras=[];
-  if(a.taste){
-    const target=a.object||'그것';
-    extras.push(target+(hasBatchim(target)?'은':'는')+' '+String(a.taste).replace(/[.]+$/,'')+'.');
-  }
-  if(a.feeling)extras.push('기분은 '+String(a.feeling).replace(/[.]+$/,'')+'.');
-  if(a.thought)extras.push(String(a.thought).replace(/[.]+$/,'')+'.');
-  if(a.reaction)extras.push('상대방은 '+String(a.reaction).replace(/[.]+$/,'')+'.');
-  if(a.result&&v==='만들다')extras.push('완성한 것은 '+String(a.result).replace(/[.]+$/,'')+'.');
-  if(a.feature&&v==='좋아하다')extras.push(String(a.object||'그것')+'의 '+String(a.feature).replace(/[.]+$/,'')+'.');
+  const objectRaw=String(a.object||'').trim();
+
   if(a.nextAction){
     const action=normalizeShortActionV3(a.nextAction);
     const actor=a.nextActionSubject?subjectPhraseForNextActionV3(a.nextActionSubject):'';
-    extras.push((actor?actor+' ':'')+action.replace(/[.]+$/,'')+'.');
+    let text=((actor?actor+' ':'')+action).replace(/\s+/g,' ').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    if(text)sentences.push(text);
   }
-  if(a.favorite)extras.push(String(a.favorite).replace(/[.]+$/,'')+'이 가장 재미있었다.');
-  if(a.content)extras.push(String(a.content).replace(/[.]+$/,'')+'.');
-  if(a.topic&&v==='쓰다')extras.push(String(a.topic)+'에 대해 썼다.');
-  if(a.method&&v==='만들다')extras.push(String(a.method).replace(/[.]+$/,'')+'.');
 
-  verbFirstStateV3.sentence=[base,...extras].filter(Boolean).join(' ');
+  if(a.taste){
+    const taste=String(a.taste).replace(/[.]+$/,'').trim();
+    const target=objectRaw||'그것';
+    let text=target+(hasBatchim(target)?'은':'는')+' '+taste;
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.feeling){
+    let text='기분은 '+String(a.feeling).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.thought){
+    let text=String(a.thought).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.reaction){
+    let text='받은 사람은 '+String(a.reaction).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.result&&v==='만들다'){
+    let text='완성한 것은 '+String(a.result).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.feature&&v==='좋아하다'){
+    let text='좋아하는 점은 '+String(a.feature).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.favorite){
+    let text=String(a.favorite).replace(/[.]+$/,'').trim()+'이 가장 재미있었다.';
+    sentences.push(text);
+  }
+
+  if(a.content){
+    let text='기억나는 내용은 '+String(a.content).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.topic&&v==='쓰다'){
+    let text=String(a.topic).replace(/[.]+$/,'').trim()+'에 대해 썼다.';
+    sentences.push(text);
+  }
+
+  if(a.method&&v==='만들다'){
+    let text=String(a.method).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  if(a.activity&&v==='좋아하다'){
+    let text=String(a.activity).replace(/[.]+$/,'').trim();
+    if(text&&!/[.!?]$/.test(text))text+='.';
+    sentences.push(text);
+  }
+
+  verbFirstStateV3.sentence=sentences.filter(Boolean).join(' ');
   return verbFirstStateV3.sentence;
+}
+
+function verbFirstProgressSentenceV3(){
+  return verbFirstBuildSentenceV3();
 }
 
 function renderVerbSelectV3(){
@@ -2521,7 +2594,7 @@ function renderAdaptiveClarificationV3(){
   const qText=(pending.q&&pending.q.length<28)?pending.q:pending.fallbackQ;
   card.innerHTML=`
     <h1>${escapeHtml(qText)}</h1>
-    ${sentence?`<div class="story-two" style="margin:12px 0"><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
+    ${sentence?`<div class="story-two" style="margin:12px 0"><div class="help" style="margin-bottom:6px">지금까지 만든 문장</div><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
     <p class="help">방금 말한 행동을 누가 했는지만 알려 주세요.</p>
 
     <div class="choices">
