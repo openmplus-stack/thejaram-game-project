@@ -447,7 +447,7 @@ function grade6ExtendedSentenceV5(verb,a){
  if(a.place)parts.push(verbFirstPlaceTextV3(a.place));
  if(a.destination)parts.push(verbFirstDestinationTextV3(a.destination));
  else if(a.object)parts.push(verbFirstObjectTextV3(a.object));
- parts.push(grade6PastV5(verb));
+ parts.push(verbPredicateV27(verb));
  const story=[parts.filter(Boolean).join(' ')+'.'];
  if(a.reason)story.push(verbSentenceReasonV19(a.reason));
  if(a.thought)story.push(String(a.thought).replace(/[.]+$/,'')+'.');
@@ -2859,7 +2859,7 @@ function verbFirstObjectTextV3(value){
   const raw=String(value||'').trim().replace(/[.?!]+$/,'');
   if(!raw)return '';
   if(verbChoiceKindV25(raw)==='sentence'||/(을|를)$/.test(raw))return raw;
-  return raw+(hasBatchim(raw)?'을':'를');
+  return verbParticleV27(raw,'을','를');
 }
 
 function verbFirstPlaceTextV3(value){
@@ -2880,7 +2880,7 @@ function verbFirstCompanionTextV3(value){
   const raw=String(value||'').trim().replace(/[.?!]+$/,'');
   if(!raw)return '';
   if(/(와|과|랑|이랑)$/.test(raw))return raw;
-  return raw+(hasBatchim(raw)?'과':'와');
+  return verbParticleV27(raw,'과','와');
 }
 
 function verbFirstRecipientTextV3(value,kind){
@@ -2896,7 +2896,7 @@ function verbFirstPredicatePastV3(verb){
     '쓰다':'썼다','놀다':'놀았다','만나다':'만났다','주다':'주었다','받다':'받았다',
     '만들다':'만들었다','좋아하다':'좋아한다'
   };
-  return map[verb]||GRADE6_BASIC_V4.past[verb]||verb;
+  return map[verb]||GRADE6_BASIC_V4.past[verb]||verbPredicateV27(verb);
 }
 
 function verbFirstNominativeV3(raw){
@@ -3034,7 +3034,7 @@ function verbV8SpecialSentence(v,a){
  let first='';
  if(v==='비교하다'&&a.pair)first=[sub,verbFirstObjectTextV3(a.pair),'비교했다.'].filter(Boolean).join(' ');
  else if(v==='해결하다'&&a.problem)first=[sub,raw(a.problem)+'는 문제를 해결했다.'].filter(Boolean).join(' ');
- else if(a.object)first=[sub,object,grade6PastV5(v)+'.'].filter(Boolean).join(' ');
+ else if(a.object)first=[sub,object,verbPredicateV27(v)+'.'].filter(Boolean).join(' ');
  else if(v==='설명하다'&&a.recipient)first=[sub,verbFirstRecipientTextV3(a.recipient,'recipient'),'설명했다.'].filter(Boolean).join(' ');
  if(!first)return '';
  const map={similarity:'같은 점은 ',differenceCore:'다른 점은 ',learning:'알게 된 것은 ',judgment:'판단한 내용은 ',evidenceCore:'그 근거는 ',firstAction:'먼저 할 일은 ',purpose:'계획한 이유는 ',cause:'문제가 생긴 이유는 ',method:'사용한 방법은 ',result:'그 결과 ',discovery:'발견한 것은 ',mainIdea:'가장 중요한 내용은 ',supporting:'그 내용을 뒷받침하는 것은 ',clue:'찾은 단서는 ',inference:'추론한 내용은 ',criterion:'비교한 기준은 ',conclusion:'비교한 결과 ',alternative:'다른 가능성은 ',consequence:'그 뒤에 ',example:'설명에 사용한 예는 ',understanding:'상대방이 이해한 내용은 ',resources:'필요한 준비물은 ',obstacle:'예상되는 어려움은 ',comparisonNote:'전과 달라진 점은 ',omitted:'요약하면서 생략한 내용은 ',verification:'확인할 방법은 '};
@@ -3058,6 +3058,31 @@ function verbUnifiedSurfaceV26(value){
   output.push(sentence);
  }
  return output.join(' ');
+}
+// V27: central particle and predicate rules shared by all generation paths.
+function verbParticleV27(value,consonant,vowel){
+ const s=String(value||'').trim().replace(/[.!?]+$/,'');
+ if(!s)return '';
+ return s+(hasBatchim(s)?consonant:vowel);
+}
+function verbPredicateV27(verb){
+ const v=String(verb||'').trim();
+ const known={
+ '걷다':'걸었다','듣다':'들었다','돕다':'도왔다','씻다':'씻었다',
+ '입다':'입었다','쉬다':'쉬었다','사다':'샀다','찾다':'찾았다',
+ '고르다':'골랐다','타다':'탔다','내리다':'내렸다','뛰다':'뛰었다',
+ '울다':'울었다','웃다':'웃었다','알다':'알았다','살다':'살았다',
+ '놓다':'놓았다','먹다':'먹었다','마시다':'마셨다','보다':'보았다',
+ '읽다':'읽었다','쓰다':'썼다','오다':'왔다','가다':'갔다',
+ '주다':'주었다','받다':'받았다','만나다':'만났다','만들다':'만들었다',
+ '놀다':'놀았다','자다':'잤다','앉다':'앉았다','서다':'섰다'
+ };
+ if(known[v])return known[v];
+ const fromV5=grade6PastV5(v);
+ if(fromV5!==v)return fromV5;
+ if(v.endsWith('하다'))return v.slice(0,-2)+'했다';
+ if(/(?:리다|기다|치다|지다|니다)$/.test(v))return v.slice(0,-1).replace(/다$/,'')+'었다';
+ return v;
 }
 function verbUnifiedGenerateV26(verb,answers,base,localExtras){
  const a=answers||{};
@@ -3379,7 +3404,7 @@ function verbFirstPreviewV11(verb,answers,completed){
  const a=answers||{};
  const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
  const verbEnding=verbFirstPredicatePastV3(verb);
- const predicate=verbEnding!==verb?verbEnding:grade6PastV5(verb);
+ const predicate=verbEnding!==verb?verbEnding:verbPredicateV27(verb);
  const pieces=[];
  if(a.time)pieces.push(String(a.time));
  if(subject)pieces.push(subject);
