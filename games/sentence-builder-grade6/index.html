@@ -2254,7 +2254,247 @@ function renderCoreSentenceV2(event){
 }
 
 
+function createVerbFirstStateV3(){
+  return {
+    verb:'',
+    step:0,
+    answers:{},
+    history:[],
+    sentence:'',
+    completed:false
+  };
+}
+let verbFirstStateV3=createVerbFirstStateV3();
+
+function resetVerbFirstV3(){
+  verbFirstStateV3=createVerbFirstStateV3();
+}
+
+function verbFirstSubjectTextV3(value){
+  const raw=String(value||'').trim();
+  if(!raw)return '';
+  if(raw==='나')return '나는';
+  if(raw==='우리 가족')return '우리 가족은';
+  return raw+(hasBatchim(raw)?'이':'가');
+}
+
+function verbFirstObjectTextV3(value){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  return raw+(hasBatchim(raw)?'을':'를');
+}
+
+function verbFirstPlaceTextV3(value){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  if(/(에서|에)$/.test(raw))return raw;
+  return raw+'에서';
+}
+
+function verbFirstDestinationTextV3(value){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  if(/에$/.test(raw))return raw;
+  return raw+'에';
+}
+
+function verbFirstCompanionTextV3(value){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  if(/(와|과|랑|이랑)$/.test(raw))return raw;
+  return raw+(hasBatchim(raw)?'과':'와');
+}
+
+function verbFirstRecipientTextV3(value,kind){
+  const raw=String(value||'').trim().replace(/[.?!]+$/,'');
+  if(!raw)return '';
+  if(kind==='source')return raw+'에게';
+  return raw+'에게';
+}
+
+function verbFirstPredicatePastV3(verb){
+  const map={
+    '가다':'갔다','보다':'보았다','먹다':'먹었다','마시다':'마셨다','읽다':'읽었다',
+    '쓰다':'썼다','놀다':'놀았다','만나다':'만났다','주다':'주었다','받다':'받았다',
+    '만들다':'만들었다','좋아하다':'좋아한다'
+  };
+  return map[verb]||verb;
+}
+
+function verbFirstBuildSentenceV3(){
+  const v=verbFirstStateV3.verb;
+  const a=verbFirstStateV3.answers||{};
+  const chunks=[];
+  if(a.reason)chunks.push(String(a.reason).replace(/서$/,'서'));
+  if(a.time)chunks.push(String(a.time));
+  if(a.subject)chunks.push(verbFirstSubjectTextV3(a.subject));
+  if(a.companion)chunks.push(verbFirstCompanionTextV3(a.companion));
+  if(a.place)chunks.push(verbFirstPlaceTextV3(a.place));
+  if(a.destination)chunks.push(verbFirstDestinationTextV3(a.destination));
+  if(a.source)chunks.push(verbFirstRecipientTextV3(a.source,'source'));
+  if(a.recipient)chunks.push(verbFirstRecipientTextV3(a.recipient,'recipient'));
+
+  if(a.object){
+    if(v==='좋아하다'){
+      chunks.push(verbFirstObjectTextV3(a.object));
+    }else{
+      chunks.push(verbFirstObjectTextV3(a.object));
+    }
+  }
+
+  if(a.activity&&v==='놀다')chunks.push(String(a.activity)+'을 하며');
+  if(a.material&&v==='만들다')chunks.push(String(a.material)+'으로');
+
+  let base='';
+  const canFormCore=!!(a.subject && (
+    (v==='가다'&&a.destination) ||
+    (['보다','먹다','마시다','읽다','쓰다','만나다','주다','받다','만들다','좋아하다'].includes(v)&&a.object) ||
+    (v==='놀다'&&a.activity)
+  ));
+
+  if(canFormCore){
+    base=chunks.filter(Boolean).join(' ').replace(/\s+/g,' ').trim()+' '+verbFirstPredicatePastV3(v)+'.';
+    base=base.replace(/\s+([.])/g,'$1');
+  }
+
+  const extras=[];
+  if(a.taste){
+    const target=a.object||'그것';
+    extras.push(target+(hasBatchim(target)?'은':'는')+' '+String(a.taste).replace(/[.]+$/,'')+'.');
+  }
+  if(a.feeling)extras.push('기분은 '+String(a.feeling).replace(/[.]+$/,'')+'.');
+  if(a.thought)extras.push(String(a.thought).replace(/[.]+$/,'')+'.');
+  if(a.reaction)extras.push('상대방은 '+String(a.reaction).replace(/[.]+$/,'')+'.');
+  if(a.result&&v==='만들다')extras.push('완성한 것은 '+String(a.result).replace(/[.]+$/,'')+'.');
+  if(a.feature&&v==='좋아하다')extras.push(String(a.object||'그것')+'의 '+String(a.feature).replace(/[.]+$/,'')+'.');
+  if(a.nextAction)extras.push(String(a.nextAction).replace(/[.]+$/,'')+'.');
+  if(a.favorite)extras.push(String(a.favorite).replace(/[.]+$/,'')+'이 가장 재미있었다.');
+  if(a.content)extras.push(String(a.content).replace(/[.]+$/,'')+'.');
+  if(a.topic&&v==='쓰다')extras.push(String(a.topic)+'에 대해 썼다.');
+  if(a.method&&v==='만들다')extras.push(String(a.method).replace(/[.]+$/,'')+'.');
+
+  verbFirstStateV3.sentence=[base,...extras].filter(Boolean).join(' ');
+  return verbFirstStateV3.sentence;
+}
+
+function renderVerbSelectV3(){
+  resetVerbFirstV3();
+  stepText.textContent='동사 선택';
+  bar.style.width='8%';
+  const verbs=Object.keys(VERB_FIRST_DEFINITIONS_V3);
+  card.innerHTML=`
+    <h1>무엇을 했어요?</h1>
+    <p class="help">먼저 하고 싶은 말의 중심 동사를 골라 주세요.</p>
+    <div class="choices" style="margin-top:14px">
+      ${verbs.map(v=>`<button type="button" class="choice verb-pick-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+    </div>
+  `;
+  card.querySelectorAll('.verb-pick-v3').forEach(b=>b.onclick=()=>{
+    verbFirstStateV3.verb=b.dataset.v;
+    verbFirstStateV3.step=0;
+    renderVerbQuestionV3();
+  });
+}
+
+function renderVerbQuestionV3(){
+  const verb=verbFirstStateV3.verb;
+  const plan=verbFirstQuestionPlanV3(verb);
+  const step=verbFirstStateV3.step;
+  if(!verb||!plan.length)return renderVerbSelectV3();
+  if(step>=plan.length)return renderVerbResultV3();
+
+  const q=plan[step];
+  const pages=verbFirstChoicePagesV3(verb,q.role);
+  const sentence=verbFirstBuildSentenceV3();
+  stepText.textContent=(step+1)+'/5';
+  bar.style.width=((step+1)*18)+'%';
+
+  card.innerHTML=`
+    <h1>${escapeHtml(q.q)}</h1>
+    ${sentence?`<div class="story-two" style="margin:12px 0"><b>📝 ${escapeHtml(sentence)}</b></div>`:''}
+    <p class="help">보기에서 고르거나 직접 입력할 수 있어요.</p>
+
+    <div class="choices" id="verbFirstChoices1V3">
+      ${pages.first.map(v=>`<button type="button" class="choice verb-answer-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+    </div>
+
+    ${pages.more.length?`
+      <div style="margin-top:12px">
+        <button type="button" class="btn reveal-examples" id="verbMoreV3">+ 더 보기</button>
+      </div>
+      <div class="choices extra" id="verbFirstChoices2V3" hidden>
+        ${pages.more.map(v=>`<button type="button" class="choice verb-answer-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      </div>
+    `:''}
+
+    <div class="custom" style="margin-top:14px">
+      <label for="verbTypedV3">✏️ 직접 입력</label>
+      <div class="custom-row">
+        <input id="verbTypedV3" placeholder="보기에 없으면 직접 써 주세요" autocomplete="off">
+        <button type="button" class="btn add" id="verbTypedAddV3">입력</button>
+      </div>
+    </div>
+
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="verbBackV3">${step===0?'동사 다시 고르기':'이전'}</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+
+  const accept=(value,source)=>{
+    const clean=String(value||'').trim();
+    if(!clean)return;
+    verbFirstStateV3.answers[q.role]=clean;
+    verbFirstStateV3.history.push({step,verb,role:q.role,q:q.q,value:clean,source});
+    verbFirstBuildSentenceV3();
+    verbFirstStateV3.step+=1;
+    renderVerbQuestionV3();
+  };
+
+  card.querySelectorAll('.verb-answer-v3').forEach(b=>b.onclick=()=>accept(b.dataset.v,'choice'));
+  const more=card.querySelector('#verbMoreV3');
+  if(more)more.onclick=()=>{
+    card.querySelector('#verbFirstChoices2V3').hidden=false;
+    more.style.display='none';
+  };
+  const input=card.querySelector('#verbTypedV3');
+  const add=()=>accept(input.value,'typed');
+  card.querySelector('#verbTypedAddV3').onclick=add;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+
+  card.querySelector('#verbBackV3').onclick=()=>{
+    if(step===0)return renderVerbSelectV3();
+    verbFirstStateV3.step=Math.max(0,step-1);
+    renderVerbQuestionV3();
+  };
+}
+
+function renderVerbResultV3(){
+  const sentence=verbFirstBuildSentenceV3();
+  stepText.textContent='완성';
+  bar.style.width='100%';
+  card.innerHTML=`
+    <h1>문장이 완성되었어요.</h1>
+    <div class="story-two" style="margin-top:14px">
+      <div style="font-size:1.28em;line-height:1.6"><b>${escapeHtml(sentence||'아직 문장을 만들 정보가 부족해요.')}</b></div>
+    </div>
+    <div class="actions" style="margin-top:18px">
+      <button type="button" class="btn" id="verbRestartV3">다른 동사</button>
+      <button type="button" class="btn next" id="verbAgainV3">같은 동사로 다시</button>
+    </div>
+    <div style="clear:both"></div>
+  `;
+  card.querySelector('#verbRestartV3').onclick=renderVerbSelectV3;
+  card.querySelector('#verbAgainV3').onclick=()=>{
+    const v=verbFirstStateV3.verb;
+    resetVerbFirstV3();
+    verbFirstStateV3.verb=v;
+    renderVerbQuestionV3();
+  };
+}
+
 function renderMeaningStartV2(){
+  if(VERB_FIRST_ENGINE_V3&&VERB_FIRST_ENGINE_V3.enabled){renderVerbSelectV3();return;}
   stepText.textContent='내 생각';
   bar.style.width='12%';
   card.innerHTML=`
@@ -2732,18 +2972,18 @@ function contextItems(s){
  return {main:s.items,extra:s.examples,matched:false,restricted:false}
 }
 
-function startCompose(){idx=0;ans={};expanded={};storyDraft=[];storyV2=createEmptyStoryV2();showScreen('composeScreen');if(SENTENCE_ENGINE_V2.enabled){renderMeaningStartV2();return}render()}
-function skipCurrentStep(){const s=steps[idx];if(!s||s.key==='predicate')return;delete ans[s.key];if(idx<steps.length-1){idx++;render()}else finish()}
-let finishing=false;
-function nextCurrentStep(){
- const s=steps[idx];if(!s||!ans[s.key]||finishing)return;
- if(idx<steps.length-1){idx++;render();return}
- finishing=true;
- try{finish()}catch(err){
-   console.error('sentence finish failed',err);
-   let sentence='';try{sentence=buildSentence()}catch(e){sentence=Object.values(ans).filter(Boolean).join(' ')}
-   showSafeFinishedSentence(sentence)
- }finally{finishing=false}
+function startCompose(){
+  selected=[];
+  custom={};
+  cur=0;
+  resetStoryV2();
+  resetVerbFirstV3();
+  show('compose');
+  if(VERB_FIRST_ENGINE_V3&&VERB_FIRST_ENGINE_V3.enabled){
+    renderVerbSelectV3();
+    return;
+  }
+  renderMeaningStartV2();
 }
 const commonSpellingCorrections={
  '버수':'버스','뻐스':'버스','학교애':'학교에','학교예':'학교에','집애':'집에','친구랑가':'친구랑','선생임':'선생님','선생닝':'선생님',
