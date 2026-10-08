@@ -2841,9 +2841,24 @@ function verbFirstSubjectTextV3(value){
   return linked+(hasBatchim(names[names.length-1])?'이':'가');
 }
 
+function verbChoiceKindV25(value){
+ const s=String(value||'').trim().replace(/[.!?]+$/,'');
+ if(!s)return 'empty';
+ if(/(?:했다|하였다|먹었다|마셨다|읽었다|보았다|봤다|썼다|갔다|왔다|된다|되었다|있었다|없었다|싶다|좋았다|나빴다|어려웠다|즐거웠다|기뻤다|놀았다|들었다|했다|알았다|배웠다|찾았다|봤다|이다|이었다)$/.test(s))return 'sentence';
+ if(/(?:해서|어서|아서|려고|하러|러)$/.test(s))return 'reason';
+ if(/(?:에서|에게|에게서|으로|로|을|를|와|과)$/.test(s))return 'phrase';
+ return 'noun';
+}
+function verbNaturalNounClauseV25(prefix,value){
+ const s=String(value||'').trim().replace(/[.!?]+$/,'');
+ if(!s)return '';
+ if(verbChoiceKindV25(s)==='sentence')return prefix.replace(/(?:것은|내용은|점은)\s*$/,'')+' '+s+'.';
+ return prefix+s+'이다.';
+}
 function verbFirstObjectTextV3(value){
   const raw=String(value||'').trim().replace(/[.?!]+$/,'');
   if(!raw)return '';
+  if(verbChoiceKindV25(raw)==='sentence'||/(을|를)$/.test(raw))return raw;
   return raw+(hasBatchim(raw)?'을':'를');
 }
 
@@ -2923,7 +2938,7 @@ function verbNaturalDetailV24(verb,value){
  if(!s)return '';
  if(verb==='먹다'||verb==='마시다')return '맛은 '+s+'.';
  if(verb==='보다')return '특히 '+s+'.';
- if(/(?:다|했다|었다|았다|됐다|싶다)$/.test(s))return '기억에 남는 점은 '+s+'.';
+ if(verbChoiceKindV25(s)==='sentence')return s+'.';
  return '기억에 남는 것은 '+s+(hasBatchim(s)?'이다.':'이다.');
 }
 function verbNaturalNextV24(verb,value){
@@ -2932,14 +2947,15 @@ function verbNaturalNextV24(verb,value){
  const action={'먹다':'먹','마시다':'마시','보다':'보','읽다':'읽','듣다':'듣','쓰다':'쓰','공부하다':'공부하','배우다':'배우','연습하다':'연습하','외우다':'외우'}[verb];
  if(!action)return '';
  const conjugation={'먹다':'먹고','마시다':'마시고','보다':'보고','읽다':'읽고','듣다':'듣고','쓰다':'쓰고','공부하다':'공부하고','배우다':'배우고','연습하다':'연습하고','외우다':'외우고'}[verb];
+ if(verbChoiceKindV25(s)==='sentence')return '다음에는 '+s+'.';
  return '다음에는 '+verbFirstObjectTextV3(s)+' '+conjugation+' 싶다.';
 }
 function verbV7ExpansionText(answers){
  const a=answers||{};
  const extra=[];
- if(a.detail)extra.push('가장 기억에 남는 것은 '+verbV7EndSentence(a.detail));
- if(a.discovery)extra.push('새롭게 알게 된 것은 '+verbV7EndSentence(a.discovery));
- if(a.evidence)extra.push('그렇게 생각한 근거는 '+verbV7EndSentence(a.evidence));
+ if(a.detail)extra.push(verbNaturalNounClauseV25('가장 기억에 남는 것은 ',a.detail));
+ if(a.discovery)extra.push(verbNaturalNounClauseV25('새롭게 알게 된 것은 ',a.discovery));
+ if(a.evidence)extra.push(verbNaturalNounClauseV25('그렇게 생각한 근거는 ',a.evidence));
  if(a.difference)extra.push('다른 점은 '+verbV7EndSentence(a.difference));
  if(a.methodExtra)extra.push('그때 '+verbV7EndSentence(a.methodExtra));
  if(a.actionExtra)extra.push('그리고 '+verbV7EndSentence(a.actionExtra));
