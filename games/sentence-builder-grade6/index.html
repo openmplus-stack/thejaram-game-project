@@ -2835,8 +2835,8 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
- if(a.deepBasis)extra.push('근거로 살펴본 것은 '+verbFirstSubjectTextV3(a.deepBasis).replace(/(은|는|이|가)$/,'')+'이다.');
- if(a.deepFinding)extra.push('확인한 내용은 '+verbV7EndSentence(a.deepFinding));
+ if(a.deepBasis)extra.push('근거 자료로는 '+verbFirstObjectTextV3(a.deepBasis)+' 살펴보았다.');
+ if(a.deepFinding)extra.push('살펴본 결과, '+verbV7EndSentence(a.deepFinding));
  if(a.deepNext)extra.push('다음에는 '+verbV7EndSentence(a.deepNext));
  if(a.planPreparation)extra.push('준비한 것은 '+verbFirstSubjectTextV3(a.planPreparation).replace(/(은|는|이|가)$/,'')+'이다.');
  if(a.planProcess)extra.push('그 과정에서 '+verbV7EndSentence(a.planProcess));
@@ -2898,7 +2898,7 @@ function verbV8SpecialSentence(v,a){
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
-  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV8SpecialSentence(v,a);return verbFirstStateV3.sentence;}
+  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV7CombineSentence(verbV8SpecialSentence(v,a),a);return verbFirstStateV3.sentence;}
   if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a);return verbFirstStateV3.sentence;}
 
   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
