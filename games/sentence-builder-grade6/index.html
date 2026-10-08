@@ -3084,8 +3084,13 @@ function verbFirstBuildSentenceV3(){
   if(a.observation)sentences.push('걷다가 '+String(a.observation).replace(/[.]+$/,'')+'을 보았다.');
   if(a.nextAction){
     const action=normalizeShortActionV3(a.nextAction);
-    const actor=a.nextActionSubject?subjectPhraseForNextActionV3(a.nextActionSubject):(v==='가다'&&a.companion?'우리는 함께':v==='가다'&&a.subject?verbFirstSubjectTextV3(a.subject):'');
-    let text=((actor?actor+' ':'')+action).replace(/\s+/g,' ').trim();
+    let actor=a.nextActionSubject?subjectPhraseForNextActionV3(a.nextActionSubject):(v==='가다'&&a.companion?'우리는 함께':v==='가다'&&a.subject?verbFirstSubjectTextV3(a.subject):'');
+    let nextAction=action;
+    if(v==='가다'&&a.companion&&/^친구와 (놀았다|공부했다|이야기했다|쉬었다)$/.test(nextAction)){
+      nextAction=nextAction.replace(/^친구와 /,'');
+    }
+    if(v==='가다'&&a.companion&&a.goPurpose==='공부하러'&&nextAction==='공부했다')actor='우리는 함께';
+    let text=((actor?actor+' ':'')+nextAction).replace(/\s+/g,' ').trim();
     if(text&&!/[.!?]$/.test(text))text+='.';
     if(text)sentences.push(text);
   }
