@@ -561,6 +561,7 @@ const VERB_SELECTION_FALLBACK_V10={
 };
 function verbFirstChoicesForV3(verb,role){
   if(verb==='가다'&&VERB_GO_CHOICES_V12[role])return VERB_GO_CHOICES_V12[role].slice();
+  if(VERB_MOVE_EXTRA_V13[verb]&&VERB_MOVE_CHOICES_V13[role])return VERB_MOVE_CHOICES_V13[role].slice();
   if(VERB_AUDIT_CHOICES_V9[role])return VERB_AUDIT_CHOICES_V9[role].slice();
   if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
   if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
@@ -617,6 +618,25 @@ const VERB_GO_CHOICES_V12={
  visitMemory:['책','친구','건물','운동장','나무','꽃','풍경','놀이기구','동물','맛있는 음식','사람들','즐거웠던 시간'],
  visitFeeling:['즐거웠다','행복했다','신났다','편안했다','뿌듯했다','재미있었다','놀랐다','긴장했다','아쉬웠다','피곤했다','무서웠다','심심했다'],
  visitAgain:['다음에도 가고 싶다','친구와 다시 가고 싶다','가족과 다시 가고 싶다','주말에 다시 가고 싶다','더 오래 있고 싶다','다른 곳도 가 보고 싶다','다음에는 다른 일을 하고 싶다','혼자 다시 가고 싶다','당분간 쉬고 싶다','다음에는 준비해서 가고 싶다','다음에는 가지 않겠다','아직 모르겠다']
+};
+const VERB_MOVE_EXTRA_V13={
+ '오다':[['moveScene','오는 길에 무엇을 보았어요?'],['moveFeeling','도착했을 때 기분이 어땠어요?'],['moveNext','도착한 뒤 무엇을 했어요?']],
+ '돌아오다':[['moveScene','돌아오는 길에 무엇을 보았어요?'],['moveFeeling','돌아왔을 때 기분이 어땠어요?'],['moveNext','돌아온 뒤 무엇을 했어요?']],
+ '들어가다':[['moveScene','들어가면서 무엇을 보았어요?'],['moveFeeling','들어갔을 때 기분이 어땠어요?'],['moveNext','들어간 뒤 무엇을 했어요?']],
+ '나오다':[['moveScene','나오면서 무엇을 보았어요?'],['moveFeeling','나왔을 때 기분이 어땠어요?'],['moveNext','나온 뒤 무엇을 했어요?']],
+ '걷다':[['moveScene','걸으면서 무엇을 보았어요?'],['moveFeeling','걷고 나서 기분이 어땠어요?'],['moveNext','걷고 나서 무엇을 했어요?']],
+ '뛰다':[['moveScene','뛰면서 무엇을 보았어요?'],['moveFeeling','뛰고 나서 몸이 어땠어요?'],['moveNext','뛰고 나서 무엇을 했어요?']],
+ '달리다':[['moveScene','달리면서 무엇을 보았어요?'],['moveFeeling','달리고 나서 몸이 어땠어요?'],['moveNext','달린 뒤 무엇을 했어요?']],
+ '타다':[['moveScene','타고 가면서 무엇을 보았어요?'],['moveFeeling','이동하는 동안 기분이 어땠어요?'],['moveNext','내린 다음 무엇을 했어요?']],
+ '내리다':[['moveScene','내린 곳에서 무엇을 보았어요?'],['moveFeeling','내렸을 때 기분이 어땠어요?'],['moveNext','내린 다음 무엇을 했어요?']],
+ '일어나다':[['moveScene','일어나서 무엇을 보았어요?'],['moveFeeling','일어났을 때 몸이 어땠어요?'],['moveNext','일어나서 무엇을 했어요?']],
+ '앉다':[['moveScene','앉아서 무엇을 보았어요?'],['moveFeeling','앉았을 때 몸이 어땠어요?'],['moveNext','앉은 다음 무엇을 했어요?']],
+ '서다':[['moveScene','서서 무엇을 보았어요?'],['moveFeeling','서 있을 때 몸이 어땠어요?'],['moveNext','그다음 무엇을 했어요?']]
+};
+const VERB_MOVE_CHOICES_V13={
+ moveScene:['친구','강아지','고양이','나무','꽃','하늘','구름','자동차','버스','가게','운동장','사람들'],
+ moveFeeling:['즐거웠다','기분이 좋았다','신났다','편안했다','뿌듯했다','피곤했다','힘들었다','숨이 찼다','다리가 아팠다','긴장했다','무서웠다','괜찮았다'],
+ moveNext:['물을 마셨다','잠시 쉬었다','친구를 만났다','책을 읽었다','밥을 먹었다','집에 갔다','공부를 했다','사진을 찍었다','손을 씻었다','가방을 정리했다','엄마에게 전화했다','다른 곳으로 이동했다']
 };
 const VERB_EXPANSION_QUESTIONS_V7={
  sensory:[['detail','무엇이 가장 눈에 띄었어요?'],['discovery','새롭게 알게 된 것은 무엇이에요?'],['reflection','다음에는 무엇을 더 알아보고 싶어요?']],
@@ -750,7 +770,7 @@ function verbQuestionPlanV7(verb){
  if(!def)return [];
  const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
  const core=verbAuditQuestionPlanV9(verb);
- const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_MOVE_EXTRA_V13[verb]||VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
  return core.concat(extra);
 }
 
@@ -2772,6 +2792,9 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
+ if(a.moveScene)extra.push('이동하는 동안 '+verbFirstObjectTextV3(a.moveScene)+' 보았다.');
+ if(a.moveFeeling)extra.push('그때 '+verbV7EndSentence(a.moveFeeling));
+ if(a.moveNext)extra.push('그다음 '+verbV7EndSentence(a.moveNext));
  if(a.visitMemory)extra.push('그곳에서는 '+verbFirstSubjectTextV3(a.visitMemory)+' 기억에 남았다.');
  if(a.visitFeeling)extra.push('그곳에서 '+verbV7EndSentence(a.visitFeeling));
  if(a.visitAgain)extra.push('나는 '+verbV7EndSentence(a.visitAgain));
