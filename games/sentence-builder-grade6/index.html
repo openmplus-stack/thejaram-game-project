@@ -2817,7 +2817,13 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
- if(a.dailyDetail)extra.push('기억에 남는 내용은 '+verbV7EndSentence(a.dailyDetail));
+ if(a.dailyDetail){
+  const v=verbFirstStateV3.verb;
+  const detail=String(a.dailyDetail).trim().replace(/[.!?]+$/,'');
+  if(v==='먹다'||v==='마시다')extra.push('맛은 '+detail+'.');
+  else if(v==='보다')extra.push('특히 '+detail+'.');
+  else extra.push('기억에 남는 것은 '+detail+( /(?:다|었다|았다|했다)$/.test(detail)?'.':'이다.'));
+ }
  if(a.dailyResult)extra.push('그 뒤에 '+verbV7EndSentence(a.dailyResult));
  if(a.dailyNext){const v=verbFirstStateV3.verb;const nextVerb=({'먹다':'먹고','마시다':'마시고','보다':'보고','읽다':'읽고','듣다':'듣고','쓰다':'쓰고','공부하다':'공부하고','배우다':'배우고','연습하다':'연습하고','외우다':'외우고'})[v]||'하고';extra.push('다음에는 '+verbFirstObjectTextV3(a.dailyNext)+' '+nextVerb+' 싶다.');}
  if(a.moveScene)extra.push('이동하는 동안 '+verbFirstObjectTextV3(a.moveScene)+' 보았다.');
