@@ -3042,11 +3042,33 @@ function verbV8SpecialSentence(v,a){
  if(a.reflection)extras.push('나는 '+raw(a.reflection)+'.');
  return [first,...extras].join(' ');
 }
+// Unified sentence pipeline: legacy frame generators provide base clauses only.
+// All verbs now pass through the same extension, de-duplication and surface cleanup.
+function verbUnifiedSurfaceV26(value){
+ let text=String(value||'').replace(/\s+/g,' ').trim();
+ if(!text)return '';
+ text=text.replace(/\s+([.!?])/g,'$1').replace(/([.!?])(?=[^\s])/g,'$1 ');
+ const clauses=text.split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
+ const output=[];
+ for(let sentence of clauses){
+  if(!/[.!?]$/.test(sentence))sentence+='.';
+  sentence=sentence.replace(/^그 결과 그 결과\s*/,'그 결과 ').replace(/^그 뒤에 그 뒤에\s*/,'그 뒤에 ');
+  if(sentence==='.'||sentence==='이다.')continue;
+  if(output[output.length-1]===sentence)continue;
+  output.push(sentence);
+ }
+ return output.join(' ');
+}
+function verbUnifiedGenerateV26(verb,answers,base,localExtras){
+ const a=answers||{};
+ const extension=verbSentenceExtensionV19(verb,a);
+ return verbUnifiedSurfaceV26([base,...(localExtras||[]),extension].filter(Boolean).join(' '));
+}
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
-  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV7CombineSentence(verbV8SpecialSentence(v,a),a,v);return verbFirstStateV3.sentence;}
-  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a,v);return verbFirstStateV3.sentence;}
+  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbUnifiedGenerateV26(v,a,verbV8SpecialSentence(v,a));return verbFirstStateV3.sentence;}
+  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbUnifiedGenerateV26(v,a,grade6ExtendedSentenceV5(v,a));return verbFirstStateV3.sentence;}
 
   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
   const time=a.time?String(a.time).trim():'';
@@ -3191,7 +3213,7 @@ function verbFirstBuildSentenceV3(){
     sentences.push(text);
   }
 
-  verbFirstStateV3.sentence=verbV7CombineSentence(sentences.filter(Boolean).join(' '),a);
+  verbFirstStateV3.sentence=verbUnifiedGenerateV26(v,a,sentences.filter(Boolean).join(' '));
   return verbFirstStateV3.sentence;
 }
 
