@@ -541,6 +541,7 @@ const GRADE6_BASIC_ROLE_CHOICES_V4={
  destination:['학교','집','공원','도서관','교실','운동장','놀이터','병원','식당','마트','학원','친구 집']
 };
 function verbFirstChoicesForV3(verb,role){
+  if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
   const specific=VERB_SPECIFIC_CHOICES_V3[verb]&&VERB_SPECIFIC_CHOICES_V3[verb][role];
   if(VERB_FIRST_DEFINITIONS_V3[verb]?.extendedV5&&role==='object')return GRADE6_EXTENDED_OBJECTS_V5[VERB_FIRST_DEFINITIONS_V3[verb].group].slice();
   if(GRADE6_BASIC_V4.verbs[verb]&&role==='object')return GRADE6_BASIC_V4.choices[GRADE6_BASIC_V4.verbs[verb]].slice();
@@ -573,10 +574,70 @@ function verbFirstDefinitionV3(verb){
   return VERB_FIRST_DEFINITIONS_V3[String(verb||'').trim()]||null;
 }
 
+
+// Grade 6 eight-question curriculum: five foundation questions + three optional expansions.
+// Keep original predicate-specific 5 questions for the first 30 tested verbs.
+const VERB_QUESTION_FAMILY_V7={
+ sensory:['보다','듣다','관찰하다','살펴보다','발견하다','알아보다','읽다','조사하다','탐구하다'],
+ movement:['가다','오다','돌아오다','들어가다','나오다','걷다','뛰다','달리다','타다','내리다','일어나다','앉다','서다'],
+ consumption:['먹다','마시다'],
+ communication:['말하다','묻다','대답하다','질문하다','설명하다','알려주다','전달하다','소개하다','발표하다','이야기하다','대화하다','의논하다','토론하다','주장하다','설득하다','부탁하다','요청하다','제안하다','권하다','약속하다','표현하다','묘사하다','보고하다','반박하다','동의하다'],
+ emotion:['좋아하다','싫어하다','사랑하다','미워하다','기뻐하다','슬퍼하다','걱정하다','두려워하다','무서워하다','부러워하다','기대하다','실망하다','후회하다','만족하다','감동하다','공감하다','이해하다','존중하다','배려하다','위로하다','격려하다','사과하다','용서하다','감사하다'],
+ cognition:['외우다','기억하다','떠올리다','익히다','배우다','연습하다','공부하다','비교하다','구별하다','분류하다','연결하다','추측하다','추론하다','예상하다','예측하다','상상하다','생각하다','집중하다','요약하다','판단하다','평가하다','확인하다','검토하다','분석하다','해석하다','비판하다','반성하다','되돌아보다','점검하다','인정하다','의심하다','검증하다','증명하다','정리하다','종합하다','구체화하다','일반화하다','추상화하다','적용하다','활용하다','구분하다','성찰하다'],
+ planning:['계획하다','결정하다','선택하다','시작하다','시도하다','도전하다','실행하다','실천하다','수행하다','만들다','조립하다','구성하다','설계하다','수정하다','변경하다','조절하다','해결하다','극복하다','협력하다','참여하다','완성하다','달성하다','발전시키다','개선하다','관리하다'],
+ everyday:['놀다','만나다','주다','받다','쓰다','씻다','입다','벗다','자다','쉬다','사다','팔다','고르다','찾다','사용하다','청소하다','준비하다','챙기다','버리다','정리하다','도와주다']
+};
+const VERB_FAMILY_BY_NAME_V7={};
+for(const [type,verbs] of Object.entries(VERB_QUESTION_FAMILY_V7))for(const v of verbs)VERB_FAMILY_BY_NAME_V7[v]=type;
+const VERB_EXPANSION_QUESTIONS_V7={
+ sensory:[['detail','무엇이 가장 눈에 띄었어요?'],['discovery','새롭게 알게 된 것은 무엇이에요?'],['reflection','다음에는 무엇을 더 알아보고 싶어요?']],
+ movement:[['method','어떻게 이동했어요?'],['result','도착한 다음에는 무엇을 했어요?'],['reflection','그 경험에서 무엇이 기억에 남아요?']],
+ consumption:[['companionExtra','누구와 함께 먹거나 마셨어요?'],['result','먹거나 마신 뒤 몸은 어땠어요?'],['reflection','다음에도 먹거나 마시고 싶어요?']],
+ communication:[['detail','어떤 말을 가장 중요하게 전했어요?'],['reactionExtra','상대방은 어떤 반응을 보였어요?'],['reflection','대화하고 나서 무엇을 알게 되었어요?']],
+ emotion:[['detail','특히 어떤 점에서 그렇게 느꼈어요?'],['actionExtra','그 마음 때문에 무엇을 했어요?'],['reflection','그 마음을 어떻게 표현하고 싶어요?']],
+ cognition:[['evidence','그렇게 생각한 근거는 무엇이에요?'],['difference','다른 생각이나 방법과 무엇이 달라요?'],['reflection','생각한 뒤 무엇을 알게 되었어요?']],
+ planning:[['methodExtra','어떤 순서로 진행했어요?'],['resultExtra','실제로 어떤 결과가 나왔어요?'],['reflection','다음에는 무엇을 바꾸고 싶어요?']],
+ everyday:[['methodExtra','어떻게 했어요?'],['resultExtra','그 결과 어떻게 되었어요?'],['reflection','다음에는 어떻게 하고 싶어요?']]
+};
+const VERB_EXPANSION_OVERRIDES_V7={
+ '보다':[['detail','본 것의 어떤 모습이 기억나요?'],['reactionExtra','그것을 보고 무엇을 했어요?'],['reflection','그것을 보고 어떤 생각이 들었어요?']],
+ '마시다':[['companionExtra','누구와 함께 마셨어요?'],['resultExtra','마신 뒤 몸은 어땠어요?'],['reflection','다음에도 마시고 싶어요?']],
+ '먹다':[['detail','어떤 맛이 가장 기억나요?'],['resultExtra','먹고 나서 배가 어땠어요?'],['reflection','다음에도 먹고 싶어요?']],
+ '놀다':[['detail','놀이에서 무엇을 했어요?'],['resultExtra','놀고 나서 어떻게 되었어요?'],['reflection','다음에는 무엇을 하며 놀고 싶어요?']],
+ '주다':[['detail','준 물건은 어떤 것이었어요?'],['resultExtra','그 뒤에 무슨 일이 있었어요?'],['reflection','다음에는 누구에게 무엇을 주고 싶어요?']],
+ '받다':[['detail','받은 물건은 어떤 것이었어요?'],['actionExtra','그 물건으로 무엇을 했어요?'],['reflection','받은 뒤 어떤 생각이 들었어요?']],
+ '비교하다':[['evidence','무엇을 기준으로 비교했어요?'],['difference','가장 큰 차이는 무엇이었어요?'],['reflection','비교해서 무엇을 알게 되었어요?']],
+ '판단하다':[['evidence','어떤 근거로 판단했어요?'],['resultExtra','판단한 다음 무엇을 했어요?'],['reflection','다시 판단한다면 무엇을 확인할 거예요?']],
+ '계획하다':[['methodExtra','먼저 무엇부터 하기로 했어요?'],['resultExtra','계획대로 진행되었어요?'],['reflection','다음 계획에서 무엇을 바꾸고 싶어요?']],
+ '해결하다':[['methodExtra','문제를 해결하려고 무엇을 했어요?'],['resultExtra','문제가 어떻게 달라졌어요?'],['reflection','다음에 같은 문제가 생기면 어떻게 할 거예요?']],
+ '설명하다':[['detail','가장 중요하게 설명한 내용은 무엇이에요?'],['reactionExtra','듣는 사람은 이해했어요?'],['reflection','다시 설명한다면 무엇을 보충할 거예요?']]
+};
+const VERB_EXPANSION_ANSWER_BANK_V7={
+ detail:['모양이 기억난다','색이 기억난다','크기가 기억난다','소리가 기억난다','내용이 기억난다','표정이 기억난다','가장 중요한 부분이다','새로운 사실이다','어려웠던 부분이다','재미있었던 부분이다','달랐던 부분이다','결과가 기억난다'],
+ discovery:['새로운 사실을 알았다','원인을 알게 되었다','방법을 알게 되었다','규칙을 발견했다','차이점을 알았다','공통점을 찾았다','잘못 알고 있었음을 알았다','다른 생각을 이해했다','문제점을 발견했다','해결 방법을 알았다','더 알아보고 싶어졌다','아직 잘 모르겠다'],
+ reflection:['다시 해 보고 싶다','더 자세히 알아보고 싶다','다음에는 다른 방법을 쓰고 싶다','친구에게 알려 주고 싶다','직접 확인하고 싶다','한 번 더 연습하고 싶다','조심해야겠다고 생각했다','중요하다고 생각했다','재미있었다','어려웠다','생각이 달라졌다','새로운 계획을 세우고 싶다'],
+ evidence:['직접 확인했다','책에서 읽었다','설명을 들었다','자료를 찾아보았다','여러 번 관찰했다','결과를 비교했다','기록을 확인했다','숫자가 달랐다','규칙과 같았다','경험이 있었다','시험해 보았다','친구의 의견도 들었다'],
+ difference:['모양이 달랐다','크기가 달랐다','색이 달랐다','목적이 달랐다','방법이 달랐다','결과가 달랐다','속도가 달랐다','순서가 달랐다','재료가 달랐다','생각이 달랐다','기능이 달랐다','차이가 없었다'],
+ methodExtra:['순서대로 했다','천천히 했다','도구를 사용했다','친구와 나누어 했다','도움을 받았다','혼자 했다','먼저 확인했다','계획을 세웠다','자료를 찾아보았다','반복해서 연습했다','방법을 바꾸었다','직접 해 보았다'],
+ actionExtra:['친구에게 말했다','사진을 찍었다','도움을 요청했다','다시 살펴보았다','선생님께 질문했다','집에 돌아갔다','더 알아보았다','직접 해 보았다','기록했다','친구를 도왔다','웃었다','잠시 쉬었다'],
+ reactionExtra:['웃었다','고맙다고 말했다','고개를 끄덕였다','질문했다','놀랐다','기뻐했다','다시 물었다','칭찬했다','대답했다','잘 이해했다고 말했다','표정이 바뀌었다','아무 말도 하지 않았다'],
+ resultExtra:['잘 끝났다','문제가 해결되었다','시간이 더 걸렸다','새로운 문제가 생겼다','친구가 기뻐했다','도움이 되었다','더 쉽게 할 수 있었다','목표를 이루었다','조금 어려웠다','모양이 달라졌다','기분이 좋아졌다','다시 시도했다'],
+ result:['편안해졌다','피곤해졌다','기뻤다','아쉬웠다','배가 불렀다','목이 시원해졌다','긴장이 풀렸다','즐거웠다','속이 불편했다','뿌듯했다','무서웠다','놀랐다'],
+ companionExtra:['친구','엄마','아빠','동생','할머니','할아버지','선생님','형','누나','짝꿍','사촌','우리 가족']
+};
+function verbQuestionPlanV7(verb){
+ const def=VERB_FIRST_DEFINITIONS_V3[verb];
+ if(!def)return [];
+ const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
+ const core=(def.questions||[]).slice(0,5).map(x=>({...x}));
+ const extra=(VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ return core.concat(extra);
+}
+
 function verbFirstQuestionPlanV3(verb){
   const def=verbFirstDefinitionV3(verb);
   if(!def)return [];
-  return (def.questions||[]).slice(0,VERB_FIRST_ENGINE_V3.maxQuestions);
+  return verbQuestionPlanV7(verb);
 }
 
 
@@ -2893,8 +2954,8 @@ function renderVerbQuestionV3(){
   let currentSelection='';
   const picked=subjectMulti?(Array.isArray(verbFirstStateV3.answers.subject)?verbFirstStateV3.answers.subject:[]):[];
   const choiceButtons=arr=>arr.map(v=>`<button type="button" class="choice verb-answer-v3 ${subjectMulti&&picked.includes(v)?'subject-picked-v3':''}" aria-pressed="${subjectMulti&&picked.includes(v)?'true':'false'}" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('');
-  stepText.textContent=(step+1)+'/5';
-  bar.style.width=((step+1)*18)+'%';
+  stepText.textContent=(step+1)+' / '+plan.length;
+  bar.style.width=(((step+1)/plan.length)*100)+'%';
 
   card.innerHTML=`
     <h1>${escapeHtml(q.q)}</h1>
