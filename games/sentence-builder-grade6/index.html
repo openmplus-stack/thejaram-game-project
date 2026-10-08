@@ -541,6 +541,7 @@ const GRADE6_BASIC_ROLE_CHOICES_V4={
  destination:['학교','집','공원','도서관','교실','운동장','놀이터','병원','식당','마트','학원','친구 집']
 };
 function verbFirstChoicesForV3(verb,role){
+  if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
   if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
   const specific=VERB_SPECIFIC_CHOICES_V3[verb]&&VERB_SPECIFIC_CHOICES_V3[verb][role];
   if(VERB_FIRST_DEFINITIONS_V3[verb]?.extendedV5&&role==='object')return GRADE6_EXTENDED_OBJECTS_V5[VERB_FIRST_DEFINITIONS_V3[verb].group].slice();
@@ -625,12 +626,54 @@ const VERB_EXPANSION_ANSWER_BANK_V7={
  result:['편안해졌다','피곤해졌다','기뻤다','아쉬웠다','배가 불렀다','목이 시원해졌다','긴장이 풀렸다','즐거웠다','속이 불편했다','뿌듯했다','무서웠다','놀랐다'],
  companionExtra:['친구','엄마','아빠','동생','할머니','할아버지','선생님','형','누나','짝꿍','사촌','우리 가족']
 };
+const VERB_CORE_OVERRIDES_V8={
+ '비교하다':[['subject','누가 비교했어요?'],['pair','무엇과 무엇을 비교했어요?'],['similarity','어떤 점이 같았어요?'],['differenceCore','어떤 점이 달랐어요?'],['learning','비교하고 무엇을 알게 되었어요?']],
+ '판단하다':[['subject','누가 판단했어요?'],['object','무엇을 판단했어요?'],['judgment','어떻게 판단했어요?'],['evidenceCore','판단한 근거는 무엇이에요?'],['nextAction','판단한 뒤 무엇을 했어요?']],
+ '설명하다':[['subject','누가 설명했어요?'],['object','무엇을 설명했어요?'],['recipient','누구에게 설명했어요?'],['method','어떻게 설명했어요?'],['reaction','듣는 사람은 어떻게 반응했어요?']],
+ '계획하다':[['subject','누가 계획했어요?'],['object','무엇을 계획했어요?'],['purpose','왜 계획했어요?'],['firstAction','먼저 무엇을 하기로 했어요?'],['time','언제 시작하기로 했어요?']],
+ '해결하다':[['subject','누가 해결했어요?'],['problem','어떤 문제가 있었어요?'],['cause','왜 문제가 생겼어요?'],['method','어떻게 해결했어요?'],['result','해결한 결과는 어땠어요?']],
+ '관찰하다':[['subject','누가 관찰했어요?'],['object','무엇을 관찰했어요?'],['place','어디에서 관찰했어요?'],['discovery','무엇을 발견했어요?'],['learning','무엇을 알게 되었어요?']],
+ '요약하다':[['subject','누가 요약했어요?'],['object','무엇을 요약했어요?'],['mainIdea','가장 중요한 내용은 무엇이에요?'],['supporting','그 내용을 뒷받침하는 것은 무엇이에요?'],['learning','요약하며 무엇을 알게 되었어요?']],
+ '추론하다':[['subject','누가 추론했어요?'],['object','무엇에 대해 추론했어요?'],['clue','어떤 단서를 찾았어요?'],['inference','무엇이라고 추론했어요?'],['evidenceCore','그렇게 추론한 근거는 무엇이에요?']]
+};
+const VERB_EXTRA_OVERRIDES_V8={
+ '비교하다':[['criterion','무엇을 기준으로 비교했어요?'],['conclusion','가장 중요한 차이에서 무엇을 알았어요?'],['reflection','다음에는 무엇을 더 비교하고 싶어요?']],
+ '판단하다':[['alternative','다른 판단도 가능할까요?'],['consequence','그 판단으로 무엇이 달라졌어요?'],['reflection','다시 판단한다면 무엇을 확인할 거예요?']],
+ '설명하다':[['example','어떤 예를 들어 설명했어요?'],['understanding','상대방이 이해한 부분은 무엇이에요?'],['reflection','다시 설명한다면 무엇을 보충할 거예요?']],
+ '계획하다':[['resources','무엇을 준비해야 해요?'],['obstacle','어떤 어려움이 생길 수 있어요?'],['reflection','어려움이 생기면 어떻게 할 거예요?']],
+ '해결하다':[['alternative','다른 해결 방법도 있나요?'],['consequence','해결한 뒤 무엇이 달라졌어요?'],['reflection','다음에 같은 문제가 생기면 어떻게 할 거예요?']],
+ '관찰하다':[['detail','가장 눈에 띈 모습은 무엇이에요?'],['comparisonNote','전과 비교해 무엇이 달라졌어요?'],['reflection','다음에는 무엇을 관찰하고 싶어요?']],
+ '요약하다':[['omitted','어떤 내용은 생략했어요?'],['conclusion','한 문장으로 말하면 무엇이에요?'],['reflection','요약한 내용을 어디에 활용할까요?']],
+ '추론하다':[['alternative','다른 가능성도 있을까요?'],['verification','추론이 맞는지 어떻게 확인할까요?'],['reflection','새로운 단서를 찾으면 생각이 달라질까요?']]
+};
+const VERB_Q_CHOICES_V8={
+ criterion:['크기','색','모양','쓰임','속도','가격','무게','재료','장소','방법','결과','특징'],
+ conclusion:['방법이 다르다','목적이 다르다','기능이 다르다','결과가 다르다','장단점이 다르다','조건이 다르다','공통점이 있다','차이가 크다','비슷한 부분이 많다','상황에 따라 다르다','하나가 더 편리하다','추가 확인이 필요하다'],
+ alternative:['다른 방법이 있다','다른 의견이 있다','다른 원인일 수 있다','다른 결과도 가능하다','더 쉬운 방법이 있다','더 안전한 방법이 있다','아직 모르겠다','추가 자료가 필요하다','친구의 생각도 듣겠다','다시 비교하겠다','다르게 해 보겠다','지금 판단을 유지하겠다'],
+ consequence:['문제가 해결되었다','시간이 절약되었다','생각이 달라졌다','친구가 안심했다','더 어려워졌다','새로운 문제가 생겼다','방법이 바뀌었다','기분이 좋아졌다','결과가 같았다','결과가 달랐다','안전해졌다','아직 변화가 없다'],
+ example:['실제 경험','그림','사진','책 속 장면','비슷한 상황','실험 결과','표','그래프','숫자','시범','이야기','비교'],
+ resources:['책','자료','필기도구','컴퓨터','시간','장소','친구의 도움','선생님의 도움','준비물','예산','계획표','연습'],
+ obstacle:['시간 부족','준비물 부족','의견 차이','방법을 모름','어려운 문제','실수','기상 변화','일정 변경','규칙을 모름','힘이 부족함','정보 부족','예상하지 못한 일'],
+ understanding:['중요한 개념','순서','이유','예시','방법','결과','차이점','공통점','규칙','핵심 문장','주의할 점','목적'],
+ comparisonNote:['모양','크기','색','위치','속도','개수','소리','움직임','온도','길이','방향','상태'],
+ omitted:['반복되는 말','중요하지 않은 예','세부 설명','인사말','관련 없는 내용','긴 묘사','작은 사건','같은 뜻의 표현','일부 숫자','부가 정보','잘 모르는 부분','생략하지 않았다'],
+ verification:['다시 관찰한다','자료를 찾아본다','직접 실험한다','다른 사람에게 묻는다','책에서 확인한다','결과를 비교한다','기록을 찾아본다','시간을 두고 확인한다','전문가에게 질문한다','예를 더 찾는다','계산해 본다','아직 확인할 수 없다'],
+ mainIdea:['문제의 원인','가장 중요한 사건','주인공의 행동','글쓴이의 주장','문제 해결 방법','실험 결과','여행의 목적','경험한 일','변화한 점','설명한 원리','작품의 주제','핵심 정보'],
+ supporting:['구체적인 사례','실험 결과','등장인물의 말','글 속 설명','자료의 숫자','그림','사진','관찰 결과','비교 결과','이유','경험','인용한 내용'],
+ clue:['발자국','표정','행동','소리','변화한 모습','시간','장소','물건','글 속 단서','숫자','대화','관찰 결과'],
+ inference:['곧 비가 올 것이다','친구가 속상했을 것이다','누군가 지나갔을 것이다','도움이 필요했을 것이다','이유가 있을 것이다','다른 방법이 필요할 것이다','문제가 반복될 것이다','결과가 달라질 것이다','아직 알 수 없다','규칙이 있을 것이다','실수가 있었을 것이다','다음 사건이 이어질 것이다'],
+ judgment:['필요하다','필요하지 않다','가능하다','어렵다','안전하다','위험하다','옳다','옳지 않다','공평하다','불공평하다','적절하다','다시 확인해야 한다'],
+ problem:['준비물이 없다','시간이 부족하다','물건이 고장 났다','친구와 의견이 다르다','방법을 모른다','길을 잃었다','실수를 했다','계획이 바뀌었다','설명이 어렵다','약속을 잊었다','규칙을 모른다','정보가 부족하다'],
+ firstAction:['자료를 찾는다','준비물을 챙긴다','일정을 정한다','친구와 의논한다','규칙을 확인한다','연습한다','선생님께 질문한다','역할을 나눈다','도구를 준비한다','계획표를 만든다','예시를 살펴본다','순서를 정한다']
+};
+
 function verbQuestionPlanV7(verb){
  const def=VERB_FIRST_DEFINITIONS_V3[verb];
  if(!def)return [];
  const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
- const core=(def.questions||[]).slice(0,5).map(x=>({...x}));
- const extra=(VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ const override=VERB_CORE_OVERRIDES_V8[verb];
+ const core=override?override.map(([role,q])=>({role,q,kind:'core'})):(def.questions||[]).slice(0,5).map(x=>({...x}));
+ const extra=(VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
  return core.concat(extra);
 }
 
@@ -2657,9 +2700,26 @@ function verbV7ExpansionText(answers){
 function verbV7CombineSentence(base,a){
  return [String(base||'').trim(),verbV7ExpansionText(a)].filter(Boolean).join(' ');
 }
+function verbV8SpecialSentence(v,a){
+ const sub=a.subject?verbFirstSubjectTextV3(a.subject):'';
+ const object=a.object?verbFirstObjectTextV3(a.object):'';
+ const raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
+ const extras=[];
+ let first='';
+ if(v==='비교하다'&&a.pair)first=[sub,raw(a.pair)+'를 비교했다.'].filter(Boolean).join(' ');
+ else if(v==='해결하다'&&a.problem)first=[sub,raw(a.problem)+'라는 문제를 해결했다.'].filter(Boolean).join(' ');
+ else if(a.object)first=[sub,object,grade6PastV5(v)+'.'].filter(Boolean).join(' ');
+ else if(v==='설명하다'&&a.recipient)first=[sub,verbFirstRecipientTextV3(a.recipient,'recipient'),'설명했다.'].filter(Boolean).join(' ');
+ if(!first)return '';
+ const map={similarity:'같은 점은 ',differenceCore:'다른 점은 ',learning:'알게 된 것은 ',judgment:'판단한 내용은 ',evidenceCore:'그 근거는 ',firstAction:'먼저 할 일은 ',purpose:'계획한 이유는 ',cause:'문제가 생긴 이유는 ',method:'사용한 방법은 ',result:'그 결과 ',discovery:'발견한 것은 ',mainIdea:'가장 중요한 내용은 ',supporting:'그 내용을 뒷받침하는 것은 ',clue:'찾은 단서는 ',inference:'추론한 내용은 ',criterion:'비교한 기준은 ',conclusion:'비교한 결과 ',alternative:'다른 가능성은 ',consequence:'그 뒤에 ',example:'설명에 사용한 예는 ',understanding:'상대방이 이해한 내용은 ',resources:'필요한 준비물은 ',obstacle:'예상되는 어려움은 ',comparisonNote:'전과 달라진 점은 ',omitted:'요약하면서 생략한 내용은 ',verification:'확인할 방법은 '};
+ for(const [key,prefix]of Object.entries(map))if(a[key])extras.push(prefix+raw(a[key])+'.');
+ if(a.reflection)extras.push('나는 '+raw(a.reflection)+'.');
+ return [first,...extras].join(' ');
+}
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
+  if(VERB_CORE_OVERRIDES_V8[v]){verbFirstStateV3.sentence=verbV8SpecialSentence(v,a);return verbFirstStateV3.sentence;}
   if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a);return verbFirstStateV3.sentence;}
 
   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
