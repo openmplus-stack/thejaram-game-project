@@ -3056,13 +3056,7 @@ function renderAdaptiveClarificationV3(){
 
     <button type="button" class="btn next" id="adaptiveConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>
     <div class="actions" style="margin-top:12px"><button type="button" class="btn" id="adaptiveSkipV3">건너뛰기</button><button type="button" class="btn next" id="adaptiveFinishV3">완료</button></div>
-    <div class="custom" style="margin-top:14px">
-      <label for="adaptiveTypedV3">✏️ 직접 입력</label>
-      <div class="custom-row">
-        <input id="adaptiveTypedV3" placeholder="예: 나랑 강아지" autocomplete="off">
-        <button type="button" class="btn add" id="adaptiveTypedAddV3">입력</button>
-      </div>
-    </div>
+
   `;
 
   let pendingChoice='';
@@ -3093,10 +3087,7 @@ function renderAdaptiveClarificationV3(){
   };
   card.querySelector('#adaptiveSkipV3').onclick=()=>{verbFirstStateV3.pendingClarification=null;renderVerbQuestionV3()};
   card.querySelector('#adaptiveFinishV3').onclick=()=>{verbFirstStateV3.pendingClarification=null;renderVerbResultV3()};
-  const input=card.querySelector('#adaptiveTypedV3');
-  const add=()=>accept(input.value,'typed');
-  card.querySelector('#adaptiveTypedAddV3').onclick=add;
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
+
 }
 
 function renderVerbQuestionV3(){
@@ -3136,13 +3127,6 @@ function renderVerbQuestionV3(){
 
     ${!subjectMulti?`<button type="button" class="btn next" id="verbConfirmV3" disabled style="width:100%;margin-top:14px">확인</button>`:''}
     ${subjectMulti?`<p class="help" style="margin-top:12px"></p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>확인 (${picked.length})</button>`:''}
-    <div class="custom" style="margin-top:14px">
-      <label for="verbTypedV3">✏️ 직접 입력</label>
-      <div class="custom-row">
-        <input id="verbTypedV3" placeholder="보기에 없으면 직접 써 주세요" autocomplete="off">
-        <button type="button" class="btn add" id="verbTypedAddV3">입력</button>
-      </div>
-    </div>
 
     <div class="actions" style="margin-top:18px">
       <button type="button" class="btn" id="verbBackV3">${step===0?'처음부터':'이전'}</button>
@@ -3182,7 +3166,7 @@ function renderVerbQuestionV3(){
       currentSelection=b.dataset.v;
       card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=x===b;x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
       const confirm=card.querySelector('#verbConfirmV3');if(confirm)confirm.disabled=false;
-      card.querySelector('#verbTypedV3').value='';
+
     }
   });
   const confirm=card.querySelector('#verbConfirmV3');if(confirm)confirm.onclick=()=>accept(currentSelection,'choice');
@@ -3194,17 +3178,6 @@ function renderVerbQuestionV3(){
     more.textContent='− 접기';more.setAttribute('aria-expanded','true');
     more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=true;more.textContent='＋ 더 보기';more.setAttribute('aria-expanded','false');more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=false;more.textContent='− 접기';more.setAttribute('aria-expanded','true')}};
   };
-  const input=card.querySelector('#verbTypedV3');
-  const add=()=>{
-    const value=input.value.trim();if(!value)return;
-    if(subjectMulti){accept(value,'typed');return;}
-    currentSelection=value;
-    card.querySelectorAll('.verb-answer-v3').forEach(x=>{x.classList.remove('subject-picked-v3');x.setAttribute('aria-pressed','false')});
-    if(confirm)confirm.disabled=false;
-  };
-  card.querySelector('#verbTypedAddV3').onclick=add;
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();add()}});
-
   card.querySelector('#verbSkipV3').onclick=()=>{delete verbFirstStateV3.answers[q.role];verbFirstStateV3.step+=1;renderVerbQuestionV3()};
   card.querySelector('#verbFinishV3').onclick=()=>{if(verbFirstBuildSentenceV3())renderVerbResultV3()};
   card.querySelector('#verbBackV3').onclick=()=>{
