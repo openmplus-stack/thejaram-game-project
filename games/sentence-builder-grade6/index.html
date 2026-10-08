@@ -422,7 +422,7 @@ function grade6ExtendedQuestionsV5(verb,group){
  const past=grade6PastV5(verb);
  return roles.map((role,i)=>({
    role,
-   q:i===0?'누가 했어요?':i===1?(role==='destination'?'어디로 '+past.replace(/다$/,'어요?'): '무엇을 '+(verb.endsWith('하다')?verb.slice(0,-2)+'했어요?':past.replace(/다$/,'어요?'))):(GRADE6_EXTENDED_QUESTION_V5[role]||'무엇을 했어요?'),
+   q:i===0?'누가 '+verbV7PolitePast(verb)+'?':i===1?(role==='destination'?'어디로 '+verbV7PolitePast(verb)+'?': '무엇을 '+verbV7PolitePast(verb)+'?'):(GRADE6_EXTENDED_QUESTION_V5[role]||'무엇을 했어요?'),
    kind:i===0||i===1?'core':'context'
  }));
 }
@@ -2628,10 +2628,39 @@ function verbFirstReasonTextV3(raw){
  if(/했다$/.test(s))return s.slice(0,-2)+'해서';
  return s+'서';
 }
+function verbV7PolitePast(verb){
+ const irregular={'가다':'갔어요','오다':'왔어요','보다':'보았어요','먹다':'먹었어요','마시다':'마셨어요','읽다':'읽었어요','쓰다':'썼어요','놀다':'놀았어요','만나다':'만났어요','주다':'주었어요','받다':'받았어요','만들다':'만들었어요','좋아하다':'좋아해요','걷다':'걸었어요','듣다':'들었어요','묻다':'물었어요','타다':'탔어요','내리다':'내렸어요','찾다':'찾았어요','사다':'샀어요','씻다':'씻었어요','입다':'입었어요','쉬다':'쉬었어요','알아보다':'알아보았어요','일어나다':'일어났어요','서다':'섰어요','자다':'잤어요','벗다':'벗었어요','팔다':'팔았어요','외우다':'외웠어요','배우다':'배웠어요','달리다':'달렸어요','돌아오다':'돌아왔어요','들어가다':'들어갔어요','나오다':'나왔어요'};
+ if(irregular[verb])return irregular[verb];
+ if(verb.endsWith('하다'))return verb.slice(0,-2)+'했어요';
+ return verb;
+}
+function verbV7EndSentence(value){
+ let s=String(value||'').trim().replace(/[.!?]+$/,'');
+ if(!s)return '';
+ return s+'.';
+}
+function verbV7ExpansionText(answers){
+ const a=answers||{};
+ const extra=[];
+ if(a.detail)extra.push('가장 기억에 남는 것은 '+verbV7EndSentence(a.detail));
+ if(a.discovery)extra.push('새롭게 알게 된 것은 '+verbV7EndSentence(a.discovery));
+ if(a.evidence)extra.push('그렇게 생각한 근거는 '+verbV7EndSentence(a.evidence));
+ if(a.difference)extra.push('다른 점은 '+verbV7EndSentence(a.difference));
+ if(a.methodExtra)extra.push('그때 '+verbV7EndSentence(a.methodExtra));
+ if(a.actionExtra)extra.push('그리고 '+verbV7EndSentence(a.actionExtra));
+ if(a.reactionExtra)extra.push('상대방은 '+verbV7EndSentence(a.reactionExtra));
+ if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
+ if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
+ if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
+ return extra.join(' ');
+}
+function verbV7CombineSentence(base,a){
+ return [String(base||'').trim(),verbV7ExpansionText(a)].filter(Boolean).join(' ');
+}
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
   const a=verbFirstStateV3.answers||{};
-  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=grade6ExtendedSentenceV5(v,a);return verbFirstStateV3.sentence;}
+  if(VERB_FIRST_DEFINITIONS_V3[v]?.extendedV5){verbFirstStateV3.sentence=verbV7CombineSentence(grade6ExtendedSentenceV5(v,a),a);return verbFirstStateV3.sentence;}
 
   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
   const time=a.time?String(a.time).trim():'';
@@ -2769,7 +2798,7 @@ function verbFirstBuildSentenceV3(){
     sentences.push(text);
   }
 
-  verbFirstStateV3.sentence=sentences.filter(Boolean).join(' ');
+  verbFirstStateV3.sentence=verbV7CombineSentence(sentences.filter(Boolean).join(' '),a);
   return verbFirstStateV3.sentence;
 }
 
