@@ -597,11 +597,6 @@ function verbFirstChoicesForV3(verb,role){
 function verbFirstChoicePagesV3(verb,role){
   const raw=verbFirstChoicesForV3(verb,role)||[];
   const all=[...new Set(raw.map(v=>String(v||'').trim()).filter(Boolean))].slice(0,12);
-  const fallback=['다른 내용을 살펴보았다','친구에게 물어보았다','선생님께 질문했다','다시 확인했다','혼자 해 보았다','함께 해 보았다','천천히 진행했다','다른 방법을 찾았다','자료를 찾아보았다','방법을 바꾸었다','다음에 시도하겠다','아직 잘 모르겠다'];
-  for(const option of fallback){
-    if(all.length>=12)break;
-    if(!all.includes(option))all.push(option);
-  }
   return {first:all.slice(0,6),more:all.slice(6,12)};
 }
 
