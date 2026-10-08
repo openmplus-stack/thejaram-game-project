@@ -3085,15 +3085,26 @@ function verbPredicateV27(verb){
  return v;
 }
 function verbRepresentativePolishV28(verb,answers,base){
- const a=answers||{}, raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
+ const a=answers||{},raw=x=>String(x||'').trim().replace(/[.!?]+$/,'');
+ const subject=a.subject?verbFirstSubjectTextV3(a.subject):'';
  if(verb==='비교하다'&&a.pair){
-   const subject=a.subject?verbFirstSubjectTextV3(a.subject):'나는';
-   const first=[subject,verbFirstObjectTextV3(a.pair),'비교했다.'].join(' ');
-   const facts=[];
-   if(a.similarity)facts.push('같은 점은 '+raw(a.similarity)+(verbChoiceKindV25(a.similarity)==='sentence'?'.':'이다.'));
-   if(a.differenceCore)facts.push('다른 점은 '+raw(a.differenceCore)+(verbChoiceKindV25(a.differenceCore)==='sentence'?'.':'이다.'));
-   if(a.learning)facts.push(verbChoiceKindV25(a.learning)==='sentence'?raw(a.learning)+'.':'비교하면서 '+raw(a.learning)+' 알게 되었다.');
-   return [first,...facts].join(' ');
+  const sentences=[[subject||'나는',verbFirstObjectTextV3(a.pair),'비교했다.'].join(' ')];
+  if(a.similarity)sentences.push('같은 점은 '+raw(a.similarity)+(verbChoiceKindV25(a.similarity)==='sentence'?'.':'이다.'));
+  if(a.differenceCore)sentences.push('다른 점은 '+raw(a.differenceCore)+(verbChoiceKindV25(a.differenceCore)==='sentence'?'.':'이다.'));
+  if(a.learning)sentences.push(raw(a.learning)+'.');
+  return sentences.join(' ');
+ }
+ if(verb==='가다'&&a.destination){
+  return [a.time,subject,a.companion?verbFirstCompanionTextV3(a.companion):'',a.goTransport,a.goPurpose,verbFirstDestinationTextV3(a.destination),'갔다.'].filter(Boolean).join(' ');
+ }
+ if(verb==='먹다'&&a.object){
+  return [a.time,subject,a.companion?verbFirstCompanionTextV3(a.companion):'',a.place?verbFirstPlaceTextV3(a.place):'',verbFirstObjectTextV3(a.object),'먹었다.'].filter(Boolean).join(' ');
+ }
+ if(verb==='만들다'&&a.object){
+  return [subject,a.place?verbFirstPlaceTextV3(a.place):'',a.material?raw(a.material)+'으로':'',verbFirstObjectTextV3(a.object),'만들었다.'].filter(Boolean).join(' ');
+ }
+ if(verb==='좋아하다'&&a.object){
+  return [subject,verbFirstObjectTextV3(a.object),'좋아한다.'].filter(Boolean).join(' ');
  }
  return base;
 }
