@@ -146,7 +146,17 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
   }
   document.addEventListener('error',e=>{ if(e.target && e.target.tagName==='IMG') recover(e.target); },true);
 })();
-</script></head><body><main class='app shell'><section id='homeScreen' class='screen active'><div class='home-open'><div class='home-topbar'><div class='home-logo brand-image'><img src='assets/branding/logo-sentence-toktok.png' alt='문장 톡톡 - 내 생각을 한 문장씩 모아요'></div><div class='home-stats'><button class='login-mini' id='loginBtn'>로그인</button></div></div><img id='homeGrowthPenguin' class='home-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 성장 펭귄'><div class='home-bottom-actions single'><button type='button' class='home-action start' id='startBtn'>✏️ 시작하기 <span>→</span></button></div></div></section><section id='composeScreen' class='screen'><div class='top'><div class='badge'>문장 구성</div><div id='stepText'>1 / 6</div></div><div class='progress'><div id='bar' class='bar'></div></div><section id='card' class='card'></section></section><section id='antarcticScreen' class='screen'><h1 class='screen-title'>나의 남극</h1><div id='antarcticWorld' class='antarctic-world day'><div class='antarctic-sky'><div id='penguinVillageTitle'>나의 펭귄 마을</div></div><div class='antarctic-overlay'><div class='antarctic-pill compact-pill'>🐟 <b id='antarcticFish'>0</b></div><div class='antarctic-pill compact-pill'>🎁 <b id='antarcticItems'>0</b></div></div><div class='penguin-habitat'><div id='penguinStage' class='penguin-stage feed-target movable-penguin' title='눌러서 이글루로 보내기'><img id='growthPenguin' class='growth-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='1단계 아기 펭귄'></div></div><div class='feed-area'><div id='feedModeNote' class='feed-mode-note'>먹이를 줄 펭귄을 골라 주세요.</div><button type='button' class='fish-btn fish-only' id='feedBtn' aria-label='물고기 먹이 주기'><span class='fish-image' aria-hidden='true'>🐟</span></button><div class='feed-msg' id='feedMsg'></div></div></div><div class='fish-inventory-wrap'><div class='fish-inventory-head'><h3>물고기 보관함</h3><div class='fish-inventory-total'>보유 <b id='fishInventoryTotal'>0</b>마리</div></div><div class='fish-inventory-viewport' id='fishInventoryViewport' aria-label='보유 물고기 목록. 좌우로 밀어서 볼 수 있습니다.'><div class='fish-inventory-track' id='fishInventoryTrack'></div></div><div class='fish-swipe-help'>← 오른쪽에서 왼쪽으로 밀어 모든 물고기를 볼 수 있어요 →</div></div><div class='penguin-dock-wrap'><h3>나의 펭귄</h3><div class='igloo-dock' id='iglooDock'><div class='igloo-shell'><div class='igloo-lines'></div><div class='igloo-door'></div></div><button type='button' class='stored-penguin' id='storedPenguin' aria-label='아기 펭귄을 남극으로 보내기'><img src='assets/penguins/penguin-01-baby.png.PNG' alt='아기 펭귄'></button><div class='dock-help' id='dockHelp'>펭귄을 눌러 남극으로 보내거나 이글루로 데려올 수 있어요.</div></div></div><div class='home-box antarctic-details'><h3>성장 기록</h3><div class='stat'>먹인 물고기 <b id='fedCount'>0</b>마리<div class='growth-track'><div id='growthFill' class='growth-fill'></div></div><div class='growth' id='nextGrowthText'>다음 성장까지 물고기 5마리</div></div></div></section><section id='dictionaryScreen' class='screen'><h1 class='screen-title'>나의 문장 사전</h1><div id='dictionaryList'></div></section><section id='myScreen' class='screen'><h1 class='screen-title'>마이페이지</h1><div class='home-box'><h3>나의 성장</h3><div class='my-growth'><img id='myGrowthPenguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 펭귄'><div class='stat' id='growthStat'>1단계 · 아기 펭귄</div></div></div><div class='home-box'><h3>나의 이야기 보물</h3><div id='treasureList' class='empty-note'>아직 발견한 보물이 없어요.</div></div><div class='home-box'><h3>특별 펭귄</h3><div id='specialList' class='empty-note'>앞으로 만날 특별 펭귄을 기다려 주세요.</div></div></section><nav class='app-nav'><button class='nav-btn active' data-screen='homeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-01-baby.png.PNG' alt=''></span>홈</button><button class='nav-btn' data-screen='composeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-04-word-collector.png.PNG' alt=''></span>문장 구성</button><button class='nav-btn' data-screen='antarcticScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-06-sentence-explorer.png.PNG' alt=''></span>나의 남극</button><button class='nav-btn' data-screen='dictionaryScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-07-reader.png.PNG' alt=''></span>문장 사전</button><button class='nav-btn' data-screen='myScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-10-graduate.png.PNG' alt=''></span>마이</button></nav></main><div id='treasureModal' class='modal' aria-hidden='true'><div class='modal-card'><h2 id='modalTitle'></h2><div id='modalSource' class='source'></div><p id='modalSummary'></p><button class='close-modal' id='closeModal'>닫기</button></div></div><script>
+</script><style id="verb-v3-display-fix">
+#composeScreen .card h1{font-size:clamp(1.7rem,4vw,2.4rem)!important}
+#composeScreen .card .help,#composeScreen .card label{font-size:1.2em!important}
+#composeScreen .card .choice{font-size:1.2em!important;line-height:1.4!important;min-height:3.35em!important}
+#composeScreen .card .btn,#composeScreen .card input{font-size:1.2em!important}
+#composeScreen .card .story-two{font-size:1.2em!important}
+#composeScreen .card .choices[hidden]{display:none!important}
+#composeScreen .card .choices.extra{margin-top:12px}
+#composeScreen .card .choice.subject-picked-v3{background:#d9f4ea!important;border:3px solid #218c70!important;color:#174e41!important;font-weight:800}
+#composeScreen .card .verb-more-toggle-v3{display:block;width:100%;margin:14px 0 0!important;min-height:48px}
+</style></head><body><main class='app shell'><section id='homeScreen' class='screen active'><div class='home-open'><div class='home-topbar'><div class='home-logo brand-image'><img src='assets/branding/logo-sentence-toktok.png' alt='문장 톡톡 - 내 생각을 한 문장씩 모아요'></div><div class='home-stats'><button class='login-mini' id='loginBtn'>로그인</button></div></div><img id='homeGrowthPenguin' class='home-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 성장 펭귄'><div class='home-bottom-actions single'><button type='button' class='home-action start' id='startBtn'>✏️ 시작하기 <span>→</span></button></div></div></section><section id='composeScreen' class='screen'><div class='top'><div class='badge'>문장 구성</div><div id='stepText'>1 / 6</div></div><div class='progress'><div id='bar' class='bar'></div></div><section id='card' class='card'></section></section><section id='antarcticScreen' class='screen'><h1 class='screen-title'>나의 남극</h1><div id='antarcticWorld' class='antarctic-world day'><div class='antarctic-sky'><div id='penguinVillageTitle'>나의 펭귄 마을</div></div><div class='antarctic-overlay'><div class='antarctic-pill compact-pill'>🐟 <b id='antarcticFish'>0</b></div><div class='antarctic-pill compact-pill'>🎁 <b id='antarcticItems'>0</b></div></div><div class='penguin-habitat'><div id='penguinStage' class='penguin-stage feed-target movable-penguin' title='눌러서 이글루로 보내기'><img id='growthPenguin' class='growth-penguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='1단계 아기 펭귄'></div></div><div class='feed-area'><div id='feedModeNote' class='feed-mode-note'>먹이를 줄 펭귄을 골라 주세요.</div><button type='button' class='fish-btn fish-only' id='feedBtn' aria-label='물고기 먹이 주기'><span class='fish-image' aria-hidden='true'>🐟</span></button><div class='feed-msg' id='feedMsg'></div></div></div><div class='fish-inventory-wrap'><div class='fish-inventory-head'><h3>물고기 보관함</h3><div class='fish-inventory-total'>보유 <b id='fishInventoryTotal'>0</b>마리</div></div><div class='fish-inventory-viewport' id='fishInventoryViewport' aria-label='보유 물고기 목록. 좌우로 밀어서 볼 수 있습니다.'><div class='fish-inventory-track' id='fishInventoryTrack'></div></div><div class='fish-swipe-help'>← 오른쪽에서 왼쪽으로 밀어 모든 물고기를 볼 수 있어요 →</div></div><div class='penguin-dock-wrap'><h3>나의 펭귄</h3><div class='igloo-dock' id='iglooDock'><div class='igloo-shell'><div class='igloo-lines'></div><div class='igloo-door'></div></div><button type='button' class='stored-penguin' id='storedPenguin' aria-label='아기 펭귄을 남극으로 보내기'><img src='assets/penguins/penguin-01-baby.png.PNG' alt='아기 펭귄'></button><div class='dock-help' id='dockHelp'>펭귄을 눌러 남극으로 보내거나 이글루로 데려올 수 있어요.</div></div></div><div class='home-box antarctic-details'><h3>성장 기록</h3><div class='stat'>먹인 물고기 <b id='fedCount'>0</b>마리<div class='growth-track'><div id='growthFill' class='growth-fill'></div></div><div class='growth' id='nextGrowthText'>다음 성장까지 물고기 5마리</div></div></div></section><section id='dictionaryScreen' class='screen'><h1 class='screen-title'>나의 문장 사전</h1><div id='dictionaryList'></div></section><section id='myScreen' class='screen'><h1 class='screen-title'>마이페이지</h1><div class='home-box'><h3>나의 성장</h3><div class='my-growth'><img id='myGrowthPenguin' src='assets/penguins/penguin-01-baby.png.PNG' alt='나의 펭귄'><div class='stat' id='growthStat'>1단계 · 아기 펭귄</div></div></div><div class='home-box'><h3>나의 이야기 보물</h3><div id='treasureList' class='empty-note'>아직 발견한 보물이 없어요.</div></div><div class='home-box'><h3>특별 펭귄</h3><div id='specialList' class='empty-note'>앞으로 만날 특별 펭귄을 기다려 주세요.</div></div></section><nav class='app-nav'><button class='nav-btn active' data-screen='homeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-01-baby.png.PNG' alt=''></span>홈</button><button class='nav-btn' data-screen='composeScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-04-word-collector.png.PNG' alt=''></span>문장 구성</button><button class='nav-btn' data-screen='antarcticScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-06-sentence-explorer.png.PNG' alt=''></span>나의 남극</button><button class='nav-btn' data-screen='dictionaryScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-07-reader.png.PNG' alt=''></span>문장 사전</button><button class='nav-btn' data-screen='myScreen'><span class='nav-penguin'><img src='assets/penguins/penguin-10-graduate.png.PNG' alt=''></span>마이</button></nav></main><div id='treasureModal' class='modal' aria-hidden='true'><div class='modal-card'><h2 id='modalTitle'></h2><div id='modalSource' class='source'></div><p id='modalSummary'></p><button class='close-modal' id='closeModal'>닫기</button></div></div><script>
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
@@ -2327,11 +2337,19 @@ function resetVerbFirstV3(){
 }
 
 function verbFirstSubjectTextV3(value){
-  const raw=String(value||'').trim();
-  if(!raw)return '';
-  if(raw==='나')return '나는';
-  if(raw==='우리 가족')return '우리 가족은';
-  return raw+(hasBatchim(raw)?'이':'가');
+  const people=(Array.isArray(value)?value:[value]).map(v=>String(v||'').trim()).filter(Boolean);
+  if(!people.length)return '';
+  const bare=v=>v.replace(/(은|는|이|가)$/,'');
+  if(people.length===1){
+    const raw=people[0];
+    if(raw==='나')return '나는';
+    if(raw==='우리 가족')return '우리 가족은';
+    if(/(은|는|이|가)$/.test(raw))return raw;
+    return raw+(hasBatchim(raw)?'이':'가');
+  }
+  const names=people.map(p=>p==='나'?'나':bare(p));
+  const linked=names.map((p,i)=>i===names.length-1?p:p+(hasBatchim(p)?'과':'와')).join(' ');
+  return linked+(hasBatchim(names[names.length-1])?'이':'가');
 }
 
 function verbFirstObjectTextV3(value){
@@ -2658,6 +2676,9 @@ function renderVerbQuestionV3(){
   const q=plan[step];
   const pages=verbFirstChoicePagesV3(verb,q.role);
   const sentence=verbFirstBuildSentenceV3();
+  const subjectMulti=q.role==='subject';
+  const picked=subjectMulti?(Array.isArray(verbFirstStateV3.answers.subject)?verbFirstStateV3.answers.subject:[]):[];
+  const choiceButtons=arr=>arr.map(v=>`<button type="button" class="choice verb-answer-v3 ${subjectMulti&&picked.includes(v)?'subject-picked-v3':''}" aria-pressed="${subjectMulti&&picked.includes(v)?'true':'false'}" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('');
   stepText.textContent=(step+1)+'/5';
   bar.style.width=((step+1)*18)+'%';
 
@@ -2667,18 +2688,19 @@ function renderVerbQuestionV3(){
     <p class="help">보기에서 고르거나 직접 입력할 수 있어요.</p>
 
     <div class="choices" id="verbFirstChoices1V3">
-      ${pages.first.map(v=>`<button type="button" class="choice verb-answer-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+      ${choiceButtons(pages.first)}
     </div>
 
     ${pages.more.length?`
       <div style="margin-top:12px">
-        <button type="button" class="btn reveal-examples" id="verbMoreV3">+ 더 보기</button>
+        <button type="button" class="btn reveal-examples verb-more-toggle-v3" id="verbMoreV3" aria-expanded="false">＋ 더 보기</button>
       </div>
       <div class="choices extra" id="verbFirstChoices2V3" hidden>
-        ${pages.more.map(v=>`<button type="button" class="choice verb-answer-v3" data-v="${escapeHtml(v)}">${escapeHtml(v)}</button>`).join('')}
+        ${choiceButtons(pages.more)}
       </div>
     `:''}
 
+    ${subjectMulti?`<p class="help" style="margin-top:12px">여러 명을 선택할 수 있어요. 선택한 순서대로 문장에 들어가요.</p><button type="button" class="btn next" id="verbSubjectNextV3" ${picked.length?'':'disabled'}>선택 완료 (${picked.length}) →</button>`:''}
     <div class="custom" style="margin-top:14px">
       <label for="verbTypedV3">✏️ 직접 입력</label>
       <div class="custom-row">
@@ -2696,20 +2718,38 @@ function renderVerbQuestionV3(){
   const accept=(value,source)=>{
     const clean=String(value||'').trim();
     if(!clean)return;
-    verbFirstStateV3.answers[q.role]=clean;
+    if(subjectMulti){
+      const old=Array.isArray(verbFirstStateV3.answers.subject)?verbFirstStateV3.answers.subject.slice():[];
+      if(!old.includes(clean))old.push(clean);
+      verbFirstStateV3.answers.subject=old;
+    }else verbFirstStateV3.answers[q.role]=clean;
     verbFirstStateV3.history.push({step,verb,role:q.role,q:q.q,value:clean,source});
     verbFirstBuildSentenceV3();
+    if(subjectMulti){renderVerbQuestionV3();return;}
     verbFirstStateV3.step+=1;
     const adaptive=makeAdaptiveClarificationV3(q,clean);
     if(adaptive)verbFirstStateV3.pendingClarification=adaptive;
     renderVerbQuestionV3();
   };
 
-  card.querySelectorAll('.verb-answer-v3').forEach(b=>b.onclick=()=>accept(b.dataset.v,'choice'));
+  card.querySelectorAll('.verb-answer-v3').forEach(b=>b.onclick=()=>{
+    if(subjectMulti){
+      const v=b.dataset.v;
+      const list=Array.isArray(verbFirstStateV3.answers.subject)?verbFirstStateV3.answers.subject.slice():[];
+      const at=list.indexOf(v);
+      if(at>=0)list.splice(at,1);else list.push(v);
+      verbFirstStateV3.answers.subject=list;
+      card.querySelectorAll('.verb-answer-v3').forEach(x=>{const on=list.includes(x.dataset.v);x.classList.toggle('subject-picked-v3',on);x.setAttribute('aria-pressed',String(on))});
+      const next=card.querySelector('#verbSubjectNextV3');if(next){next.disabled=!list.length;next.textContent='선택 완료 ('+list.length+') →';}
+    }else accept(b.dataset.v,'choice');
+  });
+  const subjectNext=card.querySelector('#verbSubjectNextV3');
+  if(subjectNext)subjectNext.onclick=()=>{if(!(verbFirstStateV3.answers.subject||[]).length)return;verbFirstStateV3.step+=1;renderVerbQuestionV3()};
   const more=card.querySelector('#verbMoreV3');
   if(more)more.onclick=()=>{
     card.querySelector('#verbFirstChoices2V3').hidden=false;
-    more.style.display='none';
+    more.textContent='− 접기';more.setAttribute('aria-expanded','true');
+    more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=true;more.textContent='＋ 더 보기';more.setAttribute('aria-expanded','false');more.onclick=()=>{card.querySelector('#verbFirstChoices2V3').hidden=false;more.textContent='− 접기';more.setAttribute('aria-expanded','true')}};
   };
   const input=card.querySelector('#verbTypedV3');
   const add=()=>accept(input.value,'typed');
