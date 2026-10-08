@@ -150,7 +150,7 @@ body{background-image:linear-gradient(rgba(247,251,240,.76),rgba(238,248,231,.82
 const SENTENCE_ENGINE_V2={
   version:2,
   enabled:true,
-  phase:'verb-first-stage-6-live-sentence',
+  phase:'verb-first-stage-6-start-fix',
   principles:{
     meaningFirst:true,
     preserveChildMeaning:true,
@@ -164,7 +164,7 @@ const SENTENCE_ENGINE_V2={
 const VERB_FIRST_ENGINE_V3={
   version:'3.0',
   enabled:true,
-  phase:'verb-first-stage-4-adaptive',
+  phase:'verb-first-stage-6-start-fix',
   maxQuestions:5,
   principle:'verb-first-question-tree'
 };
@@ -3232,7 +3232,7 @@ function startCompose(){
   cur=0;
   resetStoryV2();
   resetVerbFirstV3();
-  show('compose');
+  showScreen('composeScreen');
   if(VERB_FIRST_ENGINE_V3&&VERB_FIRST_ENGINE_V3.enabled){
     renderVerbSelectV3();
     return;
