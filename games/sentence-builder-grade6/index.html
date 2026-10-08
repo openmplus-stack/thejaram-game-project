@@ -562,6 +562,7 @@ const VERB_SELECTION_FALLBACK_V10={
 function verbFirstChoicesForV3(verb,role){
   if(verb==='가다'&&VERB_GO_CHOICES_V12[role])return VERB_GO_CHOICES_V12[role].slice();
   if(VERB_MOVE_EXTRA_V13[verb]&&VERB_MOVE_CHOICES_V13[role])return VERB_MOVE_CHOICES_V13[role].slice();
+  if(VERB_DAILY_CHOICES_V14[verb]&&VERB_DAILY_CHOICES_V14[verb][role])return VERB_DAILY_CHOICES_V14[verb][role].slice();
   if(VERB_AUDIT_CHOICES_V9[role])return VERB_AUDIT_CHOICES_V9[role].slice();
   if(VERB_Q_CHOICES_V8[role])return VERB_Q_CHOICES_V8[role].slice();
   if(VERB_EXPANSION_ANSWER_BANK_V7[role])return VERB_EXPANSION_ANSWER_BANK_V7[role].slice();
@@ -637,6 +638,30 @@ const VERB_MOVE_CHOICES_V13={
  moveScene:['친구','강아지','고양이','나무','꽃','하늘','구름','자동차','버스','가게','운동장','사람들'],
  moveFeeling:['즐거웠다','기분이 좋았다','신났다','편안했다','뿌듯했다','피곤했다','힘들었다','숨이 찼다','다리가 아팠다','긴장했다','무서웠다','괜찮았다'],
  moveNext:['물을 마셨다','잠시 쉬었다','친구를 만났다','책을 읽었다','밥을 먹었다','집에 갔다','공부를 했다','사진을 찍었다','손을 씻었다','가방을 정리했다','엄마에게 전화했다','다른 곳으로 이동했다']
+};
+const VERB_DAILY_EXTRA_V14={
+ '먹다':[['dailyDetail','먹은 음식은 어떤 맛이었어요?'],['dailyResult','먹고 난 뒤 몸은 어땠어요?'],['dailyNext','다음에는 무엇을 먹고 싶어요?']],
+ '마시다':[['dailyDetail','마신 음료는 어떤 맛이었어요?'],['dailyResult','마신 뒤 몸은 어땠어요?'],['dailyNext','다음에는 무엇을 마시고 싶어요?']],
+ '보다':[['dailyDetail','본 것의 어떤 점이 기억에 남아요?'],['dailyResult','그것을 보고 무엇을 했어요?'],['dailyNext','다음에는 무엇을 보고 싶어요?']],
+ '읽다':[['dailyDetail','읽은 글에서 무엇이 기억나요?'],['dailyResult','읽고 나서 무엇을 알았어요?'],['dailyNext','다음에는 무엇을 읽고 싶어요?']],
+ '듣다':[['dailyDetail','들은 내용 중 무엇이 기억나요?'],['dailyResult','듣고 나서 무엇을 알았어요?'],['dailyNext','다음에는 무엇을 듣고 싶어요?']],
+ '쓰다':[['dailyDetail','쓴 글에서 중요한 내용은 무엇이에요?'],['dailyResult','쓰고 나서 어떻게 되었어요?'],['dailyNext','다음에는 무엇을 쓰고 싶어요?']],
+ '공부하다':[['dailyDetail','공부하면서 가장 중요했던 것은 무엇이에요?'],['dailyResult','공부한 뒤 무엇을 알게 되었어요?'],['dailyNext','다음에는 무엇을 공부하고 싶어요?']],
+ '배우다':[['dailyDetail','배운 것 중 무엇이 기억나요?'],['dailyResult','배우고 나서 무엇을 할 수 있게 되었어요?'],['dailyNext','다음에는 무엇을 배우고 싶어요?']],
+ '연습하다':[['dailyDetail','무엇을 가장 많이 연습했어요?'],['dailyResult','연습한 뒤 무엇이 달라졌어요?'],['dailyNext','다음에는 무엇을 연습하고 싶어요?']],
+ '외우다':[['dailyDetail','외운 것 중 무엇이 기억나요?'],['dailyResult','외운 내용을 어떻게 확인했어요?'],['dailyNext','다음에는 무엇을 외우고 싶어요?']]
+};
+const VERB_DAILY_CHOICES_V14={
+ '먹다':{dailyDetail:['달콤했다','짭짤했다','매웠다','새콤했다','고소했다','담백했다','부드러웠다','바삭했다','따뜻했다','차가웠다','싱거웠다','쓴맛이 났다'],dailyResult:['배가 불렀다','기분이 좋았다','힘이 났다','졸렸다','배가 아팠다','목이 말랐다','속이 편안했다','조금 더 먹고 싶었다','너무 배불렀다','입이 매웠다','만족스러웠다','특별한 변화가 없었다'],dailyNext:['김밥','피자','빵','과일','떡볶이','밥','국수','치킨','햄버거','샌드위치','아이스크림','샐러드']},
+ '마시다':{dailyDetail:['달콤했다','시원했다','따뜻했다','새콤했다','고소했다','싱거웠다','진했다','연했다','쓴맛이 났다','상큼했다','부드러웠다','탄산이 톡 쏘았다'],dailyResult:['목이 시원해졌다','갈증이 사라졌다','몸이 따뜻해졌다','기분이 좋아졌다','힘이 났다','속이 편안했다','목이 덜 말랐다','배가 불렀다','조금 더 마시고 싶었다','맛이 오래 남았다','특별한 변화가 없었다','속이 불편했다'],dailyNext:['물','우유','주스','차','사이다','콜라','초코우유','딸기우유','탄산수','이온음료','레몬에이드','과일주스']},
+ '보다':{dailyDetail:['색이 선명했다','모양이 특이했다','크기가 컸다','움직임이 빨랐다','표정이 재미있었다','풍경이 아름다웠다','새로운 모습이었다','친구가 있었다','동물이 있었다','중요한 장면이었다','생각보다 달랐다','놀라운 장면이었다'],dailyResult:['사진을 찍었다','친구에게 이야기했다','다시 살펴보았다','고개를 끄덕였다','웃었다','놀랐다','그림을 그렸다','질문했다','기록했다','조용히 지켜보았다','다른 곳으로 갔다','더 알아보았다'],dailyNext:['영화','사진','그림','책','풍경','별','꽃','동물','축구 경기','박물관 전시','애니메이션','연극']},
+ '읽다':{dailyDetail:['주인공의 행동','중요한 사건','문제의 원인','결말','새로운 단어','재미있는 장면','놀라운 사실','글쓴이의 주장','인물의 마음','사건의 순서','설명한 방법','글의 제목'],dailyResult:['새로운 사실을 알았다','주인공의 마음을 이해했다','모르는 단어를 배웠다','내용을 요약했다','친구에게 이야기했다','질문이 생겼다','다시 읽었다','기억에 남았다','생각이 달라졌다','문제를 풀었다','더 알아보고 싶어졌다','아직 이해하기 어려웠다'],dailyNext:['동화책','만화책','소설책','과학책','역사책','그림책','신문','잡지','시','설명문','전기문','교과서']},
+ '듣다':{dailyDetail:['중요한 안내','친구의 이야기','새로운 정보','노래의 가사','선생님의 설명','질문','대답','주인공의 목소리','재미있는 소리','주의할 점','약속한 내용','사건의 순서'],dailyResult:['내용을 이해했다','새로운 사실을 알았다','질문을 했다','기억했다','고개를 끄덕였다','따라 했다','친구에게 설명했다','메모했다','다시 들었다','생각이 달라졌다','도움이 되었다','아직 이해하지 못했다'],dailyNext:['음악','동화','뉴스','안내 방송','선생님의 설명','친구의 이야기','자연의 소리','라디오','노래','강의','발표','낭독']},
+ '쓰다':{dailyDetail:['제목','첫 문장','중요한 사건','주인공의 마음','나의 생각','새로운 단어','마지막 문장','문제 해결 방법','이유','설명','순서','결론'],dailyResult:['글을 완성했다','틀린 글자를 고쳤다','내용을 다시 읽었다','친구에게 보여 주었다','선생님께 제출했다','글을 고쳐 썼다','새로운 생각이 났다','시간이 더 필요했다','기분이 뿌듯했다','조금 어려웠다','제목을 바꾸었다','다음 내용을 생각했다'],dailyNext:['일기','편지','독후감','설명문','이야기','시','메모','계획표','소감문','관찰 기록','소개 글','주장하는 글']},
+ '공부하다':{dailyDetail:['새로운 개념','중요한 단어','문제 해결 방법','공식','사건의 순서','역사적 사실','글의 중심 내용','실험 방법','규칙','다른 나라의 문화','자료 읽는 방법','표와 그래프'],dailyResult:['새로운 내용을 이해했다','문제를 풀 수 있게 되었다','핵심을 설명할 수 있게 되었다','용어를 외웠다','친구에게 알려 주었다','어려운 부분을 발견했다','실수가 줄었다','다시 복습했다','더 궁금해졌다','도움이 되었다','조금 어려웠다','아직 연습이 필요하다'],dailyNext:['국어','수학','과학','사회','역사','영어','한자','음악','미술','컴퓨터','환경','지리']},
+ '배우다':{dailyDetail:['새로운 단어','순서','규칙','방법','도구 사용법','중요한 사실','인사 방법','발표 방법','그림 그리는 방법','노래','운동 동작','생활 예절'],dailyResult:['혼자 할 수 있게 되었다','조금 더 잘하게 되었다','친구에게 알려 주었다','직접 해 보았다','실수가 줄었다','설명할 수 있게 되었다','기억하게 되었다','연습이 더 필요했다','자신감이 생겼다','방법을 이해했다','도움이 되었다','어려웠다'],dailyNext:['요리','그림','노래','악기','운동','글쓰기','컴퓨터','사진 촬영','역사','영어','과학 실험','생활 기술']},
+ '연습하다':{dailyDetail:['발음','읽기','글쓰기','계산','달리기','줄넘기','발표','악기 연주','그림 그리기','노래','자전거 타기','인사하기'],dailyResult:['속도가 빨라졌다','실수가 줄었다','더 정확해졌다','자신감이 생겼다','혼자 할 수 있었다','어려운 부분을 알았다','조금 늘었다','친구에게 보여 주었다','아직 어려웠다','계속 연습해야 한다','잘 기억하게 되었다','기분이 뿌듯했다'],dailyNext:['읽기','글쓰기','발표','악기','그림','달리기','줄넘기','계산','노래','요리','자전거','한자']},
+ '외우다':{dailyDetail:['첫 문장','중요한 단어','핵심 내용','마지막 부분','단어의 뜻','순서','이름','숫자','공식','날짜','노래 가사','약속'],dailyResult:['소리 내어 말했다','다시 써 보았다','빈칸을 채웠다','친구에게 들려주었다','혼자 반복했다','순서를 확인했다','선생님께 말했다','틀린 부분을 고쳤다','처음부터 다시 말했다','퀴즈를 풀었다','암기 카드를 사용했다','기억이 잘 나지 않았다'],dailyNext:['시','노래 가사','영어 단어','한자','구구단','이름','날짜','공식','중요한 문장','역사 연표','전화번호','규칙']}
 };
 const VERB_EXPANSION_QUESTIONS_V7={
  sensory:[['detail','무엇이 가장 눈에 띄었어요?'],['discovery','새롭게 알게 된 것은 무엇이에요?'],['reflection','다음에는 무엇을 더 알아보고 싶어요?']],
@@ -770,7 +795,7 @@ function verbQuestionPlanV7(verb){
  if(!def)return [];
  const family=VERB_FAMILY_BY_NAME_V7[verb]||'everyday';
  const core=verbAuditQuestionPlanV9(verb);
- const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_MOVE_EXTRA_V13[verb]||VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
+ const extra=((verb==='가다')?VERB_GO_EXTRA_V12:VERB_MOVE_EXTRA_V13[verb]||VERB_DAILY_EXTRA_V14[verb]||VERB_EXTRA_OVERRIDES_V8[verb]||VERB_EXPANSION_OVERRIDES_V7[verb]||VERB_EXPANSION_QUESTIONS_V7[family]).map(([role,q])=>({role,q,kind:'extension'}));
  return core.concat(extra);
 }
 
@@ -2792,6 +2817,9 @@ function verbV7ExpansionText(answers){
  if(a.resultExtra)extra.push('그 결과 '+verbV7EndSentence(a.resultExtra));
  if(a.companionExtra)extra.push(verbV7EndSentence(String(a.companionExtra)+'와 함께했다'));
  if(a.reflection)extra.push('나는 '+verbV7EndSentence(a.reflection));
+ if(a.dailyDetail)extra.push('기억에 남는 내용은 '+verbV7EndSentence(a.dailyDetail));
+ if(a.dailyResult)extra.push('그 뒤에 '+verbV7EndSentence(a.dailyResult));
+ if(a.dailyNext){const v=verbFirstStateV3.verb;const nextVerb=({'먹다':'먹고','마시다':'마시고','보다':'보고','읽다':'읽고','듣다':'듣고','쓰다':'쓰고','공부하다':'공부하고','배우다':'배우고','연습하다':'연습하고','외우다':'외우고'})[v]||'하고';extra.push('다음에는 '+verbFirstObjectTextV3(a.dailyNext)+' '+nextVerb+' 싶다.');}
  if(a.moveScene)extra.push('이동하는 동안 '+verbFirstObjectTextV3(a.moveScene)+' 보았다.');
  if(a.moveFeeling)extra.push('그때 '+verbV7EndSentence(a.moveFeeling));
  if(a.moveNext)extra.push('그다음 '+verbV7EndSentence(a.moveNext));
