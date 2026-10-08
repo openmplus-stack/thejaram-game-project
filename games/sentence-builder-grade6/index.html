@@ -442,10 +442,18 @@ const VERB_FIRST_ROLE_CHOICE_MAP_V3={
   feature:'feature'
 };
 
+
+const GRADE6_BASIC_ROLE_CHOICES_V4={
+ observation:['강아지','고양이','자동차','꽃','나무','친구','새','공','구름','나비','사람','운동장'],
+ method:['짐을 들어 주었다','길을 알려 주었다','설명해 주었다','함께 정리했다','물건을 찾아 주었다','문을 열어 주었다','준비를 도왔다','숙제를 도와주었다','밀어 주었다','기다려 주었다','함께 연습했다','친구를 위로했다'],
+ reaction:['고맙다고 인사했다','기뻐했다','웃었다','고개를 끄덕였다','좋아했다','도움을 받았다','다시 물었다','대답했다','놀랐다','안심했다','칭찬했다','감사하다고 말했다'],
+ result:['깨끗해졌다','정리가 잘되었다','공간이 넓어졌다','물건을 쉽게 찾았다','보기 좋아졌다','편리해졌다','안전해졌다','깔끔해졌다','사용하기 쉬워졌다','기분이 좋아졌다','준비가 끝났다','시간이 절약되었다'],
+ destination:['학교','집','공원','도서관','교실','운동장','놀이터','병원','식당','마트','학원','친구 집']
+};
 function verbFirstChoicesForV3(verb,role){
   const specific=VERB_SPECIFIC_CHOICES_V3[verb]&&VERB_SPECIFIC_CHOICES_V3[verb][role];
   if(GRADE6_BASIC_V4.verbs[verb]&&role==='object')return GRADE6_BASIC_V4.choices[GRADE6_BASIC_V4.verbs[verb]].slice();
-  if(role==='observation')return ['강아지','고양이','자동차','꽃','나무','친구','새','공','구름','나비','사람','운동장'];
+  if(GRADE6_BASIC_ROLE_CHOICES_V4[role])return GRADE6_BASIC_ROLE_CHOICES_V4[role].slice();
   if(Array.isArray(specific)&&specific.length)return specific.slice(0,12);
 
   if(role==='object'){
@@ -2498,7 +2506,11 @@ function verbFirstBuildSentenceV3(){
   if(isBasicExtra){
     const predicate=verbFirstPredicatePastV3(v);
     const ready=!!(a.object||a.place||a.destination);
-    if(ready){if(object)coreParts.push(object);coreParts.push(predicate);coreReady=true}
+    if(ready){
+      if(v==='내리다'&&a.object)coreParts.push(verbFirstPlaceTextV3(a.object));
+      else if(object)coreParts.push(object);
+      coreParts.push(predicate);coreReady=true
+    }
   }else if(v==='가다'){
     if(destination){coreParts.push('갔다');coreReady=true}
   }else if(v==='놀다'){
@@ -2543,6 +2555,7 @@ function verbFirstBuildSentenceV3(){
   }
 
   if(a.method&&v==='도와주다')sentences.push(String(a.method).replace(/[.]+$/,'')+'.');
+  if(a.result&&v==='정리하다')sentences.push('정리하고 나서 '+String(a.result).replace(/[.]+$/,'')+'.');
   if(a.feeling){
     let text='기분은 '+String(a.feeling).replace(/[.]+$/,'').trim();
     if(text&&!/[.!?]$/.test(text))text+='.';
