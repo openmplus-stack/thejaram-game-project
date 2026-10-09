@@ -3171,6 +3171,13 @@ function verbRepresentativePolishV28(verb,answers,base){
  }
  return base;
 }
+function verbSubjectFirstV33(text,answers){
+ const subject=answers?.subject?verbFirstSubjectTextV3(answers.subject):'';
+ if(!subject)return text;
+ const escaped=subject.replace(/[.*+?^$\{\}()|[\]\\]/g,'\\function verbUnifiedGenerateV26(verb,answers,base,localExtras){');
+ const pattern=new RegExp('^(.+?)\\s+('+escaped+')\\s+');
+ return String(text||'').replace(pattern,(all,prefix,who)=>who+' '+prefix+' ');
+}
 function verbUnifiedGenerateV26(verb,answers,base,localExtras){
  const a=answers||{};
  const copy={...a};
@@ -3179,7 +3186,7 @@ function verbUnifiedGenerateV26(verb,answers,base,localExtras){
  // A follow-up action is already part of the basic sentence builder.
  if(verb==='가다'&&a.nextAction)delete copy.actionExtra;
  const extension=verbSentenceExtensionV19(verb,copy);
- return verbUnifiedSurfaceV26([verbRepresentativePolishV28(verb,a,base),...(localExtras||[]),extension].filter(Boolean).join(' '));
+ return verbUnifiedSurfaceV26([verbSubjectFirstV33(verbRepresentativePolishV28(verb,a,base),a),...(localExtras||[]),extension].filter(Boolean).join(' '));
 }
 function verbFirstBuildSentenceV3(){
   const v=verbFirstStateV3.verb;
