@@ -673,10 +673,33 @@ function learningIntegrityHTML(){
  const x=learningIntegrityData();
  return '<section class="learning-recommendations"><h3>학습 기록 정합성 점검</h3><p><strong>'+(x.issues.length?'확인 필요 '+x.issues.length+'개':'기본 검사 통과')+'</strong></p><p>현재 '+x.sessionCount+'회차 · 답안이 있는 회차 '+x.recordedSessions+'개 · 미션 기록 '+x.tasks+'개 · 답안 이력 '+x.history+'건 · 보관된 수업일지 '+x.snapshots+'건 · 확정 보고서 '+x.reports+'건</p>'+(x.unassigned?'<p>회차가 없는 이전 답안 기록 '+x.unassigned+'건은 회차별 비교에서 제외됩니다.</p>':'')+(x.issues.length?'<ul>'+x.issues.slice(0,12).map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul>':'<p>검사 가능한 기록 구조와 회차 연결에서 오류가 발견되지 않았습니다.</p>')+'<p class="small muted">기록 내용의 사실 여부나 누락된 과거 기록까지 확인하는 검사는 아닙니다. 문제가 있으면 백업 후 기록을 점검하세요.</p></section>';
 }
+function integrityRepairPlan(){
+ const x=learningIntegrityData(),numbers=[s.learningSession];
+ for(const key of Object.keys(s.lessonSnapshots||{}))if(/^[1-9][0-9]*$/.test(key))numbers.push(Number(key));
+ for(const item of s.parentReportArchive||[])if(Number.isInteger(item?.session))numbers.push(item.session);
+ for(const p of Object.values(s.episodeProgress||{}))for(const rec of Object.values(p?.tasks||{}))for(const entry of Array.isArray(rec?.history)?rec.history:[])if(Number.isInteger(entry?.session))numbers.push(entry.session);
+ const target=Math.max(...numbers),safe=Number.isInteger(target)&&target>s.learningSession&&target<=10000;
+ return {target,safe,description:safe?'기록을 삭제하지 않고 현재 수업 회차를 '+target+'회차로 맞춥니다.':'자동으로 안전하게 수정할 수 있는 회차 불일치가 없습니다. 기타 오류는 백업 후 수동 점검이 필요합니다.'};
+}
+let integrityBackupPrepared=false;
+function prepareIntegrityRepair(){backupLearningData();integrityBackupPrepared=true;alert('백업 파일 저장을 요청했습니다. 실제 다운로드 완료 여부를 확인한 뒤 복구를 진행하세요.')}
+function repairLearningSession(){
+ const plan=integrityRepairPlan();
+ if(!plan.safe){alert(plan.description);return}
+ if(!integrityBackupPrepared){alert('먼저 복구 전 백업 파일 저장 버튼을 누르세요.');return}
+ if(!confirm('백업 파일이 실제 저장되었는지 확인하셨나요? 현재 회차를 '+plan.target+'회차로 수정합니다. 기록은 삭제하지 않습니다.'))return;
+ const previous=s.learningSession;
+ try{s.learningSession=plan.target;save();integrityBackupPrepared=false;render();alert('수업 회차를 수정했습니다. 남은 오류는 점검 화면에서 확인하세요.')}
+ catch(e){s.learningSession=previous;save();render();alert('수정 실패: '+e.message)}
+}
+function integrityRepairHTML(){
+ const p=integrityRepairPlan();
+ return '<section class="learning-recommendations"><h3>오류 복구 안내</h3><p>'+esc(p.description)+'</p><p>진행 기록·답안 이력·확정 보고서 자체는 자동으로 삭제하거나 변경하지 않습니다.</p><button onclick="prepareIntegrityRepair()">복구 전 백업 파일 저장</button> <button onclick="repairLearningSession()" '+(p.safe?'':'disabled')+'>수업 회차 연결 수정</button><p class="small muted">파일 다운로드 완료 여부는 교사가 확인해야 합니다. 자동 수정은 회차가 뒤처진 경우에만 지원합니다.</p></section>';
+}
 function backupRestoreHTML(){
  return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>백업 파일은 무결성 확인값과 함께 저장됩니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 미리보기 및 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원 전 회차·수업일지·확정 보고서 건수와 기록 연결을 검사하고, 저장 검증 실패 시 이전 기록으로 되돌립니다. 이전 버전 백업은 무결성 확인값이 없어 구조 검사만 수행합니다. 복원하면 현재 기록이 교체됩니다.</p></section>';
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
