@@ -193,7 +193,7 @@ let activeMission=0,missionChoice='';
 function taskKey(i,scene,type){return 't'+type+'-l'+(ep1MissionLevel()||'higher')}
 function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+taskKey(i,scene,type)]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i>=2)return otherMission(i,scene,type);if(i===1)return ep2Question(scene,type,ep1MissionLevel()||1);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=5?EP1_ADVANCED[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===2)return sunMoonMission(scene,type,ep1MissionLevel()||1);if(i>=2)return otherMission(i,scene,type);if(i===1)return ep2Question(scene,type,ep1MissionLevel()||1);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=5?EP1_ADVANCED[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){if(s.selectedBook===null||!Number.isInteger(type)||type<0||type>3)return;activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){if(s.page!=='missionFull')return;missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
@@ -506,6 +506,34 @@ const OTHER_EPISODE_DATA=[{"a":["호랑이가 오누이를 쫓아왔어요. 오�
 function otherStoryText(i,scene){const d=OTHER_EPISODE_DATA[i-2];const base=STORYBOOK[i][scene];const band=ep1Band();if(band===0)return base;if(band===1)return base.replaceAll('했어요.','했습니다.').replaceAll('있었어요.','있었습니다.').replaceAll('거예요.','것입니다.');return base.replaceAll('했어요.','했습니다.').replaceAll('있었어요.','있었습니다.').replaceAll('거예요.','것입니다.')+' 이러한 상황은 인물의 선택과 사건의 원인, 결과를 함께 생각하게 합니다.'}
 /* Step 33: questions for episodes 3-10 derive from the exact graded scene facts.
    Four independent targets: actor, event, context, and evidence. */
+
+/* Episode 3: each scene has four distinct, scene-grounded missions.
+   Answers are supported by the corresponding graded passage. */
+const SUN_MOON_MISSIONS=[
+ [
+  {question:'1장면: 호랑이를 피해 나무 위로 올라간 사람은 누구인가요?',answer:'오누이',choices:['오누이','산신령','나무꾼','선녀']},
+  {question:'1장면: 오누이는 무엇을 했나요?',answer:'호랑이를 피해 나무 위로 올라갔어요',choices:['호랑이를 피해 나무 위로 올라갔어요','하늘에 동아줄을 내려 달라고 빌었어요','동아줄이 내려오지 않아 기다렸어요','용궁으로 내려갔어요']},
+  {question:'1장면: 오누이에게 어떤 위험이 있었나요?',answer:'호랑이가 나무 아래에 있었어요',choices:['호랑이가 나무 아래에 있었어요','동아줄이 이미 내려왔어요','제비가 박씨를 가져왔어요','용왕이 병이 났어요']},
+  {question:'1장면: 본문에 맞는 내용을 고르세요.',answer:'오누이는 호랑이를 피하려고 나무에 올라갔어요.',choices:['오누이는 호랑이를 피하려고 나무에 올라갔어요.','오누이는 호랑이에게 먹이를 주려고 나무에 올라갔어요.','호랑이는 오누이를 도우려고 따라왔어요.','오누이는 연못에서 쇠도끼를 찾았어요.']}
+ ],
+ [
+  {question:'2장면: 하늘에 도움을 청한 사람은 누구인가요?',answer:'오누이',choices:['오누이','흥부','도깨비','콩쥐']},
+  {question:'2장면: 오누이는 하늘에 무엇을 부탁했나요?',answer:'동아줄을 내려 달라고 빌었어요',choices:['동아줄을 내려 달라고 빌었어요','박씨를 가져다 달라고 했어요','금도끼를 보여 달라고 했어요','팥죽을 끓여 달라고 했어요']},
+  {question:'2장면: 오누이에게 동아줄이 필요한 이유는 무엇인가요?',answer:'안전하게 위로 올라가기 위해서예요',choices:['안전하게 위로 올라가기 위해서예요','나무를 베기 위해서예요','용궁에 가기 위해서예요','노래를 부르기 위해서예요']},
+  {question:'2장면: 본문에 맞는 내용을 고르세요.',answer:'오누이는 위험에서 벗어나려고 하늘에 도움을 청했어요.',choices:['오누이는 위험에서 벗어나려고 하늘에 도움을 청했어요.','오누이는 호랑이에게 동아줄을 주었어요.','오누이는 이미 하늘에 올라갔어요.','오누이는 도깨비의 잔치에 갔어요.']}
+ ],
+ [
+  {question:'3장면: 동아줄을 기다린 사람은 누구인가요?',answer:'오누이',choices:['오누이','자라','선녀','혹부리 영감']},
+  {question:'3장면: 오누이는 어떤 상황에서 기다렸나요?',answer:'동아줄이 내려오지 않았어요',choices:['동아줄이 내려오지 않았어요','호랑이가 집으로 돌아갔어요','금도끼가 연못에 빠졌어요','제비가 날아왔어요']},
+  {question:'3장면: 루시가 찾아야 하는 것은 무엇인가요?',answer:'사라진 동아줄',choices:['사라진 동아줄','금도끼','박씨','날개옷']},
+  {question:'3장면: 본문에 맞는 내용을 고르세요.',answer:'동아줄이 사라져 오누이는 아직 위로 올라가지 못했어요.',choices:['동아줄이 사라져 오누이는 아직 위로 올라가지 못했어요.','오누이는 동아줄을 타고 이미 집에 돌아왔어요.','호랑이가 오누이에게 금도끼를 주었어요.','오누이는 자라를 타고 용궁에 갔어요.']}
+ ]
+];
+function sunMoonMission(scene,type,level){
+ const q=SUN_MOON_MISSIONS[scene][type];
+ return {...q,question:level>=5?q.question.replace('본문에 맞는 내용을 고르세요.','본문에서 확인할 수 있는 진술을 고르세요.'):q.question};
+}
+
 function otherMission(i,scene,type){
  const [actor,event,context]=GRADED_SCENE_FACTS[i][scene],level=ep1MissionLevel()||1;
  const wrongFacts=GRADED_SCENE_FACTS.filter((_,j)=>j!==i).flatMap(row=>row.map(x=>x[1]));
