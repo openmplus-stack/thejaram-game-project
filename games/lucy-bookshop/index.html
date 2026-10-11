@@ -185,7 +185,7 @@ let activeMission=0,missionChoice='';
 function taskKey(i,scene,type){return 't'+type+'-l'+(i===0?ep1MissionLevel()||'higher':'general')}
 function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+taskKey(i,scene,type)]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=5?EP1_ADVANCED[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
@@ -306,7 +306,7 @@ const EP1_BEGINNER={
 ]
 };
 function currentTaskLevel(){const n=Number(s.topik)||1;return n===1||n===2?n:0}
-function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=ep1MissionLevel();const goals=beginner===3?['중급 어휘 이해','관용적 표현 이해','사건 순서 분석','인물 의도 추론']:beginner===4?['맥락 속 어휘 이해','문법 의미 분석','인과관계 분석','서사적 추론']:beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
+function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=ep1MissionLevel();const goals=beginner===5?['고급 문맥 의미 분석','서술 의도 파악','인과 구조 분석','근거 중심 추론']:beginner===6?['서사 표현 효과','담화 의미 해석','갈등 구조 분석','주제·서사 기능 평가']:beginner===3?['중급 어휘 이해','관용적 표현 이해','사건 순서 분석','인물 의도 추론']:beginner===4?['맥락 속 어휘 이해','문법 의미 분석','인과관계 분석','서사적 추론']:beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
 
 
 function episodeHealth(i){const p=progress(i),item=(s.inventory||{})['ep'+(i+1)];return {storyDone:[0,1,2].every(n=>allTasksDone(i,n)),visited:(p.investigatedLocations||[]).length,required:EPISODES[i].places.length,verified:!!p.deduction?.verified,captured:!!item,restored:p.phase==='completed'&&item?.status==='restored'}}
@@ -356,7 +356,52 @@ const EP1_INTERMEDIATE={
 ]
 ]
 };
-function ep1MissionLevel(){const n=Number(s.topik)||1;return n>=1&&n<=4?n:0}
+function ep1MissionLevel(){const n=Number(s.topik)||1;return n>=1&&n<=6?n:0}
+
+
+/* Step 23: advanced Korean reading tasks for episode 1; authored, not official TOPIK questions. */
+const EP1_ADVANCED={
+5:[
+[
+{question:'“생계를 책임지는 유일한 도구”에서 강조하는 의미는?',answer:'도끼의 상실이 생활 기반을 위협한다는 점',choices:['도끼의 상실이 생활 기반을 위협한다는 점','도끼가 금으로 만들어졌다는 점','나무꾼이 도끼를 수집한다는 점','연못이 매우 깊다는 점']},
+{question:'“떠나지 못했습니다”가 암시하는 심리는?',answer:'문제를 해결하지 못해 막막하고 불안한 마음',choices:['새로운 모험에 대한 기대','문제를 해결하지 못해 막막하고 불안한 마음','산신령을 향한 분노','도끼를 잃은 사실에 대한 무관심']},
+{question:'첫 장면의 인과관계를 가장 정확히 설명한 것은?',answer:'작업 중 실수로 도구를 잃었기 때문에 생계에 대한 불안이 생겼다.',choices:['산신령이 나타나서 나무꾼이 일을 시작했다.','도끼를 선물받았기 때문에 연못에 갔다.','작업 중 실수로 도구를 잃었기 때문에 생계에 대한 불안이 생겼다.','나무꾼이 연못을 떠났기 때문에 도끼가 사라졌다.']},
+{question:'첫 장면에서 가장 중요한 갈등은?',answer:'생활에 꼭 필요한 도구를 잃고 되찾을 방법을 모르는 상황',choices:['나무꾼과 산신령의 말다툼','생활에 꼭 필요한 도구를 잃고 되찾을 방법을 모르는 상황','금도끼의 가격을 둘러싼 다툼','루시와 복딱의 경쟁']}
+],
+[
+{question:'산신령이 금도끼와 은도끼를 보여 주려는 행위의 서사적 기능은?',answer:'나무꾼의 정직함을 드러낼 선택의 상황을 만드는 것',choices:['금속의 종류를 가르치는 것','나무꾼의 정직함을 드러낼 선택의 상황을 만드는 것','도끼의 무게를 비교하는 것','나무꾼을 집으로 보내는 것']},
+{question:'“한편”이 연결하는 두 행동의 관계는?',answer:'도끼를 찾아 주는 일과 정직함을 시험하는 일을 함께 진행함',choices:['두 행동이 서로 무관함','도끼를 찾아 주는 일과 정직함을 시험하는 일을 함께 진행함','첫 번째 행동을 취소함','나무꾼이 두 장소를 이동함']},
+{question:'산신령의 계획을 순서대로 정리한 것은?',answer:'사정을 들음 → 도와주기로 함 → 정직함을 시험할 계획을 세움',choices:['시험을 끝냄 → 사정을 들음 → 도와주기로 함','사정을 들음 → 도와주기로 함 → 정직함을 시험할 계획을 세움','금도끼를 잃음 → 도끼를 만듦 → 나무를 벰','나무꾼을 만남 → 떠남 → 연못에 돌아옴']},
+{question:'금도끼보다 쇠도끼가 중요하다는 서술의 함의는?',answer:'물질적 가치보다 정직함과 자신의 삶이 우선이라는 뜻',choices:['금도끼는 사용할 수 없다는 뜻','산신령이 쇠를 싫어한다는 뜻','물질적 가치보다 정직함과 자신의 삶이 우선이라는 뜻','은도끼가 가장 값비싸다는 뜻']}
+],
+[
+{question:'금도끼의 실종이 원래 이야기 구조에 끼친 변화는?',answer:'인물의 성품을 검증할 핵심 사건이 중단된다.',choices:['인물의 성품을 검증할 핵심 사건이 중단된다.','나무꾼이 처음부터 부자가 된다.','산신령이 처음부터 등장하지 않는다.','쇠도끼가 금도끼로 변한다.']},
+{question:'“흔적도 없이”가 전달하는 상황의 특징은?',answer:'사라진 경위를 추적하기 어려울 만큼 단서가 부족함',choices:['도끼가 눈앞에 남아 있음','사라진 경위를 추적하기 어려울 만큼 단서가 부족함','도끼가 여러 개로 늘어남','연못이 완전히 마름']},
+{question:'사건의 인과관계를 가장 잘 나타낸 것은?',answer:'금도끼 실종 → 선택 장면 중단 → 루시의 조사 필요',choices:['루시의 조사 → 나무꾼의 탄생 → 금도끼 실종','나무꾼의 귀환 → 산신령 등장 → 금도끼 실종','금도끼 실종 → 선택 장면 중단 → 루시의 조사 필요','도끼 제작 → 복원 완료 → 실종']},
+{question:'루시의 추론에 필요한 가장 중요한 근거는?',answer:'산신령이 먼저 꺼내려던 금도끼가 없어졌다는 사실',choices:['나무꾼이 산에서 살았다는 사실','연못에 물고기가 있을 수 있다는 추측','산신령이 먼저 꺼내려던 금도끼가 없어졌다는 사실','나무꾼이 나무를 베었다는 사실']}
+],
+],
+6:[
+[
+{question:'나무꾼의 상실을 “생계를 책임지는 유일한 도구”로 표현한 효과는?',answer:'개인의 실수가 생존의 위기로 이어질 수 있음을 부각한다.',choices:['도끼의 미적 가치를 객관적으로 평가한다.','개인의 실수가 생존의 위기로 이어질 수 있음을 부각한다.','연못의 생태적 가치를 강조한다.','산신령의 초자연적 능력을 입증한다.']},
+{question:'첫 장면의 서술 방식으로 가장 적절한 평가는?',answer:'일상적 사건을 통해 인물의 절박한 처지를 드러낸다.',choices:['서로 무관한 사건을 나열한다.','일상적 사건을 통해 인물의 절박한 처지를 드러낸다.','인물의 결말을 먼저 공개한다.','산신령의 관점에서 모든 사건을 서술한다.']},
+{question:'첫 장면에서 갈등이 심화되는 과정은?',answer:'도구의 상실 → 회수 불가능 → 생계에 대한 불안',choices:['생계 안정 → 도구의 획득 → 귀가','산신령 등장 → 보상 획득 → 귀가','도구의 상실 → 회수 불가능 → 생계에 대한 불안','금도끼 획득 → 부의 축적 → 이별']},
+{question:'이야기의 출발점에서 가장 중요한 가치 충돌의 가능성은?',answer:'절박한 생계와 정직한 선택 사이의 긴장',choices:['산림 개발과 관광 사이의 긴장','절박한 생계와 정직한 선택 사이의 긴장','전통과 현대 기술 사이의 긴장','속도와 효율 사이의 긴장']}
+],
+[
+{question:'산신령이 금도끼를 먼저 제시하려는 선택이 갖는 의미는?',answer:'물질적 유혹을 통해 정직성의 기준을 드러내려는 장치',choices:['금속의 내구성을 측정하는 장치','물질적 유혹을 통해 정직성의 기준을 드러내려는 장치','연못의 깊이를 알려 주는 장치','나무꾼의 직업을 바꾸는 장치']},
+{question:'“한편”으로 연결된 산신령의 두 목적에 대한 설명은?',answer:'도움이라는 표면적 행동에 성품을 확인하려는 의도가 결합된다.',choices:['두 목적은 시간상 완전히 분리된다.','도움이라는 표면적 행동에 성품을 확인하려는 의도가 결합된다.','산신령은 나무꾼을 돕지 않기로 한다.','나무꾼이 산신령의 정직함을 시험한다.']},
+{question:'이 장면의 계획과 실행을 구분한 설명은?',answer:'정직함을 시험하려는 계획이 세워졌지만 선택 장면은 아직 시작되지 않았다.',choices:['나무꾼이 이미 금도끼를 받았다.','정직함을 시험하려는 계획이 세워졌지만 선택 장면은 아직 시작되지 않았다.','산신령이 시험을 마치고 떠났다.','나무꾼이 금도끼를 잃어버렸다.']},
+{question:'나무꾼이 쇠도끼를 중시한다는 서술이 뒷받침하는 주제는?',answer:'소유에 대한 진실성과 정직함은 재물의 값보다 중요하다.',choices:['귀한 물건일수록 반드시 받아야 한다.','물질적 가치가 인간의 성품을 결정한다.','소유에 대한 진실성과 정직함은 재물의 값보다 중요하다.','나무꾼은 자신의 생계에 무관심하다.']}
+],
+[
+{question:'금도끼 실종이 서사의 핵심 장치에 미치는 영향은?',answer:'정직성을 검증할 선택의 조건 자체가 무너진다.',choices:['나무꾼의 직업이 즉시 바뀐다.','정직성을 검증할 선택의 조건 자체가 무너진다.','산신령의 존재가 부정된다.','연못이 다른 장소로 이동한다.']},
+{question:'“흔적도 없이 사라진”이라는 표현이 형성하는 효과는?',answer:'원인과 행위자를 알 수 없는 불확실성을 강화한다.',choices:['사건의 범인을 확정한다.','원인과 행위자를 알 수 없는 불확실성을 강화한다.','사건의 해결을 미리 공개한다.','시간의 경과를 정확하게 알려 준다.']},
+{question:'세 장면의 구조를 가장 적절히 요약한 것은?',answer:'상실로 인한 위기 → 정직함의 시험 예고 → 시험의 조건이 사라지는 새로운 위기',choices:['보상 획득 → 귀환 → 새로운 직업','상실로 인한 위기 → 정직함의 시험 예고 → 시험의 조건이 사라지는 새로운 위기','인물 소개 → 여행 → 결혼','시험 완료 → 물건 상실 → 갈등 해소']},
+{question:'루시가 해결해야 할 과제를 가장 정확히 규정한 것은?',answer:'실종된 금도끼를 찾아 원래 이야기의 선택 장면을 회복하는 일',choices:['쇠도끼 대신 다른 도구를 만드는 일','산신령을 이야기 밖으로 데려오는 일','실종된 금도끼를 찾아 원래 이야기의 선택 장면을 회복하는 일','나무꾼이 더 많은 금도끼를 갖도록 돕는 일']}
+]
+]
+};
 
 render();
 </script></body></html>
