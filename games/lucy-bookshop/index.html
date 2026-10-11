@@ -33,6 +33,16 @@ button:disabled{opacity:.58}
 @media (prefers-reduced-motion:reduce){
  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
+</style><style id="stage79-compat">
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:hidden}
+.app,.panel,.mission,.dialogue,.scene-stage{min-width:0}
+button,select,input,textarea{-webkit-appearance:none;appearance:none}
+button{user-select:none;-webkit-user-select:none}
+input,textarea,select{max-width:100%}
+@supports not (height:100dvh){@media (min-width:900px) and (orientation:landscape) and (pointer:coarse){.panel{min-height:calc(100vh - 130px)}}}
+@media(max-width:430px){.app{padding:10px}.panel{padding:16px}.top{gap:8px;flex-wrap:wrap}.actions,.scene-actions,.mission-actions{gap:10px}.actions button{max-width:100%}.location-grid{grid-template-columns:1fr}}
+@media print{body{background:white!important}.app{max-width:none}.panel{box-shadow:none;min-height:0}button,.actions,.footer{display:none!important}}
 </style></head><body><div class="app"><div class="top"><span>📖 루시와 수상한 책방</span><button onclick="go('settings')">⚙️ 설정</button></div><main id="view" class="panel"></main><footer>11단계 개발용 프로토타입 · 전래동화 미션은 후속 단계에서 구현합니다.</footer></div><script>
 const KEY='lucy-bookshop-save-v1';
 const TALES=['금도끼 은도끼','흥부와 놀부','해와 달이 된 오누이','도깨비 방망이','선녀와 나무꾼','팥죽 할멈과 호랑이','혹부리 영감','토끼와 자라','콩쥐 팥쥐','견우와 직녀'];
@@ -817,10 +827,26 @@ function archiveSecurityHTML(){
  const x=archiveSecurityAudit();
  return '<section class="learning-recommendations"><h3>77단계 개인정보·복원 보안 점검</h3><p>보고서 HTML 검사 '+(x.ok?'통과':'확인 필요')+'</p><p class="small muted">백업 파일에는 학습·관찰 정보가 포함될 수 있습니다. 공용 기기와 백업 파일 공유에 주의하세요. 브라우저 저장 기록은 별도 암호화나 사용자별 접근 통제가 적용되지 않습니다.</p></section>';
 }
+function deviceCompatibilityAudit(){
+ const caps={
+  storage:(()=>{try{return typeof localStorage!=='undefined'&&typeof localStorage.getItem==='function'}catch(e){return false}})(),
+  speech:typeof window!=='undefined'&&'speechSynthesis' in window,
+  fileReader:typeof FileReader!=='undefined',
+  fileDownload:typeof URL!=='undefined'&&typeof URL.createObjectURL==='function',
+  print:typeof window!=='undefined'&&typeof window.open==='function',
+  clipboard:typeof navigator!=='undefined'&&!!navigator.clipboard
+ };
+ return caps;
+}
+function deviceCompatibilityHTML(){
+ const x=deviceCompatibilityAudit();
+ const labels={storage:'학습 기록 저장',speech:'음성 읽기',fileReader:'백업 파일 읽기',fileDownload:'백업 다운로드',print:'보고서 새 창 출력',clipboard:'클립보드'};
+ return '<section class="learning-recommendations"><h3>79단계 브라우저 호환성 점검</h3><ul>'+Object.keys(labels).map(k=>'<li>'+esc(labels[k])+' — '+(x[k]?'브라우저 API 확인':'지원 확인 필요')+'</li>').join('')+'</ul><p class="small muted">API 존재 여부만 확인합니다. Safari·Chrome에서 실제 동작과 팝업·다운로드 권한은 기기별로 직접 확인해야 합니다.</p></section>';
+}
 function backupRestoreHTML(){
  return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>백업 파일은 무결성 확인값과 함께 저장됩니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 미리보기 및 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원 전 회차·수업일지·확정 보고서 건수와 기록 연결을 검사하고, 저장 검증 실패 시 이전 기록으로 되돌립니다. 이전 버전 백업은 무결성 확인값이 없어 구조 검사만 수행합니다. 복원하면 현재 기록이 교체됩니다.</p></section>';
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+integratedRecordAuditHTML()+classroomScenarioAuditHTML()+detailedRecordIntegrityHTML()+archiveSecurityHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+integratedRecordAuditHTML()+classroomScenarioAuditHTML()+detailedRecordIntegrityHTML()+archiveSecurityHTML()+deviceCompatibilityHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
