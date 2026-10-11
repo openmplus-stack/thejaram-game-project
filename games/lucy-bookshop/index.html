@@ -64,7 +64,18 @@ let s;try{s={...DEFAULT,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch{s=
 if(!Number.isInteger(s.learningSession)||s.learningSession<1)s.learningSession=1;
 const view=document.getElementById('view');
 const esc=x=>String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const save=()=>localStorage.setItem(KEY,JSON.stringify(s));
+let lastSaveError='';
+function safeSave(){
+ try{localStorage.setItem(KEY,JSON.stringify(s));lastSaveError='';return true}
+ catch(e){lastSaveError='저장 공간 또는 브라우저 설정으로 기록을 저장하지 못했습니다. 이 화면을 닫기 전에 백업을 시도하세요.';showSaveWarning();return false}
+}
+function showSaveWarning(){
+ const root=document.getElementById('save-warning');if(root){root.textContent=lastSaveError;root.hidden=!lastSaveError}
+}
+function storageRecoveryHTML(){
+ return '<section class="learning-recommendations"><h3>82단계 저장 오류 대응</h3><p>'+(lastSaveError?esc(lastSaveError):'최근 저장 요청에서 오류가 보고되지 않았습니다.')+'</p><p class="small muted">브라우저 저장 실패 시 현재 화면에 남아 있는 기록이 안전하게 보존되는 것은 아닙니다. 중요한 기록은 별도로 백업하세요.</p></section>';
+}
+const save=()=>safeSave();
 function set(p){Object.assign(s,p);save();render()}
 function go(p){set({page:p})}
 function newGame(){if(Object.keys(s.episodeProgress).length&&!confirm('새 모험을 시작하면 이전 진행 기록이 초기화됩니다. 계속할까요?'))return;s={...DEFAULT,episodeProgress:{},restoredIds:[],inventory:{},page:'setup'};save();render()}
@@ -102,7 +113,7 @@ else if(page==='finale'){if(!allBooksRestored()){h='<section class="hero"><h2>�
 else if(page==='analytics'){h='<button onclick="go(\'shop\')">← 책방으로</button><h2>📊 교사용 학습 기록</h2><p class="small-note">이 기기의 브라우저에 저장된 기록입니다. 표준화 검사 점수가 아닙니다.</p><div class="report-actions"><button onclick="exportReport()">📄 결과 CSV 저장</button><button onclick="copyReport()">📋 결과 요약 복사</button></div>'+analyticsHTML()}
 else if(page==='settings')h='<button onclick="go(\'shop\')">← 책방으로</button><h2>설정</h2><label>한국어 수준</label><select id="level" onchange="set({topik:this.value})">'+levels()+'</select><label>안내 언어 (번역 후속 구현)</label><select id="lang" onchange="set({uiLanguage:this.value})"><option value="ko">한국어</option><option value="en">English</option><option value="ja">日本語</option><option value="zh">简体中文</option><option value="vi">Tiếng Việt</option></select><div class="actions"><button onclick="go(\'start\')">시작 화면</button><button onclick="reset()">저장 기록 초기화</button></div>';
 else {s.page='shop';save();return render()}
-view.innerHTML=h;setSelect('lang',s.uiLanguage);setSelect('level',s.topik);setSelect('diag',s.diagnostic);
+view.innerHTML='<div id="save-warning" role="alert" style="'+(lastSaveError?'':'display:none;')+'padding:14px;background:#fff0ed;border:2px solid #b84637;border-radius:12px;margin-bottom:12px;font-weight:700">'+esc(lastSaveError)+'</div>'+h;setSelect('lang',s.uiLanguage);setSelect('level',s.topik);setSelect('diag',s.diagnostic);
 }
 function introNext(){if(s.prologueIndex>=INTRO.length-1)go('shop');else set({prologueIndex:s.prologueIndex+1})}
 function chooseLocation(n){if(n<=progress(s.selectedBook).location)updateProgress(s.selectedBook,{location:n})}
@@ -883,7 +894,7 @@ function contentFinalAuditHTML(){
 function backupRestoreHTML(){
  return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>백업 파일은 무결성 확인값과 함께 저장됩니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 미리보기 및 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원 전 회차·수업일지·확정 보고서 건수와 기록 연결을 검사하고, 저장 검증 실패 시 이전 기록으로 되돌립니다. 이전 버전 백업은 무결성 확인값이 없어 구조 검사만 수행합니다. 복원하면 현재 기록이 교체됩니다.</p></section>';
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+integratedRecordAuditHTML()+classroomScenarioAuditHTML()+detailedRecordIntegrityHTML()+archiveSecurityHTML()+deviceCompatibilityHTML()+contentFinalAuditHTML()+performanceDiagnosticHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+integratedRecordAuditHTML()+classroomScenarioAuditHTML()+detailedRecordIntegrityHTML()+archiveSecurityHTML()+deviceCompatibilityHTML()+contentFinalAuditHTML()+performanceDiagnosticHTML()+storageRecoveryHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
