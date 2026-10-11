@@ -649,10 +649,34 @@ function restoreLearningData(input){
  reader.onerror=()=>{alert('파일을 읽을 수 없습니다.');input.value=''};
  reader.readAsText(file);
 }
+function learningIntegrityData(){
+ const issues=verifyRestoredState(s).map(x=>'구조: '+x),session=learningSessionSummary(),snapshots=Object.keys(s.lessonSnapshots||{}).length,reports=(s.parentReportArchive||[]).length;
+ if(!Number.isInteger(s.learningSession)||s.learningSession<1)issues.push('수업 회차가 올바르지 않습니다.');
+ for(const d of session.sessions)if(d.session>s.learningSession)issues.push('현재 회차보다 미래인 '+d.session+'회차 답안 기록이 있습니다.');
+ let tasks=0,history=0;
+ for(const [key,p] of Object.entries(s.episodeProgress||{})){
+  if(!p||typeof p!=='object'||Array.isArray(p))continue;
+  for(const [task,rec] of Object.entries(p.tasks||{})){
+   tasks++;
+   if(!rec||typeof rec!=='object'||Array.isArray(rec)){issues.push(key+'번 동화의 미션 기록 오류');continue}
+   if(rec.history!==undefined&&!Array.isArray(rec.history)){issues.push(key+'번 동화의 답안 이력 구조 오류');continue}
+   for(const x of rec.history||[]){
+    history++;
+    if(!x||typeof x!=='object'||Array.isArray(x)){issues.push('답안 이력 항목 오류');continue}
+    if(x.session!==undefined&&(!Number.isInteger(x.session)||x.session<1||x.session>s.learningSession))issues.push('답안 이력 회차 연결 오류');
+   }
+  }
+ }
+ return {issues:[...new Set(issues)],sessionCount:s.learningSession,recordedSessions:session.sessions.length,unassigned:session.unassigned,snapshots,reports,tasks,history};
+}
+function learningIntegrityHTML(){
+ const x=learningIntegrityData();
+ return '<section class="learning-recommendations"><h3>학습 기록 정합성 점검</h3><p><strong>'+(x.issues.length?'확인 필요 '+x.issues.length+'개':'기본 검사 통과')+'</strong></p><p>현재 '+x.sessionCount+'회차 · 답안이 있는 회차 '+x.recordedSessions+'개 · 미션 기록 '+x.tasks+'개 · 답안 이력 '+x.history+'건 · 보관된 수업일지 '+x.snapshots+'건 · 확정 보고서 '+x.reports+'건</p>'+(x.unassigned?'<p>회차가 없는 이전 답안 기록 '+x.unassigned+'건은 회차별 비교에서 제외됩니다.</p>':'')+(x.issues.length?'<ul>'+x.issues.slice(0,12).map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul>':'<p>검사 가능한 기록 구조와 회차 연결에서 오류가 발견되지 않았습니다.</p>')+'<p class="small muted">기록 내용의 사실 여부나 누락된 과거 기록까지 확인하는 검사는 아닙니다. 문제가 있으면 백업 후 기록을 점검하세요.</p></section>';
+}
 function backupRestoreHTML(){
  return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>백업 파일은 무결성 확인값과 함께 저장됩니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 미리보기 및 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원 전 회차·수업일지·확정 보고서 건수와 기록 연결을 검사하고, 저장 검증 실패 시 이전 기록으로 되돌립니다. 이전 버전 백업은 무결성 확인값이 없어 구조 검사만 수행합니다. 복원하면 현재 기록이 교체됩니다.</p></section>';
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
