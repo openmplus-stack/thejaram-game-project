@@ -245,17 +245,18 @@ const MISSION_ROTATIONS=[
 ];
 function genericVariedMission(i,scene,type,format){
  const [actor,event,context]=GRADED_SCENE_FACTS[i][scene];
- const key=scene===2?EPISODES[i].target:actor;
+ const key=actor;
  const pool=[...new Set(GRADED_SCENE_FACTS.flatMap(row=>row.flatMap(f=>[f[0]])))].filter(x=>x!==key);
- const choices=[key,...pool.slice((i+scene)%Math.max(1,pool.length)),...pool.slice(0,(i+scene)%Math.max(1,pool.length))].slice(0,8);
+ const candidates=[...new Set([key,...pool])];const choices=[...candidates.slice(1,4)];choices.splice((i+scene+type)%(choices.length+1),0,key);
  if(format==='word-hunt')return {format,question:'이 장면의 핵심 인물 또는 물건을 찾으세요.',answer:key,choices};
  if(format==='initials')return {format,question:'초성 '+hangulInitials(key)+'에 맞는 단어를 찾으세요.',answer:key,choices:choices.slice(0,4)};
  if(format==='syllable-build'){const parts=[...key];return {format,question:'음절을 순서대로 눌러 핵심 단어를 완성하세요.',answer:key,parts,choices:[...parts].reverse()};}
  if(format==='fill-blank')return {format,question:'이 장면에서 행동한 인물은 누구인가요?',answer:actor,choices:[actor,...pool.filter(x=>x!==actor).slice(0,3)]};
- if(format==='word-chain'){const last=[...key].at(-1),candidate=[...new Set([...pool,key])].find(x=>x!==key&&x.startsWith(last));if(!candidate)return {format:'choice',question:'이 장면에서 중요한 인물이나 물건을 고르세요.',answer:key,choices:choices.slice(0,4)};return {format,question:'끝말잇기: '+key+' → ?',answer:candidate,choices:[candidate,...pool.filter(x=>x!==candidate&&!x.startsWith(last)).slice(0,3)]};}
+ if(format==='word-chain'){const last=[...key].at(-1),candidate=[...new Set([...pool,key])].find(x=>x!==key&&x.startsWith(last));return {format:'choice',question:'본문에 나온 인물을 고르세요.',answer:actor,choices};}
  if(format==='match')return {format,question:'본문에 나온 인물과 행동을 바르게 연결하세요.',answer:actor+' → '+event,choices:[actor+' → '+event,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][0]+' → '+row[scene][1])]};
  if(format==='clue-book')return {format,question:'단서 수첩에 기록할 사실을 고르세요.',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
  if(format==='why')return {format,question:'본문에 나온 상황을 고르세요.',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
+ if(format==='deduction'&&scene!==2)return {format:'choice',question:'본문에 나온 인물을 고르세요.',answer:actor,choices};
  if(format==='deduction')return {format,question:'루시가 되찾아야 할 물건은 무엇인가요?',answer:EPISODES[i].target,choices:[EPISODES[i].target,...EPISODES.filter((_,j)=>j!==i).slice(0,3).map(e=>e.target)]};
  return {...taskQuestion(i,scene,type),format:'choice'};
 }
@@ -731,6 +732,7 @@ function levelContentAudit(){
  }
  return {ok:!issues.length,issues,passages:180,missions:checked};
 }
+function missionEvidenceAudit(){const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){const q=missionActivity(i,sc,t);if(i===2)continue;const passage=gradedSceneText(i,sc,1).replace(/<[^>]+>/g,''),[actor,event,context]=GRADED_SCENE_FACTS[i][sc];if(q.format==='match'&&!passage.includes(event)||['why','clue-book'].includes(q.format)&&!passage.includes(context)||!['match','why','clue-book','deduction'].includes(q.format)&&!passage.includes(actor))issues.push('근거 누락 '+i+'-'+sc+'-'+t)}return {ok:!issues.length,issues}}
 function editorialConsistencyAudit(){
  const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let lv=1;lv<=6;lv++){
   const passage=i===2?sunMoonReading(sc,lv):gradedSceneText(i,sc,lv);
@@ -741,7 +743,7 @@ function editorialConsistencyAudit(){
 }
 function releaseSelfCheck(){
  const issues=[];
- if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues,...editorialConsistencyAudit().issues);
+ if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues,...editorialConsistencyAudit().issues,...missionEvidenceAudit().issues);
  for(let i=0;i<EPISODES.length;i++){
    if(!Array.isArray(EPISODES[i].places)||!EPISODES[i].places.length)issues.push('장소 누락 '+(i+1));
    for(let sc=0;sc<3;sc++){
