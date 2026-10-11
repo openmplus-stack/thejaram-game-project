@@ -67,6 +67,12 @@
       "title": "리듬 나라 짝꿍",
       "description": "8개 나라의 국가·수도·국기를 4박 리듬과 O/X 판단으로 연결하는 독서인지 학습 앱",
       "status": "published"
+    },
+    {
+      "slug": "lucy-bookshop",
+      "title": "루시와 수상한 책방",
+      "description": "전래동화 속 사라진 이야기를 찾아가는 한국어 모험 게임 (11단계 개발용 프로토타입)",
+      "status": "prototype"
     }
   ]
 }
