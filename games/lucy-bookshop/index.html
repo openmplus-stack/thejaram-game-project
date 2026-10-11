@@ -274,9 +274,26 @@ function missionFormat(i,scene,type){
  if(i!==2)return MISSION_ROTATIONS[(i*3+scene)%MISSION_ROTATIONS.length][type];
  return [['hidden-object','image-find','initials','sequence'],['fill-blank','match','word-chain','clue-book'],['spot-difference','syllable-build','why','deduction']][scene][type];
 }
+function topikLeveledMission(i,scene,type,level){
+ const [actor,event,context]=GRADED_SCENE_FACTS[i][scene],lv=Math.max(1,Math.min(6,Number(level)||1)),other=GRADED_SCENE_FACTS.filter((_,j)=>j!==i).map(row=>row[scene]),seed=i*13+scene*5+type;
+ const pick=(answer,wrong)=>{const opts=[...new Set(wrong.filter(v=>v!==answer))].slice(0,3);opts.splice(seed%(opts.length+1),0,answer);return opts};
+ const actors=GRADED_SCENE_FACTS.flatMap(row=>row.map(f=>f[0]));
+ if(lv<=2){if(type===0)return {format:'word-hunt',question:'본문에 나온 인물을 찾으세요.',answer:actor,choices:pick(actor,actors)};
+ if(type===1){const parts=[...actor];return {format:'syllable-build',question:'인물의 이름을 순서대로 완성하세요.',answer:actor,parts,choices:[...parts].reverse()}}
+ if(type===2)return {format:'choice',question:'본문에 나온 행동을 고르세요.',answer:event,choices:pick(event,other.map(f=>f[1]))};
+ return {format:'clue-book',question:'본문에 나온 사실을 고르세요.',answer:context,choices:pick(context,other.map(f=>f[2]))}}
+ if(lv<=4){if(type===0)return {format:'match',question:'인물과 행동을 바르게 연결하세요.',answer:actor+' → '+event,choices:pick(actor+' → '+event,other.map(f=>f[0]+' → '+f[1]))};
+ if(type===1)return {format:'clue-book',question:'본문에 나타난 상황을 고르세요.',answer:context,choices:pick(context,other.map(f=>f[2]))};
+ if(type===2)return {format:'choice',question:'이 장면에서 인물이 한 행동은?',answer:event,choices:pick(event,other.map(f=>f[1]))};
+ return {format:'why',question:'이 장면에 제시된 상황으로 알맞은 것은?',answer:context,choices:pick(context,other.map(f=>f[2]))}}
+ if(type===0)return {format:'clue-book',question:'본문에서 직접 확인할 수 있는 사실은?',answer:context,choices:pick(context,other.map(f=>f[2]))};
+ if(type===1)return {format:'match',question:'본문에 근거하여 인물의 행동을 정확히 설명한 것은?',answer:actor+' → '+event,choices:pick(actor+' → '+event,other.map(f=>f[0]+' → '+f[1]))};
+ if(type===2)return {format:'why',question:'추측 없이 본문에서 확인할 수 있는 상황은?',answer:context,choices:pick(context,other.map(f=>f[2]))};
+ return {format:'choice',question:'본문에 제시된 사건을 정확히 설명한 것은?',answer:event,choices:pick(event,other.map(f=>f[1]))};
+}
 function missionActivity(i,scene,type){
  const base=taskQuestion(i,scene,type),format=missionFormat(i,scene,type);
- if(i!==2)return genericVariedMission(i,scene,type,format);
+ if(i!==2)return topikLeveledMission(i,scene,type,ep1MissionLevel()||1);
  if(format==='image-find')return scene===0?{format,question:'호랑이 그림을 찾으세요.',answer:'🐅',choices:['🐦','🐅','🐢','🐸']}:{format,question:'동아줄 그림을 찾으세요.',answer:'🪢',choices:['🪓','🪢','🌱','🪶']};
  if(format==='hidden-object')return {format,question:'숲속에 숨은 호랑이를 찾아 터치하세요.',answer:'🐅',choices:['🌲','🌳','🍃','🐅','🌿','🪨','🌲','🌼','🍄']};
  if(format==='spot-difference')return {format,question:'두 장면을 비교해 사라진 물건을 찾으세요.',answer:'🪢',choices:['🌲','🪢','☁️','🌳'],before:['🌲','☁️','🪢','🌳'],after:['🌲','☁️','🌳']};
@@ -733,6 +750,7 @@ function levelContentAudit(){
  return {ok:!issues.length,issues,passages:180,missions:checked};
 }
 function missionEvidenceAudit(){const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){const q=missionActivity(i,sc,t);if(i===2)continue;const passage=gradedSceneText(i,sc,1).replace(/<[^>]+>/g,''),[actor,event,context]=GRADED_SCENE_FACTS[i][sc];if(q.format==='match'&&!passage.includes(event)||['why','clue-book'].includes(q.format)&&!passage.includes(context)||!['match','why','clue-book','deduction'].includes(q.format)&&!passage.includes(actor))issues.push('근거 누락 '+i+'-'+sc+'-'+t)}return {ok:!issues.length,issues}}
+function topikMissionLevelAudit(){const issues=[];let checked=0;for(let lv=1;lv<=6;lv++)for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){const q=i===2?missionActivity(i,sc,t):topikLeveledMission(i,sc,t,lv);if(!q.answer||!q.question||(!q.parts&&!q.choices.includes(q.answer)))issues.push('문항 누락 '+lv+'-'+i+'-'+sc+'-'+t);if(i!==2&&q.format!=='syllable-build'&&new Set(q.choices).size!==q.choices.length)issues.push('중복 보기 '+lv+'-'+i+'-'+sc+'-'+t);checked++}return {ok:!issues.length,issues,checked}}
 function editorialConsistencyAudit(){
  const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let lv=1;lv<=6;lv++){
   const passage=i===2?sunMoonReading(sc,lv):gradedSceneText(i,sc,lv);
@@ -743,7 +761,7 @@ function editorialConsistencyAudit(){
 }
 function releaseSelfCheck(){
  const issues=[];
- if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues,...editorialConsistencyAudit().issues,...missionEvidenceAudit().issues);
+ if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues,...editorialConsistencyAudit().issues,...missionEvidenceAudit().issues,...topikMissionLevelAudit().issues);
  for(let i=0;i<EPISODES.length;i++){
    if(!Array.isArray(EPISODES[i].places)||!EPISODES[i].places.length)issues.push('장소 누락 '+(i+1));
    for(let sc=0;sc<3;sc++){
