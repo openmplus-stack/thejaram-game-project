@@ -182,10 +182,10 @@ const STORYBOOK=[
 ];
 const MISSION_NAMES=['단어 찾기','문장 이해','순서 맞추기','단서 추리'];
 let activeMission=0,missionChoice='';
-function taskKey(i,scene,type){return 't'+type+'-l'+(i===0?ep1MissionLevel()||'higher':'general')}
+function taskKey(i,scene,type){return 't'+type+'-l'+(i<=1?ep1MissionLevel()||'higher':'general')}
 function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+taskKey(i,scene,type)]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=5?EP1_ADVANCED[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===1)return ep2Question(scene,type,ep1MissionLevel()||1);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=5?EP1_ADVANCED[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
@@ -255,9 +255,9 @@ missions:[
 ]
 };
 function ep1Band(){const n=Number(s.topik)||1;return n<=2?0:n<=4?1:2}
-function storyText(i,scene){return i===0?EP1_CONTENT.texts[scene][ep1Band()]:STORYBOOK[i][scene]}
-function episodeWords(i,scene){return i===0?EP1_CONTENT.words[scene]:VOCAB[i][scene]}
-function episodeGrammar(i,scene){return i===0?EP1_CONTENT.grammar[scene]:['문장 이해와 사건 순서','이유와 결과 표현']}
+function storyText(i,scene){return i===0?EP1_CONTENT.texts[scene][ep1Band()]:i===1?EP2_STORIES[ep1Band()][scene]:STORYBOOK[i][scene]}
+function episodeWords(i,scene){return i===0?EP1_CONTENT.words[scene]:i===1?EP2_WORDS[scene]:VOCAB[i][scene]}
+function episodeGrammar(i,scene){return i===0?EP1_CONTENT.grammar[scene]:i===1?EP2_GRAMMAR[scene]:['문장 이해와 사건 순서','이유와 결과 표현']}
 
 
 /* Step 19: TOPIK beginner learning prototype for episode 1.
@@ -306,7 +306,7 @@ const EP1_BEGINNER={
 ]
 };
 function currentTaskLevel(){const n=Number(s.topik)||1;return n===1||n===2?n:0}
-function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=ep1MissionLevel();const goals=beginner===5?['고급 문맥 의미 분석','서술 의도 파악','인과 구조 분석','근거 중심 추론']:beginner===6?['서사 표현 효과','담화 의미 해석','갈등 구조 분석','주제·서사 기능 평가']:beginner===3?['중급 어휘 이해','관용적 표현 이해','사건 순서 분석','인물 의도 추론']:beginner===4?['맥락 속 어휘 이해','문법 의미 분석','인과관계 분석','서사적 추론']:beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
+function taskLearningGoal(i,scene,type){if(i>1)return '';const beginner=ep1MissionLevel();const goals=beginner===5?['고급 문맥 의미 분석','서술 의도 파악','인과 구조 분석','근거 중심 추론']:beginner===6?['서사 표현 효과','담화 의미 해석','갈등 구조 분석','주제·서사 기능 평가']:beginner===3?['중급 어휘 이해','관용적 표현 이해','사건 순서 분석','인물 의도 추론']:beginner===4?['맥락 속 어휘 이해','문법 의미 분석','인과관계 분석','서사적 추론']:beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
 
 
 function episodeHealth(i){const p=progress(i),item=(s.inventory||{})['ep'+(i+1)];return {storyDone:[0,1,2].every(n=>allTasksDone(i,n)),visited:(p.investigatedLocations||[]).length,required:EPISODES[i].places.length,verified:!!p.deduction?.verified,captured:!!item,restored:p.phase==='completed'&&item?.status==='restored'}}
@@ -402,6 +402,65 @@ const EP1_ADVANCED={
 ]
 ]
 };
+
+
+/* Step 24: Episode 2, Heungbu and Nolbu, six-band authored reading prototype. */
+const EP2_STORIES=[
+[
+'옛날 옛날에 흥부라는 착한 사람이 살았어요. 흥부는 다리를 다친 제비를 보았어요. <em>흥부는 제비의 다리를 고쳐 주었어요.</em> 제비는 다시 하늘로 날아갔어요.',
+'봄이 되자 제비가 흥부의 집에 돌아왔어요. 제비는 고마운 마음을 전하고 싶었어요. <em>제비는 흥부에게 박씨를 가져다주려고 했어요.</em> 흥부는 제비를 반갑게 맞았어요.',
+'그런데 제비의 부리에는 아무것도 없었어요. <em>제비가 가져오려던 박씨가 사라졌어요.</em> 흥부는 제비를 걱정했어요. 루시는 박씨가 어디로 갔는지 찾기로 했어요.'
+],
+[
+'옛날에 가난하지만 마음씨 착한 흥부가 살았습니다. 어느 날 흥부는 다리를 다친 제비를 발견했습니다. <em>흥부가 제비를 정성껏 돌봐 주자</em> 제비는 건강해져서 멀리 날아갔습니다.',
+'이듬해 봄, 제비가 흥부의 집으로 돌아왔습니다. 제비는 자신을 도와준 흥부에게 고마운 마음을 전하려고 했습니다. <em>제비는 작은 박씨를 선물하려고 했습니다.</em> 흥부는 제비가 돌아와 무척 기뻤습니다.',
+'그러나 제비가 흥부에게 다가왔을 때 부리가 텅 비어 있었습니다. <em>흥부에게 주려던 박씨가 감쪽같이 사라진 것입니다.</em> 루시는 제비가 지나온 길을 떠올리며 사라진 선물을 찾아 나섰습니다.'
+],
+[
+'옛날, 어려운 형편에도 남을 돕기를 주저하지 않는 흥부가 살았습니다. 그는 우연히 다리를 다친 제비를 발견하고 정성스럽게 치료해 주었습니다. <em>작은 생명도 소중히 여긴 흥부의 보살핌 덕분에</em> 제비는 다시 하늘을 날 수 있게 되었습니다.',
+'다음 해 봄, 제비가 흥부를 찾아왔습니다. 제비는 자신을 살려 준 은혜에 보답하고자 특별한 선물을 준비했습니다. <em>그 선물은 땅에 심으면 자라나는 박씨였습니다.</em> 흥부는 선물보다 제비가 무사히 돌아온 사실을 더 기뻐했습니다.',
+'하지만 제비가 흥부 앞에 내려앉자 예상하지 못한 일이 벌어졌습니다. 제비가 가져오려던 박씨가 온데간데없어진 것입니다. <em>보답의 상징이 사라지면서 이야기의 중요한 사건이 이어지지 못했습니다.</em> 루시는 제비의 이동 경로를 근거로 단서를 찾기 시작했습니다.'
+]
+];
+const EP2_WORDS=[['흥부','제비','다치다','돌보다','날아가다'],['봄','돌아오다','고맙다','선물','박씨'],['부리','사라지다','걱정하다','흔적','찾다']];
+const EP2_GRAMMAR=[['-아/어 주다 (도움)','-자 (앞일 뒤에 이어짐)','-기 때문에 (이유)'],['-려고 하다 (의도)','-고 싶다 (바람)','-자 (시간적 연결)'],['-려던 (계획했지만 달라짐)','-면서 (동시·연결)','-기 위해 (목적)']];
+const EP2_MISSION_FACTS=[
+[
+{question:'흥부가 도와준 동물은?',answer:'제비',choices:['제비','토끼','호랑이','자라']},
+{question:'제비에게 어떤 일이 있었나요?',answer:'다리를 다쳤어요.',choices:['다리를 다쳤어요.','집을 잃었어요.','물에 빠졌어요.','길을 잃었어요.']},
+{question:'먼저 일어난 일은?',answer:'흥부가 다친 제비를 발견했어요.',choices:['제비가 날아갔어요.','흥부가 다친 제비를 발견했어요.','제비가 선물을 가져왔어요.','박씨가 사라졌어요.']},
+{question:'흥부의 행동으로 알 수 있는 성격은?',answer:'남을 돕는 착한 마음',choices:['남을 돕는 착한 마음','욕심이 많은 마음','화가 많은 마음','겁이 많은 마음']}
+],
+[
+{question:'제비가 흥부에게 주려던 것은?',answer:'박씨',choices:['박씨','금도끼','날개옷','방망이']},
+{question:'제비가 선물을 준비한 이유는?',answer:'흥부에게 고마운 마음을 전하려고요.',choices:['흥부에게 고마운 마음을 전하려고요.','흥부를 놀리려고요.','새 집을 찾으려고요.','연못에 가려고요.']},
+{question:'사건의 순서로 맞는 것은?',answer:'제비가 건강해짐 → 봄에 흥부를 찾아옴',choices:['봄에 흥부를 찾아옴 → 제비가 다침','제비가 건강해짐 → 봄에 흥부를 찾아옴','박씨가 사라짐 → 제비가 다침','흥부가 떠남 → 제비가 태어남']},
+{question:'박씨는 어떤 의미를 가진 선물인가요?',answer:'도움에 대한 고마움',choices:['도움에 대한 고마움','경쟁에서 얻은 상','싸움의 증거','벌을 주는 물건']}
+],
+[
+{question:'제비의 부리에서 사라진 것은?',answer:'박씨',choices:['박씨','쇠도끼','알밤','동아줄']},
+{question:'흥부에게 박씨를 줄 수 없게 된 이유는?',answer:'제비가 가져오던 박씨가 사라졌기 때문이에요.',choices:['흥부가 집에 없었기 때문이에요.','제비가 가져오던 박씨가 사라졌기 때문이에요.','봄이 오지 않았기 때문이에요.','제비가 날지 못했기 때문이에요.']},
+{question:'먼저 일어난 일은?',answer:'제비가 흥부의 집에 돌아왔어요.',choices:['루시가 박씨를 찾았어요.','박이 열렸어요.','제비가 흥부의 집에 돌아왔어요.','이야기가 복원되었어요.']},
+{question:'루시가 찾으려는 물건은?',answer:'박씨',choices:['금도끼','박씨','날개옷','은도끼']}
+]
+];
+const EP2_LEVEL_QUESTIONS={
+1:['누가 제비를 도와주었어요?','제비가 가져오려던 선물은?','무엇이 사라졌어요?'],
+2:['흥부가 제비를 돌본 까닭은?','제비가 선물을 준비한 이유는?','루시가 제비의 길을 살피는 이유는?'],
+3:['“정성껏”의 의미와 가까운 것은?','제비가 돌아온 계절은?','“감쪽같이”가 나타내는 상황은?'],
+4:['흥부의 보살핌이 제비에게 미친 결과는?','선물의 서사적 기능은?','박씨의 실종이 초래한 결과는?'],
+5:['흥부의 행동에 나타난 가치는?','제비의 귀환이 갖는 의미는?','사라진 박씨가 이야기 전개에 미친 영향은?'],
+6:['첫 장면에서 보살핌이 강조되는 효과는?','제비가 박씨를 준비한 행동의 함의는?','실종 사건이 기존 이야기 구조를 어떻게 바꾸는가?']
+};
+const EP2_LEVEL_ANSWERS={
+1:['흥부','박씨','박씨'],
+2:['다친 제비를 도와주기 위해서요.','도움에 보답하려고요.','사라진 박씨의 흔적을 찾기 위해서요.'],
+3:['마음을 다하여','봄','흔적 없이 사라짐'],
+4:['제비가 건강을 되찾아 날 수 있게 되었다.','은혜에 대한 보답을 드러낸다.','보답의 장면이 이어지지 못한다.'],
+5:['작은 생명도 소중히 여기는 태도','은혜를 기억하고 되갚으려는 행동','보답을 완성할 핵심 물건이 없어져 갈등이 생긴다.'],
+6:['인물의 선의를 행동을 통해 구체화한다.','과거의 도움과 현재의 보답을 연결한다.','보답을 가능하게 할 매개가 사라져 이야기의 진행이 중단된다.']
+};
+function ep2Question(scene,type,level){const base=EP2_MISSION_FACTS[scene][type];if(type===2)return base;if(level===1)return base;if(level===2&&type===0)return base;if(level>=2&&type===1){const answer=EP2_LEVEL_ANSWERS[level][scene];return {question:EP2_LEVEL_QUESTIONS[level][scene],answer,choices:[answer,...base.choices.filter(x=>x!==answer).slice(0,3)]}}if(level>=3&&type===3){const answer=EP2_LEVEL_ANSWERS[level][scene];return {question:EP2_LEVEL_QUESTIONS[level][scene],answer,choices:[...base.choices.slice(0,3),answer]}}return base}
 
 render();
 </script></body></html>
