@@ -604,12 +604,12 @@ function verifyRestoredState(x){
  if(!plain(x.episodeProgress)||!plain(x.inventory))issues.push('진행 상태 또는 보관함 형식 오류');
  if(x.selectedBook!==null&&x.selectedBook!==undefined&&(!Number.isInteger(x.selectedBook)||x.selectedBook<0||x.selectedBook>=EPISODES.length))issues.push('선택한 동화 번호 오류');
  for(const [key,p] of Object.entries(x.episodeProgress||{})){
-  if(!/^(0|[1-9]\\d*)$/.test(key)||Number(key)>=EPISODES.length||!plain(p)){issues.push('동화 진행 기록 오류');continue}
+  if(!/^(0|[1-9][0-9]*)$/.test(key)||Number(key)>=EPISODES.length||!plain(p)){issues.push('동화 진행 기록 오류');continue}
   if(p.scene!==undefined&&(!Number.isInteger(p.scene)||p.scene<0||p.scene>2))issues.push('장면 번호 오류');
   if(p.tasks!==undefined&&!plain(p.tasks))issues.push('미션 기록 구조 오류');
  }
  for(const [key,rows] of Object.entries(x.lessonSnapshots||{})){
-  if(!/^[1-9]\\d*$/.test(key)||Number(key)>x.learningSession||!Array.isArray(rows)||rows.some(v=>!plain(v)||typeof v.name!=='string'))issues.push('수업일지 연결 오류');
+  if(!/^[1-9][0-9]*$/.test(key)||Number(key)>x.learningSession||!Array.isArray(rows)||rows.some(v=>!plain(v)||typeof v.name!=='string'))issues.push('수업일지 연결 오류');
  }
  for(const item of x.parentReportArchive||[]){
   if(!plain(item)||typeof item.body!=='string'||typeof item.at!=='string'||!Number.isInteger(item.session)||item.session<1||item.session>x.learningSession)issues.push('확정 보고서 연결 오류');
@@ -696,10 +696,28 @@ function integrityRepairHTML(){
  const p=integrityRepairPlan();
  return '<section class="learning-recommendations"><h3>오류 복구 안내</h3><p>'+esc(p.description)+'</p><p>진행 기록·답안 이력·확정 보고서 자체는 자동으로 삭제하거나 변경하지 않습니다.</p><button onclick="prepareIntegrityRepair()">복구 전 백업 파일 저장</button> <button onclick="repairLearningSession()" '+(p.safe?'':'disabled')+'>수업 회차 연결 수정</button><p class="small muted">파일 다운로드 완료 여부는 교사가 확인해야 합니다. 자동 수정은 회차가 뒤처진 경우에만 지원합니다.</p></section>';
 }
+function integratedRecordAudit(){
+ const checks=[];
+ const test=(name,fn)=>{try{checks.push({name,ok:!!fn()})}catch(e){checks.push({name,ok:false})}};
+ test('학습 회차 집계',()=>Array.isArray(learningSessionSummary().sessions));
+ test('재평가 비교',()=>Array.isArray(reassessmentComparison()));
+ test('수업 계획과 실행 기록',()=>Array.isArray(editableLessonPlan())&&Array.isArray(lessonExecutionRows()));
+ test('수업일지 생성',()=>!!lessonJournalData());
+ test('보호자 보고서 초안',()=>typeof parentReportDraft().home==='string');
+ test('확정 보고서 보관함',()=>Array.isArray(s.parentReportArchive||[]));
+ test('백업 무결성',()=>validateBackup(backupPayload(s)).version===2);
+ test('복원 연결 검사',()=>verifyRestoredState(s).length===0);
+ test('기록 정합성',()=>learningIntegrityData().issues.length===0);
+ return {checks,passed:checks.filter(x=>x.ok).length};
+}
+function integratedRecordAuditHTML(){
+ const x=integratedRecordAudit();
+ return '<section class="learning-recommendations"><h3>54~73단계 통합 검수</h3><p>현재 저장 기록 기준 '+x.passed+'/'+x.checks.length+'개 검사 통과</p><ul>'+x.checks.map(v=>'<li>'+(v.ok?'통과':'확인 필요')+' — '+esc(v.name)+'</li>').join('')+'</ul><p class="small muted">코드와 저장 기록의 기본 구조를 점검합니다. 실제 iPad 사용성, 인쇄 및 파일 다운로드 검증은 별도입니다.</p></section>';
+}
 function backupRestoreHTML(){
  return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>백업 파일은 무결성 확인값과 함께 저장됩니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 미리보기 및 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원 전 회차·수업일지·확정 보고서 건수와 기록 연결을 검사하고, 저장 검증 실패 시 이전 기록으로 되돌립니다. 이전 버전 백업은 무결성 확인값이 없어 구조 검사만 수행합니다. 복원하면 현재 기록이 교체됩니다.</p></section>';
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+learningIntegrityHTML()+integrityRepairHTML()+integratedRecordAuditHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
