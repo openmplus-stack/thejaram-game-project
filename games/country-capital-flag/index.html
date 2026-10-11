@@ -143,7 +143,7 @@ body{background:#e9f7f7;color:var(--navy)}
 @media(max-width:700px){.homeBox{padding:22px 16px}.homeMenu{grid-template-columns:1fr 1fr}.homeMenu button{min-height:82px}.homeStart{min-height:72px}.flowBox{border-radius:28px}}
 </style>
 <style id="uploaded-art-assets">
-.home{background-image:linear-gradient(#ffffff22,#ffffff22),url('assets/backgrounds/bg-world-home.webp');background-size:cover;background-position:center}
+.home{background-image:linear-gradient(#ffffff22,#ffffff22),url('assets/backgrounds/bg-world-home.png');background-size:cover;background-position:center}
 .homeBox{background:#fffdf3d9}
 .homeGlobe{font-size:0;width:clamp(100px,16vw,210px);height:clamp(100px,16vw,210px);margin:0 auto 4px;background:url('assets/characters/explorer-master.png') center/contain no-repeat}
 .learnScreen{background-image:linear-gradient(#f7fbffbb,#f7fbffbb),url('assets/backgrounds/bg-study.webp');background-size:cover;background-position:center}
@@ -155,6 +155,22 @@ body{background:#e9f7f7;color:var(--navy)}
 .treasureDetailImage{width:min(260px,65vw);height:210px;object-fit:contain;display:block;margin:8px auto}
 .treasurePick{min-height:185px}.treasurePick strong{font-size:16px}.treasurePick span{font-size:14px;overflow-wrap:anywhere}
 .rewardPending{grid-column:1/-1;color:#667b78;text-align:center;padding:15px}
+</style><style id="storybook-home-v2">
+/* Illustrated full-screen home, matching the approved explorer concept. */
+#home.home{background: url('assets/backgrounds/bg-world-home.png') center center / cover no-repeat #92d7ee!important;min-height:100dvh;align-items:center;justify-content:center;padding:clamp(14px,2vw,30px)!important}
+#home.home::before{display:none!important}
+#home .homeBox{width:min(660px,90vw);max-width:660px;margin:0 auto 0 32%;padding:clamp(16px,2.4vw,30px)!important;background:rgba(255,248,219,.92)!important;border:5px solid #a56b32!important;border-radius:28px!important;box-shadow:0 9px 0 #70451f,0 22px 45px #153d4155!important;backdrop-filter:none!important}
+#home .homeGlobe{position:fixed;bottom:3%;left:3%;width:clamp(145px,28vw,360px);height:clamp(180px,48vh,490px);background:url('assets/characters/explorer-master.png') center bottom/contain no-repeat;pointer-events:none}
+#home .homeTitle{font-size:clamp(30px,4vw,55px)!important;font-weight:1000!important;color:#603113!important;text-shadow:1px 3px #fff4db!important;line-height:1.12}
+#home .homeSub{font-size:clamp(17px,2.1vw,26px)!important;color:#83552e!important;margin:12px 0 20px!important}
+#home .homeStart{background:linear-gradient(#ffb94b,#ef8425)!important;color:#fff!important;border:3px solid #ffe3a3!important;box-shadow:0 7px 0 #ac5819,0 12px 20px #784b2844!important}
+#home .homeMenu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin-top:22px}
+#home .homeMenu button{min-height:96px!important;border:3px solid #fff5d9!important;border-radius:18px!important;box-shadow:0 5px 0 #7c563a!important;color:#fff!important;font-weight:950!important;font-size:clamp(15px,1.65vw,21px)!important;padding:10px 6px!important}
+#home .homeMenu button:nth-child(1){background:linear-gradient(#57b9ff,#146cce)!important}
+#home .homeMenu button:nth-child(2){background:linear-gradient(#b778e4,#7942af)!important}
+#home .homeMenu button:nth-child(3){background:linear-gradient(#4dc780,#159356)!important}
+#home .homeMenu .ico{display:block;font-size:clamp(23px,2.7vw,37px)}
+@media(max-width:740px){#home.home{background-position:center}#home .homeBox{width:96%;margin:0 auto 20vh;padding:15px!important}#home .homeGlobe{height:23vh;width:34vw;bottom:1%;left:1%}#home .homeMenu{grid-template-columns:repeat(3,1fr)}#home .homeMenu button{min-height:80px!important;font-size:13px!important}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
