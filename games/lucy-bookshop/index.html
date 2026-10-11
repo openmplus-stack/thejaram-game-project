@@ -182,14 +182,14 @@ const STORYBOOK=[
 ];
 const MISSION_NAMES=['단어 찾기','문장 이해','순서 맞추기','단서 추리'];
 let activeMission=0,missionChoice='';
-function taskKey(i,scene,type){return 't'+type}
-function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+type]||{done:false,attempts:0}}
+function taskKey(i,scene,type){return 't'+type+'-l'+(i===0?currentTaskLevel()||'higher':'general')}
+function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+taskKey(i,scene,type)]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0)return EP1_CONTENT.missions[scene][type];if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0)return currentTaskLevel()?EP1_BEGINNER[currentTaskLevel()][scene][type]:EP1_CONTENT.missions[scene][type];if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
-function taskCheck(){const i=s.selectedBook,scene=progress(i).scene,q=taskQuestion(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);const started=Date.now();if(!missionChoice){alert('답을 선택해 주세요.');return}const correct=answerNormalize(missionChoice)===answerNormalize(q.answer);soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+activeMission]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.attempts===0&&correct,updatedAt:new Date().toISOString(),lastAnswer:missionChoice,history:[...(rec.history||[]),{answer:missionChoice,correct,at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
+function taskCheck(){const i=s.selectedBook,scene=progress(i).scene,q=taskQuestion(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);const started=Date.now();if(!missionChoice){alert('답을 선택해 주세요.');return}const correct=answerNormalize(missionChoice)===answerNormalize(q.answer);soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+taskKey(i,scene,activeMission)]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.attempts===0&&correct,updatedAt:new Date().toISOString(),lastAnswer:missionChoice,history:[...(rec.history||[]),{answer:missionChoice,correct,at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
 function missionMenu(i,scene){return '<section class="mission-menu"><h3>미션을 선택하세요</h3><p>네 가지 미션을 모두 완료하면 다음 장면으로 갈 수 있어요.</p><div class="mission-menu-grid">'+MISSION_NAMES.map((name,t)=>'<button onclick="taskOpen('+t+')">'+(taskRecord(i,scene,t).done?'✓ ':'')+(t===0?'📚 ':t===1?'💬 ':t===2?'🔢 ':'🔎 ')+name+'</button>').join('')+'</div></section>'}
 function sceneStory(i,scene){return storyText(i,scene).replace(/<em>/g,'<strong class="story-emphasis">').replace(/<\/em>/g,'</strong>')}
 function resultsHTML(i){return '<section class="lesson-results"><h3>📚 이번 이야기에서 배운 내용</h3>'+[0,1,2].map(scene=>'<h4>장면 '+(scene+1)+'</h4><p><strong>단어:</strong> '+episodeWords(i,scene).map(esc).join(' · ')+'</p><p><strong>문장 표현:</strong> '+lessonSentences(i,scene,s.topik).map(esc).join(' / ')+'</p>').join('')+'</section>'}
@@ -254,6 +254,55 @@ function ep1Band(){const n=Number(s.topik)||1;return n<=2?0:n<=4?1:2}
 function storyText(i,scene){return i===0?EP1_CONTENT.texts[scene][ep1Band()]:STORYBOOK[i][scene]}
 function episodeWords(i,scene){return i===0?EP1_CONTENT.words[scene]:VOCAB[i][scene]}
 function episodeGrammar(i,scene){return i===0?EP1_CONTENT.grammar[scene]:['문장 이해와 사건 순서','이유와 결과 표현']}
+
+
+/* Step 19: TOPIK beginner learning prototype for episode 1.
+   1급: short concrete statements; 2급: basic causal/sequence statements.
+   These are authored instructional approximations, not official TOPIK test items. */
+const EP1_BEGINNER={
+1:[
+[
+{question:'나무꾼이 잃어버린 것은?',answer:'쇠도끼',choices:['쇠도끼','신발','책','모자']},
+{question:'나무꾼은 어디에서 나무를 했어요?',answer:'산',choices:['바다','학교','산','시장']},
+{question:'먼저 일어난 일은?',answer:'나무꾼이 나무를 했어요.',choices:['나무꾼이 울었어요.','나무꾼이 나무를 했어요.','산신령이 도끼를 찾았어요.','루시가 돌아왔어요.']},
+{question:'쇠도끼가 빠진 곳은?',answer:'연못',choices:['연못','방','책상','하늘']}
+],
+[
+{question:'연못에서 누가 나타났어요?',answer:'산신령',choices:['나무꾼','호랑이','산신령','제비']},
+{question:'나무꾼이 잃어버린 것은?',answer:'쇠도끼',choices:['은도끼','쇠도끼','금도끼','방망이']},
+{question:'먼저 일어난 일은?',answer:'산신령이 나타났어요.',choices:['나무꾼이 집에 갔어요.','금도끼가 돌아왔어요.','산신령이 나타났어요.','루시가 잠들었어요.']},
+{question:'산신령이 보여 주려고 한 것은?',answer:'금도끼와 은도끼',choices:['금도끼와 은도끼','사과와 배','책과 연필','모자와 신발']}
+],
+[
+{question:'무엇이 사라졌어요?',answer:'금도끼',choices:['쇠도끼','금도끼','박씨','날개옷']},
+{question:'산신령은 왜 놀랐어요?',answer:'금도끼가 없어서요.',choices:['비가 와서요.','나무꾼이 웃어서요.','금도끼가 없어서요.','연못이 작아서요.']},
+{question:'먼저 일어난 일은?',answer:'산신령이 연못을 살펴보았어요.',choices:['루시가 집에 갔어요.','산신령이 연못을 살펴보았어요.','금도끼가 돌아왔어요.','나무꾼이 도끼를 팔았어요.']},
+{question:'사라진 물건은 무엇인가요?',answer:'금도끼',choices:['동아줄','은도끼','금도끼','박씨']}
+]
+],
+2:[
+[
+{question:'나무꾼이 연못에 빠뜨린 물건은?',answer:'쇠도끼',choices:['쇠도끼','은도끼','금도끼','방망이']},
+{question:'나무꾼이 속상한 이유는 무엇인가요?',answer:'일할 때 쓰는 도끼를 잃어버려서요.',choices:['나무를 다 베어서요.','일할 때 쓰는 도끼를 잃어버려서요.','친구를 만나서요.','날씨가 좋아서요.']},
+{question:'일어난 순서가 맞는 것은?',answer:'나무를 했어요 → 도끼를 빠뜨렸어요',choices:['도끼를 찾았어요 → 나무를 했어요','산신령이 왔어요 → 나무를 했어요','나무를 했어요 → 도끼를 빠뜨렸어요','집에 갔어요 → 도끼를 빠뜨렸어요']},
+{question:'나무꾼이 연못을 바라본 이유는?',answer:'잃어버린 도끼를 찾고 싶어서요.',choices:['물고기를 보고 싶어서요.','수영하려고요.','잃어버린 도끼를 찾고 싶어서요.','물을 마시려고요.']}
+],
+[
+{question:'연못에서 나타난 인물은 누구인가요?',answer:'산신령',choices:['도깨비','나무꾼','산신령','용왕']},
+{question:'산신령이 나무꾼에게 도끼를 보여 주려는 이유는?',answer:'나무꾼을 도와주고 정직함을 알아보려고요.',choices:['나무꾼을 도와주고 정직함을 알아보려고요.','연못을 팔려고요.','나무를 옮기려고요.','도끼를 버리려고요.']},
+{question:'일어난 순서가 맞는 것은?',answer:'나무꾼이 슬퍼했어요 → 산신령이 나타났어요',choices:['산신령이 떠났어요 → 나무꾼이 슬퍼했어요','나무꾼이 슬퍼했어요 → 산신령이 나타났어요','나무꾼이 집에 갔어요 → 산신령이 나타났어요','루시가 돌아왔어요 → 나무꾼이 슬퍼했어요']},
+{question:'산신령이 먼저 보여 주려던 것은?',answer:'금도끼',choices:['쇠도끼','은도끼','금도끼','나무도끼']}
+],
+[
+{question:'사라진 물건은 무엇인가요?',answer:'금도끼',choices:['박씨','은도끼','금도끼','쇠도끼']},
+{question:'금도끼가 사라져 어떤 일이 생겼나요?',answer:'나무꾼의 정직함을 시험하지 못했어요.',choices:['나무꾼의 정직함을 시험하지 못했어요.','연못이 말랐어요.','산신령이 집에 갔어요.','나무꾼이 도끼를 팔았어요.']},
+{question:'일어난 순서가 맞는 것은?',answer:'산신령이 연못을 살펴봤어요 → 금도끼가 없는 것을 알았어요',choices:['금도끼를 찾았어요 → 산신령이 떠났어요','루시가 집에 갔어요 → 금도끼가 돌아왔어요','산신령이 연못을 살펴봤어요 → 금도끼가 없는 것을 알았어요','나무꾼이 도끼를 팔았어요 → 산신령이 웃었어요']},
+{question:'세 장면을 읽고 찾을 물건은 무엇인가요?',answer:'금도끼',choices:['쇠도끼','날개옷','금도끼','박씨']}
+]
+]
+};
+function currentTaskLevel(){const n=Number(s.topik)||1;return n===1||n===2?n:0}
+function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=currentTaskLevel();const goals=beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
 
 render();
 </script></body></html>
