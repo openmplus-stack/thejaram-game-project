@@ -473,7 +473,7 @@ function lessonPlanData(){
  ];
  return {minutes,steps:names.map((name,i)=>({name,minutes:minutes[i],activity:activities[i]})),picks,total:minutes.reduce((a,b)=>a+b,0)};
 }
-function editableLessonPlan(){return Array.isArray(s.customLessonPlan)&&s.customLessonPlan.length?s.customLessonPlan:lessonPlanData().steps}
+function editableLessonPlan(){return (Array.isArray(s.customLessonPlan)&&s.customLessonPlan.length?s.customLessonPlan:lessonPlanData().steps).map((x,i)=>({...x,id:x.id||'base-'+i}))}
 function lessonPlanEdit(index,field,value){
  const steps=editableLessonPlan().map(x=>({...x}));if(!steps[index]||!['name','activity','minutes'].includes(field))return;
  if(field==='minutes'){const n=Number(value);if(!Number.isInteger(n)||n<1||n>120)return;steps[index].minutes=n}
@@ -481,19 +481,23 @@ function lessonPlanEdit(index,field,value){
  s.customLessonPlan=steps;save();
 }
 function lessonPlanMove(index,delta){const steps=editableLessonPlan().map(x=>({...x})),next=index+delta;if(next<0||next>=steps.length)return;[steps[index],steps[next]]=[steps[next],steps[index]];s.customLessonPlan=steps;save();render()}
-function lessonPlanAdd(){const steps=editableLessonPlan().map(x=>({...x}));if(steps.length>=12)return;steps.push({name:'추가 활동',minutes:5,activity:'활동 목표와 방법을 입력하세요.'});s.customLessonPlan=steps;save();render()}
+function lessonPlanAdd(){const steps=editableLessonPlan().map(x=>({...x}));if(steps.length>=12)return;steps.push({id:'added-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),name:'추가 활동',minutes:5,activity:'활동 목표와 방법을 입력하세요.'});s.customLessonPlan=steps;save();render()}
 function lessonPlanRemove(index){const steps=editableLessonPlan().map(x=>({...x}));if(steps.length<=1)return;steps.splice(index,1);s.customLessonPlan=steps;save();render()}
 function lessonPlanReset(){if(!confirm('수정한 수업 계획을 초기화하고 자동 계획으로 돌아갈까요?'))return;s.customLessonPlan=null;save();render()}
-function lessonExecutionRows(){const key=String(s.learningSession),saved=s.lessonExecution?.[key]||[];return editableLessonPlan().map((x,i)=>({name:x.name,minutes:x.minutes,activity:x.activity,done:saved[i]?.done===true,note:saved[i]?.note||''}))}
+function lessonExecutionRows(){
+ const key=String(s.learningSession),saved=s.lessonExecution?.[key]||{};
+ const steps=editableLessonPlan();
+ return steps.map((x,i)=>{const record=Array.isArray(saved)?saved[i]:saved[x.id];return {...x,done:record?.done===true,note:record?.note||''}});
+}
 function lessonExecutionEdit(index,field,value){
  if(!['done','note'].includes(field))return;const key=String(s.learningSession),rows=lessonExecutionRows();if(!rows[index])return;
- const saved=(s.lessonExecution?.[key]||[]).map(x=>({...x}));while(saved.length<rows.length)saved.push({});
- saved[index][field]=field==='done'?value===true:String(value).slice(0,500);
+ const existing=s.lessonExecution?.[key]||{},saved=Array.isArray(existing)?Object.fromEntries(editableLessonPlan().map((x,i)=>[x.id,existing[i]||{}])):{...existing};
+ const id=rows[index].id;saved[id]={...(saved[id]||{}),[field]:field==='done'?value===true:String(value).slice(0,500)};
  s.lessonExecution={...(s.lessonExecution||{}),[key]:saved};save();if(field==='done')render();
 }
 function lessonExecutionHTML(){
  const rows=lessonExecutionRows(),done=rows.filter(x=>x.done).length;
- return '<section class="learning-recommendations"><h3>수업 실행 기록 · '+s.learningSession+'회차</h3><p>진행 '+done+'/'+rows.length+'개 활동 완료</p>'+rows.map((x,i)=>'<div style="padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:12px"><label><input type="checkbox" '+(x.done?'checked':'')+' onchange="lessonExecutionEdit('+i+',\'done\',this.checked)"> <strong>'+(i+1)+'. '+esc(x.name)+'</strong> ('+x.minutes+'분)</label><p>'+esc(x.activity)+'</p><label>교사 관찰 메모<textarea style="width:100%;min-height:60px" placeholder="수행 모습, 도움 수준, 다음 지도 사항" onchange="lessonExecutionEdit('+i+',\'note\',this.value)">'+esc(x.note)+'</textarea></label></div>').join('')+'<p class="small muted">실행 기록은 회차별로 저장됩니다. 활동명을 바꾸거나 순서를 이동하면 기존 체크·메모가 위치 기준으로 남으므로 실행 중 계획 구조 변경에 주의하세요.</p></section>';
+ return '<section class="learning-recommendations"><h3>수업 실행 기록 · '+s.learningSession+'회차</h3><p>진행 '+done+'/'+rows.length+'개 활동 완료</p>'+rows.map((x,i)=>'<div style="padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:12px"><label><input type="checkbox" '+(x.done?'checked':'')+' onchange="lessonExecutionEdit('+i+',\'done\',this.checked)"> <strong>'+(i+1)+'. '+esc(x.name)+'</strong> ('+x.minutes+'분)</label><p>'+esc(x.activity)+'</p><label>교사 관찰 메모<textarea style="width:100%;min-height:60px" placeholder="수행 모습, 도움 수준, 다음 지도 사항" onchange="lessonExecutionEdit('+i+',\'note\',this.value)">'+esc(x.note)+'</textarea></label></div>').join('')+'<p class="small muted">실행 기록은 회차별로 저장됩니다. 활동별 고유 ID로 기록을 연결하므로 순서를 이동해도 체크·메모가 유지됩니다. 삭제한 활동의 과거 기록은 보관되지만 현재 목록에는 표시되지 않습니다.</p></section>';
 }
 function lessonPlanHTML(){
  const auto=lessonPlanData(),steps=editableLessonPlan(),total=steps.reduce((n,x)=>n+(Number(x.minutes)||0),0);
