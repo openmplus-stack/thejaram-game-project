@@ -588,7 +588,32 @@ function printAudienceReport(kind){
  const html='<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>학습 변화 보고서</title><style>body{font-family:sans-serif;margin:30px;color:#263D50;line-height:1.7}table{width:100%;border-collapse:collapse}td,th{border:1px solid #bbb;padding:8px;text-align:left}th{background:#eef5f4}@media print{button{display:none}}</style></head><body><h1>루시와 수상한 책방 · 학습 변화 보고서</h1>'+audienceReportBody(kind)+'<p><small>수업별 문제 수와 난도가 다르면 정답률은 직접 비교하기 어렵습니다. 표준화된 평가 결과가 아닙니다.</small></p><button onclick="window.print()">인쇄하기</button></body></html>';
  w.document.write(html);w.document.close();w.focus();
 }
-function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
+function backupLearningData(){
+ const data={format:'lucy-bookshop-backup',version:1,createdAt:new Date().toISOString(),state:s};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='lucy-bookshop-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function restoreLearningData(input){
+ const file=input?.files?.[0];if(!file)return;
+ if(file.size>5*1024*1024){alert('백업 파일은 5MB 이하만 복원할 수 있습니다.');input.value='';return}
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const data=JSON.parse(reader.result);
+   if(data?.format!=='lucy-bookshop-backup'||data.version!==1||!data.state||typeof data.state!=='object'||Array.isArray(data.state))throw Error('지원하지 않는 백업 파일입니다.');
+   const x=data.state;
+   if(!Number.isInteger(x.learningSession)||x.learningSession<1||x.learningSession>10000||!x.episodeProgress||typeof x.episodeProgress!=='object'||Array.isArray(x.episodeProgress)||!x.inventory||typeof x.inventory!=='object'||Array.isArray(x.inventory))throw Error('백업 데이터 구조가 올바르지 않습니다.');
+   if(!confirm('현재 기기의 모든 학습 기록을 백업 파일의 기록으로 교체합니다. 계속할까요?'))return;
+   s={...DEFAULT,...x,page:'start'};save();render();alert('백업 기록을 복원했습니다.');
+  }catch(e){alert('복원 실패: '+e.message)}finally{input.value=''}
+ };
+ reader.onerror=()=>{alert('파일을 읽을 수 없습니다.');input.value=''};
+ reader.readAsText(file);
+}
+function backupRestoreHTML(){
+ return '<section class="learning-recommendations"><h3>학습 기록 백업 및 복원</h3><p>수업 기록, 활동 계획, 확정 보고서를 JSON 파일로 보관합니다.</p><button onclick="backupLearningData()">전체 기록 백업 파일 저장</button><label style="display:block;margin-top:12px">백업 파일 복원 <input type="file" accept=".json,application/json" onchange="restoreLearningData(this)"></label><p class="small muted">복원하면 현재 기기의 기록이 모두 교체됩니다. 복원 전에 현재 기록도 백업해 두세요. 파일에 학습자 정보가 포함될 수 있으니 안전하게 보관하세요.</p></section>';
+}
+function audienceReportHTML(){return parentReviewHTML()+parentArchiveHTML()+backupRestoreHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
