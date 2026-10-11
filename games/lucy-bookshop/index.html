@@ -403,7 +403,7 @@ function errorPatternHTML(){
  const max=x.entries[0].count;
  return '<section class="learning-recommendations"><h3>오답 유형 분석</h3><p>분류된 오답 '+x.total+'회</p>'+x.entries.map(v=>'<p><strong>'+esc(v.label)+'</strong> '+v.count+'회</p><div style="height:12px;border-radius:8px;background:#e5e7eb;overflow:hidden"><div style="height:100%;background:#287D7A;width:'+(100*v.count/max)+'%"></div></div>').join('')+'<h4>반복 오류 지도 제안</h4>'+(x.repeated.length?'<ul>'+x.repeated.map(v=>'<li>'+esc(v.label)+' ('+v.count+'회): '+esc(v.tip)+'</li>').join('')+'</ul>':'<p>같은 오류가 2회 이상 기록되면 제안을 표시합니다.</p>')+'<p class="small muted">문항과 선택지 규칙에 따른 분류이며 진단 결과가 아닙니다.</p></section>';
 }
-function nextLearningSession(){s.learningSession=(Number(s.learningSession)||1)+1;save();render()}
+function nextLearningSession(){const n=Number(s.learningSession)||1;s.lessonSnapshots={...(s.lessonSnapshots||{}),[n]:lessonExecutionRows().map(x=>({...x}))};s.learningSession=n+1;s.journalViewSession=s.learningSession;save();render()}
 function reassessmentAudit(){const rec={attempts:5,history:[{session:1,firstAttempt:true},{session:1,firstAttempt:false}]};const prev=s.learningSession;s.learningSession=2;const first=sessionAttempts(rec)===0;s.learningSession=prev;return {ok:first&&sessionAttempts({history:[{session:s.learningSession} ]})===1}}
 function learningSessionSummary(){
  const sessions={};let unassigned=0;
@@ -499,15 +499,17 @@ function lessonExecutionHTML(){
  const rows=lessonExecutionRows(),done=rows.filter(x=>x.done).length;
  return '<section class="learning-recommendations"><h3>수업 실행 기록 · '+s.learningSession+'회차</h3><p>진행 '+done+'/'+rows.length+'개 활동 완료</p>'+rows.map((x,i)=>'<div style="padding:12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:12px"><label><input type="checkbox" '+(x.done?'checked':'')+' onchange="lessonExecutionEdit('+i+',\'done\',this.checked)"> <strong>'+(i+1)+'. '+esc(x.name)+'</strong> ('+x.minutes+'분)</label><p>'+esc(x.activity)+'</p><label>교사 관찰 메모<textarea style="width:100%;min-height:60px" placeholder="수행 모습, 도움 수준, 다음 지도 사항" onchange="lessonExecutionEdit('+i+',\'note\',this.value)">'+esc(x.note)+'</textarea></label></div>').join('')+'<p class="small muted">실행 기록은 회차별로 저장됩니다. 활동별 고유 ID로 기록을 연결하므로 순서를 이동해도 체크·메모가 유지됩니다. 삭제한 활동의 과거 기록은 보관되지만 현재 목록에는 표시되지 않습니다.</p></section>';
 }
-function lessonJournalData(){
- const rows=lessonExecutionRows(),session=s.learningSession,attempts=[];
+function lessonJournalData(session=Number(s.journalViewSession)||s.learningSession){
+ const rows=session===s.learningSession?lessonExecutionRows():(s.lessonSnapshots?.[session]||[]),attempts=[];
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++)for(const x of taskRecord(i,sc,t).history||[])if(x.session===session)attempts.push(x);
  const first=attempts.filter(x=>x.firstAttempt),independent=first.filter(x=>x.correct&&Number(x.hints||0)===0&&x.teacherHelp!=='assisted');
  return {session,rows,completed:rows.filter(x=>x.done).length,total:rows.reduce((n,x)=>n+(Number(x.minutes)||0),0),attempts:attempts.length,first:first.length,independent:independent.length,helped:attempts.filter(x=>Number(x.hints)>0||x.teacherHelp==='assisted').length,guide:learningRecommendations(analyticsRows())};
 }
+function selectJournalSession(n){if(!Number.isInteger(n)||n<1||n>s.learningSession)return;s.journalViewSession=n;save();render()}
 function lessonJournalHTML(){
- const j=lessonJournalData();
- return '<section class="learning-recommendations" id="lesson-journal"><h3>수업일지 · '+j.session+'회차</h3><p>계획 '+j.total+'분 · 활동 완료 '+j.completed+'/'+j.rows.length+' · 답안 제출 '+j.attempts+'회 · 첫 시도 독립 정답 '+j.independent+'/'+j.first+'</p><div class="report-table-wrap"><table class="report-table"><thead><tr><th>활동</th><th>시간</th><th>수행</th><th>교사 관찰</th></tr></thead><tbody>'+j.rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+x.minutes+'분</td><td>'+(x.done?'완료':'미완료')+'</td><td>'+esc(x.note||'미기록')+'</td></tr>').join('')+'</tbody></table></div><p><strong>다음 수업 지도 방향:</strong> '+esc(j.guide.next.join(' / ')||'추가 관찰 후 결정')+'</p><button type="button" onclick="printLessonJournal()">수업일지 인쇄</button><p class="small muted">현재 회차의 실행 기록과 미션 제출을 합친 요약입니다. 실제 소요 시간이 아니라 계획 시간이며, 인쇄 시 학습자 개인정보를 확인하세요.</p></section>';
+ const j=lessonJournalData(),sessions=Array.from({length:s.learningSession},(_,i)=>i+1);
+ const selector='<label>조회할 회차 <select onchange="selectJournalSession(Number(this.value))">'+sessions.map(n=>'<option value="'+n+'" '+(n===j.session?'selected':'')+'>'+n+'회차</option>').join('')+'</select></label>'; 
+ return '<section class="learning-recommendations" id="lesson-journal"><h3>수업일지 · '+j.session+'회차</h3>'+selector+'<p>계획 '+j.total+'분 · 활동 완료 '+j.completed+'/'+j.rows.length+' · 답안 제출 '+j.attempts+'회 · 첫 시도 독립 정답 '+j.independent+'/'+j.first+'</p><div class="report-table-wrap"><table class="report-table"><thead><tr><th>활동</th><th>시간</th><th>수행</th><th>교사 관찰</th></tr></thead><tbody>'+j.rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+x.minutes+'분</td><td>'+(x.done?'완료':'미완료')+'</td><td>'+esc(x.note||'미기록')+'</td></tr>').join('')+'</tbody></table></div><p><strong>다음 수업 지도 방향:</strong> '+esc(j.guide.next.join(' / ')||'추가 관찰 후 결정')+'</p><button type="button" onclick="printLessonJournal()">수업일지 인쇄</button><p class="small muted">현재 회차의 실행 기록과 미션 제출을 합친 요약입니다. 실제 소요 시간이 아니라 계획 시간이며, 인쇄 시 학습자 개인정보를 확인하세요.</p></section>';
 }
 function printLessonJournal(){
  const j=lessonJournalData(),w=window.open('','_blank');if(!w){alert('인쇄 창이 차단되었습니다. 팝업을 허용해 주세요.');return}
