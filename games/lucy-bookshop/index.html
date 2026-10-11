@@ -43,7 +43,7 @@ else if(page==='setup')h='<p class="kicker">모험 준비</p><h2>루시와 함�
 else if(page==='prologue'){const t=INTRO[Math.max(0,Math.min(5,s.prologueIndex))];h='<p class="kicker">프롤로그 '+(s.prologueIndex+1)+' / '+INTRO.length+'</p><div class="story-art">📚 🐈‍⬛ ✨</div><div class="dialogue">'+esc(t)+'</div><div class="actions"><button onclick="set({prologueIndex:Math.max(0,s.prologueIndex-1)})" '+(s.prologueIndex===0?'disabled':'')+'>이전</button><button onclick="speak(INTRO[s.prologueIndex])">🔊 듣기</button><button class="primary" onclick="introNext()">'+(s.prologueIndex===INTRO.length-1?'책방 들어가기':'다음 →')+'</button></div>'}
 else if(page==='shop')h='<p class="kicker">마법의 책방 · 복원 '+s.restoredIds.length+'/10권</p><h2>어떤 이야기를 펼칠까요?</h2><div class="character">🐈‍⬛ <p>서묵: 흠, 다음 책을 골라 보라고.</p></div><div class="shop-grid">'+TALES.map((t,n)=>'<button class="book '+(s.restoredIds.includes('ep'+(n+1))?'restored':'')+'" onclick="book('+n+')"><span>📕 '+(n+1)+'</span>'+esc(t)+'</button>').join('')+'</div><div class="footer"><button onclick="alert(\'복딱 보관함은 15단계에서 구현합니다.\')">🎒 복딱</button><button onclick="alert(\'단서 기록은 16단계에서 구현합니다.\')">📜 단서</button><button onclick="alert(\'학습 기록은 17단계에서 구현합니다.\')">⭐ 학습 기록</button></div>';
 else if(page==='book'&&e){const done=p.phase==='completed',info=BOOK_INFO[i];h='<button onclick="go(\'shop\')">← 책방으로</button><p class="kicker">전래동화 '+(i+1)+' / 10</p><h2>'+esc(TALES[i])+'</h2><div class="book-cover" role="img" aria-label="동화 대표 이미지 임시 자리"><div class="book-cover-art">'+info.visual+'</div><span>대표 일러스트 제작 전 · 임시 이미지</span></div><div class="book-info"><h3>등장인물</h3><p>'+esc(info.people)+'</p><h3>이야기 소개</h3><p>'+esc(info.summary)+'</p></div><div class="note"><strong>모험 방법</strong><p>이야기를 읽고 각 장면의 미션을 해결하세요. 단서 A와 B를 모아 사라진 존재를 추리한 다음 현대 한국에서 찾아보세요.</p><p class="small-note">현재는 장면별 대표 미션 1개가 연결되어 있습니다. 목표는 장면마다 3개이며, 미션을 완료하면 초성 단서가 나타납니다.</p></div><p class="note">'+(done?'이 책의 이야기가 복원되었습니다.':p.phase==='modern'?'현대 한국에서 단서를 조사할 차례입니다.':p.phase==='investigate'?'초성과 펜던트를 사용해 사라진 이름을 추리하세요.':p.phase==='recovered'?'복딱의 보관함에서 사라진 물건을 확인하세요.':'현재 진행: 장면 '+(p.scene+1)+'/3')+'</p><div class="actions"><button class="primary" onclick="openEpisode()">'+(done?'복원 완료 ✓':p.phase==='modern'?'현대 한국으로 이동 →':p.phase==='investigate'?'펜던트로 추리하기 →':p.phase==='recovered'?'이야기 복원하기 →':'이야기 시작하기 →')+'</button></div>'}
-else if(page==='scene'&&e){const scene=Math.min(2,p.scene);h='<div class="scene-head"><button onclick="go(\'book\')">← 책 정보</button><span class="status-pill">장면 '+(scene+1)+' / 3</span></div><h2>'+esc(TALES[i])+'</h2><div class="scene-stage"><div class="scene-emoji">'+e.icon+' 📖</div><div class="scene-text">'+esc(e.scene[scene][0])+'</div><p class="small-note">대표 장면 일러스트 제작 예정</p></div><div class="storybook-text">'+sceneStory(i,scene)+'</div><div class="scene-actions"><button onclick="speak(STORYBOOK[s.selectedBook][progress(s.selectedBook).scene].replace(/<[^>]*>/g,\'\'))">🔊 이야기 듣기</button></div>'+missionMenu(i,scene)+clueStrip(i)+'<div class="scene-actions"><button onclick="backScene()">← 이전</button><button class="primary" onclick="nextScene()" '+(!allTasksDone(i,scene)?'disabled':'')+'>'+(scene===2?'현대 한국으로 →':'다음 장면 →')+'</button></div>'}
+else if(page==='scene'&&e){const scene=Math.min(2,p.scene);h='<div class="scene-head"><button onclick="go(\'book\')">← 책 정보</button><span class="status-pill">장면 '+(scene+1)+' / 3</span></div><h2>'+esc(TALES[i])+'</h2><div class="scene-stage"><div class="scene-emoji">'+e.icon+' 📖</div><div class="scene-text">'+esc(e.scene[scene][0])+'</div><p class="small-note">대표 장면 일러스트 제작 예정</p></div><div class="storybook-text">'+sceneStory(i,scene)+'</div><div class="scene-actions"><button onclick="speak(storyText(s.selectedBook,progress(s.selectedBook).scene).replace(/<[^>]*>/g,\'\'))">🔊 이야기 듣기</button></div>'+missionMenu(i,scene)+clueStrip(i)+'<div class="scene-actions"><button onclick="backScene()">← 이전</button><button class="primary" onclick="nextScene()" '+(!allTasksDone(i,scene)?'disabled':'')+'>'+(scene===2?'현대 한국으로 →':'다음 장면 →')+'</button></div>'}
 else if(page==='missionFull'&&e){const scene=p.scene,q=taskQuestion(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);h='<div class="mission-full"><button onclick="go(\'scene\')">← 이야기로</button><p class="kicker">장면 '+(scene+1)+' · 미션 '+(activeMission+1)+'/4</p><h2>'+MISSION_NAMES[activeMission]+'</h2><div class="mission-question">'+esc(q.question)+'</div><div class="mission-answer-grid">'+q.choices.map(x=>'<button class="'+(missionChoice===x?'picked':'')+'" onclick="taskChoose('+JSON.stringify(x).replace(/"/g,'&quot;')+')">'+esc(x)+'</button>').join('')+'</div>'+(rec.attempts&&!rec.correct?'<p class="feedback wrong">다시 생각해 보세요.</p>':'')+'<div class="scene-actions"><button onclick="speak('+JSON.stringify(q.question).replace(/"/g,'&quot;')+')">🔊 문제 듣기</button><button class="primary" onclick="taskCheck()">정답 확인</button></div></div>'}
 else if(page==='modern'&&e){const loc=e.places[p.location],chosen=!!p.placeChosen;h='<div class="scene-head"><button onclick="go(\'book\')">← 책 정보</button><span class="status-pill">현대 한국 탐색 '+(p.location+1)+' / '+e.places.length+'</span></div><h2>어디로 가야 할까요?</h2><p>이야기에서 찾은 단서를 생각하고 조사할 장소를 선택하세요.</p><div class="place-grid">'+placeOptions(i,p.location).map(name=>'<button onclick="selectPlace('+e.places.indexOf(name)+')" '+(chosen?'disabled':'')+'>📍 '+esc(name)+'</button>').join('')+'</div>'+(chosen?'<div class="scene-stage"><div class="scene-emoji">🏙️ 🔎</div><h3>'+esc(loc)+'</h3><p>장소를 찾았어요! 다음 단서를 조사해 보세요.</p></div>'+talkHTML()+'<div class="interaction"><button onclick="interactNPC()">💬 직원에게 질문하기</button></div><div class="scene-actions"><button class="primary" onclick="modernNext()">'+(p.location===e.places.length-1?'펜던트 추리로 →':'다음 장소 찾기 →')+'</button></div>':'<p class="small-note">정답 장소를 선택하면 그곳으로 이동합니다.</p>')}
 else if(page==='deduce'&&e){const m=p.deduction||{attempts:0,hints:0,verified:false};h='<button onclick="go(\'book\')">← 책 정보</button><p class="kicker">16단계 · 루시의 펜던트</p><h2>사라진 존재의 이름을 찾아요</h2><div class="pendant-art" aria-label="루시의 마법 펜던트">💎 ✨</div><p>세 장면에서 얻은 초성을 읽고, 사라진 존재의 이름을 추리해 보세요.</p>'+clueStrip(i)+'<div class="deduce-panel"><label for="deduce-answer">어떤 존재가 사라졌을까요?</label><input id="deduce-answer" type="text" autocomplete="off" placeholder="이름을 입력하세요" value="'+esc(deduceInput)+'" oninput="deduceInput=this.value" '+(m.verified?'disabled':'')+'/><div class="actions"><button onclick="deduceHint()" '+(m.hints>=2||m.verified?'disabled':'')+'>💡 힌트 '+m.hints+'/2</button><button class="primary" onclick="verifyPendant()" '+(m.verified?'disabled':'')+'>💎 펜던트로 확인</button></div>'+(m.hints?'<p class="clue">힌트: '+(m.hints===1?'각 초성을 순서대로 이어 보세요.':'단어는 '+Array.from(e.target.replace(/\s/g,'')).length+'글자입니다. 이야기 속에서 사라진 존재예요.')+'</p>':'')+(m.attempts&&!m.verified?'<p role="status" class="feedback wrong">아직 일치하지 않아요. 이야기의 단서를 다시 살펴보세요.</p>':'')+(m.verified?'<p role="status" class="feedback right">✓ 펜던트가 빛났어요! 사라진 존재를 확인했습니다.</p><button class="primary" onclick="finishDeduction()">복딱과 회수하기 →</button>':'')+'</div>'}
@@ -185,14 +185,14 @@ let activeMission=0,missionChoice='';
 function taskKey(i,scene,type){return 't'+type}
 function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+type]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=VOCAB[i][scene],story=STORYBOOK[i][scene],q=missionFor(i,scene);if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0)return EP1_CONTENT.missions[scene][type];if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
 function taskCheck(){const i=s.selectedBook,scene=progress(i).scene,q=taskQuestion(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);const started=Date.now();if(!missionChoice){alert('답을 선택해 주세요.');return}const correct=answerNormalize(missionChoice)===answerNormalize(q.answer);soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+activeMission]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.attempts===0&&correct,updatedAt:new Date().toISOString(),lastAnswer:missionChoice,history:[...(rec.history||[]),{answer:missionChoice,correct,at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
 function missionMenu(i,scene){return '<section class="mission-menu"><h3>미션을 선택하세요</h3><p>네 가지 미션을 모두 완료하면 다음 장면으로 갈 수 있어요.</p><div class="mission-menu-grid">'+MISSION_NAMES.map((name,t)=>'<button onclick="taskOpen('+t+')">'+(taskRecord(i,scene,t).done?'✓ ':'')+(t===0?'📚 ':t===1?'💬 ':t===2?'🔢 ':'🔎 ')+name+'</button>').join('')+'</div></section>'}
-function sceneStory(i,scene){return STORYBOOK[i][scene].replace(/<em>/g,'<strong class="story-emphasis">').replace(/<\/em>/g,'</strong>')}
-function resultsHTML(i){return '<section class="lesson-results"><h3>📚 이번 이야기에서 배운 내용</h3>'+[0,1,2].map(scene=>'<h4>장면 '+(scene+1)+'</h4><p><strong>단어:</strong> '+VOCAB[i][scene].map(esc).join(' · ')+'</p><p><strong>문장 표현:</strong> '+lessonSentences(i,scene,s.topik).map(esc).join(' / ')+'</p>').join('')+'</section>'}
+function sceneStory(i,scene){return storyText(i,scene).replace(/<em>/g,'<strong class="story-emphasis">').replace(/<\/em>/g,'</strong>')}
+function resultsHTML(i){return '<section class="lesson-results"><h3>📚 이번 이야기에서 배운 내용</h3>'+[0,1,2].map(scene=>'<h4>장면 '+(scene+1)+'</h4><p><strong>단어:</strong> '+episodeWords(i,scene).map(esc).join(' · ')+'</p><p><strong>문장 표현:</strong> '+lessonSentences(i,scene,s.topik).map(esc).join(' / ')+'</p>').join('')+'</section>'}
 function selectPlace(n){const i=s.selectedBook,p=progress(i),correct=n===p.location;if(!correct){soundResult(false);alert('다른 장소를 생각해 보세요.');return}soundResult(true);updateProgress(i,{placeChosen:true})}
 function placeOptions(i,location){const target=EPISODES[i].places[location],all=['전통시장','박물관','공원','분실물 보관소','도서관','지하철역','음식점','우체국','원예 상점','생태공원','문화체험관','야생동물 구조센터','한복·공예점'];const decoys=all.filter(x=>x!==target&&!EPISODES[i].places.includes(x)).slice((i*3+location)%8,(i*3+location)%8+3);return [target,...decoys].sort((a,b)=>((a.length+i+location)%5)-((b.length+i+location)%5))}
 
@@ -202,6 +202,58 @@ function analyticsHTML(){const rows=analyticsRows(),completed=rows.filter(x=>x.c
 function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
 function exportReport(){const rows=analyticsRows(),cols=['tale','scene','mission','attempts','correct','firstTry','wrong','lastAnswer','updatedAt','support'];const csv='\uFEFF'+[cols.join(','),...rows.map(r=>cols.map(k=>csvCell(r[k])).join(','))].join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='lucy-learning-report-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function copyReport(){const rows=analyticsRows(),summary='루시와 수상한 책방 학습 결과\n시도한 미션 '+rows.length+'개\n완료 '+rows.filter(x=>x.correct).length+'개\n첫 시도 정답 '+rows.filter(x=>x.firstTry).length+'개\n'+rows.map(x=>x.tale+' / 장면 '+x.scene+' / '+x.mission+' / '+(x.correct?'완료':'미완료')+' / '+x.attempts+'회 시도').join('\n');if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(summary).then(()=>alert('결과 요약을 복사했습니다.')).catch(()=>alert('복사가 제한되어 있습니다. CSV 저장을 이용해 주세요.'));else alert('이 브라우저에서는 복사를 지원하지 않습니다. CSV 저장을 이용해 주세요.')}
+
+
+/* Episode 1 editorial master: three continuous scenes, five words per scene, grade-band targets, and evidence-based missions. */
+const EP1_CONTENT={
+words:[['나무꾼','쇠도끼','연못','빠뜨리다','속상하다'],['산신령','나타나다','금도끼','은도끼','정직하다'],['사라지다','흔적','반짝이다','찾아보다','추리하다']],
+grammar:[
+['-았/었어요 (과거 사건)','-에 (장소)','-아/어서 (이유와 결과)'],
+['-려고 하다 (의도)','-지만 (대조)','-는지 (간접 의문)'],
+['-아/어 버리다 (완료·상실)','-기 때문에 (이유)','-았/었을까요? (추측)']
+],
+texts:[
+[
+'옛날 옛날에 마음씨 착한 나무꾼이 살았어요. 나무꾼은 매일 산에서 나무를 했어요. 어느 날 나무꾼이 연못 옆에서 일을 하다가 <em>쇠도끼를 물에 빠뜨렸어요.</em> 나무꾼은 도끼가 보이지 않자 무척 속상했어요. 그는 연못을 바라보며 한숨을 쉬었어요.',
+'옛날 옛적, 깊은 산속에 성실하고 마음씨 착한 나무꾼이 살았습니다. 어느 날 그는 연못가에서 나무를 하다가 손에 쥔 쇠도끼를 놓치고 말았습니다. <em>쇠도끼가 깊은 연못 속으로 가라앉자</em> 나무꾼은 어쩔 줄 몰랐습니다. 그 도끼는 생계를 이어 가는 데 꼭 필요한 물건이었기 때문입니다.',
+'오래전, 깊은 산에서 나무를 하며 살아가는 정직한 나무꾼이 있었습니다. 어느 날 그는 연못가에서 나무를 베다가 그만 쇠도끼를 물에 빠뜨리고 말았습니다. <em>생계를 책임지는 유일한 도구를 잃은 나무꾼은</em> 연못가를 떠나지 못했습니다. 물속을 아무리 들여다보아도 도끼의 모습은 보이지 않았습니다.'
+],
+[
+'그때 연못에서 산신령이 나타났어요. 산신령은 나무꾼에게 왜 울고 있는지 물었어요. 나무꾼은 쇠도끼를 잃어버렸다고 말했어요. 산신령은 <em>금도끼와 은도끼를 보여 주려고 했어요.</em> 나무꾼은 산신령을 조용히 기다렸어요.',
+'나무꾼이 슬퍼하고 있을 때 연못에서 산신령이 모습을 드러냈습니다. 산신령은 사정을 듣고 도끼를 찾아 주겠다고 약속했습니다. 그는 나무꾼의 정직함을 시험하려고 금도끼와 은도끼를 차례로 보여 주려 했습니다. <em>나무꾼은 자기 것이 아닌 도끼를 받지 않겠다고 마음먹었습니다.</em>',
+'나무꾼의 울음소리를 들은 산신령이 연못에서 모습을 드러냈습니다. 자초지종을 들은 산신령은 도끼를 찾아 주는 한편, 나무꾼의 정직함을 시험하기로 했습니다. 먼저 금도끼를, 다음으로 은도끼를 보여 줄 생각이었습니다. <em>그러나 나무꾼에게 가장 중요한 것은 값비싼 물건이 아니라 자신의 쇠도끼였습니다.</em>'
+],
+[
+'산신령이 연못을 살펴보았어요. 그런데 이상한 일이 일어났어요. 산신령이 보여 주려던 <em>금도끼가 사라졌어요.</em> 산신령은 놀라서 주위를 둘러보았어요. 나무꾼과 루시는 사라진 물건의 흔적을 찾기 시작했어요.',
+'산신령이 첫 번째 도끼를 꺼내려던 순간 이상한 일이 벌어졌습니다. 분명히 있어야 할 금도끼가 어디에도 보이지 않았습니다. <em>금도끼가 갑자기 사라지는 바람에</em> 정직함을 시험할 기회조차 없어졌습니다. 루시는 연못 주변의 흔적을 살펴보며 무엇이 사라졌는지 추리했습니다.',
+'산신령이 나무꾼의 정직함을 시험하려는 순간 예상치 못한 일이 일어났습니다. 가장 먼저 보여 주려던 금도끼가 흔적도 없이 사라진 것입니다. <em>금도끼가 사라졌기 때문에 원래 이야기의 중요한 선택 장면도 이어질 수 없었습니다.</em> 루시는 앞서 살펴본 사건들을 근거로 사라진 물건의 정체를 추론하기 시작했습니다.'
+]
+],
+missions:[
+[
+{question:'나무꾼이 연못에 빠뜨린 물건은 무엇인가요?',answer:'쇠도끼',choices:['쇠도끼','금도끼','은도끼','방망이']},
+{question:'나무꾼이 속상했던 이유는 무엇인가요?',answer:'일할 때 쓰는 도끼를 잃어버렸기 때문이에요.',choices:['일할 때 쓰는 도끼를 잃어버렸기 때문이에요.','산신령을 만났기 때문이에요.','나무를 모두 베었기 때문이에요.','연못이 말랐기 때문이에요.']},
+{question:'먼저 일어난 일은 무엇인가요?',answer:'나무꾼이 연못 옆에서 나무를 했어요.',choices:['나무꾼이 연못 옆에서 나무를 했어요.','나무꾼이 도끼를 잃어버렸어요.','나무꾼이 슬퍼했어요.','루시가 단서를 찾았어요.']},
+{question:'나무꾼이 잃어버린 도끼의 재료는 무엇인가요?',answer:'쇠',choices:['금','은','쇠','나무']}
+],
+[
+{question:'연못에서 나타난 인물은 누구인가요?',answer:'산신령',choices:['나무꾼','산신령','흥부','도깨비']},
+{question:'산신령이 금도끼와 은도끼를 보여 주려는 까닭은 무엇인가요?',answer:'나무꾼의 정직함을 알아보기 위해서예요.',choices:['나무꾼의 정직함을 알아보기 위해서예요.','도끼를 팔기 위해서예요.','나무를 베기 위해서예요.','연못을 메우기 위해서예요.']},
+{question:'사건의 순서로 알맞은 것은 무엇인가요?',answer:'나무꾼이 울었어요 → 산신령이 나타났어요',choices:['산신령이 나타났어요 → 나무꾼이 울었어요','나무꾼이 울었어요 → 산신령이 나타났어요','나무꾼이 떠났어요 → 산신령이 울었어요','루시가 떠났어요 → 연못이 말랐어요']},
+{question:'산신령이 처음 보여 주려고 한 도끼는 무엇인가요?',answer:'금도끼',choices:['쇠도끼','은도끼','금도끼','나무도끼']}
+],
+[
+{question:'산신령이 찾지 못한 물건은 무엇인가요?',answer:'금도끼',choices:['금도끼','쇠도끼','은도끼','박씨']},
+{question:'금도끼가 사라지자 어떤 일이 생겼나요?',answer:'나무꾼의 정직함을 시험하는 장면이 이어지지 못했어요.',choices:['나무꾼의 정직함을 시험하는 장면이 이어지지 못했어요.','연못이 사라졌어요.','나무꾼이 왕이 되었어요.','산신령이 나무를 심었어요.']},
+{question:'먼저 일어난 일은 무엇인가요?',answer:'산신령이 도끼를 꺼내려고 했어요.',choices:['루시가 금도끼를 찾았어요.','금도끼가 책방에 돌아왔어요.','산신령이 도끼를 꺼내려고 했어요.','이야기가 복원되었어요.']},
+{question:'앞 장면의 단서로 추리할 수 있는 사라진 물건은?',answer:'금도끼',choices:['박씨','금도끼','날개옷','동아줄']}
+]
+]
+};
+function ep1Band(){const n=Number(s.topik)||1;return n<=2?0:n<=4?1:2}
+function storyText(i,scene){return i===0?EP1_CONTENT.texts[scene][ep1Band()]:STORYBOOK[i][scene]}
+function episodeWords(i,scene){return i===0?EP1_CONTENT.words[scene]:VOCAB[i][scene]}
+function episodeGrammar(i,scene){return i===0?EP1_CONTENT.grammar[scene]:['문장 이해와 사건 순서','이유와 결과 표현']}
 
 render();
 </script></body></html>
