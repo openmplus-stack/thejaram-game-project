@@ -347,16 +347,31 @@ let missionFeedback='';let missionHintLevel=0;
 function taskOpen(type){if(s.selectedBook===null||!Number.isInteger(type)||type<0||type>3)return;activeMission=type;missionChoice='';missionFeedback='';missionHintLevel=taskRecord(s.selectedBook,progress(s.selectedBook).scene,type).hints||0;go('missionFull')}
 function taskChoose(value){if(s.page!=='missionFull')return;missionFeedback='';missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
-function missionErrorFeedback(q){
- if(q.parts)return {code:q.format==='sequence'?'sequence-order':'assembly-order',message:q.format==='sequence'?'사건의 앞뒤 순서를 본문에서 다시 찾아보세요.':'첫 카드부터 순서대로 다시 읽어 보세요.'};
- if(q.question.includes('사건 순서'))return {code:'sequence-order',message:'앞 장면과 현재 장면에서 먼저 일어난 사건을 다시 확인해 보세요.'};
- if(q.question.includes('추측')||q.question.includes('직접 확인할 수 있는 사실'))return {code:'fact-inference',message:'본문에 직접 적힌 사실인지 확인하세요. 앞으로의 일을 단정하면 추측일 수 있어요.'};
- if(q.question.includes('의도')||q.question.includes('근거하여'))return {code:'unsupported-intent',message:'인물의 마음을 추측한 것과 본문에 나온 행동을 구분해 보세요.'};
- if(q.format==='match')return {code:'actor-action',message:'인물과 행동이 바르게 연결되었는지 확인해 보세요.'};
+function missionErrorFeedback(q,selected){
+ const answer=String(q.answer||''),value=String(selected||''),question=String(q.question||'');
+ if(q.parts){
+  const sep=q.format==='sentence-build'?' ':'|',actual=value.split(sep),expected=q.format==='syllable-build'?[...answer]:q.parts;
+  if(actual.length===expected.length&&actual.every((x,i)=>x===expected[expected.length-1-i]))return {code:'reverse-order',message:'카드 순서가 거꾸로 되었어요. 첫 부분부터 다시 배열해 보세요.'};
+  return {code:q.format==='sequence'?'sequence-order':'assembly-order',message:'본문에서 처음부터 끝까지 차례를 확인해 보세요.'};
+ }
+ if(question.includes('사건 순서')){
+  const pieces=answer.split(' → ');
+  if(pieces.length===2&&value===pieces[1]+' → '+pieces[0])return {code:'reverse-sequence',message:'두 사건의 순서를 반대로 골랐어요. 먼저 일어난 일을 앞에 놓아 보세요.'};
+  return {code:'unrelated-sequence',message:'선택한 사건이 두 장면에 모두 나오는지 확인해 보세요.'};
+ }
+ if(question.includes('추측')||question.includes('직접 확인할 수 있는 사실')){
+  if(/것이다|거예요|했을 것이다|할 것이다/.test(value))return {code:'speculation-as-fact',message:'미래나 숨은 의도를 단정한 문장을 골랐어요. 본문에 직접 나온 사실을 찾아보세요.'};
+  return {code:'fact-evidence',message:'선택한 문장이 본문에 그대로 근거를 두고 있는지 다시 확인해 보세요.'};
+ }
+ if(question.includes('의도')||question.includes('근거하여')){
+  if(/모든|반드시|미리 알고|마음을/.test(value))return {code:'unsupported-intent',message:'본문에 없는 마음이나 결과를 단정했어요. 실제 행동만 확인해 보세요.'};
+  return {code:'actor-action',message:'인물의 행동을 본문에서 다시 찾아보세요.'};
+ }
+ if(q.format==='match')return {code:'actor-action',message:'인물과 행동의 짝을 다시 확인해 보세요.'};
  if(q.format==='initials')return {code:'phonological',message:'첫소리를 다시 비교해 보세요.'};
  return {code:'evidence',message:'본문에서 선택한 답의 근거를 다시 찾아보세요.'};
 }
-function taskCheck(){if(s.selectedBook===null||s.page!=='missionFull'||!Number.isInteger(activeMission)||activeMission<0||activeMission>3)return;const i=s.selectedBook,scene=progress(i).scene,q=missionActivity(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);if(!missionChoice){missionFeedback='답을 먼저 선택해 주세요.';render();return}if(q.parts&&missionChoice.split(q.format==='sentence-build'?' ':'|').length!==q.parts.length){missionFeedback='카드를 모두 선택한 뒤 확인해 주세요.';render();return}const correct=answerNormalize(missionAnswer(q))===answerNormalize(q.answer);const error=correct?null:missionErrorFeedback(q);missionFeedback=correct?'':error.message;soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+taskKey(i,scene,activeMission)]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.firstTryCorrect===true||(rec.attempts===0&&correct&&(rec.hints||0)===0&&rec.teacherHelp!=='assisted'),updatedAt:new Date().toISOString(),lastAnswer:missionAnswer(q),lastErrorCode:error?.code||'',history:[...(rec.history||[]),{answer:missionAnswer(q),correct,errorCode:error?.code||'',hints:rec.hints||0,teacherHelp:rec.teacherHelp||'unrecorded',at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
+function taskCheck(){if(s.selectedBook===null||s.page!=='missionFull'||!Number.isInteger(activeMission)||activeMission<0||activeMission>3)return;const i=s.selectedBook,scene=progress(i).scene,q=missionActivity(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);if(!missionChoice){missionFeedback='답을 먼저 선택해 주세요.';render();return}if(q.parts&&missionChoice.split(q.format==='sentence-build'?' ':'|').length!==q.parts.length){missionFeedback='카드를 모두 선택한 뒤 확인해 주세요.';render();return}const correct=answerNormalize(missionAnswer(q))===answerNormalize(q.answer);const error=correct?null:missionErrorFeedback(q,missionAnswer(q));missionFeedback=correct?'':error.message;soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+taskKey(i,scene,activeMission)]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.firstTryCorrect===true||(rec.attempts===0&&correct&&(rec.hints||0)===0&&rec.teacherHelp!=='assisted'),updatedAt:new Date().toISOString(),lastAnswer:missionAnswer(q),lastErrorCode:error?.code||'',history:[...(rec.history||[]),{answer:missionAnswer(q),correct,errorCode:error?.code||'',hints:rec.hints||0,teacherHelp:rec.teacherHelp||'unrecorded',at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
 function missionFormatLabel(format){return ({'hidden-object':'숨은 그림 찾기','image-find':'그림 찾기','initials':'초성 맞추기','sequence':'사건 순서 맞추기','fill-blank':'빈칸 채우기','match':'인물과 행동 연결','word-chain':'끝말잇기','clue-book':'단서 수첩','spot-difference':'틀린 그림 찾기','syllable-build':'음절 조립하기','word-hunt':'단어 찾기','why':'원인과 결과','deduction':'사라진 물건 추리','choice':'이야기 이해하기','sentence-build':'문장 조립하기'})[format]||'이야기 미션'}
 function missionMenu(i,scene){const completed=[0,1,2,3].filter(t=>taskRecord(i,scene,t).done).length;return '<section class="mission-menu"><h3>미션 '+completed+'/4 완료</h3><p>네 가지 미션을 모두 완료하면 다음 장면으로 갈 수 있어요.</p><div class="mission-menu-grid">'+[0,1,2,3].map(t=>{const q=missionActivity(i,scene,t),done=taskRecord(i,scene,t).done;return '<button class="'+(done?'mission-done':'')+'" onclick="taskOpen('+t+')">'+(done?'✓ 완료 · ':'')+esc(missionFormatLabel(q.format))+'</button>'}).join('')+'</div></section>'}
 function sceneStory(i,scene){return storyText(i,scene).replace(/<em>/g,'<strong class="story-emphasis">').replace(/<\/em>/g,'</strong>')}
@@ -762,7 +777,14 @@ function levelContentAudit(){
 function missionEvidenceAudit(){const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){const q=missionActivity(i,sc,t);if(i===2)continue;const passage=gradedSceneText(i,sc,1).replace(/<[^>]+>/g,''),[actor,event,context]=GRADED_SCENE_FACTS[i][sc];if(q.format==='match'&&!passage.includes(event)||['why','clue-book'].includes(q.format)&&!passage.includes(context)||!['match','why','clue-book','deduction'].includes(q.format)&&!passage.includes(actor))issues.push('근거 누락 '+i+'-'+sc+'-'+t)}return {ok:!issues.length,issues}}
 function topikMissionLevelAudit(){const issues=[];let checked=0;for(let lv=1;lv<=6;lv++)for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){const q=i===2?missionActivity(i,sc,t):topikLeveledMission(i,sc,t,lv);if(!q.answer||!q.question||(!q.parts&&!q.choices.includes(q.answer)))issues.push('문항 누락 '+lv+'-'+i+'-'+sc+'-'+t);if(i!==2&&q.format!=='syllable-build'&&new Set(q.choices).size!==q.choices.length)issues.push('중복 보기 '+lv+'-'+i+'-'+sc+'-'+t);checked++}return {ok:!issues.length,issues,checked}}
 function cognitiveDemandAudit(){const issues=[];let tested=0;for(let i=0;i<10;i++){if(i===2)continue;for(let sc=0;sc<3;sc++){const mid=topikLeveledMission(i,sc,2,4),high=topikLeveledMission(i,sc,2,6),interpret=topikLeveledMission(i,sc,3,6);if(sc>0&&!mid.answer.includes(' → '))issues.push('사건 순서 '+i+'-'+sc);if(!high.question.includes('추측')||!interpret.question.includes('의도'))issues.push('고급 변별 '+i+'-'+sc);if(!high.choices.includes(high.answer)||!interpret.choices.includes(interpret.answer))issues.push('정답 누락 '+i+'-'+sc);tested+=3}}return {ok:!issues.length,issues,checked:tested}}
-function feedbackClassificationAudit(){const q=[{question:'사건 순서',format:'choice'},{question:'사실과 추측',format:'why'},{question:'인물의 의도',format:'choice'}],expected=['sequence-order','fact-inference','unsupported-intent'];return {ok:q.every((x,i)=>missionErrorFeedback(x).code===expected[i])}}
+function feedbackClassificationAudit(){
+ const tests=[
+  [{question:'사건 순서',answer:'먼저 → 나중',format:'choice'},'나중 → 먼저','reverse-sequence'],
+  [{question:'사건 순서',answer:'먼저 → 나중',format:'choice'},'다른 사건 → 나중','unrelated-sequence'],
+  [{question:'사실과 추측',answer:'사실',format:'choice'},'앞으로 성공할 것이다.','speculation-as-fact'],
+  [{question:'인물의 의도',answer:'사실',format:'choice'},'반드시 성공할 거예요.','unsupported-intent']
+ ];return {ok:tests.every(([q,value,code])=>missionErrorFeedback(q,value).code===code),checked:tests.length};
+}
 function editorialConsistencyAudit(){
  const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let lv=1;lv<=6;lv++){
   const passage=i===2?sunMoonReading(sc,lv):gradedSceneText(i,sc,lv);
