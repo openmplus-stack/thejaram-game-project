@@ -227,12 +227,49 @@ function sunMoonMissionAudit(){
  return {ok:issues.length===0,issues};
 }
 
+/* Step 39: diversify all remaining tales without copying Sun/Moon answers.
+   Facts are scene-specific and all choices derive from the story dataset. */
+const MISSION_ROTATIONS=[
+ ['word-hunt','initials','match','clue-book'],
+ ['fill-blank','word-chain','why','deduction'],
+ ['syllable-build','match','clue-book','deduction'],
+ ['initials','word-hunt','why','match'],
+ ['fill-blank','syllable-build','clue-book','deduction'],
+ ['word-hunt','match','initials','why']
+];
+function genericVariedMission(i,scene,type,format){
+ const [actor,event,context]=GRADED_SCENE_FACTS[i][scene];
+ const key=scene===2?EPISODES[i].target:actor;
+ const pool=[...new Set(GRADED_SCENE_FACTS.flatMap(row=>row.flatMap(f=>[f[0]])))].filter(x=>x!==key);
+ const choices=[key,...pool.slice((i+scene)%Math.max(1,pool.length)),...pool.slice(0,(i+scene)%Math.max(1,pool.length))].slice(0,8);
+ if(format==='word-hunt')return {format,question:'이 장면의 핵심 인물 또는 물건을 찾으세요.',answer:key,choices};
+ if(format==='initials')return {format,question:'초성 '+hangulInitials(key)+'에 맞는 단어를 찾으세요.',answer:key,choices:choices.slice(0,4)};
+ if(format==='syllable-build'){const parts=[...key];return {format,question:'음절을 순서대로 눌러 핵심 단어를 완성하세요.',answer:key,parts,choices:[...parts].reverse()};}
+ if(format==='fill-blank')return {format,question:'이 장면의 중심 인물은 (      )입니다.',answer:actor,choices:[actor,...pool.filter(x=>x!==actor).slice(0,3)]};
+ if(format==='word-chain'){const last=[...key].at(-1);const candidate=[...new Set([...pool,key])].find(x=>x!==key&&x.startsWith(last));if(!candidate)return {...taskQuestion(i,scene,type),format:'choice'};return {format,question:'끝말잇기: '+key+' → ?',answer:candidate,choices:[candidate,...pool.filter(x=>x!==candidate&&!x.startsWith(last)).slice(0,3)]};}
+ if(format==='match')return {format,question:'본문에 나온 인물과 행동을 바르게 연결하세요.',answer:actor+' → '+event,choices:[actor+' → '+event,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][0]+' → '+row[scene][1])]};
+ if(format==='clue-book')return {format,question:'단서 수첩에 기록할 사실을 고르세요.',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
+ if(format==='why')return {format,question:'이 장면에서 확인할 수 있는 상황은 무엇인가요?',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
+ if(format==='deduction')return {format,question:'루시가 되찾아야 할 물건은 무엇인가요?',answer:EPISODES[i].target,choices:[EPISODES[i].target,...EPISODES.filter((_,j)=>j!==i).slice(0,3).map(e=>e.target)]};
+ return {...taskQuestion(i,scene,type),format:'choice'};
+}
+function variedMissionAudit(){
+ const issues=[];for(let i=0;i<10;i++)for(let scene=0;scene<3;scene++)for(let type=0;type<4;type++){
+  const q=missionActivity(i,scene,type);
+  if(!q||!q.answer||!Array.isArray(q.choices)||!q.choices.length)issues.push('missing '+i+'-'+scene+'-'+type);
+  if(q.format==='syllable-build'&&q.parts.join('')!==q.answer)issues.push('build '+i+'-'+scene+'-'+type);
+  if(q.format!=='syllable-build'&&q.format!=='sequence'&&!q.choices.includes(q.answer))issues.push('answer '+i+'-'+scene+'-'+type);
+ }
+ return {ok:issues.length===0,issues};
+}
+
 function missionFormat(i,scene,type){
- if(i!==2)return 'choice';
+ if(i!==2)return MISSION_ROTATIONS[(i*3+scene)%MISSION_ROTATIONS.length][type];
  return [['hidden-object','image-find','initials','sequence'],['fill-blank','match','word-chain','clue-book'],['spot-difference','syllable-build','why','deduction']][scene][type];
 }
 function missionActivity(i,scene,type){
  const base=taskQuestion(i,scene,type),format=missionFormat(i,scene,type);
+ if(i!==2)return genericVariedMission(i,scene,type,format);
  if(format==='image-find')return scene===0?{format,question:'호랑이 그림을 찾으세요.',answer:'🐅',choices:['🐦','🐅','🐢','🐸']}:{format,question:'동아줄 그림을 찾으세요.',answer:'🪢',choices:['🪓','🪢','🌱','🪶']};
  if(format==='hidden-object')return {format,question:'숲속에 숨은 호랑이를 찾아 터치하세요.',answer:'🐅',choices:['🌲','🌳','🍃','🐅','🌿','🪨','🌲','🌼','🍄']};
  if(format==='spot-difference')return {format,question:'두 장면을 비교해 사라진 물건을 찾으세요.',answer:'🪢',choices:['🌲','🪢','☁️','🌳'],before:['🌲','☁️','🪢','🌳'],after:['🌲','☁️','🌳']};
@@ -642,7 +679,7 @@ function allBooksRestored(){return restoredCount()===EPISODES.length}
 const RELEASE_INFO=Object.freeze({stage:30,status:'pilot',episodes:10,verifiedOnDevice:false,gradedContentReviewed:false});
 function releaseSelfCheck(){
  const issues=[];
- if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues);
+ if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues);
  for(let i=0;i<EPISODES.length;i++){
    if(!Array.isArray(EPISODES[i].places)||!EPISODES[i].places.length)issues.push('장소 누락 '+(i+1));
    for(let sc=0;sc<3;sc++){
