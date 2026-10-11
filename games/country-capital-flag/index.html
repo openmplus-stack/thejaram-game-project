@@ -142,20 +142,7 @@ body{background:#e9f7f7;color:var(--navy)}
 .flagDetailCard{border:4px solid #fff;background:#fffef9;box-shadow:0 20px 70px #173b4d55}
 @media(max-width:700px){.homeBox{padding:22px 16px}.homeMenu{grid-template-columns:1fr 1fr}.homeMenu button{min-height:82px}.homeStart{min-height:72px}.flowBox{border-radius:28px}}
 </style>
-<style id="uploaded-art-assets">
-.home{background-image:linear-gradient(#ffffff22,#ffffff22),url('assets/backgrounds/bg-world-home.png');background-size:cover;background-position:center}
-.homeBox{background:#fffdf3d9}
-.homeGlobe{font-size:0;width:clamp(100px,16vw,210px);height:clamp(100px,16vw,210px);margin:0 auto 4px;background:url('assets/characters/explorer-master.png') center/contain no-repeat}
-.learnScreen{background-image:linear-gradient(#f7fbffbb,#f7fbffbb),url('assets/backgrounds/bg-study.webp');background-size:cover;background-position:center}
-#flagCollectionFlow{background-image:linear-gradient(#eefbffdd,#eefbffdd),url('assets/backgrounds/bg-flag-collection.webp');background-size:cover;background-position:center}
-#treasureCollectionFlow{background-image:linear-gradient(#fff9edcc,#fff9edcc),url('assets/backgrounds/bg-treasure-collection.webp');background-size:cover;background-position:center}
-#progressFlow{background-image:linear-gradient(#f3fbffcc,#f3fbffcc),url('assets/backgrounds/bg-my-learning.webp');background-size:cover;background-position:center}
-.treasureThumb{width:min(125px,100%);height:105px;object-fit:contain;display:block;margin:0 auto}
-.treasureAlbumImage{width:100%;height:115px;object-fit:contain;display:block;margin:0 auto 7px}
-.treasureDetailImage{width:min(260px,65vw);height:210px;object-fit:contain;display:block;margin:8px auto}
-.treasurePick{min-height:185px}.treasurePick strong{font-size:16px}.treasurePick span{font-size:14px;overflow-wrap:anywhere}
-.rewardPending{grid-column:1/-1;color:#667b78;text-align:center;padding:15px}
-</style><style id="storybook-home-v2">
+<style id="storybook-home-v2">
 /* Illustrated full-screen home, matching the approved explorer concept. */
 #home.home{background: url('assets/backgrounds/bg-world-home.png') center center / cover no-repeat #92d7ee!important;min-height:100dvh;align-items:center;justify-content:center;padding:clamp(14px,2vw,30px)!important}
 #home.home::before{display:none!important}
@@ -171,6 +158,20 @@ body{background:#e9f7f7;color:var(--navy)}
 #home .homeMenu button:nth-child(3){background:linear-gradient(#4dc780,#159356)!important}
 #home .homeMenu .ico{display:block;font-size:clamp(23px,2.7vw,37px)}
 @media(max-width:740px){#home.home{background-position:center}#home .homeBox{width:96%;margin:0 auto 20vh;padding:15px!important}#home .homeGlobe{height:23vh;width:34vw;bottom:1%;left:1%}#home .homeMenu{grid-template-columns:repeat(3,1fr)}#home .homeMenu button{min-height:80px!important;font-size:13px!important}}
+</style><style id="actual-uploaded-backgrounds">
+#continentFlow{background:url('assets/backgrounds/bg-continent-select.png') center/cover no-repeat #a8dded!important}
+#topicFlow{background:url('assets/backgrounds/bg-mode-select.png') center/cover no-repeat #a8dded!important}
+#countrySelectFlow{background:url('assets/backgrounds/bg-country-select.png') center/cover no-repeat #a8dded!important}
+.learnScreen{background:url('assets/backgrounds/bg-learning.png') center/cover no-repeat #a8dded!important}
+#simpleOx{background:url('assets/backgrounds/bg-quiz.png') center/cover no-repeat #a8dded!important}
+#quizResult{background:url('assets/backgrounds/bg-result.png') center/cover no-repeat #a8dded!important}
+#learnRewardFlow,#quizRewardFlow{background:url('assets/backgrounds/bg-reward.png') center/cover no-repeat #a8dded!important}
+#flagCollectionFlow,#treasureCollectionFlow,#progressFlow{background:url('assets/backgrounds/bg-world-home.png') center/cover no-repeat #a8dded!important}
+.treasureThumb{width:min(125px,100%);height:105px;object-fit:contain;display:block;margin:0 auto}
+.treasureAlbumImage{width:100%;height:115px;object-fit:contain;display:block;margin:0 auto 7px}
+.treasureDetailImage{width:min(260px,65vw);height:210px;object-fit:contain;display:block;margin:8px auto}
+.treasurePick{min-height:185px}.treasurePick strong{font-size:16px}.treasurePick span{font-size:14px;overflow-wrap:anywhere}
+.rewardPending{grid-column:1/-1;color:#667b78;text-align:center;padding:15px}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
