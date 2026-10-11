@@ -542,18 +542,38 @@ function parentNarrativeData(){
  const home=need&&guide.next.length?guide.next[0]:'짧은 이야기를 함께 읽고 누가 무엇을 했는지 한 문장으로 말해 보세요.';
  return {strength,challenge,support,home};
 }
+function parentReportDraft(){
+ const base=parentNarrativeData(),saved=s.parentReportReview||{};
+ return {strength:saved.strength??base.strength,challenge:saved.challenge??base.challenge,support:saved.support??base.support,home:saved.home??base.home,confirmed:saved.confirmed===true,confirmedAt:saved.confirmedAt||''};
+}
+function editParentReport(field,value){
+ if(!['strength','challenge','support','home'].includes(field))return;
+ const draft=parentReportDraft();s.parentReportReview={...draft,[field]:String(value).slice(0,1500),confirmed:false,confirmedAt:''};save();
+}
+function confirmParentReport(){
+ const draft=parentReportDraft();if(![draft.strength,draft.challenge,draft.support,draft.home].every(x=>x.trim())){alert('모든 항목을 작성한 후 확정하세요.');return}
+ s.parentReportReview={...draft,confirmed:true,confirmedAt:new Date().toISOString()};save();render();
+}
+function resetParentReport(){
+ if(!confirm('수정한 문장을 지우고 현재 학습 기록을 바탕으로 다시 작성할까요?'))return;
+ s.parentReportReview=null;save();render();
+}
+function parentReviewHTML(){
+ const d=parentReportDraft(),fields=[['strength','잘하고 있는 활동'],['challenge','연습이 필요한 활동'],['support','도움을 받은 모습'],['home','가정에서 함께할 활동']];
+ return '<section class="learning-recommendations"><h3>보호자용 보고서 검토 및 확정</h3><p>'+(d.confirmed?'교사 확정 완료 · '+esc(d.confirmedAt.slice(0,10)):'교사 검토 전 · 자동 생성 초안')+'</p>'+fields.map(([key,label])=>'<label><strong>'+label+'</strong><textarea style="width:100%;min-height:80px" onchange="editParentReport(\''+key+'\',this.value)">'+esc(d[key])+'</textarea></label>').join('')+'<p><button onclick="confirmParentReport()">최종 보고서 확정</button> <button onclick="resetParentReport()">자동 초안 다시 작성</button></p><p class="small muted">문장을 수정하면 확정이 해제됩니다. 보호자용 인쇄는 교사 확정 후 사용할 수 있습니다.</p></section>';
+}
 function audienceReportBody(kind){
  const r=longitudinalReportData(),rate=x=>x===null?'기록 부족':x+'%',guide=esc(r.guide.next.join(' / ')||'다음 수업에서 추가 관찰합니다.');
  const shared='<p>기록된 수업 '+r.sessions.length+'회차 · 첫 시도 독립 정답률 '+rate(r.firstRate)+' → '+rate(r.lastRate)+'</p>';
- if(kind==='parent'){const n=parentNarrativeData();return '<h2>가정에 전하는 학습 소식</h2>'+shared+'<p><strong>잘하고 있는 활동:</strong> '+esc(n.strength)+'</p><p><strong>연습이 필요한 활동:</strong> '+esc(n.challenge)+'</p><p><strong>도움을 받은 모습:</strong> '+esc(n.support)+'</p><p><strong>다음 학습:</strong> '+guide+'</p><p><strong>가정에서:</strong> '+esc(n.home)+'</p>'}
+ if(kind==='parent'){const n=parentReportDraft();return '<h2>가정에 전하는 학습 소식</h2>'+shared+'<p><strong>잘하고 있는 활동:</strong> '+esc(n.strength)+'</p><p><strong>연습이 필요한 활동:</strong> '+esc(n.challenge)+'</p><p><strong>도움을 받은 모습:</strong> '+esc(n.support)+'</p><p><strong>다음 학습:</strong> '+guide+'</p><p><strong>가정에서:</strong> '+esc(n.home)+'</p>'}
  return '<h2>교사용 학습 변화 분석</h2>'+shared+'<p>동일 미션 비교 '+r.compared+'개 · 독립 정답으로 변화 '+r.improved+'개 · 독립 정답 미유지 '+r.declined+'개</p><table><thead><tr><th>회차</th><th>독립 정답/첫 시도</th><th>힌트 제출</th><th>교사 도움</th><th>오답</th></tr></thead><tbody>'+r.sessions.map(x=>'<tr><td>'+x.session+'</td><td>'+x.firstCorrect+'/'+x.firstAttempts+'</td><td>'+x.hintUsed+'</td><td>'+x.teacherAssisted+'</td><td>'+x.errors+'</td></tr>').join('')+'</tbody></table><p><strong>다음 지도:</strong> '+guide+'</p>';
 }
 function printAudienceReport(kind){
- if(!['parent','teacher'].includes(kind))return;const w=window.open('','_blank');if(!w){alert('인쇄 창이 차단되었습니다.');return}
+ if(!['parent','teacher'].includes(kind))return;if(kind==='parent'&&!parentReportDraft().confirmed){alert('보호자용 보고서를 검토하고 확정한 후 인쇄해 주세요.');return}const w=window.open('','_blank');if(!w){alert('인쇄 창이 차단되었습니다.');return}
  const html='<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>학습 변화 보고서</title><style>body{font-family:sans-serif;margin:30px;color:#263D50;line-height:1.7}table{width:100%;border-collapse:collapse}td,th{border:1px solid #bbb;padding:8px;text-align:left}th{background:#eef5f4}@media print{button{display:none}}</style></head><body><h1>루시와 수상한 책방 · 학습 변화 보고서</h1>'+audienceReportBody(kind)+'<p><small>수업별 문제 수와 난도가 다르면 정답률은 직접 비교하기 어렵습니다. 표준화된 평가 결과가 아닙니다.</small></p><button onclick="window.print()">인쇄하기</button></body></html>';
  w.document.write(html);w.document.close();w.focus();
 }
-function audienceReportHTML(){return '<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')">보호자용 인쇄</button></section>'}
+function audienceReportHTML(){return parentReviewHTML()+'<section class="learning-recommendations"><h3>학습 변화 보고서 출력</h3><p>교사용은 수행 지표를 자세히, 보호자용은 쉬운 설명과 가정 활동을 제공합니다.</p><button onclick="printAudienceReport(\'teacher\')">교사용 인쇄</button> <button onclick="printAudienceReport(\'parent\')" '+(parentReportDraft().confirmed?'':'disabled')+'>보호자용 인쇄</button></section>'}
 function sessionTrendSummary(){
  const byDay={};let untracked=0;
  for(let i=0;i<EPISODES.length;i++)for(let sc=0;sc<3;sc++)for(let t=0;t<4;t++){
