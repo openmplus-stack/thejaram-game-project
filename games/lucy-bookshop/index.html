@@ -182,17 +182,17 @@ const STORYBOOK=[
 ];
 const MISSION_NAMES=['단어 찾기','문장 이해','순서 맞추기','단서 추리'];
 let activeMission=0,missionChoice='';
-function taskKey(i,scene,type){return 't'+type+'-l'+(i===0?currentTaskLevel()||'higher':'general')}
+function taskKey(i,scene,type){return 't'+type+'-l'+(i===0?ep1MissionLevel()||'higher':'general')}
 function taskRecord(i,scene,type){return (progress(i).tasks||{})[scene+'-'+taskKey(i,scene,type)]||{done:false,attempts:0}}
 function allTasksDone(i,scene){return [0,1,2,3].every(t=>taskRecord(i,scene,t).done)}
-function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0)return currentTaskLevel()?EP1_BEGINNER[currentTaskLevel()][scene][type]:EP1_CONTENT.missions[scene][type];if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
+function taskQuestion(i,scene,type){const words=episodeWords(i,scene),story=storyText(i,scene),q=missionFor(i,scene);if(i===0){const lv=ep1MissionLevel();return lv<=2&&lv>=1?EP1_BEGINNER[lv][scene][type]:lv>=3?EP1_INTERMEDIATE[lv][scene][type]:EP1_CONTENT.missions[scene][type]}if(type===0)return {question:'이 장면의 핵심 단어를 고르세요.',answer:words[0],choices:[words[1],words[0],words[3]]};if(type===1)return {question:q.question,answer:q.answer,choices:q.choices};if(type===2){const parts=story.split('.').map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(Boolean);return {question:'이 장면에서 먼저 일어난 일을 고르세요.',answer:parts[0],choices:[parts[2]||parts[0],parts[0],parts[1]||parts[0]]}}return {question:'이 장면의 중요한 단서를 고르세요.',answer:EPISODES[i].scene[scene][2],choices:[EPISODES[i].scene[scene][2],'이야기와 관련 없는 일이 일어났어요.','아무 단서도 찾지 못했어요.']}}
 function taskOpen(type){activeMission=type;missionChoice='';go('missionFull')}
 function taskChoose(value){missionChoice=value;render()}
 function soundResult(correct){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(correct?660:260,c.currentTime);if(correct)o.frequency.setValueAtTime(880,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.3);o.start();o.stop(c.currentTime+.32);o.onended=()=>c.close()}catch{}}
 function taskCheck(){const i=s.selectedBook,scene=progress(i).scene,q=taskQuestion(i,scene,activeMission),rec=taskRecord(i,scene,activeMission);const started=Date.now();if(!missionChoice){alert('답을 선택해 주세요.');return}const correct=answerNormalize(missionChoice)===answerNormalize(q.answer);soundResult(correct);const p=progress(i),tasks={...(p.tasks||{})};tasks[scene+'-'+taskKey(i,scene,activeMission)]={...rec,done:correct||rec.done,attempts:rec.attempts+1,correct,firstTryCorrect:rec.attempts===0&&correct,updatedAt:new Date().toISOString(),lastAnswer:missionChoice,history:[...(rec.history||[]),{answer:missionChoice,correct,at:new Date().toISOString()}].slice(-30)};updateProgress(i,{tasks});if(correct){missionChoice='';go('scene')}}
 function missionMenu(i,scene){return '<section class="mission-menu"><h3>미션을 선택하세요</h3><p>네 가지 미션을 모두 완료하면 다음 장면으로 갈 수 있어요.</p><div class="mission-menu-grid">'+MISSION_NAMES.map((name,t)=>'<button onclick="taskOpen('+t+')">'+(taskRecord(i,scene,t).done?'✓ ':'')+(t===0?'📚 ':t===1?'💬 ':t===2?'🔢 ':'🔎 ')+name+'</button>').join('')+'</div></section>'}
 function sceneStory(i,scene){return storyText(i,scene).replace(/<em>/g,'<strong class="story-emphasis">').replace(/<\/em>/g,'</strong>')}
-function resultsHTML(i){return '<section class="lesson-results"><h3>📚 이번 이야기에서 배운 내용</h3>'+[0,1,2].map(scene=>'<h4>장면 '+(scene+1)+'</h4><p><strong>단어:</strong> '+episodeWords(i,scene).map(esc).join(' · ')+'</p><p><strong>문장 표현:</strong> '+lessonSentences(i,scene,s.topik).map(esc).join(' / ')+'</p>').join('')+'</section>'}
+function resultsHTML(i){return '<section class="lesson-results"><h3>📚 이번 이야기에서 배운 내용</h3>'+[0,1,2].map(scene=>'<h4>장면 '+(scene+1)+'</h4><p><strong>단어:</strong> '+episodeWords(i,scene).map(esc).join(' · ')+'</p><p><strong>문장 구조:</strong> '+episodeGrammar(i,scene).map(esc).join(' / ')+'</p>').join('')+'</section>'}
 
 const LOCATION_DISTRACTORS=['전통시장','박물관','공원','분실물 보관소','도서관','지하철역','음식점','우체국','원예 상점','생태공원','문화체험관','야생동물 구조센터','한복·공예점','전시관','물품 보관소','산책로','공방'];
 function placeOptions(i,location){const target=EPISODES[i].places[location];const pool=LOCATION_DISTRACTORS.filter(x=>x!==target&&!EPISODES[i].places.includes(x));const decoys=[0,1,2].map(n=>pool[(i*7+location*5+n*3)%pool.length]);const options=[{name:target,correct:true},...decoys.map(name=>({name,correct:false}))];return options.map((_,n)=>options[(n+(i+location)%4)%4])}
@@ -306,11 +306,57 @@ const EP1_BEGINNER={
 ]
 };
 function currentTaskLevel(){const n=Number(s.topik)||1;return n===1||n===2?n:0}
-function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=currentTaskLevel();const goals=beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
+function taskLearningGoal(i,scene,type){if(i!==0)return '';const beginner=ep1MissionLevel();const goals=beginner===3?['중급 어휘 이해','관용적 표현 이해','사건 순서 분석','인물 의도 추론']:beginner===4?['맥락 속 어휘 이해','문법 의미 분석','인과관계 분석','서사적 추론']:beginner===1?['핵심 명사 이해','짧은 문장과 장소 이해','기본 사건 순서','이야기 속 물건 확인']:beginner===2?['어휘 의미 구별','이유·목적 이해','사건 순서 연결','단서를 통한 추론']:['어휘 이해','문장 이해','사건 순서','단서 추론'];return goals[type]}
 
 
 function episodeHealth(i){const p=progress(i),item=(s.inventory||{})['ep'+(i+1)];return {storyDone:[0,1,2].every(n=>allTasksDone(i,n)),visited:(p.investigatedLocations||[]).length,required:EPISODES[i].places.length,verified:!!p.deduction?.verified,captured:!!item,restored:p.phase==='completed'&&item?.status==='restored'}}
 function episodeCheckpoint(i){const q=episodeHealth(i);return '<div class="checkpoint"><h3>모험 진행 확인</h3><div class="checkpoint-grid">'+[['이야기 미션 12개',q.storyDone],['현대 장소 조사',q.visited>=q.required],['펜던트 추리',q.verified],['복딱 보관함',q.captured],['이야기 복원',q.restored]].map(([name,done])=>'<span>'+(done?'✓':'○')+' '+name+'</span>').join('')+'</div></div>'}
+
+
+/* Stage 22: intermediate TOPIK 3-4 differentiated comprehension prototype, episode 1. */
+const EP1_INTERMEDIATE={
+3:[
+[
+{question:'나무꾼이 연못을 떠나지 못한 이유는 무엇인가요?',answer:'생계에 필요한 쇠도끼를 잃어버렸기 때문입니다.',choices:['산신령을 기다리라는 약속을 받았기 때문입니다.','생계에 필요한 쇠도끼를 잃어버렸기 때문입니다.','나무를 모두 베었기 때문입니다.','집으로 가는 길을 잃었기 때문입니다.']},
+{question:'“어쩔 줄 몰랐습니다”와 가장 가까운 뜻은?',answer:'어떻게 해야 할지 몰랐습니다.',choices:['기분이 아주 좋았습니다.','도끼를 이미 찾았습니다.','어떻게 해야 할지 몰랐습니다.','빨리 달렸습니다.']},
+{question:'사건의 순서로 맞는 것은?',answer:'나무를 하다가 도끼를 놓쳤고, 도끼가 가라앉았습니다.',choices:['도끼가 가라앉은 뒤 나무를 베기 시작했습니다.','산신령이 먼저 도끼를 건넸습니다.','나무를 하다가 도끼를 놓쳤고, 도끼가 가라앉았습니다.','도끼를 찾은 뒤 연못에 갔습니다.']},
+{question:'쇠도끼가 나무꾼에게 특별히 중요한 이유는?',answer:'생활을 이어 가는 데 필요한 도구이기 때문입니다.',choices:['금으로 만들어졌기 때문입니다.','산신령의 물건이기 때문입니다.','장식품이기 때문입니다.','생활을 이어 가는 데 필요한 도구이기 때문입니다.']}
+],
+[
+{question:'산신령이 도끼를 차례로 보여 주려던 목적은?',answer:'나무꾼의 정직함을 확인하려고',choices:['연못을 정리하려고','나무꾼의 정직함을 확인하려고','도끼를 팔려고','나무꾼을 놀라게 하려고']},
+{question:'“자기 것이 아닌 도끼”는 무엇을 뜻하나요?',answer:'나무꾼이 잃어버리지 않은 도끼',choices:['나무꾼이 잃어버리지 않은 도끼','나무꾼이 사용하던 쇠도끼','산에서 만든 나무도끼','물에 빠진 쇠도끼']},
+{question:'알맞은 사건 순서는?',answer:'사정을 들음 → 찾아 주겠다고 약속함 → 도끼를 보여 주려 함',choices:['도끼를 보여 줌 → 사정을 들음 → 약속함','약속함 → 집에 감 → 사정을 들음','사정을 들음 → 찾아 주겠다고 약속함 → 도끼를 보여 주려 함','집에 감 → 도끼를 잃음 → 약속함']},
+{question:'나무꾼이 금도끼를 받지 않으려는 까닭은?',answer:'자신의 물건이 아니기 때문입니다.',choices:['너무 무겁기 때문입니다.','금빛을 싫어하기 때문입니다.','자신의 물건이 아니기 때문입니다.','도끼가 필요 없기 때문입니다.']}
+],
+[
+{question:'이 장면에서 예상하지 못한 사건은?',answer:'금도끼가 갑자기 사라졌습니다.',choices:['나무꾼이 나무를 베었습니다.','산신령이 처음 나타났습니다.','금도끼가 갑자기 사라졌습니다.','쇠도끼를 물에 빠뜨렸습니다.']},
+{question:'“시험할 기회조차 없어졌습니다”의 뜻은?',answer:'정직함을 알아볼 상황을 만들지 못했습니다.',choices:['나무꾼이 시험에 합격했습니다.','정직함을 알아볼 상황을 만들지 못했습니다.','시험이 모두 끝났습니다.','산신령이 시험을 포기하지 않았습니다.']},
+{question:'올바른 사건 순서는?',answer:'금도끼를 꺼내려 함 → 금도끼가 없음을 발견함',choices:['금도끼가 돌아옴 → 연못을 떠남','나무꾼이 도끼를 팖 → 금도끼를 발견함','금도끼를 꺼내려 함 → 금도끼가 없음을 발견함','루시가 복원함 → 금도끼가 사라짐']},
+{question:'루시가 연못 주변을 살피는 목적은?',answer:'사라진 물건의 흔적을 찾기 위해서입니다.',choices:['연못의 깊이를 재기 위해서입니다.','나무를 더 베기 위해서입니다.','사라진 물건의 흔적을 찾기 위해서입니다.','집으로 돌아가기 위해서입니다.']}
+]
+],
+4:[
+[
+{question:'나무꾼이 연못가를 떠나지 못한 상황을 가장 잘 설명한 것은?',answer:'생계 수단을 잃어 해결 방법을 찾지 못하는 상황',choices:['산신령과의 약속을 일부러 어기는 상황','생계 수단을 잃어 해결 방법을 찾지 못하는 상황','값비싼 금도끼를 사려는 상황','새 일자리를 구한 상황']},
+{question:'“그만 쇠도끼를 물에 빠뜨리고 말았습니다”의 의미는?',answer:'의도하지 않은 일이 일어나고 말았다는 뜻입니다.',choices:['앞으로 도끼를 빠뜨릴 계획이라는 뜻입니다.','도끼를 일부러 버렸다는 뜻입니다.','의도하지 않은 일이 일어나고 말았다는 뜻입니다.','도끼를 찾았다는 뜻입니다.']},
+{question:'사건의 인과관계로 맞는 것은?',answer:'쇠도끼를 잃음 → 생계가 어려워질까 걱정함',choices:['산신령을 만남 → 나무를 처음 벰','금도끼를 얻음 → 연못에 감','쇠도끼를 잃음 → 생계가 어려워질까 걱정함','집에 돌아감 → 도끼를 빠뜨림']},
+{question:'나무꾼의 행동을 통해 알 수 있는 것은?',answer:'쇠도끼가 일상생활에서 꼭 필요한 물건이라는 점',choices:['쇠도끼가 일상생활에서 꼭 필요한 물건이라는 점','금도끼를 갖고 싶어 한다는 점','연못을 좋아한다는 점','산신령을 알고 있었다는 점']}
+],
+[
+{question:'산신령이 정직함을 시험하려는 이유와 가장 관련 있는 행동은?',answer:'금도끼와 은도끼를 차례로 보여 주는 행동',choices:['연못가에서 나무를 베는 행동','금도끼와 은도끼를 차례로 보여 주는 행동','나무꾼이 집에 가는 행동','연못의 물을 마시는 행동']},
+{question:'“자초지종”과 의미가 가장 가까운 것은?',answer:'일이 일어난 처음부터 끝까지의 사정',choices:['앞으로 일어날 사건에 대한 예언','일이 일어난 처음부터 끝까지의 사정','물건의 값과 재료','서로 모르는 사람의 이름']},
+{question:'인물의 의도가 드러나는 순서는?',answer:'사정을 들음 → 정직함을 시험하기로 함 → 도끼를 보여 주려 함',choices:['도끼를 보여 줌 → 사정을 들음 → 시험하기로 함','사정을 들음 → 정직함을 시험하기로 함 → 도끼를 보여 주려 함','시험이 끝남 → 도끼를 찾음 → 사정을 들음','나무를 벰 → 집에 감 → 사정을 들음']},
+{question:'나무꾼이 자신의 쇠도끼를 중요하게 생각하는 이유는?',answer:'물건의 값보다 자신의 소유와 생계가 중요하기 때문입니다.',choices:['금도끼가 너무 작기 때문입니다.','산신령을 믿지 않기 때문입니다.','물건의 값보다 자신의 소유와 생계가 중요하기 때문입니다.','은도끼를 이미 갖고 있기 때문입니다.']}
+],
+[
+{question:'금도끼 실종이 이야기 전개에 미치는 영향은?',answer:'정직함을 시험하는 원래 사건이 진행되지 못합니다.',choices:['나무꾼이 바로 부자가 됩니다.','정직함을 시험하는 원래 사건이 진행되지 못합니다.','쇠도끼가 저절로 돌아옵니다.','연못이 없어집니다.']},
+{question:'“예상치 못한 일이 일어났습니다”와 연결되는 사건은?',answer:'금도끼가 흔적 없이 사라진 사건',choices:['나무꾼이 나무를 하던 사건','금도끼가 흔적 없이 사라진 사건','산신령이 도끼를 찾겠다고 약속한 사건','나무꾼이 울던 사건']},
+{question:'사건의 인과관계로 맞는 것은?',answer:'금도끼가 사라짐 → 정직함을 시험하는 장면이 중단됨',choices:['정직함을 시험함 → 금도끼를 처음 만듦','나무를 벰 → 금도끼를 선물함','금도끼가 사라짐 → 정직함을 시험하는 장면이 중단됨','루시가 귀환함 → 금도끼가 사라짐']},
+{question:'루시가 단서를 살피는 행동에서 추론할 수 있는 것은?',answer:'사라진 물건을 찾으면 이야기의 흐름을 되돌릴 수 있다는 생각',choices:['산신령을 다른 곳으로 보내려는 생각','사라진 물건을 찾으면 이야기의 흐름을 되돌릴 수 있다는 생각','나무꾼의 쇠도끼를 버리려는 생각','연못을 없애려는 생각']}
+]
+]
+};
+function ep1MissionLevel(){const n=Number(s.topik)||1;return n>=1&&n<=4?n:0}
 
 render();
 </script></body></html>
