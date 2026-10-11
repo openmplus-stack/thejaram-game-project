@@ -251,11 +251,11 @@ function genericVariedMission(i,scene,type,format){
  if(format==='word-hunt')return {format,question:'이 장면의 핵심 인물 또는 물건을 찾으세요.',answer:key,choices};
  if(format==='initials')return {format,question:'초성 '+hangulInitials(key)+'에 맞는 단어를 찾으세요.',answer:key,choices:choices.slice(0,4)};
  if(format==='syllable-build'){const parts=[...key];return {format,question:'음절을 순서대로 눌러 핵심 단어를 완성하세요.',answer:key,parts,choices:[...parts].reverse()};}
- if(format==='fill-blank')return {format,question:'이 장면의 중심 인물은 (      )입니다.',answer:actor,choices:[actor,...pool.filter(x=>x!==actor).slice(0,3)]};
- if(format==='word-chain'){const last=[...key].at(-1);const candidate=[...new Set([...pool,key])].find(x=>x!==key&&x.startsWith(last));if(!candidate)return {...taskQuestion(i,scene,type),format:'choice'};return {format,question:'끝말잇기: '+key+' → ?',answer:candidate,choices:[candidate,...pool.filter(x=>x!==candidate&&!x.startsWith(last)).slice(0,3)]};}
+ if(format==='fill-blank')return {format,question:'이 장면에서 행동한 인물은 누구인가요?',answer:actor,choices:[actor,...pool.filter(x=>x!==actor).slice(0,3)]};
+ if(format==='word-chain'){const last=[...key].at(-1),candidate=[...new Set([...pool,key])].find(x=>x!==key&&x.startsWith(last));if(!candidate)return {format:'choice',question:'이 장면에서 중요한 인물이나 물건을 고르세요.',answer:key,choices:choices.slice(0,4)};return {format,question:'끝말잇기: '+key+' → ?',answer:candidate,choices:[candidate,...pool.filter(x=>x!==candidate&&!x.startsWith(last)).slice(0,3)]};}
  if(format==='match')return {format,question:'본문에 나온 인물과 행동을 바르게 연결하세요.',answer:actor+' → '+event,choices:[actor+' → '+event,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][0]+' → '+row[scene][1])]};
  if(format==='clue-book')return {format,question:'단서 수첩에 기록할 사실을 고르세요.',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
- if(format==='why')return {format,question:'이 장면에서 확인할 수 있는 상황은 무엇인가요?',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
+ if(format==='why')return {format,question:'본문에 나온 상황을 고르세요.',answer:context,choices:[context,...GRADED_SCENE_FACTS.filter((_,j)=>j!==i).slice(0,3).map(row=>row[scene][2])]};
  if(format==='deduction')return {format,question:'루시가 되찾아야 할 물건은 무엇인가요?',answer:EPISODES[i].target,choices:[EPISODES[i].target,...EPISODES.filter((_,j)=>j!==i).slice(0,3).map(e=>e.target)]};
  return {...taskQuestion(i,scene,type),format:'choice'};
 }
@@ -634,19 +634,20 @@ const GRADED_SCENE_FACTS=[[["나무꾼","쇠도끼를 연못에 빠뜨렸어요"
 /* Stage 45: narrative-first graded reading. Six bands are instructional
    approximations, not certified TOPIK texts; preserve story facts in every band. */
 function hasFinalConsonant(word){const ch=[...word].at(-1)||'',n=ch.charCodeAt(0)-44032;return n>=0&&n<11172&&n%28!==0}
+function punctuateKorean(text){const t=String(text||'').trim();return t&&/[.!?。]$/.test(t)?t:t+'.'}
 function gradedSceneText(i,scene,level){
  const fact=GRADED_SCENE_FACTS[i]?.[scene];if(!fact)return STORYBOOK[i]?.[scene]||'';
  const [who,action,context]=fact,lv=Math.max(1,Math.min(6,Number(level)||1));
- const source=STORYBOOK[i]?.[scene]||'';
- const clean=source.replace(/<\/?em>/g,'').replace(/\s+/g,' ').trim();
+ const source=STORYBOOK[i]?.[scene]||'',clean=source.replace(/<\/?em>/g,'').replace(/\s+/g,' ').trim();
  const sentences=(clean.match(/[^.!?。]+[.!?。]?/g)||[]).map(x=>x.trim()).filter(Boolean);
- const key='<em>'+action+'</em>';
- if(lv===1)return who+(hasFinalConsonant(who)?'이':'가')+' 나와요. '+key+' '+context;
- if(lv===2)return who+'의 이야기를 읽어 보세요. '+key+' '+context+' 다음에 어떤 일이 일어날까요?';
- if(lv===3)return (sentences.slice(0,2).join(' ')||who+'의 이야기가 이어져요.')+' '+key+' '+context;
- if(lv===4)return (sentences.slice(0,3).join(' ')||clean)+' '+key+' '+context+' 이 행동이 이야기에서 어떤 변화를 일으켰는지 생각해 보세요.';
- if(lv===5)return clean+' '+key+' '+context+' 인물의 행동과 그 결과를 본문에 나온 사실을 바탕으로 설명해 보세요.';
- return clean+' '+key+' '+context+' 인물의 의도와 사건의 결과를 구별하고, 확인 가능한 사실과 추론을 나누어 해석해 보세요.';
+ const event='<em>'+punctuateKorean(action)+'</em>',situation=punctuateKorean(context);
+ const lead=who+(hasFinalConsonant(who)?'이':'가')+' 등장해요.';
+ if(lv===1)return lead+' '+event+' '+situation;
+ if(lv===2)return lead+' '+event+' '+situation+' 다음에 무슨 일이 일어날까요?';
+ if(lv===3)return (sentences.slice(0,2).join(' ')||lead)+' '+event+' '+situation;
+ if(lv===4)return (sentences.slice(0,3).join(' ')||lead)+' '+event+' '+situation+' 이 행동이 다음 사건과 어떻게 연결될까요?';
+ if(lv===5)return clean+' '+event+' '+situation+' 인물의 행동과 결과를 구별해 보세요.';
+ return clean+' '+event+' '+situation+' 본문에서 확인한 사실과 독자가 추론한 내용을 구별해 보세요.';
 }
 function gradedTextAudit(){
  const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++){
@@ -730,9 +731,17 @@ function levelContentAudit(){
  }
  return {ok:!issues.length,issues,passages:180,missions:checked};
 }
+function editorialConsistencyAudit(){
+ const issues=[];for(let i=0;i<10;i++)for(let sc=0;sc<3;sc++)for(let lv=1;lv<=6;lv++){
+  const passage=i===2?sunMoonReading(sc,lv):gradedSceneText(i,sc,lv);
+  if(/들가 등장|\bundefined\b|\bnull\b/.test(passage))issues.push('본문 오류 '+i+'-'+sc+'-'+lv);
+  if(i!==2&&!passage.includes(punctuateKorean(GRADED_SCENE_FACTS[i][sc][1])))issues.push('핵심 사건 누락 '+i+'-'+sc+'-'+lv);
+ }
+ return {ok:!issues.length,issues};
+}
 function releaseSelfCheck(){
  const issues=[];
- if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues);
+ if(EPISODES.length!==10||STORYBOOK.length!==10||VOCAB.length!==10)issues.push('동화 기본 데이터 개수 불일치');issues.push(...storyContinuityAudit().issues,...gradedTextAudit().issues,...sunMoonMissionAudit().issues,...variedMissionAudit().issues,...levelContentAudit().issues,...editorialConsistencyAudit().issues);
  for(let i=0;i<EPISODES.length;i++){
    if(!Array.isArray(EPISODES[i].places)||!EPISODES[i].places.length)issues.push('장소 누락 '+(i+1));
    for(let sc=0;sc<3;sc++){
