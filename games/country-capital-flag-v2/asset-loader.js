@@ -6,12 +6,17 @@
   logo:original+'backgrounds/logo-world-buddy.png',
   continent:original+'backgrounds/continent-select-no-number.png',
   topic:original+'backgrounds/topic-select-no-number-no-arrows.png',
-  activities:original+'backgrounds/bg-continent-select.png',
+  activities:original+'backgrounds/bg-mode-select.png',
   countries:original+'backgrounds/bg-country-select.png',
   learning:original+'backgrounds/bg-learning.png',
   quiz:original+'backgrounds/bg-quiz.png',
   result:original+'backgrounds/bg-result.png',
   reward:original+'backgrounds/bg-reward.png',
+  learnReward:original+'backgrounds/bg-reward.png',
+  quizReward:original+'backgrounds/bg-reward.png',
+  flags:original+'backgrounds/bg-world-common.png',
+  treasures:original+'backgrounds/bg-world-common.png',
+  progress:original+'backgrounds/bg-world-common.png',
   explorer:original+'characters/explorer-master.png'
  });
  const status=new Map();
