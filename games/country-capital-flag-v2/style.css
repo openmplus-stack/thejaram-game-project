@@ -104,3 +104,18 @@
 #activities .activity-card small{font-size:clamp(14px,1.6vw,21px)}
 #activities .activity-note{font-weight:700;color:#68492a}
 @media(max-width:680px){#activities .activity-header{flex-wrap:wrap}#activities .activity-panel{padding:16px}.activity-cards{grid-template-columns:1fr}#activities .activity-card{min-height:140px}#activities .activity-artboard{min-height:100dvh}}
+
+
+/* Stage 16: iPad landscape learning card. */
+#learning.screen.active{align-items:center;justify-content:center;background:#a5e1f3;padding:clamp(12px,2vw,28px)}
+#learning .learning-board{width:min(100%,1120px);min-height:min(85dvh,770px);display:flex;flex-direction:column;gap:20px;padding:clamp(18px,3vw,35px);background:#fff9e7e8;border:6px solid #bb8a4b;border-radius:30px;box-shadow:0 10px 0 #895c2f}
+.learning-top{display:flex;justify-content:space-between;font-weight:850;font-size:clamp(18px,2.3vw,28px);color:#4d4539}
+.learning-card{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#ffffffd9;border:4px solid #c3dfd9;border-radius:28px;padding:20px;text-align:center}
+#learningFlag{display:block;max-width:min(70%,340px);height:clamp(110px,20dvh,200px);object-fit:contain}
+.learning-country{font-size:clamp(34px,5vw,66px);font-weight:950;color:#234b72}
+.learning-capital{min-height:1.5em;font-size:clamp(23px,3vw,40px);font-weight:850;color:#456d56}
+.learning-actions{display:flex;justify-content:space-between;gap:14px}
+.learning-actions button{min-width:32%}
+#learningNotice{margin:0;text-align:center;font-weight:850;font-size:clamp(17px,2vw,25px)}
+#learning button:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:680px){#learning .learning-board{min-height:95dvh}.learning-actions button{min-width:0;flex:1}}
