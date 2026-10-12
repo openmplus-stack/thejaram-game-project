@@ -397,3 +397,29 @@
 #countries .country-bottom-nav{z-index:3!important;flex:none!important;margin-top:clamp(8px,1.5vh,18px)!important;border-radius:24px!important}
 #countries .country-bottom-nav button{font-size:clamp(32px,4vw,56px)!important}
 @media(orientation:landscape) and (max-height:820px){#countries .country-artboard{padding-top:9px!important;padding-bottom:6px!important}#countries .country-main-panel{padding-top:26px!important;padding-bottom:7px!important;gap:3px!important}#countries .country-card{min-height:76px!important}#countries .country-card img{height:36px!important}#countries .country-bottom-nav button{min-height:46px!important}#countries .country-wood-sign{padding:5px!important}}
+
+/* 2026-10-13: home V2 independent illustrated assets and real buttons */
+#home.screen.active{padding:0;justify-content:center;align-items:center;background:#9ad5ed}
+#home .home-artboard,#home .home-artboard[data-asset-state="ready"]{position:relative;width:min(100vw,calc(100dvh * 4 / 3));height:auto;min-height:0;max-height:100dvh;aspect-ratio:4/3;overflow:hidden;background-color:#a8dbef;background-size:cover;background-position:center}
+#home .home-title-wrap{position:absolute;z-index:3;top:5%;left:50%;transform:translateX(-50%);width:61%;height:20%;display:flex;align-items:center;justify-content:center}
+#home .home-title-sign{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+#home .home-title-wrap h1{position:relative;z-index:1;margin:0 0 1%;color:#422b1b;font-size:clamp(23px,4.3vw,61px);font-weight:950;letter-spacing:-.045em;white-space:nowrap;text-shadow:0 2px 1px #fff6d5}
+#home .home-explorer{position:absolute;z-index:2;left:5%;bottom:9%;width:38%;height:58%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 9px 10px #24445445)}
+#home .home-panel{position:absolute;z-index:2;right:7%;top:29%;width:48%;height:60%;padding:3.2% 4%;border:2px solid #d6b98b;border-radius:24px;background:linear-gradient(140deg,#fff9e9f5,#f9ebcff5);box-shadow:0 12px 28px #29465c38,inset 0 0 0 3px #fff9edaa;display:flex;flex-direction:column;justify-content:center;gap:3%}
+#home .home-intro{margin:0;text-align:center;font-size:clamp(14px,1.8vw,24px);font-weight:800;color:#5c4631}
+#home .home-menu,#home .home-artboard[data-asset-state="ready"] .home-menu{position:static;inset:auto;display:grid;grid-template-columns:1fr;gap:clamp(7px,1vw,14px);width:100%;margin:0;align-content:center}
+#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{position:static;display:block;left:auto;top:auto;width:100%;height:auto;min-height:clamp(44px,6.1vh,74px);margin:0;padding:clamp(8px,1.1vw,15px);border:2px solid #ffffffa8;border-radius:16px;opacity:1;color:#24394a;font-size:clamp(16px,2.1vw,28px);font-weight:900;box-shadow:0 5px 0 #38556d33,0 8px 14px #38556d22;cursor:pointer;touch-action:manipulation}
+#home .home-start,#home .home-artboard[data-asset-state="ready"] .home-start{background:linear-gradient(#ffcf7d,#eaa044);color:#54321a}
+#home .home-flags,#home .home-artboard[data-asset-state="ready"] .home-flags{background:linear-gradient(#c3e7fa,#77b7dc)}
+#home .home-treasures,#home .home-artboard[data-asset-state="ready"] .home-treasures{background:linear-gradient(#d8f2dc,#89cda6)}
+#home .home-progress,#home .home-artboard[data-asset-state="ready"] .home-progress{background:linear-gradient(#f9dbb6,#e6b17b)}
+#home .home-action:focus-visible{outline:4px solid #235c93;outline-offset:3px}
+@media(orientation:portrait),(max-width:680px){
+#home .home-artboard,#home .home-artboard[data-asset-state="ready"]{width:100%;height:100dvh;max-height:none;aspect-ratio:auto;background-size:cover}
+#home .home-title-wrap{top:7%;width:94%;height:15%}
+#home .home-title-wrap h1{font-size:clamp(25px,7vw,46px)}
+#home .home-explorer{left:3%;top:20%;bottom:auto;width:48%;height:33%}
+#home .home-panel{top:auto;bottom:5%;left:5%;right:5%;width:90%;height:auto;min-height:44%;padding:5%;gap:14px}
+#home .home-intro{font-size:clamp(15px,4vw,21px)}
+#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-size:clamp(17px,4vw,24px);min-height:53px;padding:10px}
+}
