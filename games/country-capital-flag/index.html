@@ -605,7 +605,39 @@ body.world-nav-visible #home{overflow-y:auto!important}
 #countrySelectFlow .countrySelectStart{flex:none!important;margin:5px auto 0!important;padding:8px 28px!important;font-size:clamp(14px,1.5vw,20px)!important}
 #continentFlow .flowBox,#topicFlow .flowBox{padding-bottom:14%!important}
 @media(max-width:700px){#continentFlow .flowBox,#topicFlow .flowBox,#countrySelectFlow .countrySelectBox{padding-left:17%!important;padding-right:17%!important}#continentFlow .continentAdventureCard{border-width:2px!important}#countrySelectFlow .countryChoiceGrid{gap:5px!important}}
-</style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
+</style></head><body><script id="critical-navigation-bootstrap-v3">
+/* Independent, early-installed navigation: works even if the main game script fails. */
+(function(){
+var last=0;
+function openContinent(){
+ var home=document.getElementById('home'),page=document.getElementById('continentFlow');
+ if(!home||!page)return;
+ document.querySelectorAll('#home,#continentFlow,#topicFlow,#countrySelectFlow,#activityChoiceFlow,#learnScreen,#quizScreen').forEach(function(el){el.style.setProperty('display','none','important')});
+ home.style.setProperty('display','none','important');
+ page.style.setProperty('display','flex','important');
+ page.style.setProperty('visibility','visible','important');
+ page.style.setProperty('z-index','200','important');
+ document.body.classList.add('world-nav-visible');
+ window.scrollTo(0,0);
+}
+function handle(e){
+ var home=document.getElementById('home');
+ if(!home||getComputedStyle(home).display==='none')return;
+ var box=home.querySelector('.homeBox');if(!box)return;
+ var point=e.touches&&e.touches[0]||e.changedTouches&&e.changedTouches[0]||e;
+ var r=box.getBoundingClientRect();
+ var x=(point.clientX-r.left)/r.width,y=(point.clientY-r.top)/r.height;
+ var isStart=(x>.52&&x<.96&&y>.29&&y<.46)||(x>.13&&x<.89&&y>.545&&y<.65);
+ var target=e.target&&e.target.closest&&e.target.closest('#homeStart');
+ if(!isStart&&!target)return;
+ if(Date.now()-last<550){e.preventDefault();e.stopImmediatePropagation();return}
+ last=Date.now();e.preventDefault();e.stopImmediatePropagation();openContinent();
+}
+document.addEventListener('touchstart',handle,{capture:true,passive:false});
+document.addEventListener('pointerdown',handle,true);
+document.addEventListener('click',handle,true);
+})();
+</script><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
 <div id="simpleOxReady" style="min-height:70vh;display:flex;align-items:center;justify-content:center"><button id="simpleOxStart" style="border:0;border-radius:28px;background:#3f8c73;color:white;font-size:34px;font-weight:950;padding:24px 80px;box-shadow:var(--shadow)">시작하기</button></div>
