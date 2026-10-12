@@ -209,12 +209,12 @@ body{background:#e9f7f7;color:var(--navy)}
 #home.referenceArtReady .homeBox{display:block!important;width:min(100vw,calc(100dvh * 1449 / 1086))!important;height:min(100dvh,calc(100vw * 1086 / 1449))!important;min-height:0!important;max-width:none!important;max-height:none!important;padding:0!important;margin:auto!important;position:relative!important;aspect-ratio:1449/1086!important;background:url('assets/backgrounds/home-reference-01.webp') center/100% 100% no-repeat!important}
 #home.referenceArtReady .homeTitle,#home.referenceArtReady .homeArt{display:none!important}
 #home.referenceArtReady .homeControls{position:absolute!important;inset:0!important;display:block!important;max-width:none!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;pointer-events:none!important}
-#home.referenceArtReady .homeStart,#home.referenceArtReady .homeMenu button{position:absolute!important;display:block!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;text-shadow:none!important;font-size:0!important;min-height:0!important;height:11.4%!important;width:36.5%!important;left:56.4%!important;border-radius:30px!important;pointer-events:auto!important;cursor:pointer!important;opacity:0!important}
-#home.referenceArtReady .homeStart{top:32.5%!important}
+#home.referenceArtReady .homeStart,#home.referenceArtReady .homeMenu button{z-index:1000!important;touch-action:manipulation!important;position:absolute!important;display:block!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;text-shadow:none!important;font-size:0!important;min-height:0!important;height:11.4%!important;width:36.5%!important;left:56.4%!important;border-radius:30px!important;pointer-events:auto!important;cursor:pointer!important;opacity:0!important}
+#home.referenceArtReady .homeStart{top:38.5%!important}
 #home.referenceArtReady .homeMenu{display:contents!important}
-#home.referenceArtReady .homeMenu button:nth-child(1){top:44.7%!important}
-#home.referenceArtReady .homeMenu button:nth-child(2){top:56.9%!important}
-#home.referenceArtReady .homeMenu button:nth-child(3){top:69.1%!important}
+#home.referenceArtReady .homeMenu button:nth-child(1){top:49.2%!important}
+#home.referenceArtReady .homeMenu button:nth-child(2){top:59.9%!important}
+#home.referenceArtReady .homeMenu button:nth-child(3){top:70.6%!important}
 #home.referenceArtReady .homeStart:focus-visible,#home.referenceArtReady .homeMenu button:focus-visible{opacity:1!important;outline:4px solid white!important;outline-offset:-4px!important}
 @media(orientation:portrait),(max-width:680px){#home.referenceArtReady .homeBox{display:flex!important;width:100%!important;height:auto!important;min-height:100dvh!important;aspect-ratio:auto!important;padding:calc(env(safe-area-inset-top) + 15px) 16px calc(env(safe-area-inset-bottom) + 18px)!important;background:none!important}#home.referenceArtReady .homeTitle,#home.referenceArtReady .homeArt{display:flex!important}#home.referenceArtReady .homeControls{position:static!important;display:flex!important;flex-direction:column!important;width:min(100%,410px)!important;height:auto!important;pointer-events:auto!important}#home.referenceArtReady .homeMenu{display:flex!important}#home.referenceArtReady .homeStart,#home.referenceArtReady .homeMenu button{position:static!important;display:flex!important;width:100%!important;height:auto!important;min-height:60px!important;opacity:1!important;font-size:clamp(19px,4.6vw,25px)!important;color:#fff!important;text-shadow:0 2px 2px #38200e66!important;border:3px solid #ffe9b4!important;box-shadow:0 6px 0 #704222!important}#home.referenceArtReady .homeStart{background:linear-gradient(#ffce59,#ff9b19 58%,#ed7505)!important}#home.referenceArtReady .homeMenu button:nth-child(1){background:linear-gradient(#61baf8,#288be7 58%,#1163c4)!important}#home.referenceArtReady .homeMenu button:nth-child(2){background:linear-gradient(#d397ef,#a35bd2 58%,#7c38aa)!important}#home.referenceArtReady .homeMenu button:nth-child(3){background:linear-gradient(#70d993,#25b85d 58%,#098b3d)!important}}
 </style><style id="continent-adventure-v1">
@@ -820,5 +820,19 @@ function apply(){document.getElementById('continentFlow')?.classList.remove('con
 apply();
 const obs=new MutationObserver(apply);
 ['continentFlow','topicFlow'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['class']})});
+})();
+</script><script id="stable-home-button-events-v1">
+(function(){
+var home=document.getElementById('home'),start=document.getElementById('homeStart'),continent=document.getElementById('continentFlow');
+if(!home||!start||!continent)return;
+function go(e){
+if(e){e.preventDefault();e.stopImmediatePropagation()}
+var ids=['home','continentFlow','topicFlow','countrySelectFlow','activityChoiceFlow','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow','learnScreen','quizScreen','quizResult','simpleOx'];
+ids.forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none'});
+continent.style.display='flex';continent.style.visibility='visible';continent.style.opacity='1';
+window.scrollTo(0,0);
+}
+start.addEventListener('click',go,true);
+start.addEventListener('touchend',go,{capture:true,passive:false});
 })();
 </script></body></html>
