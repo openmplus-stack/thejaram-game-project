@@ -277,7 +277,7 @@ body{background:#e9f7f7;color:var(--navy)}
 </style><style id="topic-reference-and-global-icon-nav-v1">
 /* Topic page: exact illustrated artwork when uploaded, CSS layout remains fallback. */
 #topicFlow.topicArtReady{padding:0!important;overflow:hidden!important;align-items:center!important;justify-content:center!important;background:#69c6ef!important}
-#topicFlow.topicArtReady .flowBox{position:relative!important;display:block!important;flex:none!important;width:min(100vw,133.333dvh)!important;max-width:none!important;height:auto!important;max-height:100dvh!important;aspect-ratio:1448/1086!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:url('assets/backgrounds/topic-reference-03.webp') center/100% 100% no-repeat!important;overflow:hidden!important}
+#topicFlow.topicArtReady .flowBox{position:relative!important;display:block!important;flex:none!important;width:min(100vw,133.333dvh)!important;max-width:none!important;height:auto!important;max-height:100dvh!important;aspect-ratio:1448/1086!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:url('assets/backgrounds/topic-select-no-number-no-arrows.png?asset=a37d03d2') center/100% 100% no-repeat!important;overflow:hidden!important}
 #topicFlow.topicArtReady .flowHead{position:absolute!important;inset:0!important;pointer-events:none!important;border:0!important;background:none!important;margin:0!important;padding:0!important}
 #topicFlow.topicArtReady .flowHead>div{display:none!important}
 #topicFlow.topicArtReady .flowHead .back{position:absolute!important;left:17.4%!important;top:14.1%!important;width:6.7%!important;height:9.2%!important;transform:none!important;opacity:0!important;pointer-events:auto!important}
@@ -728,7 +728,7 @@ const obs=new MutationObserver(()=>requestAnimationFrame(sync));['home','contine
 const art=new Image();art.onload=function(){document.getElementById('continentFlow').classList.add('continentArtReady')};art.src='assets/backgrounds/continent-select-no-number.png?asset=2a6d5747';
 document.querySelectorAll('[data-art-nav]').forEach(b=>b.addEventListener('click',()=>{const target=document.querySelector('#worldBottomNav [data-go="'+b.dataset.artNav+'"]');if(target)target.click()}));
 })();
-</script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-reference-03.webp';document.querySelectorAll('[data-topic-nav]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#worldBottomNav [data-go="'+b.dataset.topicNav+'"]')?.click()));})();</script><script id="corner-page-navigation">
+</script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-select-no-number-no-arrows.png?asset=a37d03d2';document.querySelectorAll('[data-topic-nav]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#worldBottomNav [data-go="'+b.dataset.topicNav+'"]')?.click()));})();</script><script id="corner-page-navigation">
 (function(){
 const ids=['home','continentFlow','topicFlow','countrySelectFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow'];
 const prev=document.createElement('button'),next=document.createElement('button');
