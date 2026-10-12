@@ -446,6 +446,30 @@ body:has(#continentFlow.continentArtReady[style*="display: flex"]) #worldBottomN
 #worldBottomNav{background:transparent!important;border:0!important;box-shadow:none!important;gap:clamp(13px,3vw,40px)!important;pointer-events:none!important}
 #worldBottomNav button{pointer-events:auto!important;flex:0 0 auto!important;box-shadow:inset 0 2px 3px #fff9,0 4px 0 #a64d10,0 6px 14px #3e241d40!important}
 @media(max-width:650px){#countrySelectFlow{padding:10px 8px 100px!important}#countrySelectFlow .countrySelectBox{border-width:4px!important;padding:0 9px 14px!important}#countrySelectFlow .countryFilter{min-height:43px!important;font-size:clamp(10px,2.8vw,14px)!important;padding:6px 2px!important}#countrySelectFlow .countryChoiceGrid{gap:7px!important}#countrySelectFlow .countryPick{min-height:112px!important}#countrySelectFlow .countrySelectStart{margin-bottom:20px!important}#worldBottomNav{gap:clamp(7px,2vw,14px)!important}}
+</style><style id="country-leaf-parchment-v11">
+/* Illustrated ornamentation based on the approved reference, preserving dynamic cards. */
+#countrySelectFlow{background:#49b7e7 url('assets/backgrounds/bg-country-select.png') center/cover no-repeat!important}
+#countrySelectFlow .countrySelectBox{isolation:isolate!important;overflow:visible!important;border:9px solid #c17d32!important;border-radius:35px 35px 26px 26px!important;background:radial-gradient(ellipse at 50% 28%,#fff9e8 0%,#fff1ce 66%,#f6d998 100%)!important;box-shadow:inset 0 0 0 4px #ffe4a1,0 8px 0 #86451b,0 18px 36px #35211055!important}
+#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{content:"🌿🌼🌿";position:absolute;z-index:2;pointer-events:none;font-size:clamp(30px,4.5vw,64px);letter-spacing:-.22em;filter:drop-shadow(1px 4px 2px #53330f44)}
+#countrySelectFlow .countrySelectBox:before{top:-31px;left:-30px;transform:rotate(-19deg)}
+#countrySelectFlow .countrySelectBox:after{top:-30px;right:8px;transform:rotate(17deg)}
+#countrySelectFlow .flowHead{position:relative!important;z-index:3!important}
+#countrySelectFlow .flowTitle{border:5px solid #d58a3a!important;border-radius:23px!important;background:linear-gradient(180deg,#b86c2d 0%,#844116 52%,#5d2c12 100%)!important;box-shadow:inset 0 3px 0 #efb36a,0 6px 0 #4f270d,0 10px 16px #3e1e1240!important}
+#countrySelectFlow .flowTitle:before,#countrySelectFlow .flowTitle:after{content:"🌿";font-size:clamp(23px,3vw,38px);position:absolute;top:-13px;filter:drop-shadow(0 2px 2px #4b341b66)}
+#countrySelectFlow .flowTitle:before{left:-17px;transform:rotate(-35deg)}
+#countrySelectFlow .flowTitle:after{right:-12px;transform:rotate(35deg)}
+#countrySelectFlow .countryFilter{border:3px solid #d5b38a!important;background:linear-gradient(#fff,#fff8ed)!important;border-radius:30px!important;box-shadow:inset 0 3px 0 #fff,0 4px 0 #b99a72!important}
+#countrySelectFlow .countryFilter.active{border-color:#116dd0!important;background:linear-gradient(#35ccff,#067be7 66%,#064fc0)!important;box-shadow:inset 0 3px #ffffff77,0 4px 0 #124b99!important}
+#countrySelectFlow .countryChoiceGrid{gap:clamp(12px,1.6vw,20px)!important}
+#countrySelectFlow .countryPickWrap{isolation:isolate!important}
+#countrySelectFlow .countryPick{border:3px solid #dfa344!important;border-radius:18px!important;background:linear-gradient(#fffef6,#fff4d7)!important;box-shadow:inset 0 0 0 2px #fff5d7,0 4px 0 #bd7c28,0 6px 12px #85502226!important}
+#countrySelectFlow .countryPick.selected{border-color:#e2a23d!important;background:linear-gradient(#fffef6,#ffedc3)!important;box-shadow:inset 0 0 0 2px #fff8df,0 4px 0 #b97929!important}
+#countrySelectFlow .countryPick:before{content:"🌿";position:absolute;left:8px;top:47%;font-size:clamp(17px,2.3vw,30px);pointer-events:none;filter:drop-shadow(0 2px 1px #405b2a33)}
+#countrySelectFlow .countryCheckbox{z-index:2!important}
+#countrySelectFlow .reviewStar{z-index:3!important}
+#countrySelectFlow .countrySelectTools button,#countrySelectFlow .countrySelectStart{box-shadow:inset 0 3px #ffffff88,0 5px 0 #19579b!important}
+#countrySelectFlow #countryNone{box-shadow:inset 0 3px #ffffff88,0 5px 0 #a12b53!important}
+@media(max-width:650px){#countrySelectFlow .countrySelectBox{border-width:5px!important;border-radius:21px!important}#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{font-size:25px;top:-12px}#countrySelectFlow .countryPick{border-width:2px!important}#countrySelectFlow .countryPick:before{left:2px;font-size:15px}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
