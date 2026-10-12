@@ -375,3 +375,25 @@
 #learning .learning-bottom-nav button span{display:none}
 #learning .learning-bottom-nav{padding:7px 10px}
 @media(orientation:portrait){#learning .learning-card{grid-template-columns:1fr!important;grid-template-rows:1fr 1fr}}
+
+
+/* Country selector: illustrated parchment scroll matching approved reference. */
+#countries .country-artboard{padding:clamp(12px,2vh,26px) clamp(18px,6vw,100px) clamp(10px,1.4vh,18px)!important;gap:0!important}
+#countries .country-wood-sign{z-index:4!important;width:min(52%,540px)!important;margin-bottom:-15px!important;padding:clamp(9px,1.3vh,17px)!important;border:5px solid #80400e!important;border-radius:20px 20px 24px 24px!important;background:repeating-linear-gradient(2deg,transparent 0 14px,rgba(85,42,8,.12) 15px 17px),linear-gradient(#d99540,#a95319 70%,#79380e)!important;color:#fff8e8!important;text-shadow:2px 3px 2px #3e1e0a!important;box-shadow:0 6px 0 #5b2f0e,0 10px 14px #53320a55!important}
+#countries .country-main-panel{position:relative!important;isolation:isolate;z-index:2!important;flex:1!important;min-height:0!important;margin:0!important;padding:clamp(28px,4vh,48px) clamp(17px,2.5vw,32px) clamp(10px,1.6vh,20px)!important;gap:clamp(5px,.7vh,9px)!important;border:4px solid #bc7d2e!important;border-radius:27px 27px 23px 23px!important;background:radial-gradient(ellipse at 50% 42%,#fffaf0 0%,#fff0c8 76%,#e9b86a 100%)!important;box-shadow:inset 0 0 24px #c78a3c55,0 5px 0 #895321!important}
+#countries .country-main-panel:before,#countries .country-main-panel:after{content:"";position:absolute;z-index:-1;pointer-events:none;width:clamp(25px,3.5vw,50px);height:clamp(50px,8vh,95px);background:linear-gradient(90deg,#d18b3d,#ffe6aa 32%,#fff0c5 72%,#c17a2e);border:3px solid #b7792c;box-shadow:0 3px 4px #8c571a44}
+#countries .country-main-panel:before{left:-16px;top:8px;border-radius:55% 18% 20% 55%;transform:rotate(-5deg)}
+#countries .country-main-panel:after{right:-16px;top:8px;border-radius:18% 55% 55% 20%;transform:rotate(5deg)}
+#countries .country-main-panel h2{font-size:clamp(21px,2.6vw,37px)!important;font-weight:950!important;color:#3c231a!important}
+#countries #countryMessage{font-size:clamp(16px,1.8vw,25px)!important;color:#3c241a!important}
+#countries .country-tools{gap:clamp(6px,1vw,15px)!important}
+#countries .country-tools button{font-size:clamp(15px,1.7vw,24px)!important;min-height:clamp(42px,5.8vh,60px)!important;padding:5px clamp(10px,1.6vw,22px)!important}
+#countries .country-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:clamp(6px,.8vw,12px)!important;background:transparent!important;overflow-y:auto!important}
+#countries .country-card{border:2px solid #e5b774!important;background:rgba(255,255,251,.82)!important;box-shadow:none!important;border-radius:13px!important;min-height:clamp(88px,11.2vh,126px)!important}
+#countries .country-card img{width:clamp(64px,7.7vw,118px)!important;height:clamp(39px,5.5vh,66px)!important;object-fit:contain!important}
+#countries .country-card .country-check{left:8px!important;top:8px!important}
+#countries .country-card[aria-pressed="true"]{background:#e6f3ff!important;border-color:#187cce!important}
+#countries #countryNext{font-size:clamp(19px,2.3vw,31px)!important;min-height:clamp(45px,6vh,65px)!important;border-radius:17px!important;background:linear-gradient(#fff9dd,#ffd58e)!important}
+#countries .country-bottom-nav{z-index:3!important;flex:none!important;margin-top:clamp(8px,1.5vh,18px)!important;border-radius:24px!important}
+#countries .country-bottom-nav button{font-size:clamp(32px,4vw,56px)!important}
+@media(orientation:landscape) and (max-height:820px){#countries .country-artboard{padding-top:9px!important;padding-bottom:6px!important}#countries .country-main-panel{padding-top:26px!important;padding-bottom:7px!important;gap:3px!important}#countries .country-card{min-height:76px!important}#countries .country-card img{height:36px!important}#countries .country-bottom-nav button{min-height:46px!important}#countries .country-wood-sign{padding:5px!important}}
