@@ -1,2 +1,34 @@
-/* V2 기본 앱: 6단계는 구조 분리, 7단계는 전환 엔진 안정화 */
-(()=>{'use strict';const pages=new Set([...document.querySelectorAll('.screen')].map(e=>e.id));const history=[];let current='home';const continents=['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아','전체'];const box=document.getElementById('continentChoices');for(const name of continents){const button=document.createElement('button');button.type='button';button.textContent=name;button.dataset.continent=name;box.appendChild(button)}function go(id,remember=true){if(!pages.has(id))return false;const old=document.getElementById(current),next=document.getElementById(id);if(remember&&current!==id)history.push(current);old.classList.remove('active');old.hidden=true;next.hidden=false;next.classList.add('active');current=id;return true}for(const el of document.querySelectorAll('.screen'))el.hidden=el.id!=='home';document.addEventListener('click',event=>{const b=event.target.closest('button');if(!b)return;if(b.hasAttribute('data-back')){go(history.pop()||'home',false);return}if(b.dataset.go){go(b.dataset.go);return}if(b.dataset.continent){document.getElementById('countryMessage').textContent=b.dataset.continent+' 선택됨 · 국가 데이터 연결 예정';go('topics');return}if(b.dataset.topic){go('countries')}});window.addEventListener('error',e=>console.error('[country-v2]',e.message));})();
+/* 세계 짝꿍 찾기 V2: 단일 화면 전환 엔진 (7단계) */
+(()=>{'use strict';
+ const screens=new Map([...document.querySelectorAll('main#app > section.screen')].map(el=>[el.id,el]));
+ const state={current:'home',history:[],continent:null,topic:null};
+ const continents=['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아','전체'];
+ const choices=document.getElementById('continentChoices');
+ for(const name of continents){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.continent=name;choices.appendChild(b)}
+ function show(id,{remember=true}={}){
+  if(!screens.has(id)) {console.warn('[V2] Unknown screen:',id);return false}
+  if(id===state.current)return true;
+  const from=state.current;
+  if(remember)state.history.push(from);
+  for(const [key,el] of screens){const active=key===id;el.classList.toggle('active',active);el.hidden=!active;el.setAttribute('aria-hidden',String(!active))}
+  state.current=id;
+  window.scrollTo?.(0,0);
+  document.dispatchEvent(new CustomEvent('country-v2:navigate',{detail:{from,to:id}}));
+  return true;
+ }
+ function back(){const previous=state.history.pop();return show(previous&&screens.has(previous)?previous:'home',{remember:false})}
+ function home(){state.history.length=0;return show('home',{remember:false})}
+ function handleClick(event){
+  const button=event.target.closest('button');
+  if(!button||!document.getElementById('app').contains(button)||button.disabled)return;
+  if(button.hasAttribute('data-back')){back();return}
+  const destination=button.dataset.go;
+  if(destination){destination==='home'?home():show(destination);return}
+  if(button.dataset.continent){state.continent=button.dataset.continent;show('topics');return}
+  if(button.dataset.topic){state.topic=button.dataset.topic;document.getElementById('countryMessage').textContent='선택: '+state.continent+' · '+(state.topic==='flag-country'?'나라와 국기':'나라와 수도')+' / 국가 데이터 연결 예정';show('countries')}
+ }
+ document.getElementById('app').addEventListener('click',handleClick);
+ for(const [id,el] of screens){const active=id==='home';el.classList.toggle('active',active);el.hidden=!active;el.setAttribute('aria-hidden',String(!active))}
+ window.addEventListener('error',e=>console.error('[country-v2]',e.message));
+ window.CountryV2=Object.freeze({get screen(){return state.current},get selection(){return {continent:state.continent,topic:state.topic}},go:show,back,home});
+})();
