@@ -4,7 +4,7 @@
  const state={current:'home',history:[],continent:null,topic:null};
  const continents=['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아','전체'];
  const choices=document.getElementById('continentChoices');
- for(const name of continents){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.continent=name;choices.appendChild(b)}
+ for(const name of continents){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.continent=name;b.className='continent-choice continent-'+(['asia','europe','africa','north','south','oceania','all'][continents.indexOf(name)]);choices.appendChild(b)}
  function show(id,{remember=true}={}){
   if(!screens.has(id)) {console.warn('[V2] Unknown screen:',id);return false}
   if(id===state.current)return true;
