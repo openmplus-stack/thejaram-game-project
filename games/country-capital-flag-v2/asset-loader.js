@@ -4,7 +4,7 @@
  const registry=Object.freeze({
   home:original+'backgrounds/home-reference-01.webp',
   logo:original+'backgrounds/logo-world-buddy.png',
-  continent:original+'backgrounds/bg-continent-select.png',
+  continent:original+'backgrounds/continent-select-no-number.png',
   topic:original+'backgrounds/bg-mode-select.png',
   countries:original+'backgrounds/bg-country-select.png',
   learning:original+'backgrounds/bg-learning.png',
@@ -46,8 +46,8 @@
   img.insertAdjacentElement('afterend',fallback);
  },true);
  document.addEventListener('country-v2:navigate',event=>{
-  const key=event.detail.to;
-  if(Object.hasOwn(registry,key))background(key,document.getElementById(key));
+  const key=event.detail.to==='continents'?'continent':event.detail.to;
+  if(Object.hasOwn(registry,key))background(key,key==='continent'?document.getElementById('continentArtboard'):document.getElementById(key));
  });
  background('home',document.getElementById('homeArtboard'));
  window.CountryV2Assets=Object.freeze({registry,load,background});
