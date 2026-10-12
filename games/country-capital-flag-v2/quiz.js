@@ -4,11 +4,12 @@
  const COUNT=20;
  let questions=[],index=0,correct=0,answered=false,results=[],active=false;
  let audioContext=null,metroTimer=null,beat=0,metroRunning=false;
- function stopMetro(){if(metroTimer!==null)clearInterval(metroTimer);metroTimer=null;metroRunning=false;$('quizMetroToggle').textContent='▶ 박자 시작';$('quizMetroToggle').setAttribute('aria-pressed','false');document.querySelectorAll('.quiz-beats span').forEach(x=>x.classList.remove('on'))}
+ function stopMetro(){if(metroTimer!==null)clearInterval(metroTimer);metroTimer=null;metroRunning=false;$('quizMetroToggle').textContent='▶';$('quizMetroToggle').setAttribute('aria-pressed','false');document.querySelectorAll('.quiz-beats span').forEach(x=>x.classList.remove('on'))}
  function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===beat-1));toneBeat(beat===1);if(answered)advance()}
  function toneBeat(accent){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||=new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=accent?880:620;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.075);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.08)}catch{}}
- function startMetro(){stopMetro();if(!active)return;metroRunning=true;beat=0;$('quizMetroToggle').textContent='⏸ 박자 멈춤';$('quizMetroToggle').setAttribute('aria-pressed','true');tick();metroTimer=setInterval(tick,60000/Number($('quizBpm').value||60))}
+ function startMetro(){stopMetro();if(!active)return;metroRunning=true;beat=0;$('quizMetroToggle').textContent='Ⅱ';$('quizMetroToggle').setAttribute('aria-pressed','true');tick();metroTimer=setInterval(tick,60000/Number($('quizBpm').value||60))}
 
+ function speak(){if(!('speechSynthesis' in window)||!questions[index])return;window.speechSynthesis.cancel();const q=questions[index],part=q.topic==='flag-country'?q.partner.country+' 국기':q.partner.capital;const u=new SpeechSynthesisUtterance(q.source.country+'와 '+part+'는 서로 맞는 짝일까요?');u.lang='ko-KR';u.rate=.88;window.speechSynthesis.speak(u)}
  function tone(ok){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||= new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const now=audioContext.currentTime;const notes=ok?[660,880]:[330,220];notes.forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+i*.12;osc.type=ok?'sine':'triangle';osc.frequency.setValueAtTime(hz,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(start);osc.stop(start+.19)})}catch(e){console.warn('[V2] Sound unavailable',e)}}
  function clearFeedback(){const board=document.querySelector('#quiz .quiz-board');board.classList.remove('answer-correct','answer-wrong');$('quizYes').classList.remove('answer-picked');$('quizNo').classList.remove('answer-picked')}
 
@@ -72,6 +73,10 @@
  $('quizYes').addEventListener('click',()=>answer(true));
  $('quizNo').addEventListener('click',()=>answer(false));
  $('quizAdvance').addEventListener('click',advance);
+ $('quizBpmMinus').addEventListener('click',()=>changeBpm(-1));
+ $('quizBpmPlus').addEventListener('click',()=>changeBpm(1));
+ $('quizSpeak').addEventListener('click',speak);
+ function changeBpm(step){const sel=$('quizBpm');sel.selectedIndex=Math.max(0,Math.min(sel.options.length-1,sel.selectedIndex+step));sel.dispatchEvent(new Event('change'))}
  $('quizMetroToggle').addEventListener('click',()=>metroRunning?stopMetro():startMetro());
  $('quizBpm').addEventListener('change',()=>{if(metroRunning)startMetro()});
  document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='quiz')begin();else if(e.detail.from==='quiz'){active=false;stopMetro()}});
