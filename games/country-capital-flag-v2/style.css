@@ -152,3 +152,19 @@
 #quiz .quiz-board.answer-correct #quizFeedback{color:#157943}
 #quiz .quiz-board.answer-wrong #quizFeedback{color:#b03730}
 @media(prefers-reduced-motion:no-preference){#quiz .quiz-board.answer-correct .quiz-tile,#quiz .quiz-board.answer-wrong .quiz-tile{animation:quizFeedbackPulse .28s ease-out}@keyframes quizFeedbackPulse{0%{transform:scale(.98)}100%{transform:scale(1)}}}
+
+
+/* Stage 19: results and answer review. */
+#result.screen.active{align-items:center;justify-content:center;background:#c1e8f5;padding:clamp(12px,2vw,30px)}
+.result-board{width:min(100%,1100px);padding:clamp(18px,3vw,35px);background:#fff9e9;border:7px solid #bd8748;border-radius:30px;box-shadow:0 10px 0 #8d6131;display:flex;flex-direction:column;gap:18px}
+.result-score{display:flex;flex-direction:column;align-items:center;gap:8px;background:#eefbf4;border:4px solid #6ec39b;border-radius:25px;padding:22px;text-align:center}
+#resultPercentage{font-size:clamp(58px,9vw,112px);color:#147c53;line-height:1.1}
+#resultCount{font-size:clamp(23px,3vw,39px);font-weight:950}
+#resultMessage{font-size:clamp(17px,2vw,26px);margin:0}
+.result-details{max-height:38dvh;overflow:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
+.result-details li{padding:12px 15px;border:2px solid;border-radius:13px;font-weight:750}
+.result-right{background:#e8faed;border-color:#58b87a!important;color:#175e39}
+.result-incorrect{background:#fff0ec;border-color:#d8867b!important;color:#8c3b32}
+.result-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+.result-actions button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:680px){.result-details{grid-template-columns:1fr}}
