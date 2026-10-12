@@ -474,6 +474,18 @@ body.world-nav-visible #home{overflow-y:auto!important}
 #countrySelectFlow .countrySelectBox{padding-top:32px!important}
 #countrySelectFlow .countryChoiceGrid{padding-bottom:36px!important}
 @media(max-width:650px){#countrySelectFlow .countrySelectTools{gap:8px!important}#countrySelectFlow .countrySelectTools #countryAll,#countrySelectFlow .countrySelectTools #countryNone{flex:1 1 110px!important;min-height:49px!important;font-size:14px!important}#countrySelectFlow .countrySelectBox{padding-top:25px!important}}
+</style><style id="country-reference-image-v16">
+/* The uploaded artwork is the visual master. Render its decorative scene
+   behind live HTML controls, never as a click-blocking overlay. */
+#countrySelectFlow{background-image:url("assets/backgrounds/country-select-reference-04.png")!important;background-size:cover!important;background-position:center top!important;background-attachment:local!important}
+#countrySelectFlow .countrySelectBox{background:linear-gradient(120deg,#fff3d9ee,#ffebcbee)!important;border:7px solid #c28a46!important;box-shadow:inset 0 0 0 3px #ffe3ac,0 7px 0 #81431b,0 16px 24px #3e210e4a!important}
+#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{background-size:contain!important}
+#countrySelectFlow .countryPick{background:linear-gradient(180deg,#4dc7fc 0%,#b4eaff 54%,#8cce7a 70%,#fef0d0 71%)!important;border-color:#d88c2a!important}
+#countrySelectFlow .countryPick .countryLabel{border-top:3px solid #ffd18c!important}
+#countrySelectFlow .countryFilterTools,#countrySelectFlow .countryActivitySwitch{display:none!important}
+#countrySelectFlow .countrySelectTools{justify-content:center!important}
+#countrySelectFlow .countrySelectStart{margin-bottom:42px!important}
+@media(max-width:700px){#countrySelectFlow{background-size:auto 100%!important;background-position:center top!important}#countrySelectFlow .countrySelectBox{background:#fff1dbeF!important}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
