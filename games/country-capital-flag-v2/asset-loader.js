@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const original='../country-capital-flag/assets/';
  const registry=Object.freeze({
-  home:original+'backgrounds/home-reference-01.webp',
+  home:'./assets/bg-world-clean.png',
   logo:original+'backgrounds/logo-world-buddy.png',
   continent:original+'backgrounds/continent-select-no-number.png',
   topic:original+'backgrounds/topic-select-no-number-no-arrows.png',
