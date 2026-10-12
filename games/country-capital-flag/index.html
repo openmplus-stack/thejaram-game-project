@@ -474,18 +474,17 @@ body.world-nav-visible #home{overflow-y:auto!important}
 #countrySelectFlow .countrySelectBox{padding-top:32px!important}
 #countrySelectFlow .countryChoiceGrid{padding-bottom:36px!important}
 @media(max-width:650px){#countrySelectFlow .countrySelectTools{gap:8px!important}#countrySelectFlow .countrySelectTools #countryAll,#countrySelectFlow .countrySelectTools #countryNone{flex:1 1 110px!important;min-height:49px!important;font-size:14px!important}#countrySelectFlow .countrySelectBox{padding-top:25px!important}}
-</style><style id="country-reference-image-v16">
-/* The uploaded artwork is the visual master. Render its decorative scene
-   behind live HTML controls, never as a click-blocking overlay. */
-#countrySelectFlow{background-image:url("assets/backgrounds/country-select-reference-04.png")!important;background-size:cover!important;background-position:center top!important;background-attachment:local!important}
-#countrySelectFlow .countrySelectBox{background:linear-gradient(120deg,#fff3d9ee,#ffebcbee)!important;border:7px solid #c28a46!important;box-shadow:inset 0 0 0 3px #ffe3ac,0 7px 0 #81431b,0 16px 24px #3e210e4a!important}
-#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{background-size:contain!important}
-#countrySelectFlow .countryPick{background:linear-gradient(180deg,#4dc7fc 0%,#b4eaff 54%,#8cce7a 70%,#fef0d0 71%)!important;border-color:#d88c2a!important}
-#countrySelectFlow .countryPick .countryLabel{border-top:3px solid #ffd18c!important}
+</style><style id="clean-country-and-corner-navigation">
+/* Remove the screenshot reference from behind live interactive content. */
+#countrySelectFlow{background-image:url("assets/backgrounds/bg-country-select.png")!important;background-size:cover!important;background-position:center!important}
+#countrySelectFlow .countrySelectBox{background:linear-gradient(130deg,#fff5df,#ffe9bf)!important;opacity:1!important}
 #countrySelectFlow .countryFilterTools,#countrySelectFlow .countryActivitySwitch{display:none!important}
 #countrySelectFlow .countrySelectTools{justify-content:center!important}
-#countrySelectFlow .countrySelectStart{margin-bottom:42px!important}
-@media(max-width:700px){#countrySelectFlow{background-size:auto 100%!important;background-position:center top!important}#countrySelectFlow .countrySelectBox{background:#fff1dbeF!important}}
+#countrySelectFlow .countryPick{background:linear-gradient(#b8edff,#e9f9ff 69%,#ffe5aa 70%)!important;border:3px solid #e0a34b!important}
+#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{background-image:none!important}
+.cornerPageArrow{position:fixed!important;top:50%!important;transform:translateY(-50%);z-index:100005!important;width:52px;height:64px;border:3px solid #a56a29;border-radius:22px;background:linear-gradient(#fff9d7,#ffc35e);color:#633510;font-size:35px;font-weight:900;box-shadow:0 5px 0 #885222;cursor:pointer;display:none;align-items:center;justify-content:center}
+#cornerPrev{left:max(8px,env(safe-area-inset-left))}#cornerNext{right:max(8px,env(safe-area-inset-right))}
+@media(max-width:650px){.cornerPageArrow{width:39px;height:51px;font-size:26px;opacity:.95}#cornerPrev{left:2px}#cornerNext{right:2px}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
@@ -674,4 +673,25 @@ const obs=new MutationObserver(()=>requestAnimationFrame(sync));['home','contine
 const art=new Image();art.onload=function(){document.getElementById('continentFlow').classList.add('continentArtReady')};art.src='assets/backgrounds/continent-reference-02.webp';
 document.querySelectorAll('[data-art-nav]').forEach(b=>b.addEventListener('click',()=>{const target=document.querySelector('#worldBottomNav [data-go="'+b.dataset.artNav+'"]');if(target)target.click()}));
 })();
-</script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-reference-03.webp';document.querySelectorAll('[data-topic-nav]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#worldBottomNav [data-go="'+b.dataset.topicNav+'"]')?.click()));})();</script></body></html>
+</script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-reference-03.webp';document.querySelectorAll('[data-topic-nav]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#worldBottomNav [data-go="'+b.dataset.topicNav+'"]')?.click()));})();</script><script id="corner-page-navigation">
+(function(){
+const ids=['home','continentFlow','topicFlow','countrySelectFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow'];
+const prev=document.createElement('button'),next=document.createElement('button');
+prev.id='cornerPrev';next.id='cornerNext';prev.className=next.className='cornerPageArrow';prev.textContent='‹';next.textContent='›';prev.setAttribute('aria-label','이전 페이지');next.setAttribute('aria-label','다음 페이지');document.body.append(prev,next);
+function current(){return ids.findIndex(id=>{const el=document.getElementById(id);return el&&getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().width>0})}
+function update(){const i=current();prev.style.display=i>0?'flex':'none';next.style.display=i>=0&&i<ids.length-1?'flex':'none'}
+function go(delta){let i=current(),target=ids[i+delta];if(!target)return;
+const nav=document.querySelector('#worldBottomNav [data-go]');
+if(target==='home')document.querySelector('#worldBottomNav [data-go="home"]')?.click();
+else if(target==='continentFlow')document.querySelector('#worldBottomNav [data-go="continent"]')?.click();
+else if(target==='topicFlow'){if(typeof showFlow==='function')showFlow('#topicFlow')}
+else if(target==='countrySelectFlow'){if(typeof openCountrySelector==='function')openCountrySelector('learn')}
+else if(target==='flagCollectionFlow')document.querySelector('#worldBottomNav [data-go="flag"]')?.click();
+else if(target==='treasureCollectionFlow')document.querySelector('#worldBottomNav [data-go="treasure"]')?.click();
+else if(target==='progressFlow')document.querySelector('#worldBottomNav [data-go="progress"]')?.click();
+else if(typeof showFlow==='function')showFlow('#'+target);
+update()}
+prev.onclick=()=>go(-1);next.onclick=()=>go(1);
+const obs=new MutationObserver(update);ids.forEach(id=>{let el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['style','class']})});update();
+})();
+</script></body></html>
