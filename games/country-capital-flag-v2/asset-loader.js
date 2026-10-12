@@ -47,7 +47,7 @@
  },true);
  document.addEventListener('country-v2:navigate',event=>{
   const key=event.detail.to==='continents'?'continent':event.detail.to==='topics'?'topic':event.detail.to;
-  if(Object.hasOwn(registry,key))background(key,key==='continent'?document.getElementById('continentArtboard'):key==='topic'?document.getElementById('topicArtboard'):document.getElementById(key));
+  if(Object.hasOwn(registry,key))background(key,key==='continent'?document.getElementById('continentArtboard'):key==='topic'?document.getElementById('topicArtboard'):key==='countries'?document.getElementById('countryArtboard'):document.getElementById(key));
  });
  background('home',document.getElementById('homeArtboard'));
  window.CountryV2Assets=Object.freeze({registry,load,background});
