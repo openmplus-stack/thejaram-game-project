@@ -1,11 +1,11 @@
 /* Stage 12: independent country selector; original data and storage keys. */
 (()=>{'use strict';
  const $=id=>document.getElementById(id);
- const all=Array.isArray(window.COUNTRY_V2_DATA)?window.COUNTRY_V2_DATA:[];
+ const data=window.CountryV2Data;
  const state=window.CountryV2.state;
  function savedArray(key){try{const v=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(v)?v:[]}catch{return []}}
  function learned(){try{const v=JSON.parse(localStorage.getItem('countryStudyStats')||'{}');return new Set(Array.isArray(v.learned)?v.learned:[])}catch{return new Set()}}
- function pool(){return state.continent==='전체'?all:all.filter(x=>x.continent===state.continent)}
+ function pool(){return data.byContinent(state.continent)}
  function visible(){const base=pool(),done=learned(),review=new Set(savedArray('countryReviewList'));if(state.filter==='new')return base.filter(x=>!done.has(x.flag));if(state.filter==='learned')return base.filter(x=>done.has(x.flag));if(state.filter==='review')return base.filter(x=>review.has(x.flag));return base}
  function render(){
   const grid=$('countryChoices');grid.replaceChildren();
