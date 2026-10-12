@@ -87,3 +87,20 @@
 #countryNext{display:block;margin:16px auto 0;background:#ffe38a}
 #countryNext:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:680px){#countries .country-artboard{max-height:none}.country-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:50dvh}}
+
+
+/* Stage 13: original warm wood-framed activity selection design. */
+#activities.screen.active{display:flex;justify-content:center;align-items:center;padding:clamp(12px,2vw,26px);background:#7bcdec}
+#activities .activity-artboard{width:min(100%,1200px);min-height:min(80dvh,750px);display:flex;flex-direction:column;justify-content:center;gap:20px;padding:clamp(18px,3vw,44px);background:linear-gradient(#b4e9fb,#c8f3df);background-position:center;background-size:cover;border-radius:24px}
+#activities .activity-header{align-items:center}
+#activities .activity-panel{width:min(100%,930px);margin:0 auto;padding:clamp(22px,4vw,50px);border:8px solid #bc823d;border-radius:34px;background:linear-gradient(130deg,#ffebbbef,#fff9e5f5 45%,#ffebc4ef);box-shadow:inset 0 0 0 4px #ffdc9b,0 15px 26px #54320a55;text-align:center}
+#activities .activity-panel h3{margin:0 auto 15px;padding:13px 20px;max-width:600px;border:6px solid #ac652d;border-radius:22px;background:linear-gradient(#b96b30,#78360f 70%,#9c511c);color:white;text-shadow:0 3px #54250e;font-size:clamp(24px,3.6vw,42px)}
+#activitySummary{font-size:clamp(16px,2vw,24px);font-weight:800;color:#57371c}
+.activity-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,3vw,30px);margin:20px auto}
+#activities .activity-card{min-height:clamp(190px,26vw,310px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;border:5px solid #b98642;border-radius:25px;background:linear-gradient(#f4fbff,#dff4ff);box-shadow:0 7px 0 #9a632c;color:#164879}
+#activities .activity-card+button{background:linear-gradient(#fffef4,#e8f8e8);color:#256144}
+#activities .activity-icon{font-size:clamp(44px,6vw,82px)}
+#activities .activity-card strong{font-size:clamp(24px,3vw,37px)}
+#activities .activity-card small{font-size:clamp(14px,1.6vw,21px)}
+#activities .activity-note{font-weight:700;color:#68492a}
+@media(max-width:680px){#activities .activity-header{flex-wrap:wrap}#activities .activity-panel{padding:16px}.activity-cards{grid-template-columns:1fr}#activities .activity-card{min-height:140px}#activities .activity-artboard{min-height:100dvh}}
