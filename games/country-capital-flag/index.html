@@ -821,4 +821,12 @@ apply();
 const obs=new MutationObserver(apply);
 ['continentFlow','topicFlow'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['class']})});
 })();
+</script><style id="home-click-rescue-20261012">
+/* Make the real controls visible and tappable even if the artwork layout is not aligned. */
+#home.referenceArtReady .homeControls{pointer-events:none!important}
+#home.referenceArtReady .homeStart{position:absolute!important;left:54%!important;top:34%!important;width:39%!important;height:12%!important;opacity:1!important;z-index:900!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;touch-action:manipulation!important;background:linear-gradient(#ffdb68,#ffad25,#ec7d08)!important;color:#fff!important;font-size:clamp(17px,2.4vw,30px)!important;font-weight:950!important;border:3px solid #fff2c8!important;box-shadow:0 6px 0 #8a4a13!important}
+#home.referenceArtReady .homeMenu button{z-index:899!important}
+#home{isolation:isolate!important}
+</style><script id="home-click-rescue-handler-20261012">
+(function(){const btn=document.getElementById('homeStart');if(!btn)return;function start(e){e.preventDefault();e.stopImmediatePropagation();if(typeof showFlow==='function'){showFlow('#continentFlow')}else{document.getElementById('home').style.display='none';document.getElementById('continentFlow').style.display='flex'}}btn.addEventListener('click',start,true);})();
 </script></body></html>
