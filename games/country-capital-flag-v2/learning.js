@@ -8,6 +8,5 @@
  function complete(){if(finished)return;finished=true;window.speechSynthesis?.cancel();$('learningNotice').textContent='학습을 완료했습니다! '+session.length+'개 나라를 살펴보았습니다.';$('learningNext').disabled=true;document.dispatchEvent(new CustomEvent('country-v2:learning-complete',{detail:{countries:session.map(x=>x.flag),topic:window.CountryV2.selection.topic}}))}
  $('learningPrev').addEventListener('click',()=>{if(position>0){position--;render();speak()}});
  $('learningNext').addEventListener('click',()=>{if(finished)return;if(position<session.length-1){position++;render();speak()}else complete()});
- $('learningSpeak').addEventListener('click',speak);
  document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='learning')begin();else if(e.detail.from==='learning')window.speechSynthesis?.cancel()});
 })();
