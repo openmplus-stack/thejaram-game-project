@@ -3,6 +3,10 @@
  const $=id=>document.getElementById(id);
  const COUNT=20;
  let questions=[],index=0,correct=0,answered=false,results=[],active=false;
+ let audioContext=null;
+ function tone(ok){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||= new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const now=audioContext.currentTime;const notes=ok?[660,880]:[330,220];notes.forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+i*.12;osc.type=ok?'sine':'triangle';osc.frequency.setValueAtTime(hz,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(start);osc.stop(start+.19)})}catch(e){console.warn('[V2] Sound unavailable',e)}}
+ function clearFeedback(){const board=document.querySelector('#quiz .quiz-board');board.classList.remove('answer-correct','answer-wrong');$('quizYes').classList.remove('answer-picked');$('quizNo').classList.remove('answer-picked')}
+
  const shuffle=arr=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
  function build(){
   const selection=window.CountryV2.selection;
@@ -35,7 +39,7 @@
    $('quizRightFlag').hidden=true;
    $('quizRightText').textContent=q.partner.capital;
   }
-  answered=false;$('quizFeedback').textContent='';$('quizFeedback').className='';
+  answered=false;clearFeedback();$('quizFeedback').textContent='';$('quizFeedback').className='';
   $('quizYes').disabled=false;$('quizNo').disabled=false;$('quizAdvance').hidden=true;
  }
  function begin(){questions=build();index=0;correct=0;results=[];answered=false;active=questions.length>0;if(active)display();else $('quizFeedback').textContent='먼저 국가를 선택하세요.'}
@@ -43,6 +47,7 @@
   if(!active||answered)return;
   const q=questions[index],ok=value===q.matching;
   answered=true;if(ok)correct++;
+  clearFeedback();document.querySelector('#quiz .quiz-board').classList.add(ok?'answer-correct':'answer-wrong');(value?$('quizYes'):$('quizNo')).classList.add('answer-picked');tone(ok);
   results.push({question:index+1,source:q.source.flag,partner:q.partner.flag,expected:q.matching,answer:value,correct:ok});
   $('quizScore').textContent='정답 '+correct+'개';
   $('quizFeedback').textContent=ok?'정답이에요!':'다시 확인해 보세요. '+(q.matching?'맞는 짝입니다.':'서로 다른 짝입니다.');
