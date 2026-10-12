@@ -119,3 +119,24 @@
 #learningNotice{margin:0;text-align:center;font-weight:850;font-size:clamp(17px,2vw,25px)}
 #learning button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:680px){#learning .learning-board{min-height:95dvh}.learning-actions button{min-width:0;flex:1}}
+
+
+/* Stage 17: large touch-friendly O/X quiz layout. */
+#quiz.screen.active{align-items:center;justify-content:center;padding:clamp(10px,2vw,28px);background:#a7def0}
+#quiz .quiz-board{width:min(100%,1150px);min-height:min(85dvh,800px);padding:clamp(18px,3vw,35px);display:flex;flex-direction:column;gap:18px;border:7px solid #bb8846;border-radius:28px;background:#fff9e8ed;box-shadow:0 12px 0 #80562c}
+.quiz-stats{display:flex;justify-content:space-between;font-size:clamp(20px,2.5vw,30px);font-weight:900}
+.quiz-pair{display:grid;grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr);gap:12px;align-items:center;flex:1}
+.quiz-tile{display:flex;align-items:center;justify-content:center;min-height:clamp(180px,32dvh,350px);padding:15px;border:5px solid #84b2c3;border-radius:26px;background:white;text-align:center;font-size:clamp(26px,4vw,55px);font-weight:900;overflow-wrap:anywhere}
+.quiz-tile img{max-width:100%;max-height:210px;object-fit:contain}
+.quiz-link{text-align:center;font-size:clamp(32px,4vw,60px);font-weight:900;color:#56789a}
+.quiz-prompt{text-align:center;font-size:clamp(20px,2.5vw,31px);font-weight:850;margin:0}
+.quiz-answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+#quizYes,#quizNo{min-height:clamp(75px,11dvh,120px);font-size:clamp(30px,4vw,54px);font-weight:950}
+#quizYes{background:#d9f6e4;color:#16653c;border-color:#3eaa73}
+#quizNo{background:#ffe3dc;color:#963d31;border-color:#d67a6a}
+#quizFeedback{min-height:1.5em;margin:0;text-align:center;font-size:clamp(19px,2.3vw,28px);font-weight:900}
+#quizFeedback.quiz-correct{color:#178344}
+#quizFeedback.quiz-wrong{color:#b13b35}
+#quizAdvance{align-self:center;min-width:200px}
+#quiz button:disabled{opacity:.5}
+@media(max-width:680px){.quiz-pair{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:5px}.quiz-tile{min-height:150px;font-size:clamp(18px,4vw,30px)}.quiz-answers{gap:8px}}
