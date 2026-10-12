@@ -267,3 +267,19 @@
   #learning header h2,#quiz header h2,#result header h2,#learnReward header h2,#quizReward header h2,#flags header h2,#treasures header h2,#progress header h2{font-size:clamp(20px,3vh,30px)}
 }
 @media (pointer:coarse){button,.flag-reward-option,.treasure-reward-option{touch-action:manipulation}button:focus-visible{outline-offset:2px}}
+
+
+/* Restore rhythmic quiz mode and enlarge paired country/flag cards. */
+#quiz .quiz-metronome{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;font-size:clamp(16px,1.7vw,22px);font-weight:800}
+#quiz .quiz-metronome select{font:inherit;padding:7px 10px;border:2px solid #8c9fa2;border-radius:12px;background:#fff}
+#quiz #quizMetroToggle{min-height:46px;padding:7px 14px;font-size:clamp(15px,1.6vw,21px)}
+#quiz .quiz-beats{display:flex;gap:5px}
+#quiz .quiz-beats span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:2px solid #8caba5;background:#edf3e9;color:#56726c;font-size:15px}
+#quiz .quiz-beats span.on{background:#ffb647;border-color:#b46c1b;color:#432b0a;transform:scale(1.12)}
+#quiz #quizMetroHint{font-size:clamp(13px,1.25vw,16px);color:#526d71}
+#quiz .quiz-pair{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:clamp(8px,1.5vw,22px)}
+#quiz .quiz-tile{width:100%;min-width:0;min-height:clamp(190px,29dvh,310px);padding:clamp(12px,2vw,25px);display:flex;align-items:center;justify-content:center}
+#quiz .quiz-tile span{font-size:clamp(30px,4.2vw,62px);line-height:1.25;overflow-wrap:anywhere;word-break:keep-all;text-align:center}
+#quiz .quiz-tile img{width:min(100%,360px);max-height:26dvh;object-fit:contain}
+#quiz .quiz-link{font-size:clamp(27px,3.5vw,48px)}
+@media(orientation:landscape) and (max-height:750px){#quiz .quiz-tile{min-height:22dvh}#quiz .quiz-metronome{gap:7px}#quiz #quizMetroHint{display:none}}
