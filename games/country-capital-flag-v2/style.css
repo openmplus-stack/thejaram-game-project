@@ -337,3 +337,25 @@
 #countries .country-bottom-nav button{min-height:clamp(50px,7vh,78px);padding:4px;border:3px solid #a35d15;border-radius:25px;background:linear-gradient(#ffeb8d,#ffae2d 70%,#e47815);box-shadow:inset 0 3px 3px #fff5be,0 3px 0 #8b4d1a;font-size:clamp(26px,3vw,44px)}
 @media(orientation:landscape) and (max-height:850px){#countries .country-artboard{padding-top:12px;padding-bottom:8px}#countries .country-wood-sign{padding:5px}#countries .country-main-panel{gap:4px;padding:9px 16px}#countries .country-card{min-height:83px}#countries .country-card img{height:38px}#countries .country-bottom-nav button{min-height:48px}}
 @media(max-width:700px){#countries .country-artboard{aspect-ratio:auto;min-height:100dvh;max-height:none;padding:14px 3%}#countries .country-main-panel{flex:1}#countries .country-grid{grid-template-columns:repeat(3,minmax(0,1fr))}#countries .country-wood-sign{width:75%}}
+
+
+/* Approved illustrated learning screen: two balanced panels, large flag, wood sign, no download icon. */
+#learning.screen.active{padding:0;align-items:center;justify-content:center;background:#6bbfe8}
+#learning .learning-board{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:clamp(6px,1vh,14px);width:min(100vw,calc(100dvh * 4 / 3));height:min(100dvh,calc(100vw * 3 / 4));max-height:100dvh;padding:clamp(18px,2.4vh,30px) clamp(24px,3vw,42px) clamp(10px,1.5vh,18px);border:0;border-radius:0;background-size:cover;background-position:center;box-shadow:none}
+#learning .learning-sign{z-index:2;align-self:center;flex:none;width:min(58%,580px);text-align:center;padding:clamp(8px,1.5vh,18px);border:4px solid #92501d;border-radius:16px;background:linear-gradient(155deg,#ffda91,#d78832 65%,#b36522);box-shadow:0 5px 0 #7b4419;color:#452610;font-size:clamp(26px,3.3vw,48px);font-weight:950;text-shadow:1px 2px #ffe9bb}
+#learning .learning-top{flex:none;display:flex;justify-content:space-between;align-items:center;margin:0;padding:0 clamp(12px,1.5vw,22px);font-size:clamp(19px,2.2vw,30px);font-weight:900;color:#3b2417}
+#learning .learning-card{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:0;border:2px solid #d9b983;border-radius:26px;background:#f8f2df;box-shadow:none;overflow:hidden}
+#learning .learning-flag-panel,#learning .learning-name-panel{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:clamp(12px,2vw,28px);background:rgba(255,255,251,.96);border:2px solid #e0d3b3;border-radius:22px}
+#learning .learning-flag-panel img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;border:0!important;box-shadow:none!important}
+#learning .learning-name-panel{flex-direction:column;gap:clamp(8px,1.5vh,18px)}
+#learning .learning-country{font-size:clamp(48px,6vw,90px)!important;line-height:1.15;font-weight:950;color:#0e315b;word-break:keep-all;text-align:center}
+#learning .learning-capital{font-size:clamp(26px,3vw,44px);font-weight:850;color:#315e4b;text-align:center}
+#learning #learningSpeak{position:absolute;right:clamp(12px,1.8vw,26px);top:clamp(12px,1.8vw,26px);display:grid;place-items:center;width:clamp(50px,5vw,74px);height:clamp(50px,5vw,74px);padding:0;border:2px solid #915520;border-radius:50%;background:#fff4d1;font-size:clamp(27px,3vw,43px);box-shadow:none}
+#learning .learning-actions{flex:none;display:flex;justify-content:space-between;gap:20px;margin:0;padding:0 clamp(8px,1vw,15px)}
+#learning .learning-actions button{min-height:clamp(49px,7vh,70px);width:34%;border:3px solid #985d26;border-radius:17px;background:linear-gradient(#fff8df,#ffe3a0);font-size:clamp(18px,2vw,29px);font-weight:850}
+#learning #learningNotice{position:absolute;left:30%;right:30%;bottom:clamp(102px,13vh,145px);margin:0;text-align:center;pointer-events:none;font-size:16px}
+#learning .learning-bottom-nav{flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(5px,.8vw,12px);padding:6px 10px;border:5px solid #844a1d;border-radius:24px;background:linear-gradient(#b77936,#764117);box-shadow:0 4px 0 #543016}
+#learning .learning-bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:0;min-height:clamp(57px,9vh,95px);padding:2px;border:3px solid #a65d12;border-radius:23px;background:linear-gradient(#fff19b,#ffb932 68%,#e88417);font-size:clamp(25px,3vw,41px);box-shadow:inset 0 3px 3px #fff4b7}
+#learning .learning-bottom-nav button span{font-size:clamp(11px,1.2vw,18px);font-weight:900;white-space:nowrap;color:#39230e}
+@media(orientation:landscape) and (max-height:780px){#learning .learning-board{gap:5px;padding-top:9px;padding-bottom:7px}#learning .learning-sign{padding:4px}#learning .learning-actions button{min-height:45px}#learning .learning-bottom-nav button{min-height:54px}}
+@media(orientation:portrait){#learning .learning-board{width:100%;height:100dvh}#learning .learning-card{grid-template-columns:1fr;grid-template-rows:1fr 1fr}}
