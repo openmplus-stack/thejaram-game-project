@@ -359,3 +359,19 @@
 #learning .learning-bottom-nav button span{font-size:clamp(11px,1.2vw,18px);font-weight:900;white-space:nowrap;color:#39230e}
 @media(orientation:landscape) and (max-height:780px){#learning .learning-board{gap:5px;padding-top:9px;padding-bottom:7px}#learning .learning-sign{padding:4px}#learning .learning-actions button{min-height:45px}#learning .learning-bottom-nav button{min-height:54px}}
 @media(orientation:portrait){#learning .learning-board{width:100%;height:100dvh}#learning .learning-card{grid-template-columns:1fr;grid-template-rows:1fr 1fr}}
+
+
+/* Final approved learning layout: unboxed 50/50 flag and centered country name. */
+#learning .learning-board{background-color:transparent}
+#learning .learning-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible}
+#learning .learning-flag-panel,#learning .learning-name-panel{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:clamp(10px,2vw,26px)!important;min-width:0;min-height:0}
+#learning .learning-flag-panel img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+#learning .learning-name-panel{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#learning .learning-country{font-size:clamp(54px,6vw,98px)!important;text-align:center!important;line-height:1.16;word-break:keep-all}
+#learning .learning-capital{text-align:center}
+#learning #learningSpeak{display:none!important}
+#learning .learning-sign{background:linear-gradient(155deg,#efb75d,#b56a28 70%,#8e481b);border-color:#87471c;border-radius:18px;color:#fffaf1;text-shadow:0 2px 3px #66300d}
+#learning .learning-bottom-nav button{font-size:clamp(30px,3.7vw,50px)}
+#learning .learning-bottom-nav button span{display:none}
+#learning .learning-bottom-nav{padding:7px 10px}
+@media(orientation:portrait){#learning .learning-card{grid-template-columns:1fr!important;grid-template-rows:1fr 1fr}}
