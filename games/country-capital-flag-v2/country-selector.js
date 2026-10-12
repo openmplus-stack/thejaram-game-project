@@ -4,7 +4,7 @@
  const data=window.CountryV2Data;
  const state=window.CountryV2.state;
  function savedArray(key){try{const v=JSON.parse(localStorage.getItem(key)||'null');return Array.isArray(v)?v:[]}catch{return []}}
- function learned(){try{const v=JSON.parse(localStorage.getItem('countryStudyStats')||'{}');return new Set(Array.isArray(v.learned)?v.learned:[])}catch{return new Set()}}
+ function learned(){const codes=new Set();try{const v=JSON.parse(localStorage.getItem('countryStudyStats')||'{}');if(Array.isArray(v.learned))v.learned.forEach(x=>codes.add(x))}catch{}try{const v=JSON.parse(localStorage.getItem('countryV2Progress')||'{}');if(Array.isArray(v.learned))v.learned.forEach(x=>codes.add(x))}catch{}return codes}
  function pool(){return data.byContinent(state.continent)}
  function visible(){const base=pool(),done=learned(),review=new Set(savedArray('countryReviewList'));if(state.filter==='new')return base.filter(x=>!done.has(x.flag));if(state.filter==='learned')return base.filter(x=>done.has(x.flag));if(state.filter==='review')return base.filter(x=>review.has(x.flag));return base}
  function render(){
