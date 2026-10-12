@@ -49,6 +49,6 @@
   const key=event.detail.to;
   if(Object.hasOwn(registry,key))background(key,document.getElementById(key));
  });
- background('home',document.getElementById('home'));
+ background('home',document.getElementById('homeArtboard'));
  window.CountryV2Assets=Object.freeze({registry,load,background});
 })();
