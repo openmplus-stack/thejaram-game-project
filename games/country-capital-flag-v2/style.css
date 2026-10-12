@@ -181,3 +181,17 @@
 .flag-reward-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
 .flag-reward-actions button:disabled{opacity:.45;cursor:not-allowed}
 #flagRewardMessage{min-height:1.5em;color:#256247}
+
+
+/* Stages 21–22: reward selection and saved flags. */
+#quizReward.screen.active,#flags.screen.active{align-items:center;justify-content:center;background:#b9e5f3;padding:clamp(12px,2vw,30px)}
+.treasure-reward-board,.flags-board{width:min(100%,1150px);padding:clamp(18px,3vw,38px);background:#fff8e7;border:6px solid #b9874d;border-radius:28px;display:flex;flex-direction:column;gap:18px}
+.treasure-reward-choices,.flags-collection{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:15px;max-height:55dvh;overflow:auto}
+.treasure-reward-option,.flags-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;background:white;border:3px solid #b3cfd4;border-radius:18px;text-align:center;min-height:160px}
+.treasure-reward-option img,.flags-item img{width:140px;max-width:100%;height:100px;object-fit:contain}
+.treasure-reward-option strong,.flags-item strong{font-size:clamp(18px,2vw,25px)}
+.treasure-reward-option span,.flags-item span{font-size:14px;overflow-wrap:anywhere}
+.treasure-reward-option[aria-pressed="true"]{border-color:#168d58;background:#eaffef;box-shadow:0 0 0 4px #86dba9}
+.treasure-reward-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
+.treasure-reward-actions button:disabled{opacity:.45;cursor:not-allowed}
+#flagsSummary,#flagsEmpty,#treasureRewardMessage{font-size:clamp(18px,2vw,25px);font-weight:750;text-align:center}
