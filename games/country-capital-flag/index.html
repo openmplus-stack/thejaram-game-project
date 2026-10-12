@@ -612,6 +612,12 @@ body:has(#continentFlow:target) #continentFlow{display:flex!important;visibility
 #home .homeBox{position:relative!important}
 #home #homeDirectStart{position:absolute!important;left:57%!important;top:39%!important;width:37%!important;height:14%!important;z-index:2147483640!important;pointer-events:auto!important;display:block!important;opacity:1!important}
 @media (orientation:portrait),(max-width:680px){#home #homeDirectStart{left:10%!important;top:52%!important;width:80%!important;height:12%!important}}
+</style><style id="blank-screen-recovery-v5">
+/* Force a visible fallback page when navigating via hash or script. */
+#continentFlow:target{display:flex!important;visibility:visible!important;opacity:1!important;position:fixed!important;inset:0!important;z-index:2147483000!important;background:#48b9ee url('assets/backgrounds/bg-world-common.png') center/100% 100% no-repeat!important}
+#continentFlow:target .flowBox{display:flex!important;visibility:visible!important;opacity:1!important;z-index:2!important}
+#continentFlow:target .continentAdventureGrid,#continentFlow:target .continentAll{display:grid!important;visibility:visible!important;opacity:1!important}
+#continentFlow:target button{pointer-events:auto!important}
 </style></head><body><script id="critical-navigation-bootstrap-v3">
 /* Independent, early-installed navigation: works even if the main game script fails. */
 (function(){
