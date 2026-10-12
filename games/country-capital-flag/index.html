@@ -829,4 +829,34 @@ const obs=new MutationObserver(apply);
 #home{isolation:isolate!important}
 </style><script id="home-click-rescue-handler-20261012">
 (function(){const btn=document.getElementById('homeStart');if(!btn)return;function start(e){e.preventDefault();e.stopImmediatePropagation();if(typeof showFlow==='function'){showFlow('#continentFlow')}else{document.getElementById('home').style.display='none';document.getElementById('continentFlow').style.display='flex'}}btn.addEventListener('click',start,true);})();
+</script><style id="home-art-hitbox-alignment-v2">
+/* Artwork itself contains the four visible buttons. Match touch areas to those buttons. */
+@media (orientation:landscape) and (min-width:681px){
+#home.referenceArtReady .homeControls{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;pointer-events:none!important;z-index:950!important}
+#home.referenceArtReady .homeStart,#home.referenceArtReady .homeMenu button{position:absolute!important;left:14.5%!important;width:71%!important;height:9%!important;min-height:0!important;display:block!important;pointer-events:auto!important;opacity:0!important;background:transparent!important;border:0!important;box-shadow:none!important;font-size:0!important;touch-action:manipulation!important;cursor:pointer!important}
+#home.referenceArtReady .homeStart{top:55.2%!important}
+#home.referenceArtReady .homeMenu{display:contents!important}
+#home.referenceArtReady .homeMenu button:nth-child(1){top:64.7%!important}
+#home.referenceArtReady .homeMenu button:nth-child(2){top:74.1%!important}
+#home.referenceArtReady .homeMenu button:nth-child(3){top:83.5%!important}
+}
+</style>
+<script id="home-touch-target-fallback-v2">
+(function(){
+const home=document.getElementById('home'),box=home?.querySelector('.homeBox');
+if(!home||!box)return;
+let last=0;
+box.addEventListener('pointerup',function(e){
+if(!home.classList.contains('referenceArtReady')||getComputedStyle(home).display==='none')return;
+const r=box.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+if(x<.13||x>.88||y<.54||y>.94)return;
+const index=Math.floor((y-.552)/.094);
+const targets=[document.getElementById('homeStart'),...home.querySelectorAll('.homeMenu button')];
+if(index<0||index>3||!targets[index])return;
+if(Date.now()-last<350)return;last=Date.now();
+e.preventDefault();e.stopPropagation();
+if(index===0){if(typeof showFlow==='function')showFlow('#continentFlow');else{home.style.display='none';document.getElementById('continentFlow').style.display='flex'}}
+else targets[index].click();
+},true);
+})();
 </script></body></html>
