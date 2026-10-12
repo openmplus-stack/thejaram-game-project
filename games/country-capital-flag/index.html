@@ -470,6 +470,29 @@ body:has(#continentFlow.continentArtReady[style*="display: flex"]) #worldBottomN
 #countrySelectFlow .countrySelectTools button,#countrySelectFlow .countrySelectStart{box-shadow:inset 0 3px #ffffff88,0 5px 0 #19579b!important}
 #countrySelectFlow #countryNone{box-shadow:inset 0 3px #ffffff88,0 5px 0 #a12b53!important}
 @media(max-width:650px){#countrySelectFlow .countrySelectBox{border-width:5px!important;border-radius:21px!important}#countrySelectFlow .countrySelectBox:before,#countrySelectFlow .countrySelectBox:after{font-size:25px;top:-12px}#countrySelectFlow .countryPick{border-width:2px!important}#countrySelectFlow .countryPick:before{left:2px;font-size:15px}}
+</style><style id="global-separated-footer-v12">
+/* Shared floating navigation sits below the content, never on top of cards. */
+:root{--world-footer-clearance:118px}
+body.world-nav-visible #worldBottomNav{position:fixed!important;left:50%!important;right:auto!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;width:min(640px,calc(100% - 22px))!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:space-evenly!important;gap:clamp(12px,2.5vw,35px)!important;padding:8px 12px!important;border:0!important;background:transparent!important;box-shadow:none!important;z-index:1000!important;pointer-events:none!important}
+body.world-nav-visible #worldBottomNav button{pointer-events:auto!important;width:clamp(52px,6vw,72px)!important;height:clamp(52px,6vw,72px)!important;min-width:0!important;min-height:0!important;flex:0 0 auto!important;border-radius:50%!important}
+body.world-nav-visible #worldBottomNav .navEmoji{font-size:clamp(26px,3vw,38px)!important}
+body.world-nav-visible #countrySelectFlow,
+body.world-nav-visible #continentFlow,
+body.world-nav-visible #topicFlow,
+body.world-nav-visible #learnScreen,
+body.world-nav-visible #quizScreen,
+body.world-nav-visible #quizResult,
+body.world-nav-visible #simpleOx,
+body.world-nav-visible #learnRewardFlow,
+body.world-nav-visible #quizRewardFlow,
+body.world-nav-visible #flagCollectionFlow,
+body.world-nav-visible #treasureCollectionFlow,
+body.world-nav-visible #progressFlow,
+body.world-nav-visible #home{box-sizing:border-box!important;padding-bottom:calc(var(--world-footer-clearance) + env(safe-area-inset-bottom))!important;scroll-padding-bottom:calc(var(--world-footer-clearance) + 10px)!important}
+body.world-nav-visible #countrySelectFlow .countrySelectBox{margin-bottom:24px!important}
+body.world-nav-visible #countrySelectFlow .countrySelectStart{margin-bottom:18px!important}
+body.world-nav-visible #home{overflow-y:auto!important}
+@media(max-width:650px){:root{--world-footer-clearance:104px}body.world-nav-visible #worldBottomNav{width:calc(100% - 12px)!important;gap:clamp(5px,1.5vw,12px)!important;padding:5px 6px!important}body.world-nav-visible #worldBottomNav button{width:clamp(47px,13vw,61px)!important;height:clamp(47px,13vw,61px)!important}body.world-nav-visible #worldBottomNav .navEmoji{font-size:27px!important}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
