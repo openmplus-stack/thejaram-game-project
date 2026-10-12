@@ -22,7 +22,7 @@
  function back(){while(state.history.length){const previous=state.history.pop();if(validRoute(previous))return show(previous,{remember:false})}return home()}
  function home(){state.history.length=0;return show('home',{remember:false})}
  function handleClick(event){
-  const button=event.target.closest('button');
+  const button=event.target instanceof Element?event.target.closest('button'):null;
   if(!button||!document.getElementById('app').contains(button)||button.disabled)return;
   if(button.hasAttribute('data-back')){back();return}
   const destination=button.dataset.go;
