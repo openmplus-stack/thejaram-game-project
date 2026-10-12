@@ -13,6 +13,7 @@
   for(const [key,el] of screens){const active=key===id;el.classList.toggle('active',active);el.hidden=!active;el.setAttribute('aria-hidden',String(!active))}
   state.current=id;
   if(id==='countries')window.CountryV2Countries?.render();
+  if(id==='activities'){const label=document.getElementById('activitySummary');if(label)label.textContent=(state.continent||'전체')+' · '+state.selected.size+'개국 선택 · '+(state.topic==='flag-country'?'나라와 국기':'나라와 수도');}
   window.scrollTo?.(0,0);
   document.dispatchEvent(new CustomEvent('country-v2:navigate',{detail:{from,to:id}}));
   return true;
@@ -24,7 +25,7 @@
   if(!button||!document.getElementById('app').contains(button)||button.disabled)return;
   if(button.hasAttribute('data-back')){back();return}
   const destination=button.dataset.go;
-  if(destination){destination==='home'?home():show(destination);return}
+  if(destination){if((destination==='activities'||destination==='learning'||destination==='quiz')&&state.selected.size===0){console.warn('[V2] No countries selected');return}destination==='home'?home():show(destination);return}
   if(button.dataset.continent){state.continent=button.dataset.continent;state.selected.clear();state.filter='all';show('topics');return}
   if(button.dataset.topic){state.topic=button.dataset.topic;show('countries');return}
   if(window.CountryV2Countries?.handle(button))return
