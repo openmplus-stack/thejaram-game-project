@@ -540,6 +540,71 @@ body.world-nav-visible #home{overflow-y:auto!important}
 #learnScreen .learnFlag img.learnRealFlag{display:block!important;width:67%!important;height:67%!important;max-width:67%!important;max-height:67%!important;object-fit:contain!important;filter:none!important;transform:none!important;box-shadow:none!important;border-radius:0!important}
 #countrySelectFlow .countryPick img{width:78%!important;height:67%!important;max-height:130px!important;object-fit:contain!important;filter:none!important;transform:none!important}
 @media(max-width:650px){#activityChoiceFlow .activityChoiceBox{padding:32px 12px!important}#activityChoiceFlow .activityChoiceCards{gap:10px!important}#activityChoiceFlow .activityChoiceCards button{min-height:190px!important}#activityChoiceFlow .activityChoiceCards small{font-size:12px!important}}
+</style><style id="common-world-background-live-ui-v1">
+/* Screens 2-4: shared illustrated background, with functional HTML controls. */
+#continentFlow,#topicFlow,#countrySelectFlow{
+ background:#39b9ed url('assets/backgrounds/bg-world-common.png?asset=34cb3bba') center center/100% 100% no-repeat!important;
+ min-height:100dvh!important;height:100dvh!important;box-sizing:border-box!important;
+ padding:0!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;
+}
+#continentFlow .flowBox,#topicFlow .flowBox,#countrySelectFlow .countrySelectBox{
+ position:relative!important;display:flex!important;flex-direction:column!important;
+ width:min(100vw,133.333dvh)!important;max-width:none!important;height:min(100dvh,75vw)!important;
+ max-height:100dvh!important;aspect-ratio:4/3!important;min-height:0!important;
+ box-sizing:border-box!important;margin:auto!important;
+ padding:13% 18% 12%!important;background:transparent!important;border:0!important;
+ border-radius:0!important;box-shadow:none!important;overflow:hidden!important;
+}
+#continentFlow .flowHead,#topicFlow .flowHead,#countrySelectFlow .flowHead{
+ position:relative!important;inset:auto!important;display:flex!important;align-items:center!important;
+ justify-content:center!important;flex:none!important;pointer-events:auto!important;
+ width:100%!important;margin:0 0 1.2%!important;padding:0!important;background:transparent!important;
+ border:0!important;box-shadow:none!important;text-align:center!important;
+}
+#continentFlow .flowHead>div,#topicFlow .flowHead>div,#countrySelectFlow .flowHead>div{display:block!important}
+#continentFlow .flowHead .back,#topicFlow .flowHead .back,#countrySelectFlow .flowHead .back{display:none!important}
+#continentFlow .flowTitle,#topicFlow .flowTitle,#countrySelectFlow .flowTitle{
+ position:fixed!important;top:7.7%!important;left:50%!important;transform:translateX(-50%)!important;
+ margin:0!important;padding:0!important;width:auto!important;min-height:0!important;
+ border:0!important;background:transparent!important;box-shadow:none!important;
+ color:#fff!important;font-weight:950!important;font-size:clamp(22px,3.1vw,42px)!important;
+ white-space:nowrap!important;text-shadow:0 3px 2px #522608,2px 2px 0 #522608,-2px -1px 0 #522608!important;
+ z-index:4!important;
+}
+#continentFlow .flowTitle::before,#continentFlow .flowTitle::after,
+#topicFlow .flowTitle::before,#topicFlow .flowTitle::after,
+#countrySelectFlow .flowTitle::before,#countrySelectFlow .flowTitle::after{display:none!important}
+#continentFlow .flowTitle{font-size:0!important}
+#continentFlow .flowTitle::first-letter{font-size:0}
+#continentFlow .flowHead>div::before{content:"대륙 선택";position:fixed;top:7.7%;left:50%;transform:translateX(-50%);font-size:clamp(22px,3.1vw,42px);font-weight:950;color:white;text-shadow:0 3px 2px #522608,2px 2px 0 #522608,-2px -1px 0 #522608;z-index:5;white-space:nowrap}
+#topicFlow .flowTitle{font-size:0!important}
+#topicFlow .flowHead>div::before{content:"학습 방식 선택";position:fixed;top:7.7%;left:50%;transform:translateX(-50%);font-size:clamp(22px,3.1vw,42px);font-weight:950;color:white;text-shadow:0 3px 2px #522608,2px 2px 0 #522608,-2px -1px 0 #522608;z-index:5;white-space:nowrap}
+#continentFlow .flowSub,#topicFlow .flowSub{display:none!important}
+#continentFlow .continentAll{display:none!important}
+#continentFlow .continentAdventureGrid{position:relative!important;inset:auto!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:2%!important;flex:1!important;min-height:0!important;width:100%!important;pointer-events:auto!important}
+#continentFlow .continentAdventureCard{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;display:flex!important;flex-direction:column!important;width:100%!important;height:100%!important;opacity:1!important;pointer-events:auto!important;border:3px solid #e6a44b!important;border-radius:17px!important;overflow:hidden!important;background:#fff4d7!important;box-shadow:0 4px 0 #ae6b2e!important;padding:0!important;transform:none!important}
+#continentFlow .continentScene{display:flex!important;flex:1!important;min-height:0!important;align-items:center!important;justify-content:center!important}
+#continentFlow .continentSymbol{font-size:clamp(25px,5vw,62px)!important}
+#continentFlow .continentCaption{display:flex!important;flex-direction:column!important;justify-content:center!important;min-height:29%!important;padding:2px!important}
+#continentFlow .continentCaption strong{font-size:clamp(13px,1.8vw,23px)!important}
+#continentFlow .continentCaption small{font-size:clamp(10px,1.15vw,16px)!important}
+#topicFlow .choiceGrid{position:relative!important;inset:auto!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4%!important;width:100%!important;flex:1!important;min-height:0!important;pointer-events:auto!important;align-items:stretch!important}
+#topicFlow .choiceGrid button{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;width:100%!important;height:100%!important;opacity:1!important;pointer-events:auto!important;padding:12px!important;border:4px solid #64b9e9!important;border-radius:22px!important;background:linear-gradient(#d8f2ff,#ffffff)!important;box-shadow:0 6px 0 #8d6537!important;font-size:clamp(18px,2.4vw,34px)!important;color:#174e82!important;white-space:normal!important}
+#topicFlow .choiceGrid button:last-child{border-color:#7dcc87!important;background:linear-gradient(#e4ffe6,#fff)!important;color:#26753b!important}
+#topicFlow .choiceGrid small{font-size:clamp(12px,1.3vw,19px)!important;line-height:1.4!important}
+#continentFlow .continentArtNav,#topicFlow .topicArtNav{display:none!important}
+#countrySelectFlow .countrySelectBox{padding:12.5% 18% 11.5%!important}
+#countrySelectFlow .flowHead{margin-bottom:1%!important}
+#countrySelectFlow .countryPrompt{font-size:clamp(15px,1.7vw,24px)!important}
+#countrySelectFlow .countryFilterTools{display:none!important}
+#countrySelectFlow .countryActivitySwitch{display:none!important}
+#countrySelectFlow .countrySelectTools{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:nowrap!important;gap:3%!important;margin:1% 0!important;flex:none!important}
+#countrySelectFlow .countrySelectTools button{font-size:clamp(12px,1.4vw,19px)!important;padding:7px 14px!important}
+#countrySelectFlow .countryChoiceGrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;overflow-y:auto!important;overscroll-behavior:contain!important;flex:1!important;min-height:0!important;padding:8px 6px 16px!important;align-content:start!important}
+#countrySelectFlow .countryPick{height:clamp(110px,15vw,185px)!important}
+#countrySelectFlow .countrySelectStart{flex:none!important;margin:5px auto 0!important;padding:8px 28px!important;font-size:clamp(14px,1.5vw,20px)!important}
+#continentFlow .flowBox,#topicFlow .flowBox{padding-bottom:14%!important}
+@media(max-width:700px){#continentFlow .flowBox,#topicFlow .flowBox,#countrySelectFlow .countrySelectBox{padding-left:17%!important;padding-right:17%!important}#continentFlow .continentAdventureCard{border-width:2px!important}#countrySelectFlow .countryChoiceGrid{gap:5px!important}}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
@@ -748,5 +813,12 @@ else if(typeof showFlow==='function')showFlow('#'+target);
 update()}
 prev.onclick=()=>go(-1);next.onclick=()=>go(1);
 const obs=new MutationObserver(update);ids.forEach(id=>{let el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['style','class']})});update();
+})();
+</script><script id="common-world-background-activation-v1">
+(function(){
+function apply(){document.getElementById('continentFlow')?.classList.remove('continentArtReady');document.getElementById('topicFlow')?.classList.remove('topicArtReady');}
+apply();
+const obs=new MutationObserver(apply);
+['continentFlow','topicFlow'].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['class']})});
 })();
 </script></body></html>
