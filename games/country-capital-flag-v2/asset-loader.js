@@ -6,6 +6,7 @@
   logo:original+'backgrounds/logo-world-buddy.png',
   continent:original+'backgrounds/continent-select-no-number.png',
   topic:original+'backgrounds/topic-select-no-number-no-arrows.png',
+  activities:original+'backgrounds/bg-continent-select.png',
   countries:original+'backgrounds/bg-country-select.png',
   learning:original+'backgrounds/bg-learning.png',
   quiz:original+'backgrounds/bg-quiz.png',
@@ -47,7 +48,7 @@
  },true);
  document.addEventListener('country-v2:navigate',event=>{
   const key=event.detail.to==='continents'?'continent':event.detail.to==='topics'?'topic':event.detail.to;
-  if(Object.hasOwn(registry,key))background(key,key==='continent'?document.getElementById('continentArtboard'):key==='topic'?document.getElementById('topicArtboard'):key==='countries'?document.getElementById('countryArtboard'):document.getElementById(key));
+  if(Object.hasOwn(registry,key))background(key,key==='continent'?document.getElementById('continentArtboard'):key==='topic'?document.getElementById('topicArtboard'):key==='countries'?document.getElementById('countryArtboard'):key==='activities'?document.getElementById('activityArtboard'):document.getElementById(key));
  });
  background('home',document.getElementById('homeArtboard'));
  window.CountryV2Assets=Object.freeze({registry,load,background});
