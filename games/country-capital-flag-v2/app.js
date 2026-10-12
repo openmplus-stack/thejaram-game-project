@@ -5,7 +5,7 @@
  const continents=['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아','전체'];
  const choices=document.getElementById('continentChoices');
  for(const name of continents){const b=document.createElement('button');b.type='button';b.textContent=name;b.dataset.continent=name;b.className='continent-choice continent-'+(['asia','europe','africa','north','south','oceania','all'][continents.indexOf(name)]);choices.appendChild(b)}
- function validRoute(id){if(!screens.has(id))return false;if(['topics','countries','activities','learning','quiz'].includes(id)&&!state.continent)return false;if(['countries','activities','learning','quiz'].includes(id)&&!state.topic)return false;if(['activities','learning','quiz'].includes(id)&&state.selected.size===0)return false;return true}
+ function validRoute(id){if(!screens.has(id))return false;if(['topics','countries','activities','learning','quiz'].includes(id)&&!state.continent)return false;if(['countries','activities','learning','quiz'].includes(id)&&!state.topic)return false;if(['activities','learning','quiz'].includes(id)&&state.selected.size===0)return false;if(id==='result'&&!window.CountryV2Result?.latest)return false;if(id==='quizReward'&&!window.CountryV2Result?.latest)return false;return true}
  function show(id,{remember=true}={}){
   if(!validRoute(id)) {console.warn('[V2] Navigation blocked:',id);return false}
   if(id===state.current)return true;
