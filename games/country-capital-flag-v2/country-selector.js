@@ -11,13 +11,13 @@
   const grid=$('countryChoices');grid.replaceChildren();
   const items=visible();
   for(const item of items){
-   const button=document.createElement('button');button.type='button';button.className='country-card';button.dataset.countryCode=item.flag;button.setAttribute('aria-pressed',String(state.selected.has(item.flag)));
+   const button=document.createElement('button');button.type='button';button.className='country-card';button.dataset.countryCode=item.flag;button.setAttribute('aria-pressed',String(state.selected.has(item.flag)));const check=document.createElement('span');check.className='country-check';check.setAttribute('aria-hidden','true');check.textContent=state.selected.has(item.flag)?'✓':'';
    const flag=document.createElement('img');flag.src='https://flagcdn.com/w80/'+encodeURIComponent(item.flag)+'.png';flag.alt=item.country+' 국기';flag.loading='lazy';
-   const label=document.createElement('span');label.textContent=item.country;button.append(flag,label);grid.append(button);
+   const label=document.createElement('span');label.textContent=item.country;button.append(check,flag,label);grid.append(button);
   }
   $('countrySelectedCount').textContent=state.selected.size+'개 선택';
   $('countryNext').disabled=state.selected.size===0;
-  $('countryMessage').textContent=(state.continent||'대륙')+' · '+items.length+'개국 표시';
+  $('countryMessage').textContent='('+(state.continent||'전체')+' · '+items.length+'개국)';
   document.querySelectorAll('#countries [data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===state.filter)));
  }
  function handle(button){
