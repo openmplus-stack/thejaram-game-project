@@ -254,7 +254,7 @@ body{background:#e9f7f7;color:var(--navy)}
    with real semantic buttons placed over the artwork. */
 @media (orientation:landscape) and (min-width:700px){
 #continentFlow.continentArtReady{padding:0!important;overflow:hidden!important;align-items:center!important;justify-content:center!important;background:#59bdf4!important}
-#continentFlow.continentArtReady .flowBox{position:relative!important;display:block!important;flex:none!important;width:min(100vw,133.333dvh)!important;max-width:none!important;height:auto!important;max-height:100dvh!important;aspect-ratio:1448/1086!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:url('assets/backgrounds/continent-select-no-number.png?asset=02b3cc87') center/100% 100% no-repeat!important;overflow:hidden!important}
+#continentFlow.continentArtReady .flowBox{position:relative!important;display:block!important;flex:none!important;width:min(100vw,133.333dvh)!important;max-width:none!important;height:auto!important;max-height:100dvh!important;aspect-ratio:1448/1086!important;margin:auto!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:url('assets/backgrounds/continent-select-no-number.png?asset=2a6d5747') center/100% 100% no-repeat!important;overflow:hidden!important}
 #continentFlow.continentArtReady .flowHead{position:absolute!important;inset:0!important;margin:0!important;padding:0!important;border:0!important;background:none!important;pointer-events:none!important}
 #continentFlow.continentArtReady .flowHead>div{display:none!important}
 #continentFlow.continentArtReady .flowHead .back{position:absolute!important;left:20.5%!important;top:10%!important;width:7%!important;height:10%!important;opacity:0!important;pointer-events:auto!important;transform:none!important}
@@ -725,7 +725,7 @@ const obs=new MutationObserver(()=>requestAnimationFrame(sync));['home','contine
 })();
 </script><script id="continent-art-loader">
 (function(){
-const art=new Image();art.onload=function(){document.getElementById('continentFlow').classList.add('continentArtReady')};art.src='assets/backgrounds/continent-select-no-number.png?asset=02b3cc87';
+const art=new Image();art.onload=function(){document.getElementById('continentFlow').classList.add('continentArtReady')};art.src='assets/backgrounds/continent-select-no-number.png?asset=2a6d5747';
 document.querySelectorAll('[data-art-nav]').forEach(b=>b.addEventListener('click',()=>{const target=document.querySelector('#worldBottomNav [data-go="'+b.dataset.artNav+'"]');if(target)target.click()}));
 })();
 </script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-reference-03.webp';document.querySelectorAll('[data-topic-nav]').forEach(b=>b.addEventListener('click',()=>document.querySelector('#worldBottomNav [data-go="'+b.dataset.topicNav+'"]')?.click()));})();</script><script id="corner-page-navigation">
