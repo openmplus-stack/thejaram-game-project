@@ -611,46 +611,6 @@ body.world-nav-visible #home{overflow-y:auto!important}
 #continentFlow:target{display:flex!important;visibility:visible!important;opacity:1!important}
 body:has(#continentFlow:target) #home{display:none!important}
 body:has(#continentFlow:target) #continentFlow{display:flex!important;visibility:visible!important;opacity:1!important}
-</style><style id="landscape-visual-refinement-20261012">
-/* Layout-only refinement; preserve all existing event handlers and assets. */
-@media (orientation:landscape) and (min-width:800px){
-#continentFlow .continentAdventureGrid{gap:1.1vw!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-content:center!important}
-#continentFlow .continentAdventureCard{min-height:0!important;overflow:hidden!important}
-#continentFlow .continentScene{min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
-#continentFlow .continentSymbol{font-size:clamp(46px,5.2vw,88px)!important;line-height:1.15!important}
-#continentFlow .continentCaption strong{font-size:clamp(18px,2vw,29px)!important}
-#topicFlow .choiceGrid{gap:2.3vw!important}
-#topicFlow .choice{font-size:clamp(24px,2.8vw,40px)!important;line-height:1.4!important}
-#topicFlow .choice small{font-size:clamp(15px,1.35vw,20px)!important;line-height:1.6!important}
-#countrySelectFlow .countrySelectBox{min-height:0!important;overflow:hidden!important}
-#countrySelectFlow .countryChoiceGrid{overflow-y:auto!important;overscroll-behavior:contain!important;min-height:0!important;flex:1 1 auto!important;padding-bottom:12px!important;scrollbar-width:thin}
-#countrySelectFlow .countrySelectStart{flex-shrink:0!important;position:relative!important;z-index:3!important}
-#learnScreen{overflow:hidden!important}
-#learnScreen .learnWrap{height:min(100dvh,75vw)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding-bottom:clamp(72px,8.5dvh,110px)!important}
-#learnScreen .learnTop{flex:0 0 auto!important}
-#learnScreen .learnCard{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important}
-#learnScreen .learnPane{min-height:0!important}
-#learnScreen .learnActions{flex:0 0 auto!important;position:relative!important;z-index:5!important}
-}
-</style><style id="visual-consistency-v2-20261012">
-/* Consistent touch-friendly landscape cards and protected bottom actions. */
-@media (orientation:landscape) and (min-width:800px){
-#continentFlow .continentAdventureGrid{width:100%!important;min-height:0!important}
-#continentFlow .continentAdventureCard{display:flex!important;flex-direction:column!important;justify-content:space-between!important}
-#continentFlow .continentCaption{flex-shrink:0!important;text-align:center!important}
-#topicFlow .choiceGrid{align-items:stretch!important}
-#topicFlow .choice{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important}
-#countrySelectFlow .countrySelectBox{display:flex!important;flex-direction:column!important}
-#countrySelectFlow .countryChoiceGrid{min-height:0!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch!important}
-#countrySelectFlow .countrySelectTools,#countrySelectFlow .countrySelectStart{flex-shrink:0!important}
-#activityChoiceFlow .activityChoiceCards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:2.2vw!important}
-#activityChoiceFlow .activityChoiceCards button{min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:clamp(8px,1.5vh,18px)!important}
-#activityChoiceFlow .activityBigIcon{font-size:clamp(55px,6vw,92px)!important;line-height:1.2!important}
-#activityChoiceFlow .activityChoiceCards strong{font-size:clamp(26px,2.8vw,42px)!important}
-#activityChoiceFlow .activityChoiceCards small{font-size:clamp(15px,1.45vw,22px)!important;text-align:center!important}
-#learnScreen .learnWrap{box-sizing:border-box!important}
-#learnScreen .learnActions{margin-bottom:0!important}
-}
 </style></head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
 <div class="quizTopFix"><button id="simpleOxBack" class="back">←</button><h2 id="simpleOxTitle">국기와 나라를 연결해요</h2><div class="oxTopRight"><div class="simpleMetroControls"><label>박자 <select id="simpleBpm"><option>40</option><option>50</option><option selected>60</option><option>70</option><option>80</option><option>90</option><option>100</option><option>120</option></select> BPM</label><button id="simpleMetroPause" class="simpleMetroPause">⏸ 멈춤</button></div></div></div><div class="oxCountRow"><b id="simpleOxCount">준비</b></div>
