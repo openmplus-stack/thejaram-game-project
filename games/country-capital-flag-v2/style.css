@@ -140,3 +140,15 @@
 #quizAdvance{align-self:center;min-width:200px}
 #quiz button:disabled{opacity:.5}
 @media(max-width:680px){.quiz-pair{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:5px}.quiz-tile{min-height:150px;font-size:clamp(18px,4vw,30px)}.quiz-answers{gap:8px}}
+
+
+/* Stage 18: explicit correctness feedback visible without sound. */
+#quiz .quiz-board.answer-correct{border-color:#249e61;box-shadow:0 12px 0 #147444,0 0 0 8px #8fe6b485}
+#quiz .quiz-board.answer-wrong{border-color:#d34f4a;box-shadow:0 12px 0 #973631,0 0 0 8px #ffc1b985}
+#quiz .quiz-board.answer-correct .quiz-tile{border-color:#32aa70;background:#effff5}
+#quiz .quiz-board.answer-wrong .quiz-tile{border-color:#df625b;background:#fff2f0}
+#quiz .quiz-answers .answer-picked{outline:6px solid currentColor;outline-offset:3px;opacity:1!important}
+#quiz .quiz-board.answer-correct #quizFeedback,#quiz .quiz-board.answer-wrong #quizFeedback{padding:12px;border-radius:14px;background:#fff;font-weight:950}
+#quiz .quiz-board.answer-correct #quizFeedback{color:#157943}
+#quiz .quiz-board.answer-wrong #quizFeedback{color:#b03730}
+@media(prefers-reduced-motion:no-preference){#quiz .quiz-board.answer-correct .quiz-tile,#quiz .quiz-board.answer-wrong .quiz-tile{animation:quizFeedbackPulse .28s ease-out}@keyframes quizFeedbackPulse{0%{transform:scale(.98)}100%{transform:scale(1)}}}
