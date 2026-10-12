@@ -227,3 +227,14 @@
 #progressEmpty{text-align:center;font-size:20px}
 @media(max-width:800px){.progress-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:480px){.progress-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Stage 25: visual consistency pass against original approved assets. */
+#learning.screen.active,#quiz.screen.active,#result.screen.active,#learnReward.screen.active,#quizReward.screen.active,#flags.screen.active,#treasures.screen.active,#progress.screen.active{background-size:cover;background-position:center;background-repeat:no-repeat}
+#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{background:rgba(255,249,232,.94);border:5px solid #b9874d;border-radius:28px;box-shadow:0 9px 0 rgba(104,75,39,.35);backdrop-filter:blur(5px)}
+#learning header,#quiz header,#result header,#learnReward header,#quizReward header,#flags header,#treasures header,#progress header{gap:12px;flex-wrap:wrap}
+#learning header h2,#quiz header h2,#result header h2,#learnReward header h2,#quizReward header h2,#flags header h2,#treasures header h2,#progress header h2{color:#304b65;text-align:center;flex:1}
+#learning button,#quiz button,#result button,#learnReward button,#quizReward button,#flags button,#treasures button,#progress button{min-height:54px;touch-action:manipulation}
+#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{max-height:calc(100dvh - 28px);overflow:auto}
+@media(orientation:landscape) and (min-width:900px){#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{width:min(92vw,1140px)}}
+@media(prefers-reduced-transparency:reduce){#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{background:#fff9e8;backdrop-filter:none}}
