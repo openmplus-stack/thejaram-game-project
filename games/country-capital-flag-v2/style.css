@@ -238,3 +238,32 @@
 #learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{max-height:calc(100dvh - 28px);overflow:auto}
 @media(orientation:landscape) and (min-width:900px){#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{width:min(92vw,1140px)}}
 @media(prefers-reduced-transparency:reduce){#learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{background:#fff9e8;backdrop-filter:none}}
+
+
+/* Stage 26: iPad Pro landscape (4:3) layout and accessible touch targets. */
+@media (orientation:landscape) and (min-width:900px) and (max-aspect-ratio:1.6){
+  .app{max-width:none;min-height:100dvh}
+  .screen.active{min-height:100dvh}
+  #continents .continent-artboard,#topics .topic-artboard,#countries .country-artboard,#activities .activity-artboard{width:min(100%,calc(100dvh * 4 / 3));max-height:100dvh;margin:auto;overflow:auto}
+  #home .home-artboard{width:min(100vw,calc(100dvh * 1449 / 1086));max-height:100dvh}
+  #countries .country-grid{max-height:49dvh;overflow:auto;overscroll-behavior:contain}
+  #learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{width:min(94vw,1080px);max-height:calc(100dvh - 24px);padding:clamp(14px,2vh,30px);gap:clamp(9px,1.5vh,18px);overflow:auto}
+  #learning .learning-card{min-height:0}
+  #learning #learningFlag{max-height:22dvh;width:auto;max-width:85%;object-fit:contain}
+  #quiz .quiz-pair{min-height:0}
+  #quiz .quiz-tile{min-height:clamp(120px,22dvh,220px)}
+  #quiz .quiz-tile img{max-height:17dvh;max-width:100%;object-fit:contain}
+  #result .result-score{padding:clamp(8px,1.5vh,18px)}
+  #result #resultPercentage{font-size:clamp(44px,7vh,84px)}
+  #result .result-details{max-height:34dvh}
+  #learnReward .flag-reward-choices,#quizReward .treasure-reward-choices,#flags .flags-collection,#treasures .treasure-book-grid{max-height:45dvh;overscroll-behavior:contain}
+  #progress .progress-history{max-height:30dvh}
+  #progress .progress-stats>div{padding:12px 7px}
+  #progress .progress-stats strong{font-size:clamp(24px,4vh,45px)}
+  .screen button{min-height:48px}
+}
+@media (orientation:landscape) and (max-height:650px){
+  #learning .learning-board,#quiz .quiz-board,#result .result-board,#learnReward .flag-reward-board,#quizReward .treasure-reward-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board{gap:9px;padding:12px}
+  #learning header h2,#quiz header h2,#result header h2,#learnReward header h2,#quizReward header h2,#flags header h2,#treasures header h2,#progress header h2{font-size:clamp(20px,3vh,30px)}
+}
+@media (pointer:coarse){button,.flag-reward-option,.treasure-reward-option{touch-action:manipulation}button:focus-visible{outline-offset:2px}}
