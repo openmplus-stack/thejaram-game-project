@@ -3,7 +3,12 @@
  const $=id=>document.getElementById(id);
  const COUNT=20;
  let questions=[],index=0,correct=0,answered=false,results=[],active=false;
- let audioContext=null;
+ let audioContext=null,metroTimer=null,beat=0,metroRunning=false;
+ function stopMetro(){if(metroTimer!==null)clearInterval(metroTimer);metroTimer=null;metroRunning=false;$('quizMetroToggle').textContent='▶ 박자 시작';$('quizMetroToggle').setAttribute('aria-pressed','false');document.querySelectorAll('.quiz-beats span').forEach(x=>x.classList.remove('on'))}
+ function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===beat-1));toneBeat(beat===1);if(answered)advance()}
+ function toneBeat(accent){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||=new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=accent?880:620;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.075);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.08)}catch{}}
+ function startMetro(){stopMetro();if(!active)return;metroRunning=true;beat=0;$('quizMetroToggle').textContent='⏸ 박자 멈춤';$('quizMetroToggle').setAttribute('aria-pressed','true');tick();metroTimer=setInterval(tick,60000/Number($('quizBpm').value||60))}
+
  function tone(ok){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||= new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const now=audioContext.currentTime;const notes=ok?[660,880]:[330,220];notes.forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+i*.12;osc.type=ok?'sine':'triangle';osc.frequency.setValueAtTime(hz,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(start);osc.stop(start+.19)})}catch(e){console.warn('[V2] Sound unavailable',e)}}
  function clearFeedback(){const board=document.querySelector('#quiz .quiz-board');board.classList.remove('answer-correct','answer-wrong');$('quizYes').classList.remove('answer-picked');$('quizNo').classList.remove('answer-picked')}
 
@@ -42,7 +47,7 @@
   answered=false;clearFeedback();$('quizFeedback').textContent='';$('quizFeedback').className='';
   $('quizYes').disabled=false;$('quizNo').disabled=false;$('quizAdvance').hidden=true;
  }
- function begin(){questions=build();index=0;correct=0;results=[];answered=false;active=questions.length>0;if(active)display();else $('quizFeedback').textContent='먼저 국가를 선택하세요.'}
+ function begin(){stopMetro();questions=build();index=0;correct=0;results=[];answered=false;active=questions.length>0;if(active)display();else $('quizFeedback').textContent='먼저 국가를 선택하세요.'}
  function answer(value){
   if(!active||answered)return;
   const q=questions[index],ok=value===q.matching;
@@ -59,7 +64,7 @@
  function advance(){
   if(!active||!answered)return;
   if(index<COUNT-1){index++;display();return}
-  active=false;
+  active=false;stopMetro();
   $('quizAdvance').hidden=true;
   $('quizFeedback').textContent='20문제를 모두 풀었습니다. '+correct+' / '+COUNT+'개 정답';
   document.dispatchEvent(new CustomEvent('country-v2:quiz-complete',{detail:{score:correct,total:COUNT,percentage:Math.round(correct/COUNT*100),results:[...results],countries:window.CountryV2.selection.countries,topic:window.CountryV2.selection.topic}}));
@@ -67,6 +72,8 @@
  $('quizYes').addEventListener('click',()=>answer(true));
  $('quizNo').addEventListener('click',()=>answer(false));
  $('quizAdvance').addEventListener('click',advance);
- document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='quiz')begin();else if(e.detail.from==='quiz')active=false});
+ $('quizMetroToggle').addEventListener('click',()=>metroRunning?stopMetro():startMetro());
+ $('quizBpm').addEventListener('change',()=>{if(metroRunning)startMetro()});
+ document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='quiz')begin();else if(e.detail.from==='quiz'){active=false;stopMetro()}});
  window.CountryV2Quiz=Object.freeze({get progress(){return {index,correct,total:COUNT,answered,active}},restart:begin});
 })();
