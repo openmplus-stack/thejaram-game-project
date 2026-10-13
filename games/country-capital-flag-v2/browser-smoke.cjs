@@ -15,7 +15,19 @@ const assert=require('node:assert/strict');
  await page.locator('#home button[data-go="continents"]').click();
  assert(await page.locator('#continents').isVisible());
  await page.locator('#continents button[data-continent="아시아"]').click();
- assert(await page.locator('#topics').isVisible());await shot('topics');
+ assert(await page.locator('#topics').isVisible());
+ // A screen can be 'visible' in the DOM while its content is offscreen or covered.
+ await page.locator('#topics .topic-choice').first().waitFor({state:'visible'});
+ await page.waitForTimeout(500);
+ const topicBoxes=await page.locator('#topics .topic-choice').evaluateAll(els=>els.map(el=>{
+   const r=el.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2;
+   const top=document.elementFromPoint(cx,cy);
+   return {width:r.width,height:r.height,inViewport:cx>=0&&cx<innerWidth&&cy>=0&&cy<innerHeight,
+           unobstructed:!!top&&(top===el||el.contains(top))};
+ }));
+ assert(topicBoxes.length===2&&topicBoxes.every(b=>b.width>80&&b.height>40&&b.inViewport&&b.unobstructed),
+   'topic choices must actually be onscreen and unobstructed: '+JSON.stringify(topicBoxes));
+ await shot('topics');
  async function selectTopic(topic){
   await page.locator('#topics button[data-topic="'+topic+'"]').click();
   assert(await page.locator('#countries').isVisible());
