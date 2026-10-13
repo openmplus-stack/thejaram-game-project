@@ -48,3 +48,19 @@
  #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,
  #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital{min-height:160px}
 }
+
+/* Regression fixes: keep approved painted artboards intact; override legacy !important rules. */
+#continents .continent-header h2{display:none!important}
+#countries .country-main-panel>h2{display:none!important}
+#learning .learning-card,#quiz .quiz-pair{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
+#learning .learning-card:not(:has(.capital-mode)) .learning-name-panel{display:flex!important;align-items:center!important;justify-content:center!important}
+#learning .learning-card:not(:has(.capital-mode)) .learning-capital{display:none!important}
+#learning .learning-card:has(.capital-mode) .learning-flag-panel{display:none!important}
+#learning .learning-card:has(.capital-mode) .learning-name-panel{display:contents!important}
+#learning .learning-card:has(.capital-mode) .learning-country,#learning .learning-card:has(.capital-mode) .learning-capital{display:flex!important;align-items:center!important;justify-content:center!important}
+#quiz .quiz-pair .quiz-link{display:none!important}
+#quiz .quiz-pair .quiz-tile{min-width:0!important}
+#quiz .quiz-answers{display:grid!important;grid-template-columns:1fr 1fr!important;justify-items:center!important}
+#quiz #quizYes,#quiz #quizNo{font-size:0!important;color:transparent!important;border-radius:50%!important}
+#quiz #quizYes::after,#quiz #quizNo::after{color:#fff!important}
+#quiz .quiz-tile img[hidden],#learning img[hidden]{display:none!important}
