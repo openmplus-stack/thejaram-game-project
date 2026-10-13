@@ -820,3 +820,26 @@ background:#fff5d9!important;box-shadow:none!important;z-index:3!important;
 #countries .country-main-panel::before,#countries .country-main-panel::after{content:none!important;display:none!important}
 #countries .country-grid{background:#fff5d9!important;grid-auto-rows:clamp(60px,8.1vh,88px)!important}
 #countries .country-bottom-nav{z-index:4!important}
+
+
+/* Country cards: four per row, larger flags and labels (iPad landscape). */
+#countries .country-grid{
+grid-template-columns:repeat(4,minmax(0,1fr))!important;
+grid-auto-rows:clamp(83px,11.3vh,122px)!important;
+gap:9px!important;padding:6px!important;
+}
+#countries .country-card{
+padding:6px 4px!important;gap:4px!important;
+font-size:clamp(14px,1.38vw,20px)!important;
+border-width:2px!important;border-radius:12px!important;
+}
+#countries .country-card img{
+width:83%!important;height:59%!important;max-height:72px!important;object-fit:contain!important;
+}
+#countries .country-card .country-check{width:21px!important;height:21px!important;font-size:15px!important}
+@media(max-width:680px){
+#countries .country-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:clamp(46px,12vw,80px)!important;gap:4px!important;padding:3px!important}
+#countries .country-card{font-size:clamp(9px,1.65vw,13px)!important;padding:2px!important;gap:1px!important}
+#countries .country-card img{width:82%!important;height:55%!important;max-height:46px!important}
+#countries .country-card .country-check{width:12px!important;height:12px!important;font-size:9px!important}
+}
