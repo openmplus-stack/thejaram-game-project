@@ -23,3 +23,28 @@ jobs:
           for file in games/country-capital-flag-v2/*.js; do
             node --check "$file"
           done
+
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser runner
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start local preview server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/country-v2-server.log 2>&1 &
+          sleep 3
+      - name: Verify navigation and capture screens
+        run: node games/country-capital-flag-v2/browser-smoke.cjs
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: country-v2-browser-screenshots
+          path: /tmp/country-v2-*.png
+          if-no-files-found: ignore
