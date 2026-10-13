@@ -570,3 +570,25 @@ z-index:12!important;left:18%!important;right:1%!important;bottom:.2%!important;
 width:81%!important;height:13%!important;
 background:transparent url("./assets/ui-bottom-navigation.png") center/contain no-repeat!important;
 }
+
+/* Final approved complete JPG: art and bottom navigation are baked into one image.
+   Invisible hit regions only; no extra menu artwork, no letterbox background. */
+#continents.screen.active{background:#70c9ef!important}
+#continents .continent-artboard,
+#continents .continent-artboard[data-asset-state="ready"]{
+background-image:url("./assets/screen-continent-select.jpg")!important;
+background-position:center!important;background-repeat:no-repeat!important;background-size:100% 100%!important;
+}
+#continents .continent-bottom-nav,
+#continents .continent-artboard[data-asset-state="ready"] .continent-bottom-nav{
+left:11%!important;right:auto!important;bottom:1%!important;width:78%!important;height:12%!important;
+display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+background:none!important;background-image:none!important;border:0!important;
+box-shadow:none!important;padding:0!important;gap:0!important;opacity:1!important;
+}
+#continents .continent-bottom-nav button,
+#continents .continent-artboard[data-asset-state="ready"] .continent-bottom-nav button{
+background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;
+color:transparent!important;font-size:0!important;outline-offset:-4px!important;
+}
+#continents .continent-bottom-nav button span{display:none!important}
