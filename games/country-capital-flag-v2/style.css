@@ -805,3 +805,18 @@ pointer-events:auto!important;touch-action:manipulation!important}
 #countries .country-card .country-check{width:11px!important;height:11px!important;font-size:8px!important}
 #countries #countryNext{font-size:clamp(9px,1.5vw,13px)!important}
 }
+
+
+/* Fix screenshot 2026-10-13: remove global blue wash and cover ALL painted cards. */
+#countries .country-artboard,#countries .country-artboard[data-asset-state="ready"]{
+background-blend-mode:normal!important;filter:none!important;opacity:1!important;
+}
+#countries .country-artboard::before,#countries .country-artboard::after{content:none!important;display:none!important}
+#countries .country-main-panel{
+left:23.8%!important;top:30.6%!important;width:69.1%!important;height:55.5%!important;
+padding:1.1% 1.5% 1%!important;border:0!important;border-radius:12px!important;
+background:#fff5d9!important;box-shadow:none!important;z-index:3!important;
+}
+#countries .country-main-panel::before,#countries .country-main-panel::after{content:none!important;display:none!important}
+#countries .country-grid{background:#fff5d9!important;grid-auto-rows:clamp(60px,8.1vh,88px)!important}
+#countries .country-bottom-nav{z-index:4!important}
