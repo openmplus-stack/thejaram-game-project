@@ -469,3 +469,26 @@ body:has(#home.screen.active) .app{max-width:none!important;width:100%!important
 #home .home-action:active{filter:brightness(.94)!important;transform:translateY(2px)!important}
 #home .home-action:focus-visible{outline:4px solid #174f83!important;outline-offset:1px!important}
 @media(orientation:portrait),(max-width:680px){#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-size:clamp(15px,4vw,23px)!important}}
+
+/* 2026-10-13 approved reference: colored title, illustrated button PNGs and scroll parchment */
+#home .home-title-wrap{top:3.5%!important;width:66%!important;height:23%!important}
+#home .home-title-wrap h1{font-size:clamp(30px,5.1vw,76px)!important;letter-spacing:-.065em!important;line-height:1.12!important;white-space:nowrap!important;-webkit-text-stroke:clamp(1px,.18vw,3px) #663018;paint-order:stroke fill;text-shadow:2px 3px 0 #703219,3px 5px 2px #34160780!important}
+#home .home-title-wrap h1 span:nth-child(1){color:#ffb324}
+#home .home-title-wrap h1 span:nth-child(2){color:#b8df2d}
+#home .home-title-wrap h1 span:nth-child(3){color:#fff2fa}
+#home .home-panel{right:3.7%!important;top:29%!important;width:54%!important;height:64%!important;padding:5% 4.8% 4%!important;border:4px solid #b97731!important;border-radius:26px!important;background:linear-gradient(110deg,#fff2d3 0%,#fff8df 47%,#f7e1b5 100%)!important;box-shadow:0 13px 24px #3823184d,inset 0 0 0 5px #fffbdf99!important;gap:2.3%!important}
+#home .home-panel:before,#home .home-panel:after{content:"";position:absolute;z-index:0;left:-2.5%;right:-2.5%;height:5.5%;border:2px solid #a76626;border-radius:50%/75%;background:linear-gradient(#e9ad62,#c9873d 45%,#a65b23 50%,#f0bd75);box-shadow:0 3px 6px #38251940;pointer-events:none}
+#home .home-panel:before{top:-2.3%}
+#home .home-panel:after{bottom:-2.3%}
+#home .home-intro{position:relative;z-index:1;font-size:clamp(16px,2.05vw,29px)!important;font-weight:950!important;color:#5a2d16!important;margin:0 0 1%!important}
+#home .home-menu,#home .home-artboard[data-asset-state="ready"] .home-menu{position:relative;z-index:1;gap:clamp(3px,.35vw,7px)!important}
+#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{aspect-ratio:4.2/1!important;background-size:100% 100%!important;font-size:clamp(19px,2.55vw,36px)!important;color:#fff8d9!important;-webkit-text-stroke:clamp(.3px,.07vw,1px) #4d250d;text-shadow:2px 3px 0 #5c2a0d,0 0 3px #421f0e!important}
+#home .home-btn-label{left:5%!important;max-width:65%!important;font-weight:1000!important}
+#home .home-explorer{left:3%!important;bottom:6%!important;width:40%!important;height:58%!important}
+@media(orientation:portrait),(max-width:680px){
+#home .home-title-wrap{top:6%!important;width:96%!important;height:15%!important}
+#home .home-title-wrap h1{font-size:clamp(28px,7vw,45px)!important}
+#home .home-panel{left:5%!important;right:5%!important;top:auto!important;bottom:4%!important;width:90%!important;height:auto!important;min-height:43%!important;padding:8% 4% 7%!important}
+#home .home-explorer{top:20%!important;bottom:auto!important;width:48%!important;height:31%!important}
+#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-size:clamp(17px,4.3vw,24px)!important}
+}
