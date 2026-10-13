@@ -521,3 +521,8 @@ body:has(#home.screen.active) .app{max-width:none!important;width:100%!important
 #continents .continent-choice:focus-visible{outline:4px solid #fff!important;outline-offset:-5px!important}
 #continents .continent-choice:active{background:#ffffff20!important}
 @media(orientation:portrait),(max-width:680px){#continents .continent-artboard,#continents .continent-artboard[data-asset-state="ready"]{width:100vw!important;max-height:none!important;min-height:0!important;height:auto!important;aspect-ratio:4/3!important}}
+
+#continents .continent-bottom-nav{position:absolute!important;z-index:9!important;left:20%!important;right:2%!important;bottom:.5%!important;height:7%!important;display:flex!important;align-items:center!important;gap:1%!important;padding:.4%!important;border:2px solid #b77b3c!important;border-radius:14px!important;background:#f8e2b8f5!important;box-shadow:0 3px 8px #52331e55!important}
+#continents .continent-bottom-nav button{flex:1!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;min-height:0!important;height:100%!important;padding:0!important;border:1px solid #b27a36!important;border-radius:9px!important;background:linear-gradient(#ffe4a4,#e9a84c)!important;color:#4e3018!important;font-size:clamp(15px,1.6vw,24px)!important;font-weight:800!important;line-height:1!important}
+#continents .continent-bottom-nav button span{font-size:clamp(9px,.9vw,14px)!important}
+#continents .continent-bottom-nav button[aria-current="page"]{background:linear-gradient(#d7f3ff,#89cbe8)!important}
