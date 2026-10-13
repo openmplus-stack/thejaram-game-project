@@ -526,3 +526,23 @@ body:has(#home.screen.active) .app{max-width:none!important;width:100%!important
 #continents .continent-bottom-nav button{flex:1!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;min-height:0!important;height:100%!important;padding:0!important;border:1px solid #b27a36!important;border-radius:9px!important;background:linear-gradient(#ffe4a4,#e9a84c)!important;color:#4e3018!important;font-size:clamp(15px,1.6vw,24px)!important;font-weight:800!important;line-height:1!important}
 #continents .continent-bottom-nav button span{font-size:clamp(9px,.9vw,14px)!important}
 #continents .continent-bottom-nav button[aria-current="page"]{background:linear-gradient(#d7f3ff,#89cbe8)!important}
+
+/* Approved illustrated navigation strip, replacing CSS-drawn menu. */
+#continents .continent-bottom-nav,
+#continents .continent-artboard[data-asset-state="ready"] .continent-bottom-nav{
+position:absolute!important;z-index:9!important;left:23.5%!important;right:1.5%!important;bottom:0!important;height:8.2%!important;
+display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:stretch!important;gap:0!important;
+margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+background:transparent url("./assets/ui-bottom-navigation.png") center / 100% 100% no-repeat!important;
+}
+#continents .continent-bottom-nav button,
+#continents .continent-artboard[data-asset-state="ready"] .continent-bottom-nav button,
+#continents .continent-bottom-nav button[aria-current="page"]{
+position:relative!important;display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+background:transparent!important;background-image:none!important;color:transparent!important;font-size:0!important;line-height:0!important;
+outline-offset:-3px!important;cursor:pointer!important;touch-action:manipulation!important;
+}
+#continents .continent-bottom-nav button span{display:none!important}
+#continents .continent-bottom-nav button:focus-visible{outline:3px solid #fff!important;border-radius:22px!important}
+#continents .continent-bottom-nav button:active{background:#ffffff24!important;border-radius:22px!important}
