@@ -64,3 +64,8 @@
 #quiz #quizYes,#quiz #quizNo{font-size:0!important;color:transparent!important;border-radius:50%!important}
 #quiz #quizYes::after,#quiz #quizNo::after{color:#fff!important}
 #quiz .quiz-tile img[hidden],#learning img[hidden]{display:none!important}
+
+/* Screenshot QA: ensure O/X controls retain their intended blue/red appearance. */
+#quiz .quiz-board .quiz-answers #quizYes{background:linear-gradient(180deg,#61c2ff 0%,#0764d6 100%)!important;border:6px solid #e8f7ff!important;box-shadow:0 7px 0 #124c8c,0 12px 22px #153e6555!important}
+#quiz .quiz-board .quiz-answers #quizNo{background:linear-gradient(180deg,#ff8581 0%,#df2634 100%)!important;border:6px solid #ffe6e3!important;box-shadow:0 7px 0 #932832,0 12px 22px #62252d55!important}
+#quiz .quiz-board .quiz-answers #quizYes::after,#quiz .quiz-board .quiz-answers #quizNo::after{color:#fff!important;opacity:1!important;text-shadow:0 3px 5px #10283f77!important}
