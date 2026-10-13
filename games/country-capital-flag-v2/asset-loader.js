@@ -7,7 +7,7 @@
   continent:'./assets/screen-continent-select.png',
   topic:original+'backgrounds/topic-select-no-number-no-arrows.png',
   activities:original+'backgrounds/bg-mode-select.png',
-  countries:original+'backgrounds/bg-country-select.png',
+  countries:'./assets/bg-world-clean.png',
   learning:original+'backgrounds/bg-learning.png',
   quiz:original+'backgrounds/bg-quiz.png',
   result:original+'backgrounds/bg-result.png',
@@ -34,7 +34,7 @@
  async function background(key,element){
   if(!element)return false;
   const ok=await load(key);
-  if(ok){element.style.backgroundImage='url("'+registry[key]+'")';element.dataset.assetState='ready'}
+  if(ok){if(key!=='countries')element.style.backgroundImage='url("'+registry[key]+'")';element.dataset.assetState='ready'}
   else{element.dataset.assetState='fallback';console.warn('[country-v2] Background unavailable:',key)}
   return ok;
  }
