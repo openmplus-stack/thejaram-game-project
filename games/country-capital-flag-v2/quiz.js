@@ -34,15 +34,14 @@
   const q=questions[index];if(!q)return;
   $('quizProgress').textContent=(index+1)+' / '+COUNT;
   $('quizScore').textContent='정답 '+correct+'개';
-  $('quizLeftText').textContent=q.source.country;
-  $('quizLeftFlag').hidden=true;
+  $('quizLeftText').textContent=q.topic==='flag-country'?'':q.source.country;
+  $('quizLeftFlag').hidden=q.topic!=='flag-country';
+  $('quizRightFlag').hidden=true;
   if(q.topic==='flag-country'){
-   $('quizRightText').textContent='';
-   $('quizRightFlag').src='https://flagcdn.com/w320/'+q.partner.flag+'.png';
-   $('quizRightFlag').alt=q.partner.country+' 국기';
-   $('quizRightFlag').hidden=false;
+   $('quizLeftFlag').src='https://flagcdn.com/w320/'+q.source.flag+'.png';
+   $('quizLeftFlag').alt=q.source.country+' 국기';
+   $('quizRightText').textContent=q.partner.country;
   }else{
-   $('quizRightFlag').hidden=true;
    $('quizRightText').textContent=q.partner.capital;
   }
   answered=false;clearFeedback();$('quizFeedback').textContent='';$('quizFeedback').className='';
