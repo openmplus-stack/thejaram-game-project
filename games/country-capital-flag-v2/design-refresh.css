@@ -30,3 +30,21 @@
 #quiz .quiz-tile{min-height:220px}
 #quiz .quiz-tile img[hidden],#learning img[hidden]{display:none!important}
 @media(max-width:650px){#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital,#quiz .quiz-tile{min-height:145px}}
+
+/* Stage 2: reuse existing shared art, never generate a background per country. */
+#activities .activity-panel,#result .result-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board,#quiz .quiz-board,#learning .learning-board{border-radius:24px}
+#activities .activity-panel,#result .result-score,#flags .flags-collection,#treasures .treasure-book-grid{background-color:#fff5dc;border:3px solid #b77b3b;box-shadow:0 8px 24px #3b6b8733}
+#activities .activity-card{background:linear-gradient(180deg,#fff9e7,#f6d7a3);border:4px solid #ba7b3c;border-radius:24px;box-shadow:0 6px 0 #9a622e,0 12px 18px #284c6325}
+#activities .activity-card:focus-visible,#quiz button:focus-visible,#learning button:focus-visible{outline:4px solid #fff;outline-offset:3px}
+#learning .learning-sign{background:linear-gradient(#ffdf9b,#edb75e);border:4px solid #9b622d;border-radius:20px;color:#553113;text-align:center;box-shadow:0 5px 0 #855122}
+#quiz .quiz-stats{color:#173c72;font-weight:800}
+#quiz .quiz-pair,#learning .learning-card{background:transparent!important;border:0!important;box-shadow:none!important}
+#quiz .quiz-tile,#learning .learning-flag-panel,#learning .learning-name-panel{overflow:hidden}
+#quiz .quiz-tile img,#learning .learning-flag-panel img{width:auto;height:auto;max-width:90%;object-fit:contain}
+#quiz .quiz-answers button{touch-action:manipulation}
+@media(orientation:landscape) and (max-height:800px){
+ #quiz .quiz-tile{min-height:160px}
+ #quiz #quizYes,#quiz #quizNo{width:min(13vh,135px);min-height:75px}
+ #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,
+ #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital{min-height:160px}
+}
