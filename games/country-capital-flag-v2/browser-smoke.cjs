@@ -22,6 +22,8 @@ const assert=require('node:assert/strict');
   await page.locator('#countries .country-card').first().waitFor();
   const choices=page.locator('#countries .country-card');
   assert((await choices.count())>=2,'at least two countries');
+  // Reset selection: it intentionally persists when switching topics within one continent.
+  await page.locator('#countryClearAll').click();
   await choices.nth(0).click();await choices.nth(1).click();
   assert.equal(await page.locator('#countryNext').isEnabled(),true);
   await shot('countries-'+topic);
