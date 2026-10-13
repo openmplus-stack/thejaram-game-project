@@ -1,0 +1,25 @@
+name: Country V2 Design Smoke Test
+on:
+  push:
+    branches:
+      - design/country-v2-parchment-20261013
+  pull_request:
+    paths:
+      - 'games/country-capital-flag-v2/**'
+      - '.github/workflows/country-v2-design-check.yml'
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Node version
+        run: node --version
+      - name: Static design and navigation checks
+        run: node games/country-capital-flag-v2/design-smoke-test.cjs
+      - name: Validate JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in games/country-capital-flag-v2/*.js; do
+            node --check "$file"
+          done
