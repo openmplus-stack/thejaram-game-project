@@ -546,3 +546,37 @@ outline-offset:-3px!important;cursor:pointer!important;touch-action:manipulation
 #continents .continent-bottom-nav button span{display:none!important}
 #continents .continent-bottom-nav button:focus-visible{outline:3px solid #fff!important;border-radius:22px!important}
 #continents .continent-bottom-nav button:active{background:#ffffff24!important;border-radius:22px!important}
+
+/* Shared layout contract for future illustrated screens:
+   4:3 artboard; 87% upper content; 13% bottom navigation safe area.
+   Keep artwork and navigation images at their natural aspect ratios. */
+:root{--world-content-scale:.87;--world-nav-height:12%;--world-nav-bottom:.6%}
+#continents .continent-artboard,
+#continents .continent-artboard[data-asset-state="ready"]{
+background-image:none!important;background-color:#a9dced!important;isolation:isolate!important;
+}
+#continents .continent-artboard::before,
+#continents .continent-artboard[data-asset-state="ready"]::before{
+content:""!important;display:block!important;position:absolute!important;z-index:0!important;
+top:0!important;left:6.5%!important;width:87%!important;height:87%!important;
+background:url("./assets/screen-continent-select.png") center/100% 100% no-repeat!important;
+pointer-events:none!important;
+}
+#continents .continent-choices,
+#continents .continent-artboard[data-asset-state="ready"] .continent-choices{z-index:2!important}
+#continents .continent-choice,
+#continents .continent-artboard[data-asset-state="ready"] .continent-choice{
+width:20.7%!important;height:26.7%!important;border-radius:16px!important;
+}
+#continents .continent-asia,#continents .continent-artboard[data-asset-state="ready"] .continent-asia{left:28.95%!important;top:23.23%!important}
+#continents .continent-europe,#continents .continent-artboard[data-asset-state="ready"] .continent-europe{left:50.17%!important;top:23.23%!important}
+#continents .continent-africa,#continents .continent-artboard[data-asset-state="ready"] .continent-africa{left:72.10%!important;top:23.23%!important;width:20.0%!important}
+#continents .continent-north,#continents .continent-artboard[data-asset-state="ready"] .continent-north{left:28.95%!important;top:51.42%!important}
+#continents .continent-south,#continents .continent-artboard[data-asset-state="ready"] .continent-south{left:50.17%!important;top:51.42%!important}
+#continents .continent-oceania,#continents .continent-artboard[data-asset-state="ready"] .continent-oceania{left:72.10%!important;top:51.42%!important;width:20.0%!important}
+#continents .continent-bottom-nav,
+#continents .continent-artboard[data-asset-state="ready"] .continent-bottom-nav{
+z-index:10!important;left:9%!important;right:9%!important;bottom:var(--world-nav-bottom)!important;
+width:82%!important;height:var(--world-nav-height)!important;
+background:transparent url("./assets/ui-bottom-navigation.png") center/contain no-repeat!important;
+}
