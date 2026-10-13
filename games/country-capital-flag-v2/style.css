@@ -627,3 +627,71 @@ color:transparent!important;font-size:0!important;touch-action:manipulation!impo
 #topics .topic-artboard,#topics .topic-artboard[data-asset-state="ready"]{
 width:100vw!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:4/3!important}
 }
+
+
+/* Screen 4: country selector shares the approved landscape visual language.
+   Country data remains live and scrollable; navigation stays visible. */
+#countries.screen.active{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;min-height:100dvh!important;background:#76c9ed!important;overflow:hidden!important}
+#countries .country-artboard,#countries .country-artboard[data-asset-state="ready"]{
+position:relative!important;display:flex!important;flex-direction:column!important;
+width:min(100vw,calc(100dvh * 4 / 3))!important;height:min(100dvh,75vw)!important;
+max-width:none!important;max-height:100dvh!important;aspect-ratio:4/3!important;
+min-height:0!important;overflow:hidden!important;margin:0!important;
+padding:2.3% 5% 1.5%!important;border:0!important;border-radius:0!important;
+box-shadow:none!important;background:#b8e9f7 url("./assets/bg-world-clean.png") center/cover no-repeat!important;
+}
+#countries .country-wood-sign{position:relative!important;z-index:2!important;flex:none!important;
+align-self:center!important;width:48%!important;min-height:0!important;height:12%!important;
+display:flex!important;align-items:center!important;justify-content:center!important;
+margin:0 0 -1.4%!important;border:4px solid #7c3f18!important;border-radius:19px!important;
+background:linear-gradient(#e7a14f,#b56b2d 58%,#8d471c)!important;box-shadow:0 6px 0 #683914,0 9px 14px #55321e50!important;
+color:white!important;font-size:clamp(25px,3.5vw,49px)!important;font-weight:950!important;text-shadow:0 3px 2px #663414!important}
+#countries .country-main-panel{position:relative!important;flex:1!important;min-height:0!important;
+display:flex!important;flex-direction:column!important;align-items:stretch!important;
+margin:0 0 1%!important;padding:3.3% 3.5% 1.4%!important;
+background:linear-gradient(125deg,#fff3d9f7,#fff9e7fa 52%,#f6dfb8f7)!important;
+border:4px solid #bb8240!important;border-radius:24px!important;
+box-shadow:inset 0 0 0 3px #fff4cf,0 7px 13px #69452444!important}
+#countries .country-main-panel h2{margin:0!important;text-align:center!important;
+font-size:clamp(19px,2.5vw,35px)!important;color:#4c2c1c!important;line-height:1.25!important}
+#countries #countryMessage{margin:0!important;text-align:center!important;
+font-size:clamp(15px,1.65vw,23px)!important;color:#593b27!important}
+#countries .country-tools{display:flex!important;flex:none!important;align-items:center!important;
+gap:1.2%!important;margin:1% 0!important}
+#countries .country-tools button{min-height:0!important;padding:.6% 2%!important;
+font-size:clamp(14px,1.5vw,21px)!important;font-weight:850!important;
+border:2px solid #a66c31!important;border-radius:12px!important;background:linear-gradient(#fff4d9,#f0c983)!important;color:#50321f!important}
+#countries #countrySelectAll{background:linear-gradient(#7ed6ff,#1385dc)!important;color:white!important;border-color:#1469ad!important}
+#countries #countrySelectedCount{margin-left:auto!important;font-size:clamp(16px,1.7vw,23px)!important;color:#3c2c22!important}
+#countries .country-grid{flex:1!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;
+display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(94px,12.5vh)!important;
+gap:1.1%!important;align-content:start!important;padding:1%!important;margin:0!important;
+background:transparent!important;border:0!important;border-radius:12px!important;overscroll-behavior:contain!important}
+#countries .country-card{position:relative!important;min-width:0!important;min-height:0!important;height:100%!important;
+gap:3px!important;padding:6px 4px!important;border:2px solid #d3aa72!important;border-radius:12px!important;
+background:#fffdf7f5!important;color:#322a23!important;font-size:clamp(13px,1.42vw,19px)!important;
+font-weight:800!important;line-height:1.15!important;overflow-wrap:anywhere!important}
+#countries .country-card img{width:min(70%,110px)!important;height:48%!important;max-height:58px!important;object-fit:contain!important}
+#countries .country-card .country-check{position:absolute!important;left:5px!important;top:5px!important;
+display:grid!important;place-items:center!important;width:22px!important;height:22px!important;
+border:2px solid #8d8073!important;border-radius:5px!important;background:white!important;
+color:#116b46!important;font-size:17px!important}
+#countries .country-card[aria-pressed="true"]{background:#e1f8e8!important;border-color:#218e5d!important}
+#countries .country-card[aria-pressed="true"] .country-check{border-color:#218e5d!important}
+#countries #countryNext{flex:none!important;align-self:center!important;margin:.9% auto 0!important;
+min-height:0!important;padding:.7% 4%!important;font-size:clamp(18px,1.9vw,27px)!important;
+border:2px solid #b57937!important;border-radius:13px!important;background:linear-gradient(#ffedb1,#eeb95d)!important;color:#4d301b!important;font-weight:900!important}
+#countries #countryNext:disabled{opacity:.5!important}
+#countries .country-bottom-nav{flex:none!important;position:relative!important;
+width:94%!important;height:10.5%!important;min-height:0!important;align-self:center!important;
+display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:0!important;
+margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;
+background:transparent url("./assets/ui-bottom-navigation.png") center/100% 100% no-repeat!important}
+#countries .country-bottom-nav button{width:100%!important;height:100%!important;min-height:0!important;
+margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;
+background:transparent!important;color:transparent!important;font-size:0!important;cursor:pointer!important}
+#countries .country-bottom-nav button:focus-visible{outline:3px solid white!important;outline-offset:-4px!important}
+@media(max-width:680px){#countries .country-artboard{height:75vw!important;max-height:none!important}
+#countries .country-grid{grid-auto-rows:minmax(65px,12vw)!important}
+#countries .country-card img{max-height:42px!important}
+#countries .country-card .country-check{width:15px!important;height:15px!important;font-size:12px!important}}
