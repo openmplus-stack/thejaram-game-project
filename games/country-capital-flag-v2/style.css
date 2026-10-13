@@ -843,3 +843,19 @@ width:83%!important;height:59%!important;max-height:72px!important;object-fit:co
 #countries .country-card img{width:82%!important;height:55%!important;max-height:46px!important}
 #countries .country-card .country-check{width:12px!important;height:12px!important;font-size:9px!important}
 }
+
+
+/* Final country artboard composition: hide baked-in UI entirely behind ONE live panel. */
+#countries .country-main-panel{
+left:22.8%!important;top:29.5%!important;width:72.5%!important;height:57.8%!important;
+padding:1.5% 1.6% 1.1%!important;
+background:#fff3d3!important;border:4px solid #ad692a!important;
+border-radius:17px!important;box-shadow:inset 0 0 0 3px #fff7e4!important;
+overflow:hidden!important;isolation:isolate!important;
+}
+#countries .country-main-panel h2{margin:0!important;line-height:1.05!important;font-size:clamp(15px,1.8vw,25px)!important}
+#countries #countryMessage{margin:0!important;line-height:1.1!important;font-size:clamp(12px,1.25vw,18px)!important}
+#countries .country-tools{margin:.6% 0!important}
+#countries .country-grid{background:#fff3d3!important;grid-auto-rows:clamp(78px,10.5vh,112px)!important}
+#countries .country-artboard::before,#countries .country-artboard::after{display:none!important;content:none!important}
+#countries .country-artboard{background-blend-mode:normal!important}
