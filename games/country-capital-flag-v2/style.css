@@ -448,3 +448,24 @@ body:has(#home.screen.active) .app{max-width:none!important;width:100%!important
 #home .home-artboard,#home .home-artboard[data-asset-state="ready"]{background-repeat:no-repeat!important;background-position:center center!important;background-size:100% 100%!important;box-shadow:none!important}
 #home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-family:system-ui,"Apple SD Gothic Neo",sans-serif!important;letter-spacing:-.035em!important}
 #home .home-panel{box-shadow:0 10px 25px #1b43502e,inset 0 0 0 3px #fff9eaaa!important}
+
+/* Home: exact uploaded transparent PNG button artwork, not CSS imitations */
+#home .home-menu,#home .home-artboard[data-asset-state="ready"] .home-menu{gap:clamp(5px,.75vw,11px)!important}
+#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{
+  position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-height:0!important;height:auto!important;aspect-ratio:3.85/1!important;
+  padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;transform:none;background-color:transparent!important;
+  background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important;
+  font-size:clamp(17px,2.15vw,29px)!important;color:#342316!important;text-shadow:0 1px 2px #fff8!important;
+  cursor:pointer!important;
+}
+#home .home-start,#home .home-artboard[data-asset-state="ready"] .home-start{background-image:url("./assets/btn-home-start.png")!important}
+#home .home-flags,#home .home-artboard[data-asset-state="ready"] .home-flags{background-image:url("./assets/btn-home-flags.png")!important}
+#home .home-treasures,#home .home-artboard[data-asset-state="ready"] .home-treasures{background-image:url("./assets/btn-home-treasure.png")!important}
+#home .home-progress,#home .home-artboard[data-asset-state="ready"] .home-progress{background-image:url("./assets/btn-home-learn.png")!important}
+#home .home-btn-icon,#home .home-btn-arrow{display:none!important}
+#home .home-btn-label{display:block!important;position:relative!important;left:4%!important;max-width:58%!important;white-space:nowrap!important;pointer-events:none!important;font-weight:950!important}
+#home .home-action:active{filter:brightness(.94)!important;transform:translateY(2px)!important}
+#home .home-action:focus-visible{outline:4px solid #174f83!important;outline-offset:1px!important}
+@media(orientation:portrait),(max-width:680px){#home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-size:clamp(15px,4vw,23px)!important}}
