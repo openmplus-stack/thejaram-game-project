@@ -64,6 +64,14 @@ const assert=require('node:assert/strict');
  assert(await page.locator('#quiz').isVisible());
  assert.equal((await page.locator('#quizProgress').innerText()).trim(),'1 / 20');
  assert((await page.locator('#quizRightText').innerText()).trim().length>0);
+ const oxStyles=await page.evaluate(()=>{
+   const yes=document.querySelector('#quizYes'),no=document.querySelector('#quizNo');
+   const color=el=>getComputedStyle(el).backgroundImage;
+   return {yes:color(yes),no:color(no),yesAfter:getComputedStyle(yes,'::after').content,noAfter:getComputedStyle(no,'::after').content};
+ });
+ assert(/rgb\\(97, 194, 255\\)|rgb\\(7, 100, 214\\)/.test(oxStyles.yes),'O button blue: '+oxStyles.yes);
+ assert(/rgb\\(255, 133, 129\\)|rgb\\(223, 38, 52\\)/.test(oxStyles.no),'X button red: '+oxStyles.no);
+ assert(oxStyles.yesAfter.includes('O')&&oxStyles.noAfter.includes('×'),'O/X symbols visible');
  await shot('quiz-country-capital');
  await page.locator('#quizBpmPlus').click();
  assert.equal(await page.locator('#quizBpm').inputValue(),'70');
