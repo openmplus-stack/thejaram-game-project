@@ -4,7 +4,7 @@
  const registry=Object.freeze({
   home:'./assets/home-approved-composite.png',
   logo:original+'backgrounds/logo-world-buddy.png',
-  continent:original+'backgrounds/continent-select-no-number.png',
+  continent:'./assets/screen-continent-select.png',
   topic:original+'backgrounds/topic-select-no-number-no-arrows.png',
   activities:original+'backgrounds/bg-mode-select.png',
   countries:original+'backgrounds/bg-country-select.png',
