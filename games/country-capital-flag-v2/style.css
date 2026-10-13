@@ -492,3 +492,15 @@ body:has(#home.screen.active) .app{max-width:none!important;width:100%!important
 #home .home-explorer{top:20%!important;bottom:auto!important;width:48%!important;height:31%!important}
 #home .home-action,#home .home-artboard[data-asset-state="ready"] .home-action{font-size:clamp(17px,4.3vw,24px)!important}
 }
+
+/* Exact approved 4:3 home artwork; all text and buttons are painted in the PNG. */
+#home.screen.active{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;overflow:hidden!important;background:#a1d7ed!important}
+#home .exact-home,#home .exact-home[data-asset-state="ready"]{position:relative!important;flex:none!important;width:min(100vw,calc(100dvh * 4 / 3))!important;height:auto!important;min-height:0!important;max-height:100dvh!important;aspect-ratio:4/3!important;overflow:hidden!important;background-color:#a1d7ed!important;background-image:url("./assets/home-approved-composite.png")!important;background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important}
+#home .exact-home-actions{position:absolute!important;inset:0!important;display:block!important;pointer-events:none!important}
+#home .exact-home-hit{position:absolute!important;left:48%!important;width:45%!important;height:10.4%!important;min-height:0!important;margin:0!important;padding:0!important;display:block!important;background:transparent!important;border:0!important;border-radius:15px!important;box-shadow:none!important;color:transparent!important;font-size:0!important;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important}
+#home .exact-start{top:42%!important}
+#home .exact-flags{top:53.7%!important}
+#home .exact-treasures{top:65.1%!important}
+#home .exact-progress{top:76.4%!important}
+#home .exact-home-hit:focus-visible{outline:4px solid white!important;outline-offset:-4px!important}
+@media(orientation:portrait),(max-width:680px){#home .exact-home,#home .exact-home[data-asset-state="ready"]{width:100vw!important;min-height:0!important;height:auto!important;max-height:none!important;aspect-ratio:4/3!important}}
