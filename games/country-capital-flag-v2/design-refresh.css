@@ -196,3 +196,28 @@
  #countries .country-artboard::after{left:0%!important;width:31%!important;height:58%!important}
  #countries .country-wood-sign{font-size:clamp(20px,4vw,38px)!important}
 }
+
+/* Final targeted alignment with approved continent-selection screen.
+   Only character, title lettering, and footer artwork change. */
+#countries .country-artboard::after{
+ left:0%!important;bottom:8.2%!important;width:34.5%!important;height:70%!important;
+ background-position:left bottom!important;background-size:contain!important;
+}
+#countries .country-wood-sign{
+ font-family:system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif!important;
+ font-size:clamp(32px,4.5vw,62px)!important;font-weight:1000!important;
+ letter-spacing:-.055em!important;line-height:1!important;
+ color:#4c2411!important;
+ -webkit-text-stroke:1.3px #fff0c6!important;
+ text-shadow:0 2px 0 #fff1c8,2px 4px 0 #8d4a1f,3px 5px 3px #48230f66!important;
+}
+#countries .country-bottom-nav{
+ left:10%!important;right:1.5%!important;width:88.5%!important;
+ bottom:0%!important;height:12.3%!important;
+ background-size:100% 100%!important;
+}
+#countries .country-bottom-nav button{border:0!important;background:transparent!important;box-shadow:none!important}
+@media(max-width:680px){
+ #countries .country-artboard::after{width:34.5%!important;height:70%!important}
+ #countries .country-wood-sign{font-size:clamp(24px,4.5vw,40px)!important}
+}
