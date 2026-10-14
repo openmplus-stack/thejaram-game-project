@@ -46,3 +46,19 @@
 - 2단계에서 검증할 항목 정의
 
 **미완료:** 이미지 픽셀 비교, 기준 자산 최종 확정, 공통 템플릿 구현, Safari 실화면 검수. 이 문서는 디자인을 변경하지 않는다.
+
+## 2026-10-14 원본 파일 추가 확인
+
+GitHub 저장소에서 다음 다섯 파일의 **존재와 SHA**를 확인했다. 이 검사는 이미지 내용을 육안으로 검증한 결과가 아니다.
+
+| 파일 | Git blob SHA |
+|---|---|
+| `assets/screen-topic-select.jpg` | `7ee71633e8c359b09aac997e34aebd2516625e64` |
+| `assets/ui-title-sign.png` | `116261251f8a3272c0433f3c834e1bb7a954e06d` |
+| `assets/ui-bottom-navigation.png` | `9343b73a7137c3ee6cb838baf15598e853857803` |
+| `../country-capital-flag/assets/characters/explorer-master.png` | `2c2f59aa4e4cc1c9ff284aef8e5e22f538b421da` |
+| `../country-capital-flag/assets/characters/explorer-point.png` | `7dddc7c7d537474895dffbb8706f628efa8e4a48` |
+
+**검증 한계:** GitHub 파일/Blob 텍스트 인터페이스에서 바이너리 이미지 읽기가 지원되지 않아 승인된 화면과 실제 원본의 픽셀 비교는 완료하지 못했다. 원본을 임의로 확정하거나 모든 화면에 확대 적용하지 않는다.
+
+**다음 검수 조건:** 실제 화면 또는 파일 미리보기에서 승인된 「학습 방식 선택」 이미지와 후보 원본의 캐릭터 얼굴·포즈·투명 여백, 제목판 윤곽·글자, 하단 메뉴 5개 아이콘과 버튼 비율을 나란히 비교해 최종 자산을 선택한다.
