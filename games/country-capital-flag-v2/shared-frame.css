@@ -91,3 +91,16 @@
 @media(max-width:680px){
   #countries .country-wood-sign{font-size:clamp(26px,5.1vw,45px)!important}
 }
+
+/* Continent title is already painted into screen-continent-select.png.
+   Never render an additional title or wooden board on this screen. */
+#continents .continent-master-sign,
+#continents .continent-master-sign::before,
+#continents .continent-master-sign::after,
+#continents .continent-title-overlay,
+#continents .continent-title-overlay::before,
+#continents .continent-title-overlay::after{display:none!important;content:none!important;background:none!important}
+#continents .continent-artboard::before,
+#continents .continent-artboard::after{content:none!important;display:none!important;background-image:none!important}
+#continents .continent-artboard,
+#continents .continent-artboard[data-asset-state="ready"]{background-image:url("./assets/screen-continent-select.png")!important}
