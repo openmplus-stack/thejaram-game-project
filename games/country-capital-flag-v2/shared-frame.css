@@ -19,18 +19,16 @@
   margin:0!important;padding:0 2%!important;
   display:flex!important;align-items:center!important;justify-content:center!important;
   white-space:nowrap!important;
-  background:transparent url("./assets/ui-title-sign.png") center/contain no-repeat!important;
+  background:transparent url("./assets/title-country-select-master.png?v=20261014-master-1") center/contain no-repeat!important;
   border:0!important;border-radius:0!important;box-shadow:none!important;
   color:transparent!important;font-size:0!important;text-shadow:none!important;-webkit-text-stroke:0!important;
   z-index:6!important;
 }
 #countries .country-wood-sign::after{
-  content:""!important;
-  display:block!important;
-  position:absolute!important;
-  inset:18% 12% 20%!important;
-  background:transparent url("./assets/title-country-select.png?v=20261014-rounded-png-1") center/contain no-repeat!important;
-  pointer-events:none!important;
+  content:none!important;
+  display:none!important;
+  background:none!important;
+
 }
 #countries .country-main-panel{
   box-sizing:border-box!important;
