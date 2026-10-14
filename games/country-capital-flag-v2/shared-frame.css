@@ -6,14 +6,14 @@
  --v2-frame-title-top:2.4%;
  --v2-frame-title-width:43%;
  --v2-frame-title-height:17%;
- --v2-frame-explorer-left:1.5%;
+ --v2-frame-explorer-left:0%;
  --v2-frame-explorer-bottom:11%;
- --v2-frame-explorer-width:29%;
- --v2-frame-explorer-height:54%;
+ --v2-frame-explorer-width:40.6%;
+ --v2-frame-explorer-height:75.6%;
  --v2-frame-footer-left:5.5%;
- --v2-frame-footer-bottom:.5%;
+ --v2-frame-footer-bottom:-8%;
  --v2-frame-footer-width:89%;
- --v2-frame-footer-height:13.8%;
+ --v2-frame-footer-height:auto;
 }
 #countries .country-artboard::after{
  content:""!important;display:block!important;position:absolute!important;
@@ -30,11 +30,11 @@
  left:var(--v2-frame-title-left)!important;top:var(--v2-frame-title-top)!important;
  width:var(--v2-frame-title-width)!important;height:var(--v2-frame-title-height)!important;
  padding:0 3%!important;margin:0!important;
- background:transparent url("./assets/ui-title-sign.png") center/100% 100% no-repeat!important;
+ background:transparent url("./assets/ui-title-sign.png") center/contain no-repeat!important;
  border:0!important;border-radius:0!important;box-shadow:none!important;
- font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;
- font-size:clamp(29px,4.5vw,65px)!important;font-weight:1000!important;
- letter-spacing:-.065em!important;line-height:1!important;
+ font-family:"Arial Rounded MT Bold","NanumSquareRound","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;
+ font-size:clamp(32px,4.8vw,68px)!important;font-weight:1000!important;
+ letter-spacing:-.085em!important;line-height:1!important;
  color:#4b160b!important;-webkit-text-stroke:2px #fff0ce!important;
  text-shadow:0 3px 0 #fff5d7,2px 5px 0 #a95726,4px 7px 2px #4c250e88!important;
  z-index:6!important;
@@ -45,15 +45,16 @@
  bottom:var(--v2-frame-footer-bottom)!important;
  width:var(--v2-frame-footer-width)!important;
  height:var(--v2-frame-footer-height)!important;
+ aspect-ratio:2172 / 724!important;
  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
  gap:0!important;margin:0!important;padding:0!important;
  border:0!important;border-radius:0!important;box-shadow:none!important;
- background:transparent url("./assets/ui-bottom-navigation.png") center/100% 100% no-repeat!important;
+ background:transparent url("./assets/ui-bottom-navigation.png") center/contain no-repeat!important;
  z-index:8!important;pointer-events:none!important;
 }
 #countries .country-bottom-nav button{
- display:block!important;width:100%!important;height:100%!important;
- margin:0!important;padding:0!important;
+ display:block!important;width:100%!important;height:32%!important;
+ align-self:center!important;margin:0!important;padding:0!important;
  background:transparent!important;border:0!important;border-radius:0!important;
  box-shadow:none!important;color:transparent!important;font-size:0!important;
  text-shadow:none!important;pointer-events:auto!important;touch-action:manipulation!important;
@@ -90,3 +91,7 @@
 /* Approved illustration-first styling: the original image assets, not CSS-drawn substitutes. */
 #countries .country-wood-sign{color:#5a210d!important;-webkit-text-stroke:1.5px #ffdc8d!important;text-shadow:0 2px 0 #ffe5a7,2px 4px 0 #ad5d25,3px 5px 1px #542b15!important}
 #countries .country-main-panel{border-color:#a96b35!important;background:linear-gradient(115deg,#fff4d7,#fff9e9 52%,#fbe8c5)!important}
+
+/* The transparent menu PNG is 2172x724 (3:1); its painted buttons occupy the middle band.
+   Keep the full PNG undistorted and align five accessible hit targets to the painted band. */
+#countries .country-bottom-nav{max-height:none!important}
