@@ -221,3 +221,32 @@
  #countries .country-artboard::after{width:34.5%!important;height:70%!important}
  #countries .country-wood-sign{font-size:clamp(24px,4.5vw,40px)!important}
 }
+
+/* 2026-10-14: match the approved "학습 방식 선택" reference, not the prior country design.
+   Retain country grid and all navigation logic. */
+#countries .country-artboard::after{
+ background-image:url("../country-capital-flag/assets/characters/explorer-master.png")!important;
+ left:0%!important;bottom:8.4%!important;width:30%!important;height:58%!important;
+ background-position:left bottom!important;background-size:contain!important;
+}
+#countries .country-wood-sign{
+ left:25.5%!important;top:3.4%!important;width:51%!important;height:20%!important;
+ background-image:url("./assets/ui-title-sign.png")!important;
+ background-position:center!important;background-size:100% 100%!important;
+ font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;
+ font-size:clamp(36px,5.1vw,72px)!important;font-weight:1000!important;
+ letter-spacing:-.065em!important;line-height:1!important;
+ color:#4b160b!important;-webkit-text-stroke:2px #fff0ce!important;
+ text-shadow:0 3px 0 #fff5d7,2px 5px 0 #a95726,4px 7px 2px #4c250e88!important;
+}
+#countries .country-main-panel{top:24%!important;height:62%!important}
+#countries .country-bottom-nav{
+ left:5.5%!important;right:5.5%!important;width:89%!important;
+ bottom:0.5%!important;height:13.8%!important;
+ background-image:url("./assets/ui-bottom-navigation.png")!important;
+ background-size:100% 100%!important;
+}
+#countries .country-bottom-nav button{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+@media(max-width:680px){
+ #countries .country-wood-sign{font-size:clamp(26px,5.1vw,45px)!important}
+}
