@@ -1,5 +1,6 @@
 /* V2 shared screen frame — single source of truth for country-selection chrome.
-   Stage 2: do not modify gameplay/data or approved home/continent/topic pages. */
+   Stage 2: do not modify gameplay/data or approved home/continent/topic pages.
+   Explorer asset confirmed against approved topic screen: explorer-point.png. */
 :root{
  --v2-frame-title-left:25.5%;
  --v2-frame-title-top:3.4%;
@@ -20,7 +21,7 @@
  bottom:var(--v2-frame-explorer-bottom)!important;
  width:var(--v2-frame-explorer-width)!important;
  height:var(--v2-frame-explorer-height)!important;
- background:transparent url("../country-capital-flag/assets/characters/explorer-master.png") left bottom/contain no-repeat!important;
+ background:transparent url("../country-capital-flag/assets/characters/explorer-point.png") left bottom/contain no-repeat!important;
  z-index:2!important;pointer-events:none!important;
 }
 #countries .country-wood-sign{
