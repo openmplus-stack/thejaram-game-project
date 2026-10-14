@@ -2,14 +2,14 @@
    Stage 2: do not modify gameplay/data or approved home/continent/topic pages.
    Explorer asset confirmed against approved topic screen: explorer-point.png. */
 :root{
- --v2-frame-title-left:25.5%;
- --v2-frame-title-top:3.4%;
- --v2-frame-title-width:51%;
- --v2-frame-title-height:20%;
- --v2-frame-explorer-left:0%;
- --v2-frame-explorer-bottom:8.4%;
- --v2-frame-explorer-width:30%;
- --v2-frame-explorer-height:58%;
+ --v2-frame-title-left:30%;
+ --v2-frame-title-top:2.4%;
+ --v2-frame-title-width:43%;
+ --v2-frame-title-height:17%;
+ --v2-frame-explorer-left:1.5%;
+ --v2-frame-explorer-bottom:11%;
+ --v2-frame-explorer-width:29%;
+ --v2-frame-explorer-height:54%;
  --v2-frame-footer-left:5.5%;
  --v2-frame-footer-bottom:.5%;
  --v2-frame-footer-width:89%;
@@ -33,7 +33,7 @@
  background:transparent url("./assets/ui-title-sign.png") center/100% 100% no-repeat!important;
  border:0!important;border-radius:0!important;box-shadow:none!important;
  font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;
- font-size:clamp(36px,5.1vw,72px)!important;font-weight:1000!important;
+ font-size:clamp(29px,4.5vw,65px)!important;font-weight:1000!important;
  letter-spacing:-.065em!important;line-height:1!important;
  color:#4b160b!important;-webkit-text-stroke:2px #fff0ce!important;
  text-shadow:0 3px 0 #fff5d7,2px 5px 0 #a95726,4px 7px 2px #4c250e88!important;
@@ -73,7 +73,7 @@
 }
 #countries .country-main-panel{
  position:absolute!important;
- left:31%!important;top:24%!important;width:66%!important;height:61%!important;
+ left:31%!important;top:21%!important;width:65%!important;height:65%!important;
  display:flex!important;flex-direction:column!important;min-height:0!important;
  margin:0!important;padding:1.5% 1.8% 1.3%!important;
  border:5px solid #b57b3d!important;border-radius:22px!important;
@@ -86,3 +86,7 @@
  overscroll-behavior:contain!important;
 }
 #countries #countryNext{flex:none!important}
+
+/* Approved illustration-first styling: the original image assets, not CSS-drawn substitutes. */
+#countries .country-wood-sign{color:#5a210d!important;-webkit-text-stroke:1.5px #ffdc8d!important;text-shadow:0 2px 0 #ffe5a7,2px 4px 0 #ad5d25,3px 5px 1px #542b15!important}
+#countries .country-main-panel{border-color:#a96b35!important;background:linear-gradient(115deg,#fff4d7,#fff9e9 52%,#fbe8c5)!important}
