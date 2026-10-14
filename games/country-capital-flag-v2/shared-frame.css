@@ -1,17 +1,17 @@
 /* V2 shared screen frame — single source of truth for country-selection chrome.
    Stage 2: do not modify gameplay/data or approved home/continent/topic pages.
-   Explorer asset confirmed against approved topic screen: explorer-point.png. */
+   Country screen uses the existing upright explorer-master to prevent hand overlap. */
 :root{
  --v2-frame-title-left:30%;
  --v2-frame-title-top:2.4%;
  --v2-frame-title-width:43%;
  --v2-frame-title-height:17%;
- --v2-frame-explorer-left:0%;
+ --v2-frame-explorer-left:1%;
  --v2-frame-explorer-bottom:11%;
- --v2-frame-explorer-width:40.6%;
- --v2-frame-explorer-height:75.6%;
+ --v2-frame-explorer-width:34%;
+ --v2-frame-explorer-height:69%;
  --v2-frame-footer-left:5.5%;
- --v2-frame-footer-bottom:-8%;
+ --v2-frame-footer-bottom:-5%;
  --v2-frame-footer-width:89%;
  --v2-frame-footer-height:auto;
 }
@@ -21,7 +21,7 @@
  bottom:var(--v2-frame-explorer-bottom)!important;
  width:var(--v2-frame-explorer-width)!important;
  height:var(--v2-frame-explorer-height)!important;
- background:transparent url("../country-capital-flag/assets/characters/explorer-point.png") left bottom/contain no-repeat!important;
+ background:transparent url("../country-capital-flag/assets/characters/explorer-master.png") left bottom/contain no-repeat!important;
  z-index:2!important;pointer-events:none!important;
 }
 #countries .country-wood-sign{
@@ -35,8 +35,8 @@
  font-family:"Arial Rounded MT Bold","NanumSquareRound","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif!important;
  font-size:clamp(32px,4.8vw,68px)!important;font-weight:1000!important;
  letter-spacing:-.085em!important;line-height:1!important;
- color:#4b160b!important;-webkit-text-stroke:2px #fff0ce!important;
- text-shadow:0 3px 0 #fff5d7,2px 5px 0 #a95726,4px 7px 2px #4c250e88!important;
+ color:#421207!important;-webkit-text-stroke:3px #fff0c5!important;
+ text-shadow:0 3px 0 #fff0c5,0 5px 0 #71320e,2px 7px 1px #321507!important;
  z-index:6!important;
 }
 #countries .country-bottom-nav{
@@ -74,7 +74,7 @@
 }
 #countries .country-main-panel{
  position:absolute!important;
- left:31%!important;top:21%!important;width:65%!important;height:65%!important;
+ left:34%!important;top:19.5%!important;width:62%!important;height:59%!important;
  display:flex!important;flex-direction:column!important;min-height:0!important;
  margin:0!important;padding:1.5% 1.8% 1.3%!important;
  border:5px solid #b57b3d!important;border-radius:22px!important;
@@ -89,9 +89,14 @@
 #countries #countryNext{flex:none!important}
 
 /* Approved illustration-first styling: the original image assets, not CSS-drawn substitutes. */
-#countries .country-wood-sign{color:#5a210d!important;-webkit-text-stroke:1.5px #ffdc8d!important;text-shadow:0 2px 0 #ffe5a7,2px 4px 0 #ad5d25,3px 5px 1px #542b15!important}
+
 #countries .country-main-panel{border-color:#a96b35!important;background:linear-gradient(115deg,#fff4d7,#fff9e9 52%,#fbe8c5)!important}
 
 /* The transparent menu PNG is 2172x724 (3:1); its painted buttons occupy the middle band.
    Keep the full PNG undistorted and align five accessible hit targets to the painted band. */
 #countries .country-bottom-nav{max-height:none!important}
+
+/* Keep title, selection panel and painted footer separated in 4:3 landscape. */
+#countries .country-main-panel{box-sizing:border-box!important;overflow:hidden!important}
+#countries .country-wood-sign{box-sizing:border-box!important;white-space:nowrap!important}
+#countries .country-bottom-nav{box-sizing:border-box!important}
