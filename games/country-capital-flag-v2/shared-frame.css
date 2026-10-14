@@ -29,7 +29,7 @@
   display:block!important;
   position:absolute!important;
   inset:18% 12% 20%!important;
-  background:transparent url("./assets/title-country-select.svg?v=20261014-single-text") center/contain no-repeat!important;
+  background:transparent url("./assets/title-country-select.png?v=20261014-rounded-png-1") center/contain no-repeat!important;
   pointer-events:none!important;
 }
 #countries .country-main-panel{
