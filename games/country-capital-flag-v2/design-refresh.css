@@ -145,3 +145,54 @@
  box-shadow:inset 0 3px 2px #fff6d8,0 3px 0 #8b4b16!important;
 }
 #countries .country-bottom-nav button:focus-visible{outline:4px solid #fff!important;outline-offset:-5px!important}
+
+/* Country screen visual parity with the approved continent page (2026-10-14).
+   Reuse the EXISTING shared UI images instead of hand-drawn substitutes. */
+#countries .country-artboard,#countries .country-artboard[data-asset-state="ready"]{
+ background:#86cdef url("./assets/bg-world-clean.png") center/100% 100% no-repeat!important;
+}
+#countries .country-artboard::after{
+ content:""!important;display:block!important;position:absolute!important;
+ left:0%!important;bottom:8%!important;width:31%!important;height:58%!important;
+ background:url("../country-capital-flag/assets/characters/explorer-point.png") left bottom/contain no-repeat!important;
+ z-index:2!important;pointer-events:none!important;
+}
+#countries .country-wood-sign{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ position:absolute!important;left:31%!important;top:3.1%!important;width:45%!important;height:14.6%!important;
+ margin:0!important;padding:0 3%!important;z-index:6!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:transparent url("./assets/ui-title-sign.png") center/100% 100% no-repeat!important;
+ color:#47230f!important;font-size:clamp(27px,4vw,55px)!important;
+ font-weight:1000!important;letter-spacing:-.05em!important;
+ text-shadow:2px 3px 0 #ffe5aa,3px 5px 1px #8b481d66!important;
+}
+#countries .country-main-panel{
+ left:30%!important;top:20.3%!important;width:67%!important;height:66.2%!important;
+ border:5px solid #a96c2f!important;border-radius:23px!important;
+ background:linear-gradient(180deg,#fff5dd,#ffefcc)!important;
+ box-shadow:0 6px 0 #85501e,0 10px 18px #5a361b40,inset 0 0 0 3px #fff8e9!important;
+ z-index:3!important;
+}
+#countries .country-grid{background:transparent!important}
+#countries .country-bottom-nav{
+ position:absolute!important;left:16%!important;right:1.4%!important;
+ bottom:.4%!important;width:82.6%!important;height:10.3%!important;
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ gap:0!important;padding:0!important;margin:0!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:transparent url("./assets/ui-bottom-navigation.png") center/100% 100% no-repeat!important;
+ z-index:8!important;pointer-events:none!important;
+}
+#countries .country-bottom-nav button{
+ display:block!important;width:100%!important;height:100%!important;
+ padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;background-image:none!important;box-shadow:none!important;
+ color:transparent!important;font-size:0!important;text-shadow:none!important;
+ pointer-events:auto!important;touch-action:manipulation!important;
+}
+#countries .country-bottom-nav button:focus-visible{outline:4px solid white!important;outline-offset:-4px!important}
+@media(max-width:680px){
+ #countries .country-artboard::after{left:0%!important;width:31%!important;height:58%!important}
+ #countries .country-wood-sign{font-size:clamp(20px,4vw,38px)!important}
+}
