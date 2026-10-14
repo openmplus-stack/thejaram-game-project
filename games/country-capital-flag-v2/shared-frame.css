@@ -63,3 +63,25 @@
 @media(max-width:680px){
  #countries .country-wood-sign{font-size:clamp(26px,5.1vw,45px)!important}
 }
+
+/* Shared frame content placement: keep country data interactive and unobstructed. */
+#countries .country-artboard,
+#countries .country-artboard[data-asset-state="ready"]{
+ position:relative!important;
+ background:#86cdef url("./assets/bg-world-clean.png") center/100% 100% no-repeat!important;
+}
+#countries .country-main-panel{
+ position:absolute!important;
+ left:31%!important;top:24%!important;width:66%!important;height:61%!important;
+ display:flex!important;flex-direction:column!important;min-height:0!important;
+ margin:0!important;padding:1.5% 1.8% 1.3%!important;
+ border:5px solid #b57b3d!important;border-radius:22px!important;
+ background:linear-gradient(120deg,#fff1d2 0%,#fff9e9 50%,#f6dfb6 100%)!important;
+ box-shadow:inset 0 0 0 3px #fff4d4,0 5px 0 #86552d,0 9px 15px #563a253d!important;
+ z-index:3!important;
+}
+#countries .country-grid{
+ flex:1!important;min-height:0!important;overflow-y:auto!important;
+ overscroll-behavior:contain!important;
+}
+#countries #countryNext{flex:none!important}
