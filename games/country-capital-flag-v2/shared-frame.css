@@ -91,3 +91,19 @@
 @media(max-width:680px){
   #countries .country-wood-sign{font-size:clamp(26px,5.1vw,45px)!important}
 }
+
+/* Shared title treatment: continent and country use the same wooden image.
+   The topic screen remains the approved full-scene reference image. */
+#continents .continent-master-sign{
+  position:absolute!important;
+  left:29%!important;top:1.5%!important;
+  width:42%!important;height:18%!important;
+  z-index:7!important;
+  pointer-events:none!important;
+  background:transparent url("./assets/ui-title-sign.png") center/contain no-repeat!important;
+}
+#continents .continent-master-sign::after{
+  content:""!important;position:absolute!important;
+  inset:18% 12% 20%!important;
+  background:transparent url("./assets/title-continent-select.svg") center/contain no-repeat!important;
+}
