@@ -71,7 +71,7 @@ const assert=require('node:assert/strict');
  });
  assert(/rgb\(97, 194, 255\)|rgb\(7, 100, 214\)/.test(oxStyles.yes),'O button blue: '+oxStyles.yes);
  assert(/rgb\(255, 133, 129\)|rgb\(223, 38, 52\)/.test(oxStyles.no),'X button red: '+oxStyles.no);
- assert(oxStyles.yesAfter.includes('O')&&oxStyles.noAfter.includes('×'),'O/X symbols visible');
+ assert(oxStyles.yesAfter.includes('O')&&oxStyles.noAfter.includes('X'),'O/X symbols visible');
  await shot('quiz-country-capital');
  await page.locator('#quizBpmPlus').click();
  assert.equal(await page.locator('#quizBpm').inputValue(),'70');
