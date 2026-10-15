@@ -23,10 +23,10 @@
 #quiz .quiz-tile img{max-width:95%;max-height:90%;width:auto;height:auto;object-fit:contain}
 #quiz .quiz-pair>.quiz-link{position:absolute;left:49.8%;top:0;width:.4%;height:100%;display:block;overflow:hidden;background:#c6a373;font-size:0}
 #quiz .quiz-prompt{display:none}
-#quiz .quiz-answers{position:absolute;z-index:4;left:19%;top:59.0%;width:62%;height:20%;display:flex;align-items:stretch;justify-content:space-around;gap:0;margin:0;padding:0;overflow:visible}
-#quiz .quiz-answers button{box-sizing:border-box;display:block;position:relative;flex:0 0 36%;width:36%;height:100%;min-width:0;min-height:0;aspect-ratio:auto;padding:0;border:0!important;border-radius:0!important;box-shadow:none!important;background:none!important;overflow:visible;cursor:pointer;font-size:0;transition:transform .12s ease}
+#quiz .quiz-answers{position:absolute;z-index:4;left:18.5%;top:58%;width:63%;height:23%;display:grid;grid-template-columns:1fr 1fr;align-items:center;justify-items:center;column-gap:3%;margin:0;padding:0;overflow:visible;background:transparent!important;border:0!important;box-shadow:none!important}
+#quiz .quiz-answers button,#quiz #quizYes,#quiz #quizNo{box-sizing:border-box;display:block;position:relative;width:78%;height:100%;min-width:0;min-height:0;max-width:none;aspect-ratio:auto;appearance:none!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;background-image:none!important;overflow:visible;cursor:pointer;font-size:0;transition:transform .12s ease}
 #quiz .quiz-answers button img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
-#quiz #quizYes::after,#quiz #quizNo::after{content:none;display:none}
+#quiz .quiz-answers button::before,#quiz .quiz-answers button::after{content:none!important;display:none!important}
 #quiz .quiz-answers button:active{transform:translateY(3px) scale(.97)}
 #quiz .quiz-answers button:focus-visible{outline:3px solid #115ba6;outline-offset:1px;border-radius:16px}
 #quiz #quizFeedback{top:79.1%!important}
