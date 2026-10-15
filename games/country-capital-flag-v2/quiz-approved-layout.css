@@ -63,3 +63,14 @@
 #quiz #quizNo::after{content:'X'!important}
 #quiz #quizFeedback{top:78.3%!important}
 #quiz #quizAdvance:not([hidden]){top:78.5%!important}
+
+/* Approved transparent hand-held O/X paddles: images own the visual, buttons own the interaction. */
+#quiz .quiz-answers{top:64.1%!important;height:16.2%!important;left:24.5%!important;width:51%!important;justify-content:space-between!important;align-items:stretch!important;overflow:visible!important;z-index:4!important}
+#quiz .quiz-answers button{display:block!important;position:relative!important;flex:0 0 43%!important;width:43%!important;height:100%!important;aspect-ratio:auto!important;min-width:0!important;min-height:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background-color:transparent!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;font-size:0!important;cursor:pointer!important;transition:transform .12s ease!important}
+#quiz #quizYes{background-image:url('./assets/quiz-ox-o-hand.webp')!important;background-color:transparent!important}
+#quiz #quizNo{background-image:url('./assets/quiz-ox-x-hand.webp')!important;background-color:transparent!important}
+#quiz #quizYes::after,#quiz #quizNo::after{content:none!important;display:none!important}
+#quiz .quiz-answers button:active{transform:translateY(3px) scale(.97)!important}
+#quiz .quiz-answers button:focus-visible{outline:3px solid #115ba6!important;outline-offset:1px!important;border-radius:16px!important}
+#quiz .quiz-answers button.answer-picked{filter:drop-shadow(0 0 8px #ffdb64)!important}
+#quiz .quiz-answers button:disabled{cursor:default!important}
