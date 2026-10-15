@@ -49,3 +49,17 @@
 #quiz #quizSpeak{position:absolute!important;right:0!important;top:112%!important;height:45%!important;padding:0 .5vw!important;font-size:clamp(9px,1vw,15px)!important;background:#fff4dd!important;opacity:.9!important}
 #quiz .quiz-stats{top:27.8%!important}
 #quiz .quiz-pair{top:34.5%!important}
+
+/* Final quiz content spacing; O/X approved hand artwork pending asset upload. */
+#quiz .quiz-prompt{display:none!important}
+#quiz #quizSpeak{font-size:0!important;width:5%!important;height:68%!important;top:16%!important;right:-6%!important;padding:0!important;overflow:hidden!important}
+#quiz #quizSpeak::after{content:'🔉';font-size:clamp(12px,1.5vw,22px)!important}
+#quiz .quiz-stats{top:27.5%!important;height:3.5%!important;font-size:clamp(11px,1.15vw,17px)!important}
+#quiz .quiz-pair{top:36%!important;height:26.2%!important}
+#quiz .quiz-pair>.quiz-tile{font-size:clamp(32px,5.2vw,76px)!important}
+#quiz .quiz-answers{top:66.5%!important;height:11.4%!important;left:27%!important;width:46%!important;gap:0!important;justify-content:space-between!important}
+#quiz .quiz-answers button{font-size:0!important}
+#quiz #quizYes::after{content:'O'!important}
+#quiz #quizNo::after{content:'X'!important}
+#quiz #quizFeedback{top:78.3%!important}
+#quiz #quizAdvance:not([hidden]){top:78.5%!important}
