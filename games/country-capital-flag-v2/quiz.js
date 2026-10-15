@@ -2,10 +2,11 @@
 (()=>{'use strict';
  const $=id=>document.getElementById(id);
  const COUNT=20;
- let questions=[],index=0,correct=0,answered=false,results=[],active=false;
+ let questions=[],index=0,correct=0,answered=false,results=[],active=false,advanceTimer=null;
  let audioContext=null,metroTimer=null,beat=0,metroRunning=false,metroSoundOn=true;
+ function cancelAdvance(){if(advanceTimer!==null)clearTimeout(advanceTimer);advanceTimer=null}
  function stopMetro(){if(metroTimer!==null)clearInterval(metroTimer);metroTimer=null;metroRunning=false;$('quizMetroToggle').textContent='▶';$('quizMetroToggle').setAttribute('aria-pressed','false');document.querySelectorAll('.quiz-beats span').forEach(x=>x.classList.remove('on'))}
- function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===((beat-1)*2)||i===((beat-1)*2+1)));if(metroSoundOn)toneBeat(beat===1);if(answered)advance()}
+ function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===((beat-1)*2)||i===((beat-1)*2+1)));if(metroSoundOn)toneBeat(beat===1);}
  function toneBeat(accent){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||=new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=accent?880:620;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.075);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.08)}catch{}}
  function startMetro(){stopMetro();if(!active)return;metroRunning=true;beat=0;$('quizMetroToggle').textContent='Ⅱ';$('quizMetroToggle').setAttribute('aria-pressed','true');tick();metroTimer=setInterval(tick,60000/Number($('quizBpm').value||60))}
 
@@ -31,7 +32,7 @@
   return output;
  }
  function display(){
-  const q=questions[index];if(!q)return;
+  cancelAdvance();const q=questions[index];if(!q)return;
   $('quizProgress').textContent=(index+1)+' / '+COUNT;
   $('quizScore').textContent='정답 '+correct+'개';
   $('quizLeftText').textContent=q.topic==='flag-country'?'':q.source.country;
@@ -47,7 +48,7 @@
   answered=false;clearFeedback();$('quizFeedback').textContent='';$('quizFeedback').className='';
   $('quizYes').disabled=false;$('quizNo').disabled=false;$('quizAdvance').hidden=true;
  }
- function begin(){stopMetro();questions=build();index=0;correct=0;results=[];answered=false;active=questions.length>0;if(active)display();else $('quizFeedback').textContent='먼저 국가를 선택하세요.'}
+ function begin(){cancelAdvance();stopMetro();questions=build();index=0;correct=0;results=[];answered=false;active=questions.length>0;if(active)display();else $('quizFeedback').textContent='먼저 국가를 선택하세요.'}
  function answer(value){
   if(!active||answered)return;
   const q=questions[index],ok=value===q.matching;
@@ -58,11 +59,11 @@
   $('quizFeedback').textContent=ok?'정답이에요!':'다시 확인해 보세요. '+(q.matching?'맞는 짝입니다.':'서로 다른 짝입니다.');
   $('quizFeedback').className=ok?'quiz-correct':'quiz-wrong';
   $('quizYes').disabled=true;$('quizNo').disabled=true;
-  $('quizAdvance').hidden=false;
-  $('quizAdvance').textContent=index===COUNT-1?'결과 확인':'다음 문제 →';
+  advanceTimer=setTimeout(()=>{advanceTimer=null;advance()},1000);
  }
  function advance(){
   if(!active||!answered)return;
+  cancelAdvance();
   if(index<COUNT-1){index++;display();return}
   active=false;stopMetro();
   $('quizAdvance').hidden=true;
@@ -71,7 +72,7 @@
  }
  $('quizYes').addEventListener('click',()=>answer(true));
  $('quizNo').addEventListener('click',()=>answer(false));
- $('quizAdvance').addEventListener('click',advance);
+
  $('quizBpmMinus').addEventListener('click',()=>changeBpm(-1));
  $('quizBpmPlus').addEventListener('click',()=>changeBpm(1));
  $('quizSpeak').addEventListener('click',speak);
@@ -79,6 +80,6 @@
  function changeBpm(step){const sel=$('quizBpm');sel.selectedIndex=Math.max(0,Math.min(sel.options.length-1,sel.selectedIndex+step));sel.dispatchEvent(new Event('change'))}
  $('quizMetroToggle').addEventListener('click',()=>metroRunning?stopMetro():startMetro());
  $('quizBpm').addEventListener('change',()=>{if(metroRunning)startMetro()});
- document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='quiz')begin();else if(e.detail.from==='quiz'){active=false;stopMetro()}});
+ document.addEventListener('country-v2:navigate',e=>{if(e.detail.to==='quiz')begin();else if(e.detail.from==='quiz'){active=false;cancelAdvance();stopMetro()}});
  window.CountryV2Quiz=Object.freeze({get progress(){return {index,correct,total:COUNT,answered,active}},restart:begin});
 })();
