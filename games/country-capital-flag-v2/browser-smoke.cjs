@@ -75,8 +75,9 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#quizBpm').inputValue(),'70');
  for(let i=0;i<20;i++){
   await page.locator('#quizYes').click();
-  assert(await page.locator('#quizAdvance').isVisible());
-  await page.locator('#quizAdvance').click();
+  assert(await page.locator('#quizAdvance').isHidden(),'manual next button must stay hidden');
+  if(i<19){await page.waitForTimeout(1100);assert.equal((await page.locator('#quizProgress').innerText()).trim(),(i+2)+' / 20');}
+  else {await page.locator('#result').waitFor({state:'visible',timeout:3500});}
  }
  assert(await page.locator('#result').isVisible(),'result visible after 20 answers');
  await shot('result');
