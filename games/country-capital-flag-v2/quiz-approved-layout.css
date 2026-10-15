@@ -24,11 +24,11 @@
 #quiz .quiz-pair>.quiz-link{position:absolute;left:49.8%;top:0;width:.4%;height:100%;display:block;overflow:hidden;background:#c6a373;font-size:0}
 #quiz .quiz-prompt{display:none}
 #quiz .quiz-answers{position:absolute;z-index:4;left:18.5%;top:58%;width:63%;height:23%;display:grid;grid-template-columns:1fr 1fr;align-items:center;justify-items:center;column-gap:3%;margin:0;padding:0;overflow:visible;background:transparent!important;border:0!important;box-shadow:none!important}
-#quiz .quiz-answers button,#quiz #quizYes,#quiz #quizNo{box-sizing:border-box;display:block;position:relative;width:78%;height:100%;min-width:0;min-height:0;max-width:none;aspect-ratio:auto;appearance:none!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;background-image:none!important;overflow:visible;cursor:pointer;font-size:0;transition:transform .12s ease}
+#quiz .quiz-answers button,#quiz #quizYes,#quiz #quizNo,#quiz #quizYes.answer-picked,#quiz #quizNo.answer-picked,#quiz .quiz-board.answer-correct #quizYes,#quiz .quiz-board.answer-wrong #quizNo{box-sizing:border-box;display:block;position:relative;width:78%;height:100%;min-width:0;min-height:0;max-width:none;aspect-ratio:auto;appearance:none!important;-webkit-appearance:none!important;padding:0!important;margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;background-color:transparent!important;background-image:none!important;outline:0!important;overflow:visible;cursor:pointer;font-size:0;transition:transform .12s ease}
 #quiz .quiz-answers button img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none;background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important}
 #quiz .quiz-answers button::before,#quiz .quiz-answers button::after{content:none!important;display:none!important}
 #quiz .quiz-answers button:active{transform:translateY(3px) scale(.97)}
-#quiz .quiz-answers button:focus-visible{outline:3px solid #115ba6;outline-offset:1px;border-radius:16px}
+#quiz .quiz-answers button:focus-visible{outline:3px solid #115ba6!important;outline-offset:2px;border-radius:0}
 #quiz #quizFeedback{top:79.1%!important}
 #quiz #quizAdvance:not([hidden]){top:79.1%!important}
 /* Top bar: 8 visual dots retain original 4-beat sound. */
