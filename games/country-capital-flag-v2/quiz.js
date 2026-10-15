@@ -3,9 +3,9 @@
  const $=id=>document.getElementById(id);
  const COUNT=20;
  let questions=[],index=0,correct=0,answered=false,results=[],active=false;
- let audioContext=null,metroTimer=null,beat=0,metroRunning=false;
+ let audioContext=null,metroTimer=null,beat=0,metroRunning=false,metroSoundOn=true;
  function stopMetro(){if(metroTimer!==null)clearInterval(metroTimer);metroTimer=null;metroRunning=false;$('quizMetroToggle').textContent='▶';$('quizMetroToggle').setAttribute('aria-pressed','false');document.querySelectorAll('.quiz-beats span').forEach(x=>x.classList.remove('on'))}
- function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===beat-1));toneBeat(beat===1);if(answered)advance()}
+ function tick(){if(!active){stopMetro();return}beat=(beat%4)+1;document.querySelectorAll('.quiz-beats span').forEach((x,i)=>x.classList.toggle('on',i===((beat-1)*2)||i===((beat-1)*2+1)));if(metroSoundOn)toneBeat(beat===1);if(answered)advance()}
  function toneBeat(accent){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||=new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const t=audioContext.currentTime,o=audioContext.createOscillator(),g=audioContext.createGain();o.type='sine';o.frequency.value=accent?880:620;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.075);o.connect(g);g.connect(audioContext.destination);o.start(t);o.stop(t+.08)}catch{}}
  function startMetro(){stopMetro();if(!active)return;metroRunning=true;beat=0;$('quizMetroToggle').textContent='Ⅱ';$('quizMetroToggle').setAttribute('aria-pressed','true');tick();metroTimer=setInterval(tick,60000/Number($('quizBpm').value||60))}
 
@@ -75,6 +75,7 @@
  $('quizBpmMinus').addEventListener('click',()=>changeBpm(-1));
  $('quizBpmPlus').addEventListener('click',()=>changeBpm(1));
  $('quizSpeak').addEventListener('click',speak);
+ $('quizMetroSound').addEventListener('click',()=>{metroSoundOn=!metroSoundOn;const b=$('quizMetroSound');b.textContent=metroSoundOn?'🔊':'🔇';b.setAttribute('aria-pressed',String(metroSoundOn));});
  function changeBpm(step){const sel=$('quizBpm');sel.selectedIndex=Math.max(0,Math.min(sel.options.length-1,sel.selectedIndex+step));sel.dispatchEvent(new Event('change'))}
  $('quizMetroToggle').addEventListener('click',()=>metroRunning?stopMetro():startMetro());
  $('quizBpm').addEventListener('change',()=>{if(metroRunning)startMetro()});
