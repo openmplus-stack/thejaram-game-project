@@ -36,3 +36,16 @@
 #quiz .quiz-prompt{top:59.2%!important;left:18%!important;width:64%!important;line-height:1.3!important}
 #quiz .quiz-answers{top:64.2%!important;height:10.5%!important}
 #quiz .quiz-answers button{box-sizing:border-box!important}
+
+/* Final approved quiz top bar: no heading/back; eight indicators, transport, volume, BPM. */
+#quiz .quiz-metronome{position:absolute!important;left:20%!important;top:17.1%!important;width:60%!important;height:7.2%!important;box-sizing:border-box!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:1.1%!important;padding:.5% 1.2%!important;background:#fff3d9f5!important;border:2px solid #b58a56!important;border-radius:36px!important;white-space:nowrap!important;overflow:visible!important}
+#quiz .quiz-beats{display:flex!important;flex:1 1 auto!important;min-width:0!important;justify-content:space-evenly!important;gap:1%!important;align-items:center!important;height:100%!important}
+#quiz .quiz-beats span{display:block!important;flex:0 1 auto!important;width:clamp(8px,1.8vw,26px)!important;height:auto!important;aspect-ratio:1!important;border-radius:50%!important;border:2px solid #8ba7bc!important;background:#fffdf7!important;font-size:0!important;line-height:0!important;box-shadow:inset 0 1px 2px #0002!important}
+#quiz .quiz-beats span.on{background:#298de0!important;border-color:#16649e!important;box-shadow:0 0 0 2px #bde4ff!important}
+#quiz .quiz-metronome button{flex:0 0 auto!important;min-width:0!important;width:auto!important;height:84%!important;min-height:0!important;padding:0 .45vw!important;border-radius:12px!important;background:#d4e9f4!important;border:1px solid #95b3c8!important;color:#164b73!important;font-weight:800!important;font-size:clamp(12px,1.7vw,24px)!important}
+#quiz #quizMetroToggle,#quiz #quizMetroSound{width:7%!important}
+#quiz #quizBpmMinus,#quiz #quizBpmPlus{width:6%!important}
+#quiz #quizBpm{flex:0 0 9%!important;width:9%!important;height:84%!important;min-height:0!important;padding:0!important;border:1px solid #bba17a!important;border-radius:10px!important;background:#fff8eb!important;color:#173f67!important;text-align:center!important;text-align-last:center!important;font-weight:900!important;font-size:clamp(12px,1.65vw,24px)!important;appearance:none!important}
+#quiz #quizSpeak{position:absolute!important;right:0!important;top:112%!important;height:45%!important;padding:0 .5vw!important;font-size:clamp(9px,1vw,15px)!important;background:#fff4dd!important;opacity:.9!important}
+#quiz .quiz-stats{top:27.8%!important}
+#quiz .quiz-pair{top:34.5%!important}
