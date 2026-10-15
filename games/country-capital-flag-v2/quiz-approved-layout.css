@@ -74,3 +74,11 @@
 #quiz .quiz-answers button:focus-visible{outline:3px solid #115ba6!important;outline-offset:1px!important;border-radius:16px!important}
 #quiz .quiz-answers button.answer-picked{filter:drop-shadow(0 0 8px #ffdb64)!important}
 #quiz .quiz-answers button:disabled{cursor:default!important}
+
+/* 2026-10-15 visual correction: ID background shorthand previously overrode paddle image. */
+#quiz .quiz-pair{top:31.8%!important;height:25.2%!important}
+#quiz .quiz-answers{top:60.0%!important;height:20.5%!important;left:24%!important;width:52%!important}
+#quiz .quiz-answers button{flex:0 0 43%!important;width:43%!important;height:100%!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:0!important;overflow:visible!important}
+#quiz #quizYes{background:transparent url('./assets/quiz-ox-o-hand.webp?v=2') center/contain no-repeat!important}
+#quiz #quizNo{background:transparent url('./assets/quiz-ox-x-hand.webp?v=2') center/contain no-repeat!important}
+#quiz #quizYes::after,#quiz #quizNo::after{content:none!important;display:none!important}
