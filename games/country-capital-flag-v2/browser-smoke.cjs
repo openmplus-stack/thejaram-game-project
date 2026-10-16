@@ -202,6 +202,22 @@ const assert=require('node:assert/strict');
  await shot('treasures-parchment');
  await page.evaluate(()=>window.CountryV2.go('quizReward'));
  await shot('gift-parchment');
+ // Verify the footer PNG keeps its natural aspect ratio and stays inside the 4:3 artboard.
+ const navGeometry=await page.evaluate(async()=>{
+  const img=new Image();img.src='./assets/ui-bottom-navigation.png';
+  await new Promise((ok,fail)=>{img.onload=ok;img.onerror=()=>fail(new Error('navigation image failed to load'))});
+  const nativeRatio=img.naturalWidth/img.naturalHeight;
+  const selectors=['#flags .flags-bottom-nav','#treasures .treasure-bottom-nav','#quizReward .gift-bottom-nav'];
+  return {nativeRatio,entries:selectors.map(s=>{
+   const el=document.querySelector(s),r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();
+   return {selector:s,ratio:r.width/r.height,backgroundSize:getComputedStyle(el).backgroundSize,
+    within:r.left>=p.left-2&&r.right<=p.right+2&&r.top>=p.top-2&&r.bottom<=p.bottom+2,
+    buttons:el.querySelectorAll('button').length};
+  })};
+ });
+ assert(navGeometry.entries.every(x=>x.backgroundSize==='contain'&&x.within&&x.buttons===5),
+   'footer must preserve image aspect ratio with five hit targets: '+JSON.stringify(navGeometry));
+
  await shot('gift-and-treasure');
  assert.equal(errors.length,0,'browser errors: '+errors.join(' | '));
  console.log('PASS: home, topics, countries, flag learning, capital learning, quiz BPM, 20 questions, result');
