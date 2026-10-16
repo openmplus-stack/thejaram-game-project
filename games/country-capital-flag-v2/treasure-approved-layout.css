@@ -19,3 +19,6 @@
 #treasures #treasureBookGrid .treasure-book-item img{width:100%!important;max-width:125px!important;height:clamp(55px,8.2vw,115px)!important;aspect-ratio:auto!important;object-fit:contain!important;filter:none!important;opacity:1!important}
 #treasures #treasureBookGrid .treasure-book-item span{display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden!important;max-width:100%!important;font-size:clamp(10px,1.1vw,16px)!important;line-height:1.25!important;color:#173c62!important;text-align:center!important;overflow-wrap:anywhere!important}
 #treasures #treasureBookGrid .treasure-book-item{min-height:0!important;gap:3px!important}
+
+/* Collected treasure items use the actual #treasureBookGrid markup, without cards. */
+#treasures #treasureBookGrid .treasure-book-item{background:transparent!important;background-color:transparent!important;background-image:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:0!important;margin:0!important;}
