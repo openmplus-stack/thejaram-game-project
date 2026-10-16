@@ -68,3 +68,32 @@
   border:0!important;
   box-shadow:none!important;
 }
+
+/* Approved layout: large, handle-free O/X circles BELOW parchment and ABOVE navigation. */
+#quiz.screen.active .quiz-board .quiz-answers{
+ left:16.2%!important;
+ top:72.0%!important;
+ width:67.6%!important;
+ height:14.2%!important;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+ column-gap:3%!important;
+ justify-items:center!important;
+ align-items:center!important;
+ z-index:6!important;
+}
+#quiz.screen.active .quiz-board .quiz-answers #quizYes,
+#quiz.screen.active .quiz-board .quiz-answers #quizNo{
+ width:100%!important;
+ height:100%!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+}
+#quiz.screen.active .quiz-board .quiz-answers button img{
+ width:auto!important;
+ height:100%!important;
+ max-width:100%!important;
+ aspect-ratio:1!important;
+ object-fit:contain!important;
+}
+#quiz #quizFeedback{top:69%!important;pointer-events:none!important}
