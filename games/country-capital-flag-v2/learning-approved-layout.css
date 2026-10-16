@@ -23,3 +23,6 @@
 
 /* Capital names use the same type size as country names in learning mode. */
 #learning .learning-capital{font-size:clamp(28px,5.4vw,82px)!important;font-weight:950!important;line-height:1.12!important;color:#083566!important;overflow-wrap:anywhere!important}
+
+/* Completion message: below parchment, centered in the gap above bottom navigation. */
+#learning #learningNotice{left:18%!important;top:79.2%!important;width:64%!important;margin:0!important;padding:0!important;text-align:center!important;font-size:clamp(14px,1.9vw,27px)!important;font-weight:900!important;line-height:1.3!important;color:#123d68!important;text-shadow:0 1px 2px #fff9!important;pointer-events:none!important;z-index:7!important}
