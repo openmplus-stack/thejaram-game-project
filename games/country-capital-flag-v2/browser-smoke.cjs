@@ -149,6 +149,28 @@ const assert=require('node:assert/strict');
  }
  assert(await page.locator('#result').isVisible(),'result visible after 20 answers');
  await shot('result');
+ // Reward eligibility remains driven by a perfect 20-question quiz.
+ await page.evaluate(()=>{
+  const file=window.CountryV2RewardFiles.find(f=>/^(?:\d+[-_])?reward-[a-z]{2}-/.test(f));
+  const code=file.match(/reward-([a-z]{2})-/)[1];
+  document.dispatchEvent(new CustomEvent('country-v2:quiz-complete',{detail:{score:20,total:20,percentage:100,results:Array.from({length:20},()=>({source:code}))}}));
+ });
+ await page.locator('#resultReward').click();
+ assert(await page.locator('#quizReward').isVisible(),'treasure gift screen');
+ assert.equal(await page.locator('#quizReward .gift-bottom-nav button').count(),5,'gift has five footer buttons');
+ assert(await page.locator('#quizReward .gift-parchment').isVisible(),'gift uses approved parchment');
+ assert(await page.locator('#treasureRewardChoices .treasure-reward-option').count()>0,'eligible gifts appear');
+ const firstGift=page.locator('#treasureRewardChoices .treasure-reward-option').first();
+ assert.equal(await firstGift.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)','gift items have no white cards');
+ await firstGift.click();
+ assert.equal(await firstGift.getAttribute('aria-pressed'),'true','selected gift highlighted');
+ assert(await page.locator('#treasureRewardSave').isEnabled(),'reward button enabled');
+ await page.locator('#treasureRewardSave').click();
+ assert((await page.locator('#treasureRewardMessage').innerText()).includes('저장했습니다'),'reward saved');
+ await page.locator('#quizReward .gift-bottom-nav [data-go="treasures"]').click();
+ assert(await page.locator('#treasures').isVisible(),'navigate to treasure catalog');
+ assert(await page.locator('#treasureBookGrid .treasure-book-item').count()>0,'earned reward appears in catalog');
+ await shot('gift-and-treasure');
  assert.equal(errors.length,0,'browser errors: '+errors.join(' | '));
  console.log('PASS: home, topics, countries, flag learning, capital learning, quiz BPM, 20 questions, result');
  await browser.close();
