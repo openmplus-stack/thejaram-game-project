@@ -89,3 +89,17 @@
  display:-webkit-box!important;-webkit-box-orient:vertical!important;
  -webkit-line-clamp:2!important;overflow:hidden!important;min-height:2.6em!important;
 }
+
+/* New illustrated parchment PNG: the existing gradient remains a fallback until
+   assets/ui-collection-parchment.png is uploaded to this development branch. */
+:is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment){
+ left:10.8%!important;top:8.4%!important;width:78.4%!important;height:74.2%!important;
+ padding:4.4% 6.5% 4.3%!important;
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background-image:url("./assets/ui-collection-parchment.png")!important;
+ background-repeat:no-repeat!important;background-position:center!important;
+ background-size:100% 100%!important;
+}
+:is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment)::before{
+ content:none!important;display:none!important;
+}
