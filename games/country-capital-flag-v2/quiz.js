@@ -12,7 +12,7 @@
 
  function speak(){if(!('speechSynthesis' in window)||!questions[index])return;window.speechSynthesis.cancel();const q=questions[index],part=q.topic==='flag-country'?q.partner.country+' 국기':q.partner.capital;const u=new SpeechSynthesisUtterance(q.source.country+'와 '+part+'는 서로 맞는 짝일까요?');u.lang='ko-KR';u.rate=.88;window.speechSynthesis.speak(u)}
  function tone(ok){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||= new AC();if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});const now=audioContext.currentTime;const notes=ok?[660,880]:[330,220];notes.forEach((hz,i)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain(),start=now+i*.12;osc.type=ok?'sine':'triangle';osc.frequency.setValueAtTime(hz,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.012);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(start);osc.stop(start+.19)})}catch(e){console.warn('[V2] Sound unavailable',e)}}
- function clearFeedback(){const board=document.querySelector('#quiz .quiz-board');board.classList.remove('answer-correct','answer-wrong');$('quizYes').classList.remove('answer-picked');$('quizNo').classList.remove('answer-picked')}
+ function clearFeedback(){const board=document.querySelector('#quiz .quiz-board');board.classList.remove('answer-correct','answer-wrong');document.querySelectorAll('#quiz .quiz-pair>.quiz-tile').forEach(tile=>{tile.style.removeProperty('background');tile.style.removeProperty('background-color');tile.style.removeProperty('border-color');tile.style.removeProperty('box-shadow')});$('quizYes').classList.remove('answer-picked');$('quizNo').classList.remove('answer-picked')}
 
  const shuffle=arr=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
  function build(){
@@ -53,7 +53,7 @@
   if(!active||answered)return;
   const q=questions[index],ok=value===q.matching;
   answered=true;if(ok)correct++;
-  clearFeedback();document.querySelector('#quiz .quiz-board').classList.add(ok?'answer-correct':'answer-wrong');(value?$('quizYes'):$('quizNo')).classList.add('answer-picked');tone(ok);
+  clearFeedback();document.querySelector('#quiz .quiz-board').classList.add(ok?'answer-correct':'answer-wrong');document.querySelectorAll('#quiz .quiz-pair>.quiz-tile').forEach(tile=>{tile.style.setProperty('background',ok?'#b9f49c':'#ff7777','important');tile.style.setProperty('background-color',ok?'#b9f49c':'#ff7777','important');tile.style.setProperty('border-color',ok?'#389a39':'#b72222','important')});(value?$('quizYes'):$('quizNo')).classList.add('answer-picked');tone(ok);
   results.push({question:index+1,source:q.source.flag,partner:q.partner.flag,expected:q.matching,answer:value,correct:ok});
   $('quizScore').textContent='정답 '+correct+'개';
   $('quizFeedback').textContent=ok?'정답이에요!':'다시 확인해 보세요. '+(q.matching?'맞는 짝입니다.':'서로 다른 짝입니다.');
