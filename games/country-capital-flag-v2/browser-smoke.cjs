@@ -19,7 +19,7 @@ const assert=require('node:assert/strict');
  assert((await page.locator('#treasureBookSummary').innerText()).includes('전체 180개'));
  assert.equal(await page.locator('#treasures .treasure-bottom-nav button').count(),5,'shared five-button navigation');
  await shot('treasures-empty');
- await page.evaluate(()=>localStorage.setItem('countryTreasureCollection',JSON.stringify([window.CountryV2RewardFiles.find(f=>/^reward-[a-z]{2}-/.test(f))])));
+ await page.evaluate(()=>localStorage.setItem('countryTreasureCollection',JSON.stringify([window.CountryV2RewardFiles.find(f=>/^(?:\\d+[-_])?reward-[a-z]{2}-/.test(f))])));
  await page.evaluate(()=>window.CountryV2TreasureBook.render());
  assert.equal(await page.locator('#treasureBookGrid .treasure-book-item').count(),1,'one collected treasure visible');
  assert.equal(await page.locator('#treasureBookGrid .treasure-book-item').first().evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)','no individual treasure card');
