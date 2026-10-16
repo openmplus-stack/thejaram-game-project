@@ -103,6 +103,9 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#quizBpm').inputValue(),'70');
  for(let i=0;i<20;i++){
   await page.locator('#quizYes').click();
+  const answerColors=await page.locator('#quiz .quiz-pair>.quiz-tile').evaluateAll(els=>els.map(el=>getComputedStyle(el).backgroundColor));
+  assert(answerColors.length===2&&answerColors.every(color=>color==='rgb(185, 244, 156)'||color==='rgb(255, 119, 119)'), 'both answer cards must be entirely lime or red: '+JSON.stringify(answerColors));
+  assert(new Set(answerColors).size===1,'both answer cards must share the same feedback color');
   assert(await page.locator('#quizAdvance').isHidden(),'manual next button must stay hidden');
   if(i<19){await page.waitForTimeout(1100);assert.equal((await page.locator('#quizProgress').innerText()).trim(),(i+2)+' / 20');}
   else {await page.locator('#result').waitFor({state:'visible',timeout:3500});}
