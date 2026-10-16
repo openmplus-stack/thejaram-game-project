@@ -124,3 +124,21 @@
  z-index:7!important;
  pointer-events:none!important;
 }
+
+/* Immediate answer feedback: fill BOTH entire flag/name cards, not just a border. */
+#quiz.screen.active .quiz-board.answer-correct .quiz-pair>.quiz-tile{
+ background:#b9f49c!important;
+ background-color:#b9f49c!important;
+ border-color:#389a39!important;
+ box-shadow:inset 0 0 0 4px #69ce58,0 0 14px #4eaf5590!important;
+ transition:background-color .08s ease!important;
+}
+#quiz.screen.active .quiz-board.answer-wrong .quiz-pair>.quiz-tile{
+ background:#ff7777!important;
+ background-color:#ff7777!important;
+ border-color:#b72222!important;
+ box-shadow:inset 0 0 0 4px #e94444,0 0 14px #cc333390!important;
+ transition:background-color .08s ease!important;
+}
+#quiz.screen.active .quiz-board.answer-correct #quizFeedback{color:#176d20!important;text-shadow:0 1px 0 #fff9!important}
+#quiz.screen.active .quiz-board.answer-wrong #quizFeedback{color:#a91515!important;text-shadow:0 1px 0 #fff9!important}
