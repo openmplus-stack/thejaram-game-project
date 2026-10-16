@@ -90,6 +90,9 @@ const assert=require('node:assert/strict');
    return {id:btn.id,button:describe(btn),before:{content:getComputedStyle(btn,'::before').content,background:getComputedStyle(btn,'::before').background},after:{content:getComputedStyle(btn,'::after').content,background:getComputedStyle(btn,'::after').background},image:describe(img),container:describe(btn.parentElement)};
  }));
  console.log('QUIZ_PADDLE_COMPUTED_CSS',JSON.stringify(paddleCss));
+ assert(paddleCss.every(p=>p.button.backgroundImage==='none'&&p.button.border.startsWith('0px')&&p.button.boxShadow==='none'&&p.button.backgroundColor==='rgba(0, 0, 0, 0)'),
+   'O/X buttons must have no painted rectangle: '+JSON.stringify(paddleCss));
+
 
 
 
