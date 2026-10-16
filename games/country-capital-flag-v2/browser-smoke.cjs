@@ -67,7 +67,7 @@ const assert=require('node:assert/strict');
  const paddles=await page.locator('#quiz .quiz-answers button img').evaluateAll(imgs=>imgs.map(img=>({src:img.getAttribute('src'),loaded:img.complete&&img.naturalWidth>0,width:img.getBoundingClientRect().width,height:img.getBoundingClientRect().height})));
  assert.equal(paddles.length,2,'two paddle images');
  assert(paddles.every(p=>p.loaded&&p.width>20&&p.height>20),'paddle assets visible: '+JSON.stringify(paddles));
- assert(paddles[0].src.includes('quiz-ox-o-hand.webp')&&paddles[1].src.includes('quiz-ox-x-hand.webp'));
+ assert(paddles[0].src.includes('quiz-o-circle.svg')&&paddles[1].src.includes('quiz-x-circle.svg'));
  // Diagnose whether the original WebP pixels, rather than CSS, paint a square.
  const paddlePixels=await page.locator('#quiz .quiz-answers button img').evaluateAll(imgs=>imgs.map(img=>{
    const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
