@@ -68,6 +68,15 @@ const assert=require('node:assert/strict');
  assert.equal(paddles.length,2,'two paddle images');
  assert(paddles.every(p=>p.loaded&&p.width>20&&p.height>20),'paddle assets visible: '+JSON.stringify(paddles));
  assert(paddles[0].src.includes('quiz-ox-o-hand.webp')&&paddles[1].src.includes('quiz-ox-x-hand.webp'));
+ // Diagnose whether the original WebP pixels, rather than CSS, paint a square.
+ const paddlePixels=await page.locator('#quiz .quiz-answers button img').evaluateAll(imgs=>imgs.map(img=>{
+   const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+   const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
+   const sample=(x,y)=>Array.from(ctx.getImageData(Math.round(x*(canvas.width-1)),Math.round(y*(canvas.height-1)),1,1).data);
+   return {src:img.getAttribute('src'),size:[canvas.width,canvas.height],corners:[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>sample(x,y)),edges:[[.5,0],[0,.5],[1,.5],[.5,1]].map(([x,y])=>sample(x,y)),center:sample(.5,.5)};
+ }));
+ console.log('QUIZ_PADDLE_WEBP_PIXEL_DIAGNOSTIC',JSON.stringify(paddlePixels));
+
  const rects=await page.evaluate(()=>{const get=s=>{const r=document.querySelector(s).getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right}};return {stats:get('#quiz .quiz-stats'),pair:get('#quiz .quiz-pair'),answers:get('#quiz .quiz-answers'),footer:get('#quiz .quiz-footer button')}});
  assert(rects.stats.bottom<rects.pair.top&&rects.pair.bottom<rects.answers.top,'quiz vertical spacing: '+JSON.stringify(rects));
  await shot('quiz-country-capital');
