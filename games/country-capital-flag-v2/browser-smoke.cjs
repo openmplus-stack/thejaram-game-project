@@ -76,6 +76,16 @@ const assert=require('node:assert/strict');
    return {src:img.getAttribute('src'),size:[canvas.width,canvas.height],corners:[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>sample(x,y)),edges:[[.5,0],[0,.5],[1,.5],[.5,1]].map(([x,y])=>sample(x,y)),center:sample(.5,.5)};
  }));
  console.log('QUIZ_PADDLE_WEBP_PIXEL_DIAGNOSTIC',JSON.stringify(paddlePixels));
+ const paddleAlphaGrid=await page.locator('#quiz .quiz-answers button img').evaluateAll(imgs=>imgs.map(img=>{
+   const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+   const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0);
+   const grid=[];for(let y=0;y<=20;y++){let row='';for(let x=0;x<=20;x++){
+     const p=ctx.getImageData(Math.round(x*(c.width-1)/20),Math.round(y*(c.height-1)/20),1,1).data;
+     row+=p[3]<16?'.':p[3]<160?'+':p[2]>p[0]*1.4&&p[2]>p[1]*1.2?'B':p[0]>p[1]*1.4&&p[0]>p[2]*1.4?'R':'#';
+   }grid.push(row)}return {src:img.getAttribute('src'),grid};
+ }));
+ console.log('QUIZ_PADDLE_ALPHA_GRID',JSON.stringify(paddleAlphaGrid));
+
 
  const rects=await page.evaluate(()=>{const get=s=>{const r=document.querySelector(s).getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right}};return {stats:get('#quiz .quiz-stats'),pair:get('#quiz .quiz-pair'),answers:get('#quiz .quiz-answers'),footer:get('#quiz .quiz-footer button')}});
  assert(rects.stats.bottom<rects.pair.top&&rects.pair.bottom<rects.answers.top,'quiz vertical spacing: '+JSON.stringify(rects));
