@@ -85,6 +85,12 @@ const assert=require('node:assert/strict');
    }grid.push(row)}return {src:img.getAttribute('src'),grid};
  }));
  console.log('QUIZ_PADDLE_ALPHA_GRID',JSON.stringify(paddleAlphaGrid));
+ const paddleCss=await page.locator('#quiz .quiz-answers button').evaluateAll(btns=>btns.map(btn=>{
+   const img=btn.querySelector('img');const describe=el=>{const c=getComputedStyle(el);return {backgroundColor:c.backgroundColor,backgroundImage:c.backgroundImage,border:c.border,boxShadow:c.boxShadow,outline:c.outline,filter:c.filter,opacity:c.opacity}};
+   return {id:btn.id,button:describe(btn),before:{content:getComputedStyle(btn,'::before').content,background:getComputedStyle(btn,'::before').background},after:{content:getComputedStyle(btn,'::after').content,background:getComputedStyle(btn,'::after').background},image:describe(img),container:describe(btn.parentElement)};
+ }));
+ console.log('QUIZ_PADDLE_COMPUTED_CSS',JSON.stringify(paddleCss));
+
 
 
  const rects=await page.evaluate(()=>{const get=s=>{const r=document.querySelector(s).getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right}};return {stats:get('#quiz .quiz-stats'),pair:get('#quiz .quiz-pair'),answers:get('#quiz .quiz-answers'),footer:get('#quiz .quiz-footer button')}});
