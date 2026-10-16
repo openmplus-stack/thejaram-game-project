@@ -40,3 +40,31 @@
 #quiz #quizBpmMinus,#quiz #quizBpmPlus{width:6%!important}
 #quiz #quizBpm{flex:0 0 9%!important;width:9%!important;min-width:0!important;appearance:none!important;text-align:center!important;text-align-last:center!important}
 #quiz #quizSpeak{position:absolute!important;right:-6%!important;top:16%!important;width:5%!important;height:68%!important;padding:0!important;font-size:clamp(12px,1.5vw,22px)!important;overflow:hidden!important}
+
+
+/* Final cascade override: legacy O/X id styles used stronger selectors. */
+#quiz.screen.active .quiz-board .quiz-answers #quizYes,
+#quiz.screen.active .quiz-board .quiz-answers #quizNo,
+#quiz.screen.active .quiz-board .quiz-answers #quizYes.answer-picked,
+#quiz.screen.active .quiz-board .quiz-answers #quizNo.answer-picked,
+#quiz.screen.active .quiz-board.answer-correct .quiz-answers #quizYes,
+#quiz.screen.active .quiz-board.answer-wrong .quiz-answers #quizNo{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  border-width:0!important;
+  border-style:none!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  outline:0!important;
+  filter:none!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+#quiz.screen.active .quiz-board .quiz-answers #quizYes img,
+#quiz.screen.active .quiz-board .quiz-answers #quizNo img{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
