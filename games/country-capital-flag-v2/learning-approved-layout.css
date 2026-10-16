@@ -20,3 +20,6 @@
 #learning .learning-bottom-nav button:nth-child(4){left:58.7%!important}
 #learning .learning-bottom-nav button:nth-child(5){left:75.9%!important}
 #learning .learning-bottom-nav button:focus-visible{opacity:.3!important;outline:4px solid #174c87!important;outline-offset:-5px!important}
+
+/* Capital names use the same type size as country names in learning mode. */
+#learning .learning-capital{font-size:clamp(28px,5.4vw,82px)!important;font-weight:950!important;line-height:1.12!important;color:#083566!important;overflow-wrap:anywhere!important}
