@@ -170,6 +170,38 @@ const assert=require('node:assert/strict');
  await page.locator('#quizReward .gift-bottom-nav [data-go="treasures"]').click();
  assert(await page.locator('#treasures').isVisible(),'navigate to treasure catalog');
  assert(await page.locator('#treasureBookGrid .treasure-book-item').count()>0,'earned reward appears in catalog');
+ // Check the actual uploaded parchment asset and non-overlapping collection labels.
+ const parchmentChecks=await page.evaluate(async()=>{
+  const selectors=['#flags .flags-parchment','#treasures .treasure-parchment','#quizReward .gift-parchment'];
+  const image=new Image();image.src='./assets/ui-collection-parchment.png';
+  await new Promise((resolve,reject)=>{image.onload=resolve;image.onerror=()=>reject(new Error('parchment PNG failed to load'))});
+  return {loaded:image.naturalWidth>0&&image.naturalHeight>0,
+    panels:selectors.map(s=>{const el=document.querySelector(s),cs=getComputedStyle(el);
+      return {selector:s,background:cs.backgroundImage,visible:el.getBoundingClientRect().width>0};})};
+ });
+ assert(parchmentChecks.loaded,'illustrated parchment asset must load');
+ assert(parchmentChecks.panels.every(x=>x.background.includes('ui-collection-parchment.png')),
+   'all three screens must use the same illustrated parchment: '+JSON.stringify(parchmentChecks));
+ const checkTreasureItem=async selector=>{
+  const details=await page.locator(selector).first().evaluate(el=>{
+   const elements=[el.querySelector('img'),el.querySelector('strong'),el.querySelector('span')];
+   const boxes=elements.map(x=>{const r=x.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:r.height}});
+   return {boxes,item:el.getBoundingClientRect().height};
+  });
+  assert(details.boxes[0].bottom<=details.boxes[1].top+1,
+    'treasure image must not overlap country: '+JSON.stringify(details));
+  assert(details.boxes[1].bottom<=details.boxes[2].top+1,
+    'country must not overlap treasure name: '+JSON.stringify(details));
+ };
+ await checkTreasureItem('#treasureBookGrid .treasure-book-item');
+ await page.evaluate(()=>window.CountryV2.go('quizReward'));
+ await checkTreasureItem('#treasureRewardChoices .treasure-reward-option');
+ await page.evaluate(()=>window.CountryV2.go('flags'));
+ await shot('flags-parchment');
+ await page.evaluate(()=>window.CountryV2.go('treasures'));
+ await shot('treasures-parchment');
+ await page.evaluate(()=>window.CountryV2.go('quizReward'));
+ await shot('gift-parchment');
  await shot('gift-and-treasure');
  assert.equal(errors.length,0,'browser errors: '+errors.join(' | '));
  console.log('PASS: home, topics, countries, flag learning, capital learning, quiz BPM, 20 questions, result');
