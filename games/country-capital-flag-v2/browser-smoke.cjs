@@ -199,6 +199,14 @@ const assert=require('node:assert/strict');
  await page.evaluate(()=>window.CountryV2.go('flags'));
  await shot('flags-parchment');
  await page.evaluate(()=>window.CountryV2.go('treasures'));
+ const catalogPanel=await page.evaluate(()=>{
+  const el=document.querySelector('#treasuresCollection');
+  if(!el)return {exists:false};
+  const cs=getComputedStyle(el);
+  return {exists:true,background:cs.backgroundColor,image:cs.backgroundImage,border:cs.borderTopWidth};
+ });
+ assert(catalogPanel.exists&&catalogPanel.background==='rgba(0, 0, 0, 0)'&&catalogPanel.image==='none'&&catalogPanel.border==='0px',
+   'legacy rectangle must not cover illustrated parchment: '+JSON.stringify(catalogPanel));
  await shot('treasures-parchment');
  await page.evaluate(()=>window.CountryV2.go('quizReward'));
  await shot('gift-parchment');
