@@ -103,3 +103,16 @@
 :is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment)::before{
  content:none!important;display:none!important;
 }
+
+/* Visual screenshot review: remove the rectangular legacy catalog panel.
+   The collection items should sit directly on the illustrated parchment. */
+#treasures #treasureBookGrid,
+#treasures #treasuresCollection{
+ background:transparent!important;background-color:transparent!important;
+ background-image:none!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;outline:none!important;
+}
+#treasures #treasureBookGrid::before,
+#treasures #treasureBookGrid::after{
+ content:none!important;display:none!important;
+}
