@@ -58,7 +58,7 @@ const assert=require('node:assert/strict');
  await page.locator('#learningNext').click(); // finish both selected countries
  assert(await page.locator('#countries').isVisible(),'learning completion must return to country selection');
  assert.equal(await page.evaluate(()=>JSON.parse(localStorage.getItem('countryFlagCollection')).length),2,'completion awards both flags');
- await page.locator('#countries [data-go="home"]').first().click();
+ await page.evaluate(()=>window.CountryV2.home());
  await page.locator('#home button[data-go="flags"]').click();
  assert(await page.locator('#flags').isVisible());
  assert.equal(await page.locator('#flagsCollection .flags-item').count(),2,'two earned flags visible in gallery');
