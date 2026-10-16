@@ -97,3 +97,30 @@
  object-fit:contain!important;
 }
 #quiz #quizFeedback{top:69%!important;pointer-events:none!important}
+
+/* 2026-10-16 approved: double the flag/name cards' vertical size without shrinking parchment. */
+#quiz.screen.active .quiz-board .quiz-pair{
+ top:32.0%!important;
+ height:36.0%!important;
+ min-height:0!important;
+ max-height:36.0%!important;
+}
+#quiz.screen.active .quiz-board .quiz-pair>.quiz-tile{
+ height:100%!important;
+ min-height:0!important;
+}
+#quiz.screen.active .quiz-board .quiz-pair>.quiz-tile img{
+ max-height:90%!important;
+ max-width:95%!important;
+ object-fit:contain!important;
+}
+/* Feedback twice the prior font size; positioned between cards and O/X buttons. */
+#quiz.screen.active .quiz-board #quizFeedback{
+ top:67.7%!important;
+ left:22%!important;
+ width:56%!important;
+ font-size:clamp(24px,3vw,44px)!important;
+ line-height:1.1!important;
+ z-index:7!important;
+ pointer-events:none!important;
+}
