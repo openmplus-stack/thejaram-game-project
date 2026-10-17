@@ -41,3 +41,6 @@
 #learning .learning-bottom-nav button:nth-child(3){left:40%!important}
 #learning .learning-bottom-nav button:nth-child(4){left:60%!important}
 #learning .learning-bottom-nav button:nth-child(5){left:80%!important}
+
+/* Visual QA: remove large transparent margins inside footer artwork by scaling the image layer only. */
+#learning .learning-bottom-nav{left:5%!important;top:81.8%!important;width:90%!important;height:17.5%!important;background-size:100% 100%!important}
