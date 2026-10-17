@@ -48,6 +48,11 @@ const fs = require('node:fs');
         const el = document.querySelector(sel);
         return el && getComputedStyle(el).display !== 'none' && el.getClientRects().length > 0;
       }, selector);
+      // Wait for visible images to finish loading before evaluating broken artwork.
+      // An image still in flight must not be mistaken for a missing asset.
+      await page.waitForFunction(() => [...document.images]
+        .filter(img => img.getClientRects().length > 0)
+        .every(img => img.complete), null, { timeout: 10000 });
       const geometry = await page.evaluate((sel) => {
         const rect = (node) => {
           if (!node) return null;
