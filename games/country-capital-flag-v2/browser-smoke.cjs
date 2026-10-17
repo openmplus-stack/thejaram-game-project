@@ -51,6 +51,16 @@ const assert=require('node:assert/strict');
   await page.locator('#countries .country-card').first().waitFor();
   const choices=page.locator('#countries .country-card');
   assert((await choices.count())>=2,'at least two countries');
+  const scrollCheck=await page.locator('#countries .country-grid').evaluate(el=>{
+    const start=el.scrollTop;
+    el.scrollTop=el.scrollHeight;
+    return {start,end:el.scrollTop,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight};
+  });
+  assert(scrollCheck.scrollHeight<=scrollCheck.clientHeight+2 || scrollCheck.end>scrollCheck.start,
+    'country list must scroll to the end: '+JSON.stringify(scrollCheck));
+  await page.screenshot({path:'country-v2-countries-scrolled-end.png'});
+  await page.locator('#countries .country-grid').evaluate(el=>{el.scrollTop=0});
+
   // Check the entire scroll range, not only the initially visible country rows.
   const scrollAudit=await page.locator('#countries .country-grid').evaluate(async el=>{
     const before=el.scrollTop;
