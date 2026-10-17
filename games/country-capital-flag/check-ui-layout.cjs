@@ -36,12 +36,13 @@ const assert = require('node:assert/strict');
         const heading = screen.querySelector('.flowTitle');
         const footer = document.querySelector('#worldBottomNav');
         const cards = screen.querySelector('.countryChoiceGrid');
-        const actionButtons = [...screen.querySelectorAll('button')].filter(el => { const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); return r.width>0 && r.height>0 && cs.display!=='none' && cs.visibility!=='hidden'; });
+        const actionButtons = [...screen.querySelectorAll('button')].filter(el => { const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); return r.width>0 && r.height>0 && cs.display!=='none' && cs.visibility!=='hidden' && el.getClientRects().length>0 && el.checkVisibility({checkVisibilityCSS:true}); });
         return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight };
       }, selector);
       const visibleFooter = geometry.footer && geometry.footer.height > 0;
       const overlaps = visibleFooter && geometry.panel && geometry.footer.y < geometry.panel.bottom;
       const cardOverlap = visibleFooter && geometry.actions.some(a => a.rect.bottom > geometry.footer.y && a.rect.y < geometry.footer.bottom && a.rect.right > geometry.footer.x && a.rect.x < geometry.footer.right);
+      await page.screenshot({ path: path.join(__dirname, 'audit-' + label + '-1024x768.png'), fullPage: false });
       results.push({ screen: label, overlapsPanel: !!overlaps, overlapsCards: !!cardOverlap, ...geometry });
     }
     console.log(JSON.stringify(results, null, 2));
