@@ -53,4 +53,4 @@
 
 /* Keep long country and capital names legible within the fixed half-card. */
 #learning .learning-name-panel{overflow:hidden!important}
-#learning .learning-country,#learning .learning-capital{max-width:100%!important;max-height:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:break-word!important;word-break:keep-all!important;hyphens:none!important;font-size:clamp(22px,4.5vw,66px)!important;line-height:1.15!important}
+#learning .learning-country,#learning .learning-capital{max-width:100%!important;max-height:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;hyphens:none!important;font-size:clamp(22px,4.5vw,66px)!important;line-height:1.15!important}
