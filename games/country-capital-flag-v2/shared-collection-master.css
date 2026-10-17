@@ -139,3 +139,11 @@
 /* Match country-selection panel footprint and footer artwork. */
 :is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment){left:8%!important;top:7.5%!important;width:84%!important;height:74%!important}
 :is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:12%!important;top:83%!important;width:76%!important;height:16%!important;background-size:100% 100%!important}
+
+/* Keep the approved flag-collection typography on all three panels. */
+:is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment)>h2{font-size:clamp(24px,4.1vw,58px)!important;line-height:1.15!important;margin:0 0 1.4%!important}
+:is(#flags #flagsSummary,#treasures #treasuresSummary,#quizReward .gift-intro){font-size:clamp(15px,2.25vw,32px)!important;font-weight:900!important;line-height:1.3!important;margin:0 0 2.2%!important}
+#quizReward #treasureRewardChoices{grid-template-columns:repeat(3,minmax(0,1fr))!important;column-gap:3%!important;flex:1 1 auto!important;min-height:0!important;padding:1% 1.2%!important}
+#quizReward #treasureRewardMessage{position:static!important;flex:none!important;margin:.8% 0 1.2%!important}
+#quizReward #treasureRewardSave{position:static!important;align-self:center!important;flex:none!important;min-width:clamp(170px,21vw,295px)!important;min-height:clamp(40px,4.4vw,64px)!important;padding:.45em 1.2em!important;border:2px solid #a66c2d!important;border-radius:14px!important;background:linear-gradient(#ffdf87,#e9ad43)!important;box-shadow:0 3px 0 #9b642a!important;color:#56340d!important;font-size:clamp(15px,1.65vw,24px)!important;font-weight:900!important}
+#quizReward #treasureRewardSave::before,#quizReward #treasureRewardSave::after{display:none!important;content:none!important}
