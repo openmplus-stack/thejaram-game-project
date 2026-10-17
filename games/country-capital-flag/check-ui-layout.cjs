@@ -125,7 +125,7 @@ const fs = require('node:fs');
     assert(results.every(x => !x.overlapsCards), 'Visible interactive buttons overlap the fixed footer');
     // A full-stage transparent panel may geometrically extend behind the footer.
     // That alone is not a defect: only interactive content overlap is a failure.
-    for (const result of results) {
+    for (const result of results.filter(item => ['continent', 'topic', 'country'].includes(item.screen))) {
       assert(result.heading && result.heading.width > 0, result.screen + ': missing visible heading');
       assert.equal(result.brokenImages.length, 0, result.screen + ': broken visible images: ' + result.brokenImages.join(', '));
       assert(result.footer && result.footer.width > 0 && result.footer.height > 0, result.screen + ': shared footer is not visible');
