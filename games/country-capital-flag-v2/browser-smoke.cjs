@@ -73,7 +73,7 @@ const assert=require('node:assert/strict');
     gridNextGap:n.top-g.bottom,lastBottomGap:g.bottom-last.bottom,
     noOverlap:g.bottom<=n.top-2,buttonWithinPanel:n.bottom<=p.bottom+3};
   });
-  assert(endLayout.noOverlap&&endLayout.buttonWithinPanel&&endLayout.lastBottomGap>=0,
+  assert(endLayout.noOverlap&&endLayout.buttonWithinPanel&&endLayout.lastBottomGap>=8,
    'country scroll end and next button must not overlap: '+JSON.stringify(endLayout));
 
   await page.locator('#countryGrid').evaluate(el=>el.scrollTop=el.scrollHeight);
