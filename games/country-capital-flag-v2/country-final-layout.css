@@ -1,6 +1,6 @@
 /* Country selection only. Keep dynamic country data, buttons and other screens unchanged. */
 #countries .country-wood-sign{display:flex!important;visibility:visible!important;left:29%!important;top:1.5%!important;width:42%!important;height:18%!important;background:transparent url('./assets/title-country-select-master.png?v=20261014-master-1') center/contain no-repeat!important;z-index:6!important}#countries .country-wood-sign::before,#countries .country-wood-sign::after{display:none!important;content:none!important}
-#countries .country-main-panel{left:8%!important;top:19%!important;width:84%!important;height:64%!important;max-height:64%!important;min-height:0!important;padding:6% 8% 6%!important;gap:clamp(3px,.55vh,9px)!important;border:0!important;border-radius:0!important;background:transparent url('./assets/ui-collection-parchment.png') center/100% 100% no-repeat!important;box-shadow:none!important;z-index:3!important;overflow:hidden!important}
+#countries .country-main-panel{left:8%!important;top:19%!important;width:84%!important;height:49%!important;max-height:49%!important;min-height:0!important;padding:6% 8% 6%!important;gap:clamp(3px,.55vh,9px)!important;border:0!important;border-radius:0!important;background:transparent url('./assets/ui-collection-parchment.png') center/100% 100% no-repeat!important;box-shadow:none!important;z-index:3!important;overflow:hidden!important}
 #countries .country-main-panel>h2{display:none!important}
 #countries #countryMessage{flex:0 0 auto!important;min-height:0!important;margin:0!important;text-align:center!important}
 #countries .country-tools{flex:0 0 auto!important;margin:0!important;min-height:0!important}
@@ -12,3 +12,6 @@
 
 /* Suppress legacy CSS-drawn scroll ends; the approved parchment PNG contains its own edges. */
 #countries .country-main-panel::before,#countries .country-main-panel::after{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important}
+
+/* 1366x1024 regression: keep the parchment above the fixed bottom navigation.
+   Country cards remain scrollable within the panel. */
