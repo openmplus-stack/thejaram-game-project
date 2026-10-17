@@ -200,7 +200,7 @@ const assert=require('node:assert/strict');
  await shot('flags-parchment');
  await page.evaluate(()=>window.CountryV2.go('treasures'));
  const catalogPanel=await page.evaluate(()=>{
-  const el=document.querySelector('#treasuresCollection');
+  const el=document.querySelector('#treasureBookGrid');
   if(!el)return {exists:false};
   const cs=getComputedStyle(el);
   return {exists:true,background:cs.backgroundColor,image:cs.backgroundImage,border:cs.borderTopWidth};
