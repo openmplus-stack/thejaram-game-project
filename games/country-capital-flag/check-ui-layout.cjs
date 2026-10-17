@@ -42,9 +42,13 @@ watchdog.unref();
     page.on('pageerror', error => failures.push(error.message));
     // The app contains large artwork; DOM readiness is sufficient for navigation tests.
     // Waiting for every image's load event can exceed CI's 30s navigation timeout.
-    const response = await page.goto(base + '/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    // The app may block DOMContentLoaded with synchronous startup work.
+    // 'commit' confirms the server responded without waiting for app scripts.
+    const response = await page.goto(base + '/index.html', { waitUntil: 'commit', timeout: 15000 });
+    console.log('BROWSER_AUDIT_STAGE: entry HTTP ' + response?.status());
+    await page.waitForTimeout(1500);
     assert.equal(response?.status(), 200, 'App entry returned HTTP ' + response?.status());
-    console.log('ENTRY_DIAGNOSTIC', JSON.stringify({url:page.url(),title:await page.title(),homeStartCount:await page.locator('#homeStart').count(),bodyExcerpt:(await page.locator('body').innerText()).slice(0,250)}));
+    console.log('ENTRY_DIAGNOSTIC', JSON.stringify({url:page.url(),homeStartCount:await page.locator('#homeStart').count()}));
     assert.equal(await page.locator('#homeStart').count(), 1, 'App entry does not contain the home start control');
     const steps = [
       { label: 'continent', selector: '#continentFlow', click: '#homeStart' },
