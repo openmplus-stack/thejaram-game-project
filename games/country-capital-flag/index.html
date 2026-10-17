@@ -865,8 +865,8 @@ const ids=['home','continentFlow','topicFlow','countrySelectFlow','activityChoic
 const prev=document.createElement('button'),next=document.createElement('button');
 prev.id='cornerPrev';next.id='cornerNext';prev.className=next.className='cornerPageArrow';prev.textContent='‹';next.textContent='›';prev.setAttribute('aria-label','이전 페이지');next.setAttribute('aria-label','다음 페이지');document.body.append(prev,next);
 function current(){return ids.findIndex(id=>{const el=document.getElementById(id);return el&&getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().width>0})}
-function update(){const i=current();prev.style.display=i>0?'flex':'none';next.style.display=i>=0&&i<ids.length-1?'flex':'none'}
-function go(delta){let i=current(),target=ids[i+delta];if(!target)return;
+function update(){const i=current();prev.style.display=i>0?'flex':'none';const nextId=ids[i+1];next.style.display=i>=0&&nextId&&!['activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow'].includes(nextId)?'flex':'none'}
+function go(delta){let i=current(),target=ids[i+delta];if(!target||delta>0&&['activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow'].includes(target))return;
 const nav=document.querySelector('#worldBottomNav [data-go]');
 if(target==='home')document.querySelector('#worldBottomNav [data-go="home"]')?.click();
 else if(target==='continentFlow')document.querySelector('#worldBottomNav [data-go="continent"]')?.click();
