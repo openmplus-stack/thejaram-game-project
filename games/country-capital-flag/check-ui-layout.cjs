@@ -6,6 +6,9 @@ const path = require('node:path');
 const http = require('node:http');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+// Fail promptly with an actionable marker instead of occupying the CI runner indefinitely.
+const watchdog = setTimeout(() => { console.error('BROWSER_AUDIT_TIMEOUT: exceeded 120 seconds'); process.exit(124); }, 120000);
+watchdog.unref();
 (async () => {
   // Prevent a misleading 'pass' when artwork files are missing from the checkout.
   for (const asset of ['bg-world-common.png','continent-select-no-number.png','topic-select-no-number-no-arrows.png','country-select-reference-04.png']) {
@@ -30,8 +33,11 @@ const fs = require('node:fs');
   try { browser = await chromium.launch({ headless: true }); }
   catch (error) { await new Promise(resolve => server.close(resolve)); throw error; }
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, deviceScaleFactor: 1 });
+  page.setDefaultTimeout(10000);
+  page.setDefaultNavigationTimeout(20000);
   const results = [];
   try {
+    console.log('BROWSER_AUDIT_STAGE: navigating to app entry');
     const failures = [];
     page.on('pageerror', error => failures.push(error.message));
     // The app contains large artwork; DOM readiness is sufficient for navigation tests.
@@ -46,6 +52,7 @@ const fs = require('node:fs');
       { label: 'country', selector: '#countrySelectFlow', click: '[data-topic="flag-country"]' },
     ];
     for (const { label, selector, click } of steps) {
+      console.log('BROWSER_AUDIT_STAGE: ' + label + ' clicking ' + click);
       // Follow actual application navigation rather than forcing display styles.
       await page.locator(click).click();
       await page.waitForFunction(sel => {
@@ -81,6 +88,7 @@ const fs = require('node:fs');
       await page.screenshot({ path: path.join(__dirname, 'audit-' + label + '-1024x768.png'), fullPage: false });
       results.push({ screen: label, overlapsPanel: !!overlaps, overlapsCards: !!cardOverlap, ...geometry });
     }
+    console.log('BROWSER_AUDIT_STAGE: activity navigation');
     // Verify the next real navigation stage and both return paths.
     await page.locator('#countryChoiceGrid button').first().click();
     await page.locator('#countrySelectStart').click();
@@ -101,6 +109,7 @@ const fs = require('node:fs');
     assert(await page.locator('#countrySelectFlow').isVisible(), 'activity back did not return to country selection');
     results.push({ screen:'activity-navigation', learnBack:true, activityBack:true });
 
+    console.log('BROWSER_AUDIT_STAGE: quiz navigation');
     // Quiz entry, first question, answer progression, and safe exit.
     await page.locator('#countrySelectStart').click();
     assert(await page.locator('#activityChoiceFlow').isVisible(), 'quiz: activity choice is hidden');
