@@ -838,8 +838,8 @@ async function loadRewardManifest(){
   rewardFiles=[...new Set(found)].sort();
  }catch(e){console.info('Reward manifest fallback:',e.message)}
 }
-function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
-function setTreasureCollection(v){localStorage.setItem('countryTreasureCollection',JSON.stringify(v))}
+function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?[...new Set(value.filter(x=>typeof x==='string'))]:[]}catch(e){return[]}}
+function setTreasureCollection(v){localStorage.setItem('countryTreasureCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]))}
 function normalizedTreasures(){return getTreasureCollection().filter(x=>typeof x==='string')}
 function treasureOwned(file,code){const saved=normalizedTreasures();if(saved.includes(file))return true;if(!saved.includes(code))return false;/* Legacy country-code rewards represent one earned item, not every item in that country. */const first=rewardItemsFor(code)[0];return !!first&&first.file===file}
 function openQuizReward(){
@@ -884,8 +884,8 @@ function openTreasureDetail(t){
 loadRewardManifest().then(()=>{if(document.querySelector('#treasureCollectionFlow').style.display!=='none')renderTreasureCollection()});
 $('#treasureCollectionBack').onclick=()=>showFlow('#home');
 let rewardFlagCode=null;
-function getFlagCollection(){try{const value=JSON.parse(localStorage.getItem('countryFlagCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
-function setFlagCollection(v){localStorage.setItem('countryFlagCollection',JSON.stringify(v))}
+function getFlagCollection(){try{const value=JSON.parse(localStorage.getItem('countryFlagCollection')||'[]');return Array.isArray(value)?[...new Set(value.filter(x=>typeof x==='string'))]:[]}catch(e){return[]}}
+function setFlagCollection(v){localStorage.setItem('countryFlagCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]))}
 function openLearnReward(){
  recordLearnComplete();
  rewardFlagCode=null; const grid=$('#rewardFlagGrid');grid.innerHTML='';
