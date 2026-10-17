@@ -19,19 +19,17 @@ const fs = require('node:fs');
     page.on('pageerror', error => failures.push(error.message));
     await page.goto(pathToFileURL(path.join(__dirname, 'index.html')).href);
     await page.waitForLoadState('load');
-    for (const [label, selector] of [
-      ['continent', '#continentFlow'],
-      ['topic', '#topicFlow'],
-      ['country', '#countrySelectFlow'],
-    ]) {
-      // Independent layout probe; it does not assert navigation correctness.
-      await page.evaluate((sel) => {
-        for (const el of document.querySelectorAll('#continentFlow,#topicFlow,#countrySelectFlow,#home')) {
-          el.style.display = 'none';
-        }
-        const target = document.querySelector(sel);
-        target.style.display = 'flex';
-        document.body.classList.add('world-nav-visible');
+    const steps = [
+      { label: 'continent', selector: '#continentFlow', click: '#homeStart' },
+      { label: 'topic', selector: '#topicFlow', click: '[data-continent="아시아"]' },
+      { label: 'country', selector: '#countrySelectFlow', click: '[data-topic="flag-country"]' },
+    ];
+    for (const { label, selector, click } of steps) {
+      // Follow actual application navigation rather than forcing display styles.
+      await page.locator(click).click();
+      await page.waitForFunction(sel => {
+        const el = document.querySelector(sel);
+        return el && getComputedStyle(el).display !== 'none' && el.getClientRects().length > 0;
       }, selector);
       const geometry = await page.evaluate((sel) => {
         const rect = (node) => {
