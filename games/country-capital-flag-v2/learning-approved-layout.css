@@ -44,3 +44,6 @@
 
 /* Visual QA: remove large transparent margins inside footer artwork by scaling the image layer only. */
 #learning .learning-bottom-nav{left:5%!important;top:81.8%!important;width:90%!important;height:17.5%!important;background-size:contain!important}
+
+/* Match the approved activity screen: footer extends almost edge-to-edge. Keep native artwork ratio. */
+#learning .learning-bottom-nav{left:6%!important;top:80%!important;width:88%!important;height:20%!important;background-size:100% auto!important;background-position:center bottom!important;background-repeat:no-repeat!important}
