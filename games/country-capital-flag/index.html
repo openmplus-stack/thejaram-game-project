@@ -615,6 +615,33 @@ body:has(#continentFlow:target) #continentFlow{display:flex!important;visibility
 
 
 <style id="selection-ui-canonical-v1">
+/* One shared 4:3 stage geometry for the three selection screens. */
+#continentFlow .flowBox,
+#topicFlow .flowBox,
+#countrySelectFlow .countrySelectBox {
+  width:min(100vw, 133.333dvh)!important;
+  height:min(100dvh, 75vw)!important;
+  aspect-ratio:4 / 3!important;
+  margin:auto!important;
+  box-sizing:border-box!important;
+}
+/* Keep selection headings aligned to the same vertical reference. */
+#continentFlow .flowTitle,
+#topicFlow .flowTitle,
+#countrySelectFlow .flowTitle {
+  top:7.7%!important;
+  left:50%!important;
+  transform:translateX(-50%)!important;
+  white-space:nowrap!important;
+}
+/* Country cards scroll inside the parchment area instead of extending into the footer. */
+#countrySelectFlow .countryChoiceGrid {
+  min-height:0!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  align-content:start!important;
+}
+
 /* Single owner for selection heading, country grid and navigation geometry. */
 /* Country selection: one scoped desktop grid rule; preserve small-screen layout. */
 @media (min-width: 900px) and (orientation: landscape) {
