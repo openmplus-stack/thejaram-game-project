@@ -126,3 +126,12 @@
  background-repeat:no-repeat!important;
  background-size:100% 100%!important;
 }
+
+/* Final collection layout: preserve the natural ratio of the approved 4:3 artboard
+   while keeping the illustrated parchment and footer visually consistent. */
+:is(#flags,#treasures,#quizReward) :is(.flags-artboard,.treasure-artboard,.gift-artboard){
+ max-height:100dvh!important;overflow:hidden!important;
+}
+:is(#flags,#treasures,#quizReward) :is(.flags-parchment,.treasure-parchment,.gift-parchment){
+ box-sizing:border-box!important;min-height:0!important;
+}
