@@ -101,7 +101,7 @@ const assert=require('node:assert/strict');
   assert(endLayout.noOverlap&&endLayout.buttonWithinPanel&&endLayout.lastBottomGap>=8,
    'country scroll end and next button must not overlap: '+JSON.stringify(endLayout));
 
-  const endHit=await page.locator('#countryGrid .country-card').last().evaluate(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);return {visible:!!top&&(top===el||el.contains(top)),x,y};});
+  const endHit=await page.locator('#countries .country-grid .country-card').last().evaluate(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);return {visible:!!top&&(top===el||el.contains(top)),x,y};});
   assert(endHit.visible,'last scrolled country must be touch-accessible: '+JSON.stringify(endHit));
   const footerClearance=await page.locator('#countries').evaluate(root=>{const a=root.querySelector('.country-main-panel').getBoundingClientRect(),b=root.querySelector('.country-bottom-nav').getBoundingClientRect();return {gap:b.top-a.bottom,panelBottom:a.bottom,footerTop:b.top}});
   assert(footerClearance.gap>=0,'country parchment must not overlap footer navigation: '+JSON.stringify(footerClearance));
