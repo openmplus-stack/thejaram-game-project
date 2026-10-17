@@ -27,23 +27,26 @@
 /* Completion message: below parchment, centered in the gap above bottom navigation. */
 #learning #learningNotice{left:18%!important;top:79.2%!important;width:64%!important;margin:0!important;padding:0!important;text-align:center!important;font-size:clamp(14px,1.9vw,27px)!important;font-weight:900!important;line-height:1.3!important;color:#123d68!important;text-shadow:0 1px 2px #fff9!important;pointer-events:none!important;z-index:7!important}
 
-/* Learning screen: enlarge the parchment by 10% independently of the landscape. */
-#learning .learning-board{background-image:url('./assets/ui-collection-parchment.png'),url('./assets/bg-world-clean.png')!important;background-position:center 48%,center center!important;background-size:84% 76%,100% 100%!important;background-repeat:no-repeat!important}
-#learning .learning-top{left:16%!important;top:22%!important;width:68%!important}
-#learning .learning-card{left:15%!important;top:29%!important;width:70%!important;height:35%!important}
-#learning .learning-actions{left:15%!important;top:65%!important;width:70%!important}
-#learning #learningNotice{top:76%!important}
-/* Use the original shared navigation artwork and matching hit targets. */
-#learning .learning-bottom-nav{inset:auto!important;left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;background:transparent url('./assets/ui-bottom-navigation.png') center/contain no-repeat!important}
+/* Single authoritative learning layout. Avoid repeated positional overrides.
+   Artboard coordinates use the approved 4:3 screen; no changes to learning logic. */
+#learning .learning-board{
+ background-image:url('./assets/ui-collection-parchment.png'),url('./assets/bg-world-clean.png')!important;
+ background-position:center 45%,center center!important;
+ background-size:84% 70%,100% 100%!important;
+ background-repeat:no-repeat!important;
+}
+#learning .learning-top{left:16%!important;top:20%!important;width:68%!important}
+#learning .learning-card{left:15%!important;top:28%!important;width:70%!important;height:35%!important}
+#learning .learning-actions{left:15%!important;top:64%!important;width:70%!important}
+#learning #learningNotice{top:75%!important}
+#learning .learning-bottom-nav{
+ inset:auto!important;left:6%!important;top:81%!important;
+ width:88%!important;height:18%!important;
+ background:transparent url('./assets/ui-bottom-navigation.png') center/contain no-repeat!important;
+}
 #learning .learning-bottom-nav button{top:0!important;width:20%!important;height:100%!important}
 #learning .learning-bottom-nav button:nth-child(1){left:0!important}
 #learning .learning-bottom-nav button:nth-child(2){left:20%!important}
 #learning .learning-bottom-nav button:nth-child(3){left:40%!important}
 #learning .learning-bottom-nav button:nth-child(4){left:60%!important}
 #learning .learning-bottom-nav button:nth-child(5){left:80%!important}
-
-/* Visual QA: remove large transparent margins inside footer artwork by scaling the image layer only. */
-#learning .learning-bottom-nav{left:5%!important;top:81.8%!important;width:90%!important;height:17.5%!important;background-size:contain!important}
-
-/* Match the approved activity screen: footer extends almost edge-to-edge. Keep native artwork ratio. */
-#learning .learning-bottom-nav{left:6%!important;top:80%!important;width:88%!important;height:20%!important;background-size:100% auto!important;background-position:center bottom!important;background-repeat:no-repeat!important}
