@@ -138,7 +138,7 @@
 
 /* Match country-selection panel footprint and footer artwork. */
 :is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment){left:8%!important;top:7.5%!important;width:84%!important;height:74%!important}
-:is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:12%!important;top:83%!important;width:76%!important;height:16%!important;background-size:100% 100%!important}
+:is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:5%!important;top:82.5%!important;width:90%!important;height:17%!important;background-size:contain!important}
 
 /* Keep the approved flag-collection typography on all three panels. */
 :is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment)>h2{font-size:clamp(24px,4.1vw,58px)!important;line-height:1.15!important;margin:0 0 1.4%!important}
