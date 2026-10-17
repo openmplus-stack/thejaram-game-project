@@ -97,6 +97,25 @@ const fs = require('node:fs');
     assert(await page.locator('#countrySelectFlow').isVisible(), 'activity back did not return to country selection');
     results.push({ screen:'activity-navigation', learnBack:true, activityBack:true });
 
+    // Quiz entry, first question, answer progression, and safe exit.
+    await page.locator('#countrySelectStart').click();
+    assert(await page.locator('#activityChoiceFlow').isVisible(), 'quiz: activity choice is hidden');
+    await page.locator('#activityQuizStart').click();
+    assert(await page.locator('#simpleOx').isVisible(), 'quiz: OX screen did not open');
+    assert(await page.locator('#simpleOxStart').isVisible(), 'quiz: start button is hidden');
+    await page.locator('#simpleOxStart').click();
+    assert(await page.locator('#simpleOxGame').isVisible(), 'quiz: game is hidden after start');
+    assert.equal((await page.locator('#simpleOxCount').innerText()).trim(), '1 / 20', 'quiz: incorrect first question number');
+    await page.locator('#simpleYes').click();
+    await page.waitForFunction(() => document.querySelector('#simpleOxCount')?.textContent.trim()==='2 / 20', null, {timeout:5000});
+    assert(await page.locator('#simpleOxGame').isVisible(), 'quiz: game disappeared after answer');
+    await page.locator('#simpleOxBack').click();
+    assert(await page.locator('#activityChoiceFlow').isVisible(), 'quiz: back did not return to activity choice');
+    await page.waitForTimeout(950);
+    assert(await page.locator('#activityChoiceFlow').isVisible(), 'quiz: delayed answer timer reopened the quiz');
+    results.push({ screen:'quiz-navigation', firstQuestion:true, nextQuestion:true, back:true, pendingTimerCancelled:true });
+
+
     console.log(JSON.stringify(results, null, 2));
     assert.equal(failures.length, 0, 'Browser JavaScript errors: ' + failures.join(' | '));
     assert(results.every(x => !x.overlapsCards), 'Visible interactive buttons overlap the fixed footer');
