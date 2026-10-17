@@ -887,8 +887,20 @@ function renderFlagCollection(){
  })
 }
 function openFlagDetail(it){
- const old=document.querySelector('.flagDetailModal');if(old)old.remove();
- const m=document.createElement('div');m.className='flagDetailModal';m.innerHTML='<div class="flagDetailCard"><button class="flagDetailClose">×</button><img src="'+flagUrl(it.flag)+'" alt="'+it.country+' 국기"><h3>'+it.country+'</h3><p>수도 <b>'+it.capital+'</b></p></div>';document.body.appendChild(m);m.querySelector('.flagDetailClose').onclick=()=>m.remove();m.onclick=e=>{if(e.target===m)m.remove()}
+ const old=document.querySelector('.flagDetailModal');if(old)(old.closeDetail?old.closeDetail():old.remove());
+ const m=document.createElement('div');m.className='flagDetailModal';
+ m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label',it.country+' 국기 상세 보기');
+ const card=document.createElement('div');card.className='flagDetailCard';
+ const closeButton=document.createElement('button');closeButton.className='flagDetailClose';closeButton.type='button';closeButton.setAttribute('aria-label','닫기');closeButton.textContent='×';
+ const img=document.createElement('img');img.src=flagUrl(it.flag);img.alt=it.country+' 국기';
+ const title=document.createElement('h3');title.textContent=it.country;
+ const capital=document.createElement('p');capital.textContent='수도 · '+it.capital;
+ card.append(closeButton,img,title,capital);m.appendChild(card);
+ const previousFocus=document.activeElement;
+ const onKey=e=>{if(e.key==='Escape'){e.preventDefault();close()}};
+ const close=()=>{m.remove();document.removeEventListener('keydown',onKey);if(previousFocus&&previousFocus.isConnected)previousFocus.focus()};
+ m.closeDetail=close;closeButton.onclick=close;m.onclick=e=>{if(e.target===m)close()};
+ document.body.appendChild(m);document.addEventListener('keydown',onKey);closeButton.focus();
 }
 $('#flagCollectionBack').onclick=()=>showFlow('#home');
 document.querySelectorAll('[data-soon]').forEach(b=>b.onclick=()=>{if(b.dataset.soon==='flag'){renderFlagCollection();showFlow('#flagCollectionFlow');return}if(b.dataset.soon==='treasure'){renderTreasureCollection();showFlow('#treasureCollectionFlow');return}if(b.dataset.soon==='progress'){renderProgress();showFlow('#progressFlow');return}const s=$('#soon');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1500)});
