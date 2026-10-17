@@ -95,7 +95,7 @@ const assert=require('node:assert/strict');
  assert((await page.locator('#learningCapital').innerText()).trim().length>0);
  // Verify long Korean names wrap inside the fixed half-card without clipping.
  const longNameLayout=await page.evaluate(()=>{
-  const panel=document.querySelector('#learning .learning-name-panel');
+  const panel=document.querySelector('#learning .learning-card');
   const country=document.querySelector('#learningCountry');
   const capital=document.querySelector('#learningCapital');
   const previous=[country.textContent,capital.textContent];
