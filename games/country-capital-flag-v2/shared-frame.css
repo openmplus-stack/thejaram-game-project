@@ -33,15 +33,15 @@
 #countries .country-main-panel{
   box-sizing:border-box!important;
   position:absolute!important;
-  left:6%!important;top:21%!important;
-  width:88%!important;height:63%!important;
+  left:8%!important;top:19%!important;
+  width:84%!important;height:64%!important;
   min-width:0!important;min-height:0!important;
-  margin:0!important;padding:0.8% 1.5% 0.8%!important;
+  margin:0!important;padding:6% 8% 5%!important;
   display:flex!important;flex-direction:column!important;align-items:stretch!important;
   overflow:hidden!important;
-  border:5px solid #a96b35!important;border-radius:22px!important;
-  background:linear-gradient(115deg,#fff4d7,#fff9e9 52%,#fbe8c5)!important;
-  box-shadow:inset 0 0 0 3px #fff4d4,0 5px 0 #86552d,0 9px 15px #563a253d!important;
+  border:0!important;border-radius:0!important;
+  background:transparent url("./assets/ui-collection-parchment.png") center/100% 100% no-repeat!important;
+  box-shadow:none!important;
   z-index:3!important;
 }
 #countries .country-grid{
