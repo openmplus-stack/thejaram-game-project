@@ -244,21 +244,18 @@ const assert=require('node:assert/strict');
  assert(navGeometry.entries.every(x=>x.backgroundSize==='contain'&&x.within&&x.buttons===5),
    'footer must preserve image aspect ratio with five hit targets: '+JSON.stringify(navGeometry));
 
- // Regression guard: the learning footer must use one undistorted artwork layer.
- const learningFooter=await page.evaluate(()=>{
+ // Regression guard: inspect learning footer while the learning screen is visible.
+ // CSS percentages on a hidden board cannot be resolved to screen pixels.
+ const learningCss=await page.evaluate(()=>{
   const el=document.querySelector('#learning .learning-bottom-nav');
-  const board=document.querySelector('#learning .learning-board');
-  const cs=getComputedStyle(el),r=el.getBoundingClientRect();
-  const left=parseFloat(cs.left),top=parseFloat(cs.top),width=parseFloat(cs.width),height=parseFloat(cs.height);
-  const bw=parseFloat(getComputedStyle(board).width)||1,bh=parseFloat(getComputedStyle(board).height)||1;
+  const cs=getComputedStyle(el);
   return {image:cs.backgroundImage,size:cs.backgroundSize,buttons:el.querySelectorAll('button').length,
-   left:left/bw,right:(left+width)/bw,
-   top:top/bh,bottom:(top+height)/bh};
+   left:cs.left,top:cs.top,width:cs.width,height:cs.height};
  });
- assert(learningFooter.image.includes('ui-bottom-navigation.png')&&learningFooter.size==='contain'&&learningFooter.buttons===5,
-   'learning footer must retain original artwork ratio and five buttons: '+JSON.stringify(learningFooter));
- assert(learningFooter.left>=0&&learningFooter.right<=1&&learningFooter.top>=0&&learningFooter.bottom<=1,
-   'learning footer must stay within 4:3 artboard: '+JSON.stringify(learningFooter));
+ assert(learningCss.image.includes('ui-bottom-navigation.png')&&learningCss.size==='contain'&&learningCss.buttons===5,
+  'learning footer must use the approved image and five buttons: '+JSON.stringify(learningCss));
+ assert(learningCss.left==='6%'&&learningCss.top==='81%'&&learningCss.width==='88%'&&learningCss.height==='18%',
+  'learning footer positioning must match its single authoritative CSS: '+JSON.stringify(learningCss));
  await shot('gift-and-treasure');
  assert.equal(errors.length,0,'browser errors: '+errors.join(' | '));
  console.log('PASS: home, topics, countries, flag learning, capital learning, quiz BPM, 20 questions, result');
