@@ -36,7 +36,10 @@ const fs = require('node:fs');
     page.on('pageerror', error => failures.push(error.message));
     // The app contains large artwork; DOM readiness is sufficient for navigation tests.
     // Waiting for every image's load event can exceed CI's 30s navigation timeout.
-    await page.goto(base + '/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    const response = await page.goto(base + '/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+    assert.equal(response?.status(), 200, 'App entry returned HTTP ' + response?.status());
+    console.log('ENTRY_DIAGNOSTIC', JSON.stringify({url:page.url(),title:await page.title(),homeStartCount:await page.locator('#homeStart').count(),bodyExcerpt:(await page.locator('body').innerText()).slice(0,250)}));
+    assert.equal(await page.locator('#homeStart').count(), 1, 'App entry does not contain the home start control');
     const steps = [
       { label: 'continent', selector: '#continentFlow', click: '#homeStart' },
       { label: 'topic', selector: '#topicFlow', click: '[data-continent="아시아"]' },
