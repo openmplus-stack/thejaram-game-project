@@ -8,7 +8,7 @@
 #learning .learning-flag-panel{border-right:1px solid #c9a77a!important}
 #learning #learningFlag{display:block!important;width:90%!important;height:85%!important;max-width:90%!important;max-height:85%!important;object-fit:contain!important}
 #learning .learning-country{font-size:clamp(28px,5.4vw,82px)!important;font-weight:950!important;color:#083566!important;text-align:center!important;line-height:1.12!important;overflow-wrap:anywhere!important}
-#learning .learning-capital{font-size:clamp(21px,3.3vw,48px)!important;text-align:center!important}
+
 #learning .learning-actions{position:absolute!important;z-index:3!important;left:15.9%!important;top:65.2%!important;width:68.1%!important;height:8.0%!important;display:flex!important;justify-content:space-between!important;gap:16%!important;padding:0!important;margin:0!important}
 #learning .learning-actions button{flex:1!important;min-width:0!important;min-height:0!important;height:100%!important;padding:0 1%!important;border:2px solid #71401f!important;border-radius:18px!important;background:linear-gradient(#fff4cf,#ffe0a3)!important;box-shadow:none!important;color:#3d2415!important;font-size:clamp(15px,2vw,30px)!important;font-weight:900!important;touch-action:manipulation}
 #learning #learningNotice{position:absolute!important;z-index:2!important;left:20%!important;top:74%!important;width:60%!important;font-size:clamp(12px,1.4vw,20px)!important}
@@ -50,3 +50,7 @@
 #learning .learning-bottom-nav button:nth-child(3){left:40%!important}
 #learning .learning-bottom-nav button:nth-child(4){left:60%!important}
 #learning .learning-bottom-nav button:nth-child(5){left:80%!important}
+
+/* Keep long country and capital names legible within the fixed half-card. */
+#learning .learning-name-panel{overflow:hidden!important}
+#learning .learning-country,#learning .learning-capital{max-width:100%!important;max-height:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:break-word!important;word-break:keep-all!important;hyphens:none!important;font-size:clamp(22px,4.5vw,66px)!important;line-height:1.15!important}
