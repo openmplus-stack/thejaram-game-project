@@ -59,7 +59,7 @@ const fs = require('node:fs');
         const heading = screen.querySelector('.flowTitle');
         const footer = document.querySelector('#worldBottomNav');
         const cards = screen.querySelector('.countryChoiceGrid');
-        const footerButtons = [...footer.querySelectorAll('button')].map(el => rect(el));
+        const footerButtons = [...footer.querySelectorAll('button')].filter(el => getComputedStyle(el).display !== 'none' && el.getClientRects().length > 0).map(el => rect(el));
         const brokenImages = [...document.images].filter(img => img.getClientRects().length && (!img.complete || img.naturalWidth === 0)).map(img => img.src);
         const gridColumns = cards ? getComputedStyle(cards).gridTemplateColumns.split(' ').filter(Boolean).length : null;
         const cardCount = cards ? cards.children.length : null;
@@ -80,6 +80,8 @@ const fs = require('node:fs');
     for (const result of results) {
       assert(result.heading && result.heading.width > 0, result.screen + ': missing visible heading');
       assert.equal(result.brokenImages.length, 0, result.screen + ': broken visible images: ' + result.brokenImages.join(', '));
+      assert(result.footer && result.footer.width > 0 && result.footer.height > 0, result.screen + ': shared footer is not visible');
+      assert.equal(result.footerButtons.length, 5, result.screen + ': expected five visible shared footer buttons');
       if (result.footerButtons.length) {
         const widths = result.footerButtons.map(b => b.width);
         assert(Math.max(...widths) - Math.min(...widths) <= 1, result.screen + ': footer button widths are inconsistent');
