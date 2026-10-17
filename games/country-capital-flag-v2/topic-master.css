@@ -1,0 +1,18 @@
+/* The approved 4:3 artwork is rendered only when its asset loads. */
+#topics .topic-master-image{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;z-index:1}
+#topics .topic-artboard.topic-master-ready{position:relative!important;background-image:none!important;overflow:hidden!important}
+#topics .topic-artboard.topic-master-ready .topic-master-image{display:block!important}
+#topics .topic-artboard.topic-master-ready::before,#topics .topic-artboard.topic-master-ready::after{display:none!important;content:none!important}
+#topics .topic-artboard.topic-master-ready .topic-header{display:none!important}
+#topics .topic-artboard.topic-master-ready .topic-choices{position:absolute!important;inset:0!important;z-index:4!important;pointer-events:none!important}
+#topics .topic-artboard.topic-master-ready .topic-choice{position:absolute!important;top:24%!important;height:48.5%!important;width:30.2%!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;pointer-events:auto!important;cursor:pointer!important;min-height:0!important;padding:0!important;transform:none!important}
+#topics .topic-artboard.topic-master-ready .topic-flags{left:21.5%!important}
+#topics .topic-artboard.topic-master-ready .topic-capitals{left:52.4%!important}
+#topics .topic-artboard.topic-master-ready .topic-footer{position:absolute!important;inset:0!important;z-index:5!important;background:none!important;border:0!important;box-shadow:none!important;padding:0!important;pointer-events:none!important;display:block!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button{position:absolute!important;top:86.7%!important;height:11.2%!important;width:17.5%!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;pointer-events:auto!important;min-width:0!important;min-height:0!important;padding:0!important;transform:none!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button:nth-child(1){left:6.5%!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button:nth-child(2){left:24.2%!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button:nth-child(3){left:41.9%!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button:nth-child(4){left:59.6%!important}
+#topics .topic-artboard.topic-master-ready .topic-footer button:nth-child(5){left:77.3%!important}
+#topics .topic-artboard.topic-master-ready button:focus-visible{outline:4px solid #fff!important;outline-offset:-5px!important;border-radius:18px!important}

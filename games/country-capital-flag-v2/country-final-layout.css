@@ -1,0 +1,14 @@
+/* Country selection only. Keep dynamic country data, buttons and other screens unchanged. */
+#countries .country-wood-sign{display:flex!important;visibility:visible!important;left:29%!important;top:1.5%!important;width:42%!important;height:18%!important;background:transparent url('./assets/title-country-select-master.png?v=20261014-master-1') center/contain no-repeat!important;z-index:6!important}#countries .country-wood-sign::before,#countries .country-wood-sign::after{display:none!important;content:none!important}
+#countries .country-main-panel{left:8%!important;top:19%!important;width:84%!important;height:64%!important;max-height:64%!important;min-height:0!important;padding:6% 8% 6%!important;gap:clamp(3px,.55vh,9px)!important;border:0!important;border-radius:0!important;background:transparent url('./assets/ui-collection-parchment.png') center/100% 100% no-repeat!important;box-shadow:none!important;z-index:3!important;overflow:hidden!important}
+#countries .country-main-panel>h2{display:none!important}
+#countries #countryMessage{flex:0 0 auto!important;min-height:0!important;margin:0!important;text-align:center!important}
+#countries .country-tools{flex:0 0 auto!important;margin:0!important;min-height:0!important}
+#countries .country-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:max-content!important;align-content:start!important;flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;gap:clamp(4px,.65vw,12px)!important;padding:clamp(3px,.4vw,7px)!important;padding-bottom:clamp(12px,1.2vw,20px)!important;scroll-padding-bottom:clamp(12px,1.2vw,20px)!important}
+#countries #countryNext{flex:0 0 auto!important;align-self:center!important;margin:clamp(6px,.7vw,12px) auto 0!important;position:relative!important;z-index:4!important}
+/* Existing artwork remains intact; ensure a visible gap above the footer. */
+#countries .country-bottom-nav{z-index:8!important}
+@media (max-width:680px){#countries .country-main-panel{padding:1% 1.2%!important;border-width:3px!important}#countries .country-grid{gap:3px!important;padding:2px!important}}
+
+/* Suppress legacy CSS-drawn scroll ends; the approved parchment PNG contains its own edges. */
+#countries .country-main-panel::before,#countries .country-main-panel::after{content:none!important;display:none!important;background:none!important;border:0!important;box-shadow:none!important}
