@@ -45,6 +45,16 @@ const assert = require('node:assert/strict');
     }
     console.log(JSON.stringify(results, null, 2));
     assert(results.every(x => !x.overlapsCards), 'Country cards overlap the fixed footer');
+    // A full-stage transparent panel may geometrically extend behind the footer.
+    // That alone is not a defect: only interactive content overlap is a failure.
+    for (const result of results) {
+      assert(result.heading && result.heading.width > 0, result.screen + ': missing visible heading');
+      assert(result.panel && result.panel.width > 0, result.screen + ': missing visible panel');
+      if (result.screen === 'country') {
+        assert(result.cards && result.cards.height > 0, 'country: missing card grid');
+        assert(result.scrollHeight >= result.clientHeight, 'country: invalid scrolling geometry');
+      }
+    }
   } finally {
     await browser.close();
   }
