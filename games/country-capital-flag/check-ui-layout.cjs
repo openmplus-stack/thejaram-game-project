@@ -59,8 +59,10 @@ const fs = require('node:fs');
         const heading = screen.querySelector('.flowTitle');
         const footer = document.querySelector('#worldBottomNav');
         const cards = screen.querySelector('.countryChoiceGrid');
+        const gridColumns = cards ? getComputedStyle(cards).gridTemplateColumns.split(' ').filter(Boolean).length : null;
+        const cardCount = cards ? cards.children.length : null;
         const actionButtons = [...screen.querySelectorAll('button')].filter(el => { const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); return r.width>0 && r.height>0 && cs.display!=='none' && cs.visibility!=='hidden' && el.getClientRects().length>0 && el.checkVisibility({checkVisibilityCSS:true}); });
-        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight };
+        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight, gridColumns, cardCount };
       }, selector);
       const visibleFooter = geometry.footer && geometry.footer.height > 0;
       const overlaps = visibleFooter && geometry.panel && geometry.footer.y < geometry.panel.bottom;
@@ -79,6 +81,8 @@ const fs = require('node:fs');
       if (result.screen === 'country') {
         assert(result.cards && result.cards.height > 0, 'country: missing card grid');
         assert(result.scrollHeight >= result.clientHeight, 'country: invalid scrolling geometry');
+        assert.equal(result.gridColumns, 5, 'country: expected exactly five grid columns at 1024x768');
+        assert(result.cardCount > 0, 'country: no country cards rendered');
       }
     }
   } finally {
