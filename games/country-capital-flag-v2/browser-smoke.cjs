@@ -248,10 +248,12 @@ const assert=require('node:assert/strict');
  const learningFooter=await page.evaluate(()=>{
   const el=document.querySelector('#learning .learning-bottom-nav');
   const board=document.querySelector('#learning .learning-board');
-  const cs=getComputedStyle(el),r=el.getBoundingClientRect(),p=board.getBoundingClientRect();
+  const cs=getComputedStyle(el),r=el.getBoundingClientRect();
+  const left=parseFloat(cs.left),top=parseFloat(cs.top),width=parseFloat(cs.width),height=parseFloat(cs.height);
+  const bw=parseFloat(getComputedStyle(board).width)||1,bh=parseFloat(getComputedStyle(board).height)||1;
   return {image:cs.backgroundImage,size:cs.backgroundSize,buttons:el.querySelectorAll('button').length,
-   left:(r.left-p.left)/p.width,right:(r.right-p.left)/p.width,
-   top:(r.top-p.top)/p.height,bottom:(r.bottom-p.top)/p.height};
+   left:left/bw,right:(left+width)/bw,
+   top:top/bh,bottom:(top+height)/bh};
  });
  assert(learningFooter.image.includes('ui-bottom-navigation.png')&&learningFooter.size==='contain'&&learningFooter.buttons===5,
    'learning footer must retain original artwork ratio and five buttons: '+JSON.stringify(learningFooter));
