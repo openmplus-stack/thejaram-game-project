@@ -64,8 +64,8 @@
 #countries .country-bottom-nav{
   box-sizing:border-box!important;
   position:absolute!important;
-  left:14%!important;bottom:-7%!important;
-  width:72%!important;height:auto!important;
+  left:6%!important;bottom:-9.2%!important;
+  width:88%!important;height:auto!important;
   aspect-ratio:2172 / 724!important;
   display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
   gap:0!important;margin:0!important;padding:0!important;
