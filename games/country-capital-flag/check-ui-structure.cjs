@@ -7,14 +7,14 @@ const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 const count = (re) => [...html.matchAll(re)].length;
 const checks = [
   ['balanced style tags', () => assert.equal(count(/<style\b/gi), count(/<\/style>/gi))],
-  ['balanced script tags', () => assert.equal(count(/<script\\b/gi), count(/<\\/script>/gi))],
+  ['balanced script tags', () => assert.equal(count(/<script\b/gi), count(/<\/script>/gi))],
   ['unique HTML IDs', () => {
-    const ids = [...html.matchAll(/\\bid="([^"]+)"/g)].map(match => match[1]);
+    const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
     assert.equal(new Set(ids).size, ids.length, 'duplicate id attributes');
   }],
   ['JavaScript ID selectors resolve', () => {
-    const ids = new Set([...html.matchAll(/\\bid="([^"]+)"/g)].map(match => match[1]));
-    const selectors = [...html.matchAll(/\\$\\('#([^']+)'\\)/g)].map(match => match[1]);
+    const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]));
+    const selectors = [...html.matchAll(/\$\('#([^']+)'\)/g)].map(match => match[1]);
     const missing = [...new Set(selectors.filter(id => !ids.has(id)))];
     assert.deepEqual(missing, []);
   }],
