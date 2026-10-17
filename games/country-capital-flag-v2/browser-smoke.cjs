@@ -73,6 +73,7 @@ const assert=require('node:assert/strict');
     el.scrollTop=before;
     return {end,max,visible,count:el.children.length};
   });
+  assert(scrollAudit.count>=2,'country list must contain selectable entries');
   assert(scrollAudit.visible&&scrollAudit.end>=scrollAudit.max-2,
     'last country card must be visible at end of scroll: '+JSON.stringify(scrollAudit));
 
