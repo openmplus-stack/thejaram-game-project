@@ -154,3 +154,6 @@
 :is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;background-size:contain!important}
 /* Remove the lower-left explorer from learning and quiz without replacing the scenery. */
 #learning .learning-board::before,#quiz .quiz-board::before{content:none!important;display:none!important;background-image:none!important}
+
+/* Flag collection: match the full-width five-icon footer of country selection. */
+#flags .flags-bottom-nav{left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;aspect-ratio:auto!important;background-size:100% 100%!important}
