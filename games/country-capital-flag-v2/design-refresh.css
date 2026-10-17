@@ -1,0 +1,150 @@
+/* Visual refresh: isolated, reversible. No gameplay changes. */
+:root{--v2-ink:#153c71;--v2-gold:#f8c66a}
+#continents.screen.active,#topics.screen.active,#countries.screen.active,#activities.screen.active,#learning.screen.active,#quiz.screen.active,#result.screen.active{background:linear-gradient(180deg,#61b9f2 0%,#b5e7fa 57%,#f6e7bc 100%)}
+#continents .continent-header h2,#countries .country-main-panel>h2{display:none!important}
+#countries .country-wood-sign{font-weight:900;letter-spacing:.02em}
+#learning .learning-card,#quiz .quiz-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;gap:12px}
+#learning .learning-flag-panel,#learning .learning-name-panel,#quiz .quiz-tile{min-width:0;display:flex;justify-content:center;align-items:center;flex-direction:column;background:linear-gradient(135deg,#fffdf4,#fff0d5);border:3px solid #e3bb7c;border-radius:22px;box-shadow:inset 0 2px 6px #fff,0 6px 14px #6b9ab044}
+#learning .learning-country,#learning .learning-capital,#quiz .quiz-tile span{font-size:clamp(26px,5vw,76px);font-weight:900;line-height:1.18;color:var(--v2-ink);text-align:center;overflow-wrap:anywhere}
+#learning .learning-flag-panel img,#quiz .quiz-tile img{max-width:88%;max-height:78%;object-fit:contain}
+#quiz .quiz-link{display:none}
+#quiz .quiz-metronome{border-radius:22px;background:linear-gradient(#e7f6ff,#b9e2ff);border:3px solid #fff;box-shadow:0 4px 14px #17548630}
+#quiz .quiz-answers{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,8vw,120px);justify-items:center;align-items:center}
+#quiz #quizYes,#quiz #quizNo{width:min(100%,190px);aspect-ratio:1;min-height:90px;border-radius:50%;font-size:0;box-shadow:0 9px 0 #22466a55,0 13px 20px #19456c33;border:6px solid #fff;position:relative}
+#quiz #quizYes{background:linear-gradient(#58b7ff,#005bc7)}
+#quiz #quizNo{background:linear-gradient(#ff7772,#d71d25)}
+#quiz #quizYes::after,#quiz #quizNo::after{position:absolute;inset:0;display:grid;place-items:center;font-size:clamp(58px,8vw,112px);font-weight:900;color:white;text-shadow:0 3px 4px #0005}
+#quiz #quizYes::after{content:"O"}#quiz #quizNo::after{content:"×"}
+#quiz #quizYes:active,#quiz #quizNo:active{transform:translateY(5px);box-shadow:0 3px 0 #22466a55}
+#quiz .quiz-prompt{font-size:clamp(17px,2vw,26px);text-align:center;color:var(--v2-ink)}
+#quiz .quiz-board,#learning .learning-board{width:100%;max-width:1280px;margin-inline:auto}
+@media(max-width:650px){#quiz #quizYes,#quiz #quizNo{width:min(100%,128px)}#learning .learning-country,#learning .learning-capital,#quiz .quiz-tile span{font-size:clamp(22px,5vw,38px)}}
+
+/* Capital mode: split country and capital into independent halves. */
+#learning .learning-card:has(.learning-flag-panel.capital-mode){display:grid;grid-template-columns:1fr 1fr}
+#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-flag-panel{display:none}
+#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-name-panel{display:contents}
+#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,
+#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital{display:flex;justify-content:center;align-items:center;min-height:230px;padding:18px;background:linear-gradient(135deg,#fffdf4,#fff0d5);border:3px solid #e3bb7c;border-radius:22px}
+#quiz .quiz-pair{position:relative}
+#quiz .quiz-tile{min-height:220px}
+#quiz .quiz-tile img[hidden],#learning img[hidden]{display:none!important}
+@media(max-width:650px){#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,#learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital,#quiz .quiz-tile{min-height:145px}}
+
+/* Stage 2: reuse existing shared art, never generate a background per country. */
+#activities .activity-panel,#result .result-board,#flags .flags-board,#treasures .treasure-book,#progress .progress-board,#quiz .quiz-board,#learning .learning-board{border-radius:24px}
+#activities .activity-panel,#result .result-score,#flags .flags-collection,#treasures .treasure-book-grid{background-color:#fff5dc;border:3px solid #b77b3b;box-shadow:0 8px 24px #3b6b8733}
+#activities .activity-card{background:linear-gradient(180deg,#fff9e7,#f6d7a3);border:4px solid #ba7b3c;border-radius:24px;box-shadow:0 6px 0 #9a622e,0 12px 18px #284c6325}
+#activities .activity-card:focus-visible,#quiz button:focus-visible,#learning button:focus-visible{outline:4px solid #fff;outline-offset:3px}
+#learning .learning-sign{background:linear-gradient(#ffdf9b,#edb75e);border:4px solid #9b622d;border-radius:20px;color:#553113;text-align:center;box-shadow:0 5px 0 #855122}
+#quiz .quiz-stats{color:#173c72;font-weight:800}
+#quiz .quiz-pair,#learning .learning-card{background:transparent!important;border:0!important;box-shadow:none!important}
+#quiz .quiz-tile,#learning .learning-flag-panel,#learning .learning-name-panel{overflow:hidden}
+#quiz .quiz-tile img,#learning .learning-flag-panel img{width:auto;height:auto;max-width:90%;object-fit:contain}
+#quiz .quiz-answers button{touch-action:manipulation}
+@media(orientation:landscape) and (max-height:800px){
+ #quiz .quiz-tile{min-height:160px}
+ #quiz #quizYes,#quiz #quizNo{width:min(13vh,135px);min-height:75px}
+ #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-country,
+ #learning .learning-card:has(.learning-flag-panel.capital-mode) .learning-capital{min-height:160px}
+}
+
+/* Regression fixes: keep approved painted artboards intact; override legacy !important rules. */
+#continents .continent-header h2{display:none!important}
+#countries .country-main-panel>h2{display:none!important}
+#learning .learning-card,#quiz .quiz-pair{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:12px!important}
+#learning .learning-card:not(:has(.capital-mode)) .learning-name-panel{display:flex!important;align-items:center!important;justify-content:center!important}
+#learning .learning-card:not(:has(.capital-mode)) .learning-capital{display:none!important}
+#learning .learning-card:has(.capital-mode) .learning-flag-panel{display:none!important}
+#learning .learning-card:has(.capital-mode) .learning-name-panel{display:contents!important}
+#learning .learning-card:has(.capital-mode) .learning-country,#learning .learning-card:has(.capital-mode) .learning-capital{display:flex!important;align-items:center!important;justify-content:center!important}
+#quiz .quiz-pair .quiz-link{display:none!important}
+#quiz .quiz-pair .quiz-tile{min-width:0!important}
+#quiz .quiz-answers{display:grid!important;grid-template-columns:1fr 1fr!important;justify-items:center!important}
+#quiz #quizYes,#quiz #quizNo{font-size:0!important;color:transparent!important;border-radius:50%!important}
+#quiz #quizYes::after,#quiz #quizNo::after{color:#fff!important}
+#quiz .quiz-tile img[hidden],#learning img[hidden]{display:none!important}
+
+/* Screenshot QA: ensure O/X controls retain their intended blue/red appearance. */
+#quiz .quiz-board .quiz-answers #quizYes{background:linear-gradient(180deg,#61c2ff 0%,#0764d6 100%)!important;border:6px solid #e8f7ff!important;box-shadow:0 7px 0 #124c8c,0 12px 22px #153e6555!important}
+#quiz .quiz-board .quiz-answers #quizNo{background:linear-gradient(180deg,#ff8581 0%,#df2634 100%)!important;border:6px solid #ffe6e3!important;box-shadow:0 7px 0 #932832,0 12px 22px #62252d55!important}
+#quiz .quiz-board .quiz-answers #quizYes::after,#quiz .quiz-board .quiz-answers #quizNo::after{color:#fff!important;opacity:1!important;text-shadow:0 3px 5px #10283f77!important}
+
+
+/* 2026-10-14: Keep the existing bright explorer visual identity across remaining screens.
+   Preserve the split learning cards and circular O/X controls. */
+#countries .country-artboard::after{
+ content:""!important;display:block!important;position:absolute!important;
+ left:1.1%!important;bottom:12%!important;width:22%!important;height:52%!important;
+ background:url("../country-capital-flag/assets/characters/explorer-master.png") center bottom/contain no-repeat!important;
+ z-index:2!important;pointer-events:none!important;
+}
+#countries .country-wood-sign{
+ border-radius:28px 28px 18px 18px!important;
+ background:linear-gradient(180deg,#ffd77e 0%,#f5a13d 54%,#b95e1d 100%)!important;
+ box-shadow:0 5px 0 #8d4c1e,0 8px 14px #48280d55!important;
+}
+#countries .country-bottom-nav{
+ background:linear-gradient(180deg,#b98038,#764018)!important;
+ border:4px solid #874713!important;border-radius:24px!important;
+}
+#countries .country-bottom-nav button{
+ border:3px solid #a65a19!important;border-radius:20px!important;
+ background:linear-gradient(180deg,#ffeb9c,#ffb739 70%,#e67f15)!important;
+ box-shadow:inset 0 3px 3px #fff8d4,0 3px 0 #8b4d1a!important;
+}
+#activities .activity-artboard::after{
+ content:"";position:absolute;left:1%;bottom:4%;width:19%;height:49%;
+ background:url("../country-capital-flag/assets/characters/explorer-master.png") center bottom/contain no-repeat;
+ pointer-events:none;z-index:1;
+}
+#activities .activity-panel{position:relative;z-index:2}
+#learning .learning-board::before,#quiz .quiz-board::before{
+ content:"";position:absolute;left:0;bottom:7%;width:15%;height:25%;
+ background:url("../country-capital-flag/assets/characters/explorer-master.png") left bottom/contain no-repeat;
+ pointer-events:none;z-index:0;opacity:1;
+}
+#learning .learning-board>* ,#quiz .quiz-board>*{position:relative;z-index:1}
+#learning .learning-card,#quiz .quiz-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+#quiz #quizYes,#quiz #quizNo{border-radius:50%!important}
+@media(max-width:720px){
+ #countries .country-artboard::after{width:20%!important;height:40%!important}
+ #activities .activity-artboard::after{width:15%;height:32%}
+ #learning .learning-board::before,#quiz .quiz-board::before{width:12%;height:18%}
+}
+
+/* Country-selection image pass: use verified existing character artwork. */
+#countries .country-artboard::after{
+ background-image:url("../country-capital-flag/assets/characters/explorer-point.png")!important;
+ background-position:center bottom!important;background-repeat:no-repeat!important;
+ background-size:contain!important;
+ left:1.3%!important;bottom:11.5%!important;width:21%!important;height:52%!important;
+}
+#countries .country-main-panel{z-index:3!important}
+#countries .country-wood-sign{z-index:5!important}
+#countries .country-bottom-nav{z-index:7!important}
+#countries .country-bottom-nav button{font-family:"Apple Color Emoji","Segoe UI Emoji",sans-serif!important}
+
+/* Country selector footer: match the approved five-icon layout with reliable native symbols.
+   The approved continent/topic pages are composite images; no nonexistent PNGs referenced. */
+#countries .country-bottom-nav{
+ display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+ align-items:stretch!important;gap:.8%!important;
+ left:10%!important;width:80%!important;bottom:1.2%!important;height:10%!important;
+ padding:.45%!important;z-index:8!important;
+ border:4px solid #814517!important;border-radius:23px!important;
+ background:linear-gradient(180deg,#ad6d29,#784016)!important;
+ box-shadow:0 4px 0 #572c10!important;
+}
+#countries .country-bottom-nav button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;height:100%!important;min-width:0!important;
+ padding:0!important;border:3px solid #ae611b!important;border-radius:20px!important;
+ background:linear-gradient(180deg,#ffe9a3 0%,#ffc450 55%,#ed901c 100%)!important;
+ color:#513016!important;font-size:clamp(25px,3.2vw,48px)!important;
+ box-shadow:inset 0 3px 2px #fff6d8,0 3px 0 #8b4b16!important;
+}
+#countries .country-bottom-nav button:focus-visible{outline:4px solid #fff!important;outline-offset:-5px!important}
+
+/* Country frame's authoritative visual rules now live in shared-frame.css.
+   Removed three superseded country-specific override patches. */

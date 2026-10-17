@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>세계 짝꿍 찾기 — 이미지 원본 비교</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#eaf4f9;color:#193b50;font-family:system-ui,"Apple SD Gothic Neo",sans-serif}header{padding:18px 24px;background:#124b73;color:#fff}h1{margin:0;font-size:24px}header p{margin:8px 0 0}.wrap{max-width:1320px;margin:auto;padding:20px}h2{font-size:20px;margin:24px 0 12px}.reference{max-width:900px;margin:auto}.reference img{display:block;width:100%;aspect-ratio:4/3;object-fit:contain;background:#d9eefa}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}.card{background:white;border:2px solid #c7dbe5;border-radius:14px;padding:14px;min-width:0}.card img{width:100%;height:280px;object-fit:contain;background:repeating-conic-gradient(#edf2f4 0% 25%,#fff 0% 50%) 50%/20px 20px}.card h3{margin:0 0 8px;font-size:17px}.status{font-size:14px;color:#365a6d;margin:8px 0 0}.note{padding:12px;background:#fff4d8;border-left:4px solid #cc8e22;margin:20px 0}.card button{font:inherit;padding:8px 12px;border:1px solid #527e99;border-radius:9px;background:#e7f6ff;cursor:pointer}.card button:focus-visible{outline:3px solid #f89b22}footer{padding:18px;text-align:center}
+</style></head><body><header><h1>세계 짝꿍 찾기 · 디자인 원본 비교판</h1><p>기준 화면과 실제 저장된 원본 이미지를 같은 페이지에서 비교합니다. 기존 게임 화면은 변경하지 않습니다.</p></header>
+<main class="wrap"><h2>1. 승인된 학습 유형 선택 화면 — 비교 기준</h2><div class="reference card"><img src="./assets/screen-topic-select.jpg" alt="학습 유형 선택 전체 기준 화면" data-check="기준 화면"><p class="status">이미지 로딩 확인 중</p></div>
+<h2>2. 탐험가 캐릭터 후보</h2><div class="grid">
+<article class="card"><h3>A · explorer-master.png</h3><img src="../country-capital-flag/assets/characters/explorer-master.png" alt="탐험가 마스터" data-check="탐험가 마스터"><p class="status">확인 중</p></article>
+<article class="card"><h3>B · explorer-point.png</h3><img src="../country-capital-flag/assets/characters/explorer-point.png" alt="탐험가 포인팅" data-check="탐험가 포인팅"><p class="status">확인 중</p></article>
+</div><h2>3. 제목판 · 하단 메뉴 · 배경</h2><div class="grid">
+<article class="card"><h3>제목판 · ui-title-sign.png</h3><img src="./assets/ui-title-sign.png" alt="나무 제목판" data-check="제목판"><p class="status">확인 중</p></article>
+<article class="card"><h3>하단 메뉴 · ui-bottom-navigation.png</h3><img src="./assets/ui-bottom-navigation.png" alt="하단 메뉴 원본" data-check="하단 메뉴"><p class="status">확인 중</p></article>
+<article class="card"><h3>배경 · bg-world-clean.png</h3><img src="./assets/bg-world-clean.png" alt="세계 배경" data-check="세계 배경"><p class="status">확인 중</p></article>
+</div><p class="note">검수 항목: 캐릭터의 얼굴·손 모양·자세, 제목판의 외곽과 글자 스타일, 하단 메뉴의 아이콘·버튼 크기를 맨 위 기준 화면과 비교하세요. 로딩 성공은 디자인 일치를 의미하지 않습니다.</p>
+</main><footer><a href="./">게임 화면으로 돌아가기</a></footer>
+<script>
+for(const img of document.querySelectorAll('img[data-check]')){
+const p=img.nextElementSibling;
+const show=ok=>{p.textContent=ok?'로드 완료 · '+img.naturalWidth+' × '+img.naturalHeight+' px':'이미지를 불러오지 못했습니다';p.style.color=ok?'#176446':'#b00020'};
+img.addEventListener('load',()=>show(true));img.addEventListener('error',()=>show(false));
+if(img.complete)show(img.naturalWidth>0);
+}
+</script></body></html>
