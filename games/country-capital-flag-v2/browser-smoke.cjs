@@ -210,6 +210,13 @@ const assert=require('node:assert/strict');
  await shot('treasures-parchment');
  await page.evaluate(()=>window.CountryV2.go('quizReward'));
  await shot('gift-parchment');
+ const approvedBackground=await page.evaluate(()=>{
+  const selectors=['#flags .flags-artboard','#treasures .treasure-artboard','#quizReward .gift-artboard'];
+  return selectors.map(selector=>({selector,background:getComputedStyle(document.querySelector(selector)).backgroundImage}));
+ });
+ assert(approvedBackground.every(x=>x.background.includes('bg-world-clean.png')),
+   'all collection screens must use approved background: '+JSON.stringify(approvedBackground));
+
  // Verify the footer PNG keeps its natural aspect ratio and stays inside the 4:3 artboard.
  const navGeometry=await page.evaluate(async()=>{
   const img=new Image();img.src='./assets/ui-bottom-navigation.png';
