@@ -1,16 +1,24 @@
 // Browser geometry audit. Run from repository root after npm i -D playwright:
 // node games/country-capital-flag/check-ui-layout.cjs
-// The test opens the local app, navigates via its real buttons, and checks actual rectangles.
+// This is an isolated geometry probe; navigation flow requires a separate interaction test.
 const { chromium } = require('playwright');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 (async () => {
+  // Prevent a misleading 'pass' when artwork files are missing from the checkout.
+  for (const asset of ['bg-world-common.png','continent-select-no-number.png','topic-select-no-number-no-arrows.png','country-select-reference-04.png']) {
+    assert(fs.existsSync(path.join(__dirname, 'assets', 'backgrounds', asset)), 'Missing visual asset: ' + asset);
+  }
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 1024, height: 768 }, deviceScaleFactor: 1 });
   const results = [];
   try {
+    const failures = [];
+    page.on('pageerror', error => failures.push(error.message));
     await page.goto(pathToFileURL(path.join(__dirname, 'index.html')).href);
+    await page.waitForLoadState('load');
     for (const [label, selector] of [
       ['continent', '#continentFlow'],
       ['topic', '#topicFlow'],
@@ -46,6 +54,7 @@ const assert = require('node:assert/strict');
       results.push({ screen: label, overlapsPanel: !!overlaps, overlapsCards: !!cardOverlap, ...geometry });
     }
     console.log(JSON.stringify(results, null, 2));
+    assert.equal(failures.length, 0, 'Browser JavaScript errors: ' + failures.join(' | '));
     assert(results.every(x => !x.overlapsCards), 'Visible interactive buttons overlap the fixed footer');
     // A full-stage transparent panel may geometrically extend behind the footer.
     // That alone is not a defect: only interactive content overlap is a failure.
