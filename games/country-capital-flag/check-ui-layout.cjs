@@ -59,10 +59,12 @@ const fs = require('node:fs');
         const heading = screen.querySelector('.flowTitle');
         const footer = document.querySelector('#worldBottomNav');
         const cards = screen.querySelector('.countryChoiceGrid');
+        const footerButtons = [...footer.querySelectorAll('button')].map(el => rect(el));
+        const brokenImages = [...document.images].filter(img => img.getClientRects().length && (!img.complete || img.naturalWidth === 0)).map(img => img.src);
         const gridColumns = cards ? getComputedStyle(cards).gridTemplateColumns.split(' ').filter(Boolean).length : null;
         const cardCount = cards ? cards.children.length : null;
         const actionButtons = [...screen.querySelectorAll('button')].filter(el => { const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); return r.width>0 && r.height>0 && cs.display!=='none' && cs.visibility!=='hidden' && el.getClientRects().length>0 && el.checkVisibility({checkVisibilityCSS:true}); });
-        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight, gridColumns, cardCount };
+        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight, gridColumns, cardCount, footerButtons, brokenImages };
       }, selector);
       const visibleFooter = geometry.footer && geometry.footer.height > 0;
       const overlaps = visibleFooter && geometry.panel && geometry.footer.y < geometry.panel.bottom;
@@ -77,6 +79,12 @@ const fs = require('node:fs');
     // That alone is not a defect: only interactive content overlap is a failure.
     for (const result of results) {
       assert(result.heading && result.heading.width > 0, result.screen + ': missing visible heading');
+      assert.equal(result.brokenImages.length, 0, result.screen + ': broken visible images: ' + result.brokenImages.join(', '));
+      if (result.footerButtons.length) {
+        const widths = result.footerButtons.map(b => b.width);
+        assert(Math.max(...widths) - Math.min(...widths) <= 1, result.screen + ': footer button widths are inconsistent');
+        assert(result.footerButtons.every(b => Math.abs(b.width - b.height) <= 1), result.screen + ': footer buttons are not square');
+      }
       assert(result.panel && result.panel.width > 0, result.screen + ': missing visible panel');
       if (result.screen === 'country') {
         assert(result.cards && result.cards.height > 0, 'country: missing card grid');
