@@ -752,7 +752,7 @@ const rewardFallbackFiles=["reward-at-traditional-violin.png","reward-at-vienna-
 let rewardFiles=rewardFallbackFiles.slice(),treasureCode=null,selectedTreasureFile=null;
 const treasureNameOverrides={'morin-khuur':'마두금','ger':'게르','janggu':'장구','hanbok':'한복','cheongsachorong':'청사초롱','sunflower':'해바라기','traditional-teapot':'전통 티포트','peranakan-teacup':'페라나칸 찻잔','daruma':'다루마','obi':'기모노 오비','sensu':'접이식 부채','dombra':'돔브라','suzani':'수자니 자수','doppi':'도피 모자','rishtan-ceramic':'리슈탄 도자기'};
 function rewardSlug(filename){return filename.replace(/^\d{1,3}[-_]/,'').replace(/^reward-[a-z]{2}-/,'').replace(/\.png$/i,'')}
-function rewardCountryCode(filename){const m=filename.match(/^(?:\d{1,3}[-_])?reward-([a-z]{2})-/);return m?m[1]:null}
+function rewardCountryCode(filename){const m=filename.match(/^(?:\d{1,3}[-_])?reward-([a-z]{2})-/);if(!m)return null;return m[1]==='uk'?'gb':m[1]}
 function rewardTitle(filename){const slug=rewardSlug(filename);return treasureNameOverrides[slug]||slug.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}
 function rewardItemsFor(code){return rewardFiles.filter(f=>rewardCountryCode(f)===code).map(file=>({file,name:rewardTitle(file)}))}
 function rewardImage(file,cls){return '<img class="'+cls+'" loading="lazy" src="'+REWARD_DIR+encodeURIComponent(file)+'" alt="'+rewardTitle(file).replace(/"/g,'&quot;')+'" onerror="this.style.display=\'none\'">'}
