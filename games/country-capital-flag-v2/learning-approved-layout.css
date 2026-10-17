@@ -40,8 +40,8 @@
 #learning .learning-actions{left:15%!important;top:60%!important;width:70%!important}
 #learning #learningNotice{top:74%!important}
 #learning .learning-bottom-nav{
- inset:auto!important;left:14%!important;bottom:-7%!important;top:auto!important;
- width:72%!important;height:auto!important;aspect-ratio:2172 / 724!important;
+ inset:auto!important;left:6%!important;bottom:-9.2%!important;top:auto!important;
+ width:88%!important;height:auto!important;aspect-ratio:2172 / 724!important;
  background:transparent url('./assets/ui-bottom-navigation.png') center/contain no-repeat!important;
 }
 #learning .learning-bottom-nav button{top:55%!important;width:20%!important;height:35%!important}
