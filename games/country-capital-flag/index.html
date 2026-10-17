@@ -894,10 +894,10 @@ function openLearnReward(){
 }
 $('#saveRewardFlag').onclick=()=>{if(!rewardFlagCode)return;const saved=getFlagCollection();if(!saved.includes(rewardFlagCode)){saved.push(rewardFlagCode);setFlagCollection(saved)}renderFlagCollection();showFlow('#flagCollectionFlow')};
 function renderFlagCollection(){
- const saved=getFlagCollection(),grid=$('#flagCollectionGrid');grid.innerHTML='';$('#flagCollectionCount').textContent=saved.length+' / '+items.length+'개 모았어요.';
+ const saved=getFlagCollection(),grid=$('#flagCollectionGrid');grid.innerHTML='';const validCodes=new Set(items.map(it=>it.flag));const ownedCodes=new Set(saved.filter(code=>validCodes.has(code)));$('#flagCollectionCount').textContent=ownedCodes.size+' / '+validCodes.size+'개 모았어요.';
  ['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아'].forEach(cont=>{
   const section=document.createElement('div');section.className='flagContinentSection';
-  const list=items.filter(x=>x.continent===cont),owned=list.filter(x=>saved.includes(x.flag)).length;
+  const list=items.filter(x=>x.continent===cont),owned=list.filter(x=>ownedCodes.has(x.flag)).length;
   section.innerHTML='<div class="flagContinentHead"><strong>'+cont+'</strong><span>'+owned+' / '+list.length+'</span></div>';
   const cards=document.createElement('div');cards.className='flagAlbumGrid';
   list.forEach(it=>{const got=saved.includes(it.flag),b=document.createElement('button');b.className='flagAlbumCard '+(got?'owned':'locked');b.disabled=!got;b.innerHTML=got?'<img src="'+flagUrl(it.flag)+'" alt="'+it.country+' 국기"><strong>'+it.country+'</strong><span>눌러서 보기</span>':'<div class="lockedFlag">🔒</div><strong>???</strong><span>아직 못 모았어요</span>';if(got)b.onclick=()=>openFlagDetail(it);cards.appendChild(b)});
