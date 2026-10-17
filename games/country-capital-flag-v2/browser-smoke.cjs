@@ -64,6 +64,9 @@ const assert=require('node:assert/strict');
   // Check the entire scroll range, not only the initially visible country rows.
   const scrollAudit=await page.locator('#countries .country-grid').evaluate(async el=>{
     const before=el.scrollTop;
+    el.style.scrollBehavior='auto';
+    el.scrollTop=el.scrollHeight;
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     el.scrollTop=el.scrollHeight;
     await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
     const end=el.scrollTop, max=el.scrollHeight-el.clientHeight;
