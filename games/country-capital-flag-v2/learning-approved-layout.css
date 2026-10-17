@@ -31,14 +31,14 @@
    Artboard coordinates use the approved 4:3 screen; no changes to learning logic. */
 #learning .learning-board{
  background-image:url('./assets/ui-collection-parchment.png'),url('./assets/bg-world-clean.png')!important;
- background-position:center 45%,center center!important;
- background-size:84% 70%,100% 100%!important;
+ background-position:center 41%,center center!important;
+ background-size:84% 62%,100% 100%!important;
  background-repeat:no-repeat!important;
 }
-#learning .learning-top{left:16%!important;top:20%!important;width:68%!important}
-#learning .learning-card{left:15%!important;top:28%!important;width:70%!important;height:35%!important}
-#learning .learning-actions{left:15%!important;top:64%!important;width:70%!important}
-#learning #learningNotice{top:75%!important}
+#learning .learning-top{left:16%!important;top:18%!important;width:68%!important}
+#learning .learning-card{left:15%!important;top:25%!important;width:70%!important;height:32%!important}
+#learning .learning-actions{left:15%!important;top:60%!important;width:70%!important}
+#learning #learningNotice{top:74%!important}
 #learning .learning-bottom-nav{
  inset:auto!important;left:6%!important;top:81%!important;
  width:88%!important;height:18%!important;
