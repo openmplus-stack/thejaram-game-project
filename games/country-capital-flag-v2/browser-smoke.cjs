@@ -80,6 +80,8 @@ const assert=require('node:assert/strict');
   assert(endLayout.noOverlap&&endLayout.buttonWithinPanel&&endLayout.lastBottomGap>=8,
    'country scroll end and next button must not overlap: '+JSON.stringify(endLayout));
 
+  const endHit=await page.locator('#countryGrid .country-card').last().evaluate(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);return {visible:!!top&&(top===el||el.contains(top)),x,y};});
+  assert(endHit.visible,'last scrolled country must be touch-accessible: '+JSON.stringify(endHit));
   await shot('countries-scroll-end-'+topic);
   await page.locator('#countryGrid').evaluate(el=>el.scrollTop=0);
   await shot('countries-'+topic);
