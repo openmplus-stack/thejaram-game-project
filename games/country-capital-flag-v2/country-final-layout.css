@@ -15,3 +15,8 @@
 
 /* 1366x1024 regression: keep the parchment above the fixed bottom navigation.
    Country cards remain scrollable within the panel. */
+
+/* Approved 2026-10-17 reference: no country title/sign; enlarged country viewport. */
+#countries .country-wood-sign{display:none!important;visibility:hidden!important;background:none!important}
+#countries .country-main-panel{top:6%!important;height:63%!important;max-height:63%!important;padding:3.5% 6% 3%!important}
+#countries .country-grid{gap:clamp(6px,.8vw,14px)!important}
