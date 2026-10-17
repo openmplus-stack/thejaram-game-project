@@ -58,7 +58,7 @@ const assert=require('node:assert/strict');
   });
   assert(scrollCheck.scrollHeight<=scrollCheck.clientHeight+2 || scrollCheck.end>scrollCheck.start,
     'country list must scroll to the end: '+JSON.stringify(scrollCheck));
-  await page.screenshot({path:'country-v2-countries-scrolled-end.png'});
+  await shot('countries-scrolled-end-'+topic);
   await page.locator('#countries .country-grid').evaluate(el=>{el.scrollTop=0});
 
   // Check the entire scroll range, not only the initially visible country rows.
