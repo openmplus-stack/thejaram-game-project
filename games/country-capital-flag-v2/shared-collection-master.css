@@ -147,3 +147,10 @@
 #quizReward #treasureRewardMessage{position:static!important;flex:none!important;margin:.8% 0 1.2%!important}
 #quizReward #treasureRewardSave{position:static!important;align-self:center!important;flex:none!important;min-width:clamp(170px,21vw,295px)!important;min-height:clamp(40px,4.4vw,64px)!important;padding:.45em 1.2em!important;border:2px solid #a66c2d!important;border-radius:14px!important;background:linear-gradient(#ffdf87,#e9ad43)!important;box-shadow:0 3px 0 #9b642a!important;color:#56340d!important;font-size:clamp(15px,1.65vw,24px)!important;font-weight:900!important}
 #quizReward #treasureRewardSave::before,#quizReward #treasureRewardSave::after{display:none!important;content:none!important}
+
+/* Final spacing: keep titles clear of the rolled parchment edge. */
+:is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment){padding-top:6.3%!important}
+/* Enlarge the visible five-button navigation without stretching its artwork. */
+:is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;background-size:contain!important}
+/* Remove the lower-left explorer from learning and quiz without replacing the scenery. */
+#learning .learning-board::before,#quiz .quiz-board::before{content:none!important;display:none!important;background-image:none!important}
