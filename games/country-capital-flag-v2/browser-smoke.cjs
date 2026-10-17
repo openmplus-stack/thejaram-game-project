@@ -65,6 +65,17 @@ const assert=require('node:assert/strict');
   assert.equal(await page.locator('#countryNext').isEnabled(),true);
   const scrollCheck=await page.locator('#countryGrid').evaluate(el=>{const initial=el.scrollTop;el.scrollTop=el.scrollHeight;const last=el.querySelector('.country-card:last-child');const outer=el.getBoundingClientRect(),inner=last.getBoundingClientRect();const info={scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,scrollTop:el.scrollTop,lastBottom:inner.bottom,gridBottom:outer.bottom,visible:inner.bottom<=outer.bottom+2&&inner.top>=outer.top-2};el.scrollTop=initial;return info});
   assert(scrollCheck.visible,'last country must be visible at scroll end: '+JSON.stringify(scrollCheck));
+  const endLayout=await page.locator('#countries').evaluate(root=>{
+   const panel=root.querySelector('.country-main-panel'),grid=root.querySelector('#countryGrid'),next=root.querySelector('#countryNext');
+   const p=panel.getBoundingClientRect(),g=grid.getBoundingClientRect(),n=next.getBoundingClientRect();
+   const last=grid.querySelector('.country-card:last-child').getBoundingClientRect();
+   return {panelBottom:p.bottom,gridBottom:g.bottom,nextTop:n.top,lastBottom:last.bottom,
+    gridNextGap:n.top-g.bottom,lastBottomGap:g.bottom-last.bottom,
+    noOverlap:g.bottom<=n.top-2,buttonWithinPanel:n.bottom<=p.bottom+3};
+  });
+  assert(endLayout.noOverlap&&endLayout.buttonWithinPanel&&endLayout.lastBottomGap>=0,
+   'country scroll end and next button must not overlap: '+JSON.stringify(endLayout));
+
   await page.locator('#countryGrid').evaluate(el=>el.scrollTop=el.scrollHeight);
   await shot('countries-scroll-end-'+topic);
   await page.locator('#countryGrid').evaluate(el=>el.scrollTop=0);
