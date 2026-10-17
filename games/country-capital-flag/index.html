@@ -845,7 +845,7 @@ document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{document.querySelec
 (function(){
 const nav=document.getElementById('worldBottomNav');
 const targets={home:'#home',continent:'#continentFlow',flag:'#flagCollectionFlow',treasure:'#treasureCollectionFlow',progress:'#progressFlow'};
-function current(){const ids=['home','continentFlow','topicFlow','countrySelectFlow','learnScreen','quizScreen','quizResult','simpleOx','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow','quizStartGate','board'];return ids.find(id=>{const el=document.getElementById(id);if(!el)return false;const st=getComputedStyle(el);return st.display!=='none'&&st.visibility!=='hidden'&&el.getClientRects().length>0})||null}
+function current(){const ids=['home','continentFlow','topicFlow','countrySelectFlow','activityChoiceFlow','learnScreen','quizScreen','quizResult','simpleOx','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow','quizStartGate','board'];return ids.find(id=>{const el=document.getElementById(id);if(!el)return false;const st=getComputedStyle(el);return st.display!=='none'&&st.visibility!=='hidden'&&el.getClientRects().length>0})||null}
 function sync(){const active=current();nav.style.display=active?'flex':'none';nav.querySelectorAll('button').forEach(b=>b.classList.toggle('active',targets[b.dataset.go]==='#'+active));document.body.classList.toggle('world-nav-visible',!!active)}
 function navigate(key){const active=current();if(['learnScreen','quizScreen','simpleOx','board'].includes(active)&&!confirm('학습을 종료하고 다른 화면으로 이동할까요?'))return;
 if(key==='home'){document.querySelectorAll('.flow,.learnScreen,.quizScreen,.quizResult,.simpleOx,.learnRewardFlow,.quizRewardFlow').forEach(el=>el.style.display='none');document.getElementById('home').style.display='flex'}
@@ -861,7 +861,7 @@ document.querySelectorAll('[data-art-nav]').forEach(b=>b.addEventListener('click
 })();
 </script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-select-no-number-no-arrows.png?asset=a37d03d2';})();</script><script id="corner-page-navigation">
 (function(){
-const ids=['home','continentFlow','topicFlow','countrySelectFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow'];
+const ids=['home','continentFlow','topicFlow','countrySelectFlow','activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow'];
 const prev=document.createElement('button'),next=document.createElement('button');
 prev.id='cornerPrev';next.id='cornerNext';prev.className=next.className='cornerPageArrow';prev.textContent='‹';next.textContent='›';prev.setAttribute('aria-label','이전 페이지');next.setAttribute('aria-label','다음 페이지');document.body.append(prev,next);
 function current(){return ids.findIndex(id=>{const el=document.getElementById(id);return el&&getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().width>0})}
