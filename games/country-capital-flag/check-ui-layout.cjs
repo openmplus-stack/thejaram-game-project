@@ -34,8 +34,9 @@ const fs = require('node:fs');
   try {
     const failures = [];
     page.on('pageerror', error => failures.push(error.message));
-    await page.goto(base + '/index.html');
-    await page.waitForLoadState('load');
+    // The app contains large artwork; DOM readiness is sufficient for navigation tests.
+    // Waiting for every image's load event can exceed CI's 30s navigation timeout.
+    await page.goto(base + '/index.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
     const steps = [
       { label: 'continent', selector: '#continentFlow', click: '#homeStart' },
       { label: 'topic', selector: '#topicFlow', click: '[data-continent="아시아"]' },
