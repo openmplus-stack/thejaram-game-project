@@ -755,7 +755,11 @@ function rewardSlug(filename){return filename.replace(/^\d{1,3}[-_]/,'').replace
 function rewardCountryCode(filename){const m=filename.match(/^(?:\d{1,3}[-_])?reward-([a-z]{2})-/);if(!m)return null;return m[1]==='uk'?'gb':m[1]}
 function rewardTitle(filename){const slug=rewardSlug(filename);return treasureNameOverrides[slug]||slug.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}
 function rewardItemsFor(code){return rewardFiles.filter(f=>rewardCountryCode(f)===code).map(file=>({file,name:rewardTitle(file)}))}
-function rewardImage(file,cls){return '<img class="'+cls+'" loading="lazy" src="'+REWARD_DIR+encodeURIComponent(file)+'" alt="'+rewardTitle(file).replace(/"/g,'&quot;')+'" onerror="this.style.display=\'none\'">'}
+function rewardImage(file,cls){
+ const title=rewardTitle(file).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+ const safeClass=String(cls).replace(/[^a-zA-Z0-9 _-]/g,'');
+ return '<img class="'+safeClass+'" loading="lazy" src="'+REWARD_DIR+encodeURIComponent(file)+'" alt="'+title+'" onerror="this.onerror=null;this.style.display=\'none\';const msg=document.createElement(\'span\');msg.className=\'rewardImageMissing\';msg.textContent=\'이미지 준비 중\';this.insertAdjacentElement(\'afterend\',msg)">';
+}
 async function loadRewardManifest(){
  try{
   const response=await fetch(REWARD_DIR+'manifest.json',{cache:'no-store'});
