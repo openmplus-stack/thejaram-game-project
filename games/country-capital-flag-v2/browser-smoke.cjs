@@ -210,6 +210,17 @@ const assert=require('node:assert/strict');
  await shot('treasures-parchment');
  await page.evaluate(()=>window.CountryV2.go('quizReward'));
  await shot('gift-parchment');
+ // Catch asset load failures on all three approved collection screens.
+ const assetLoad=await page.evaluate(async()=>{
+  const urls=['./assets/bg-world-clean.png','./assets/ui-collection-parchment.png','./assets/ui-bottom-navigation.png'];
+  return Promise.all(urls.map(url=>new Promise(resolve=>{
+   const img=new Image();img.onload=()=>resolve({url,ok:true,width:img.naturalWidth,height:img.naturalHeight});
+   img.onerror=()=>resolve({url,ok:false});img.src=url;
+  })));
+ });
+ assert(assetLoad.every(x=>x.ok&&x.width>0&&x.height>0),
+   'all approved collection assets must load: '+JSON.stringify(assetLoad));
+
  const approvedBackground=await page.evaluate(()=>{
   const selectors=['#flags .flags-artboard','#treasures .treasure-artboard','#quizReward .gift-artboard'];
   return selectors.map(selector=>({selector,background:getComputedStyle(document.querySelector(selector)).backgroundImage}));
