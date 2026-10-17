@@ -51,6 +51,14 @@ const assert=require('node:assert/strict');
   await page.locator('#countries .country-card').first().waitFor();
   const choices=page.locator('#countries .country-card');
   assert((await choices.count())>=2,'at least two countries');
+  const countryArtwork=await page.locator('#countries .country-main-panel').evaluate(el=>{
+   const css=getComputedStyle(el);
+   return {background:css.backgroundImage,border:css.borderTopWidth,
+    before:getComputedStyle(el,'::before').content,after:getComputedStyle(el,'::after').content};
+  });
+  assert(countryArtwork.background.includes('ui-collection-parchment.png')&&countryArtwork.border==='0px'&&
+   countryArtwork.before==='none'&&countryArtwork.after==='none',
+   'country panel must use approved parchment, not a legacy CSS rectangle: '+JSON.stringify(countryArtwork));
   // Reset selection: it intentionally persists when switching topics within one continent.
   await page.locator('#countryClearAll').click();
   await choices.nth(0).click();await choices.nth(1).click();
