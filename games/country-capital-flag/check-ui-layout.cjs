@@ -77,6 +77,26 @@ const fs = require('node:fs');
       await page.screenshot({ path: path.join(__dirname, 'audit-' + label + '-1024x768.png'), fullPage: false });
       results.push({ screen: label, overlapsPanel: !!overlaps, overlapsCards: !!cardOverlap, ...geometry });
     }
+    // Verify the next real navigation stage and both return paths.
+    await page.locator('#countryChoiceGrid button').first().click();
+    await page.locator('#countrySelectStart').click();
+    await page.waitForFunction(() => {
+      const el=document.querySelector('#activityChoiceFlow');
+      return el && getComputedStyle(el).display!=='none' && el.getClientRects().length>0;
+    });
+    assert(await page.locator('#activityLearnStart').isVisible(), 'activity: learn action is hidden');
+    assert(await page.locator('#activityQuizStart').isVisible(), 'activity: quiz action is hidden');
+    await page.locator('#activityLearnStart').click();
+    await page.waitForFunction(() => {
+      const el=document.querySelector('#learnScreen');
+      return el && getComputedStyle(el).display!=='none' && el.getClientRects().length>0;
+    });
+    await page.locator('#learnBack').click();
+    assert(await page.locator('#activityChoiceFlow').isVisible(), 'learn back did not return to activity choice');
+    await page.locator('#activityChoiceBack').click();
+    assert(await page.locator('#countrySelectFlow').isVisible(), 'activity back did not return to country selection');
+    results.push({ screen:'activity-navigation', learnBack:true, activityBack:true });
+
     console.log(JSON.stringify(results, null, 2));
     assert.equal(failures.length, 0, 'Browser JavaScript errors: ' + failures.join(' | '));
     assert(results.every(x => !x.overlapsCards), 'Visible interactive buttons overlap the fixed footer');
