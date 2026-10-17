@@ -116,3 +116,13 @@
 #treasures #treasureBookGrid::after{
  content:none!important;display:none!important;
 }
+
+/* Approved 4:3 bg-world-clean.png (SHA 4b9d694): one identical background
+   for reward, treasure catalog, and flag collection. */
+:is(#flags .flags-artboard,#treasures .treasure-artboard,#quizReward .gift-artboard){
+ background-color:#61c6f3!important;
+ background-image:url("./assets/bg-world-clean.png")!important;
+ background-position:center center!important;
+ background-repeat:no-repeat!important;
+ background-size:100% 100%!important;
+}
