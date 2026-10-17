@@ -135,3 +135,7 @@
 :is(#flags,#treasures,#quizReward) :is(.flags-parchment,.treasure-parchment,.gift-parchment){
  box-sizing:border-box!important;min-height:0!important;
 }
+
+/* Match country-selection panel footprint and footer artwork. */
+:is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment){left:8%!important;top:7.5%!important;width:84%!important;height:74%!important}
+:is(#flags .flags-bottom-nav,#treasures .treasure-bottom-nav,#quizReward .gift-bottom-nav){left:12%!important;top:83%!important;width:76%!important;height:16%!important;background-size:100% 100%!important}
