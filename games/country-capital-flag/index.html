@@ -770,7 +770,7 @@ async function loadRewardManifest(){
 function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
 function setTreasureCollection(v){localStorage.setItem('countryTreasureCollection',JSON.stringify(v))}
 function normalizedTreasures(){return getTreasureCollection().filter(x=>typeof x==='string')}
-function treasureOwned(file,code){return normalizedTreasures().includes(file)||normalizedTreasures().includes(code)}
+function treasureOwned(file,code){const saved=normalizedTreasures();if(saved.includes(file))return true;if(!saved.includes(code))return false;/* Legacy country-code rewards represent one earned item, not every item in that country. */const first=rewardItemsFor(code)[0];return !!first&&first.file===file}
 function openQuizReward(){
  treasureCode=null;selectedTreasureFile=null;
  const pool=(sxSeenCodes.length?sxSeenCodes:selectedCountryCodes).map(code=>items.find(x=>x.flag===code)).filter(Boolean);
@@ -788,7 +788,7 @@ $('#saveTreasure').onclick=()=>{if(!selectedTreasureFile)return;const saved=norm
 function renderTreasureCollection(){
  const saved=normalizedTreasures(),grid=$('#treasureCollectionGrid');grid.innerHTML='';
  const availableFiles=rewardFiles.filter(f=>items.some(it=>it.flag===rewardCountryCode(f)));
- const ownedFiles=availableFiles.filter(f=>saved.includes(f)||saved.includes(rewardCountryCode(f)));
+ const ownedFiles=availableFiles.filter(f=>treasureOwned(f,rewardCountryCode(f)));
  $('#treasureCollectionCount').textContent=ownedFiles.length+' / '+availableFiles.length+'개 모았어요.';
  ['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아'].forEach(cont=>{
   const section=document.createElement('div');section.className='flagContinentSection treasureContinentSection';
