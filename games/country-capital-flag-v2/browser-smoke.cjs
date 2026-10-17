@@ -254,7 +254,7 @@ const assert=require('node:assert/strict');
  });
  assert(learningCss.image.includes('ui-bottom-navigation.png')&&learningCss.size==='contain'&&learningCss.buttons===5,
   'learning footer must use the approved image and five buttons: '+JSON.stringify(learningCss));
- assert(learningCss.left==='14%'&&learningCss.top==='auto'&&learningCss.width==='72%'&&learningCss.height!=='18%',
+ assert(learningCss.left==='6%'&&learningCss.top==='auto'&&learningCss.width==='88%'&&learningCss.height!=='18%',
   'learning footer positioning must match its single authoritative CSS: '+JSON.stringify(learningCss));
  await shot('gift-and-treasure');
  assert.equal(errors.length,0,'browser errors: '+errors.join(' | '));
