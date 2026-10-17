@@ -812,7 +812,7 @@ function openTreasureDetail(t){
  const old=document.querySelector('.treasureDetailModal');if(old)old.remove();
  const m=document.createElement('div');m.className='flagDetailModal treasureDetailModal';
  m.innerHTML='<div class="flagDetailCard treasureDetailCard"><button class="flagDetailClose" aria-label="닫기">×</button>'+rewardImage(t.file,'treasureDetailImage')+'<div class="treasureCountry">'+t.country+'</div><h3>'+t.name+'</h3><p>'+t.country+'의 특별한 문화 보물이에요.</p><div class="treasureMeta">수도 · '+t.capital+'</div></div>';
- document.body.appendChild(m);m.querySelector('.flagDetailClose').onclick=()=>m.remove();m.onclick=x=>{if(x.target===m)m.remove()}
+ document.body.appendChild(m);const close=()=>{m.remove();document.removeEventListener('keydown',onKey)};const onKey=e=>{if(e.key==='Escape')close()};m.querySelector('.flagDetailClose').onclick=close;m.onclick=x=>{if(x.target===m)close()};document.addEventListener('keydown',onKey);m.querySelector('.flagDetailClose').focus()
 }
 loadRewardManifest().then(()=>{if(document.querySelector('#treasureCollectionFlow').style.display!=='none')renderTreasureCollection()});
 $('#treasureCollectionBack').onclick=()=>showFlow('#home');
