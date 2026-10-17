@@ -40,7 +40,7 @@
 #learning .learning-actions{left:15%!important;top:60%!important;width:70%!important}
 #learning #learningNotice{top:74%!important}
 #learning .learning-bottom-nav{
- inset:auto!important;left:6%!important;top:61%!important;
+ inset:auto!important;left:6%!important;top:70%!important;
  width:88%!important;height:auto!important;aspect-ratio:2172 / 724!important;
  background:transparent url('./assets/ui-bottom-navigation.png') center/contain no-repeat!important;
 }
