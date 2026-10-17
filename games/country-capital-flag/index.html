@@ -861,24 +861,34 @@ document.querySelectorAll('[data-art-nav]').forEach(b=>b.addEventListener('click
 })();
 </script><script id="topic-art-loader">(function(){const art=new Image();art.onload=()=>document.getElementById('topicFlow').classList.add('topicArtReady');art.src='assets/backgrounds/topic-select-no-number-no-arrows.png?asset=a37d03d2';})();</script><script id="corner-page-navigation">
 (function(){
-const ids=['home','continentFlow','topicFlow','countrySelectFlow','activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow','flagCollectionFlow','treasureCollectionFlow','progressFlow'];
+/* Corner arrows are limited to the first three selection stages.
+   Later screens use their own validated Back/Next controls. */
+const ids=['home','continentFlow','topicFlow'];
 const prev=document.createElement('button'),next=document.createElement('button');
-prev.id='cornerPrev';next.id='cornerNext';prev.className=next.className='cornerPageArrow';prev.textContent='‹';next.textContent='›';prev.setAttribute('aria-label','이전 페이지');next.setAttribute('aria-label','다음 페이지');document.body.append(prev,next);
-function current(){return ids.findIndex(id=>{const el=document.getElementById(id);return el&&getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().width>0})}
-function update(){const i=current();prev.style.display=i>0?'flex':'none';const nextId=ids[i+1];next.style.display=i>=0&&nextId&&!['activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow'].includes(nextId)?'flex':'none'}
-function go(delta){let i=current(),target=ids[i+delta];if(!target||delta>0&&['activityChoiceFlow','learnScreen','quizScreen','learnRewardFlow','quizRewardFlow'].includes(target))return;
-const nav=document.querySelector('#worldBottomNav [data-go]');
-if(target==='home')document.querySelector('#worldBottomNav [data-go="home"]')?.click();
-else if(target==='continentFlow')document.querySelector('#worldBottomNav [data-go="continent"]')?.click();
-else if(target==='topicFlow'){if(typeof showFlow==='function')showFlow('#topicFlow')}
-else if(target==='countrySelectFlow'){if(typeof openCountrySelector==='function')openCountrySelector('learn')}
-else if(target==='flagCollectionFlow')document.querySelector('#worldBottomNav [data-go="flag"]')?.click();
-else if(target==='treasureCollectionFlow')document.querySelector('#worldBottomNav [data-go="treasure"]')?.click();
-else if(target==='progressFlow')document.querySelector('#worldBottomNav [data-go="progress"]')?.click();
-else if(typeof showFlow==='function')showFlow('#'+target);
-update()}
-prev.onclick=()=>go(-1);next.onclick=()=>go(1);
-const obs=new MutationObserver(update);ids.forEach(id=>{let el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['style','class']})});update();
+prev.id='cornerPrev';next.id='cornerNext';
+prev.className=next.className='cornerPageArrow';
+prev.textContent='‹';next.textContent='›';
+prev.setAttribute('aria-label','이전 페이지');
+next.setAttribute('aria-label','다음 페이지');
+document.body.append(prev,next);
+function current(){return ids.findIndex(id=>{
+  const el=document.getElementById(id);
+  return el&&getComputedStyle(el).display!=='none'&&el.getBoundingClientRect().width>0;
+})}
+function update(){
+  const i=current();
+  prev.style.display=i>0?'flex':'none';
+  // Forward movement needs a continent/topic choice; never skip those choices.
+  next.style.display='none';
+}
+prev.onclick=()=>{
+  const i=current();
+  if(i===1)document.getElementById('continentBack')?.click();
+  else if(i===2)document.getElementById('topicBack')?.click();
+};
+const obs=new MutationObserver(update);
+ids.forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el,{attributes:true,attributeFilter:['style','class']})});
+update();
 })();
 </script><script id="common-world-background-activation-v1">
 (function(){
