@@ -767,7 +767,7 @@ async function loadRewardManifest(){
   if(found.length)rewardFiles=found.sort();
  }catch(e){console.info('Reward manifest fallback:',e.message)}
 }
-function getTreasureCollection(){try{return JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]')}catch(e){return[]}}
+function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
 function setTreasureCollection(v){localStorage.setItem('countryTreasureCollection',JSON.stringify(v))}
 function normalizedTreasures(){return getTreasureCollection().filter(x=>typeof x==='string')}
 function treasureOwned(file,code){return normalizedTreasures().includes(file)||normalizedTreasures().includes(code)}
@@ -812,7 +812,7 @@ function openTreasureDetail(t){
 loadRewardManifest().then(()=>{if(document.querySelector('#treasureCollectionFlow').style.display!=='none')renderTreasureCollection()});
 $('#treasureCollectionBack').onclick=()=>showFlow('#home');
 let rewardFlagCode=null;
-function getFlagCollection(){try{return JSON.parse(localStorage.getItem('countryFlagCollection')||'[]')}catch(e){return[]}}
+function getFlagCollection(){try{const value=JSON.parse(localStorage.getItem('countryFlagCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
 function setFlagCollection(v){localStorage.setItem('countryFlagCollection',JSON.stringify(v))}
 function openLearnReward(){
  recordLearnComplete();
