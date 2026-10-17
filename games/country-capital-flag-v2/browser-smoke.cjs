@@ -116,6 +116,8 @@ const assert=require('node:assert/strict');
  assert(await page.locator('#learning').isVisible());
  assert.equal(await page.locator('#learningFlag').isHidden(),false,'flag is visible');
  assert((await page.locator('#learningCountry').innerText()).trim().length>0);
+ const learningArtwork=await page.locator('#learning .learning-card').evaluate(el=>({background:getComputedStyle(el).backgroundImage,border:getComputedStyle(el).borderTopWidth}));
+ assert(learningArtwork.background.includes('ui-collection-parchment.png') || learningArtwork.background.includes('parchment'), 'learning card must show parchment art: '+JSON.stringify(learningArtwork));
  await shot('learning-flag-country');
  const firstLearningCountry=(await page.locator('#learningCountry').innerText()).trim();
  assert.equal(await page.locator('#learningCount').innerText(),'1 / 2');
