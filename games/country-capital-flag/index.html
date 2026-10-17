@@ -701,6 +701,24 @@ body.world-nav-visible #worldBottomNav .navEmoji {
 @media(max-width:520px){
  #flagCollectionGrid .flagAlbumGrid,#treasureCollectionGrid .flagAlbumGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Collection header and scroll region: one stable vertical layout on iPad. */
+#flagCollectionFlow .collectionBox,#treasureCollectionFlow .collectionBox{
+ box-sizing:border-box;display:flex;flex-direction:column;min-height:0;
+ max-height:calc(100dvh - 32px);overflow:hidden;
+}
+#flagCollectionFlow .collectionBox>.flowHead,#treasureCollectionFlow .collectionBox>.flowHead{
+ flex:0 0 auto;min-width:0;margin-bottom:clamp(10px,1.8vmin,18px);
+}
+#flagCollectionFlow .collectionBox>.flowHead>div,#treasureCollectionFlow .collectionBox>.flowHead>div{
+ min-width:0;
+}
+#flagCollectionFlow .flowSub,#treasureCollectionFlow .flowSub{
+ overflow-wrap:anywhere;font-variant-numeric:tabular-nums;
+}
+#flagCollectionGrid.collectionGrid,#treasureCollectionGrid.collectionGrid{
+ flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;
+}
 </style>
 </head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
