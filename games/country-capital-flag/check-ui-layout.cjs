@@ -36,15 +36,16 @@ const assert = require('node:assert/strict');
         const heading = screen.querySelector('.flowTitle');
         const footer = document.querySelector('#worldBottomNav');
         const cards = screen.querySelector('.countryChoiceGrid');
-        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight };
+        const actionButtons = [...screen.querySelectorAll('button')].filter(el => { const r=el.getBoundingClientRect(); const cs=getComputedStyle(el); return r.width>0 && r.height>0 && cs.display!=='none' && cs.visibility!=='hidden'; });
+        return { panel: rect(panel), heading: rect(heading), footer: rect(footer), cards: rect(cards), actions: actionButtons.map(el=>({name:el.id||el.textContent.trim().slice(0,25),rect:rect(el)})), scrollHeight: cards?.scrollHeight, clientHeight: cards?.clientHeight };
       }, selector);
       const visibleFooter = geometry.footer && geometry.footer.height > 0;
       const overlaps = visibleFooter && geometry.panel && geometry.footer.y < geometry.panel.bottom;
-      const cardOverlap = visibleFooter && geometry.cards && geometry.footer.y < geometry.cards.bottom;
+      const cardOverlap = visibleFooter && geometry.actions.some(a => a.rect.bottom > geometry.footer.y && a.rect.y < geometry.footer.bottom && a.rect.right > geometry.footer.x && a.rect.x < geometry.footer.right);
       results.push({ screen: label, overlapsPanel: !!overlaps, overlapsCards: !!cardOverlap, ...geometry });
     }
     console.log(JSON.stringify(results, null, 2));
-    assert(results.every(x => !x.overlapsCards), 'Country cards overlap the fixed footer');
+    assert(results.every(x => !x.overlapsCards), 'Visible interactive buttons overlap the fixed footer');
     // A full-stage transparent panel may geometrically extend behind the footer.
     // That alone is not a defect: only interactive content overlap is a failure.
     for (const result of results) {
