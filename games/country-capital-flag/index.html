@@ -758,13 +758,13 @@ function rewardItemsFor(code){return rewardFiles.filter(f=>rewardCountryCode(f)=
 function rewardImage(file,cls){return '<img class="'+cls+'" loading="lazy" src="'+REWARD_DIR+encodeURIComponent(file)+'" alt="'+rewardTitle(file).replace(/"/g,'&quot;')+'" onerror="this.style.display=\'none\'">'}
 async function loadRewardManifest(){
  try{
-  const url='https://api.github.com/repos/openmplus-stack/thejaram-game-project/contents/games/country-capital-flag/assets/rewards?ref=main';
-  const response=await fetch(url,{headers:{'Accept':'application/vnd.github+json'}});
-  if(!response.ok)throw Error('manifest '+response.status);
+  const response=await fetch(REWARD_DIR+'manifest.json',{cache:'no-store'});
+  if(!response.ok)throw Error('local manifest '+response.status);
   const entries=await response.json();
-  if(!Array.isArray(entries))throw Error('not a directory');
-  const found=entries.filter(x=>x.type==='file'&&/^(?:\d{1,3}[-_])?reward-[a-z]{2}-.*\.png$/i.test(x.name)).map(x=>x.name);
-  if(found.length)rewardFiles=found.sort();
+  if(!Array.isArray(entries))throw Error('invalid manifest');
+  const found=entries.filter(x=>typeof x==='string'&&/^(?:\d{1,3}[-_])?reward-[a-z]{2}-.*\.png$/i.test(x));
+  if(!found.length)throw Error('empty manifest');
+  rewardFiles=[...new Set(found)].sort();
  }catch(e){console.info('Reward manifest fallback:',e.message)}
 }
 function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch(e){return[]}}
