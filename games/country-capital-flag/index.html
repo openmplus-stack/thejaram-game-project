@@ -678,6 +678,29 @@ body.world-nav-visible #worldBottomNav .navEmoji {
 .treasureDetailModal .flagDetailClose{min-width:44px;min-height:44px;cursor:pointer;}
 .treasureDetailModal .treasureDetailCard h3{font-size:clamp(21px,2.5vw,30px)!important;line-height:1.3;overflow-wrap:anywhere;margin:10px 0 6px!important;}
 .treasureDetailModal .treasureDetailCard p{font-size:clamp(15px,1.8vw,20px)!important;}
+
+/* Shared collection grid geometry: same card spacing on flag and treasure albums. */
+#flagCollectionGrid.collectionGrid,#treasureCollectionGrid.collectionGrid{
+ box-sizing:border-box;max-height:min(64dvh,650px);overflow-y:auto;overflow-x:hidden;
+ overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 22px;
+}
+#flagCollectionGrid .flagAlbumGrid,#treasureCollectionGrid .flagAlbumGrid{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+ gap:clamp(7px,1vw,13px);align-items:stretch;
+}
+#flagCollectionGrid .flagAlbumCard,#treasureCollectionGrid .flagAlbumCard{
+ box-sizing:border-box;width:100%;min-width:0;min-height:clamp(125px,13vw,155px);
+ padding:10px 6px;overflow:hidden;
+}
+#flagCollectionGrid .flagAlbumCard strong,#treasureCollectionGrid .flagAlbumCard strong{
+ max-width:100%;overflow-wrap:anywhere;text-align:center;
+}
+@media(max-width:850px){
+ #flagCollectionGrid .flagAlbumGrid,#treasureCollectionGrid .flagAlbumGrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:520px){
+ #flagCollectionGrid .flagAlbumGrid,#treasureCollectionGrid .flagAlbumGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 </head><body><section class="quizScreen" id="quizScreen"><div class="quizWrap"><div class="quizTop"><button class="back" id="quizBack">←</button><h2 id="quizTitle">문제 풀기</h2><div class="quizProgress" id="quizProgress">1 / 20</div></div><div class="quizPrompt" id="quizPrompt"></div><div class="quizChoices" id="quizChoices"></div><div class="quizStatus" id="quizStatus"></div></div></section><section class="quizResult" id="quizResult"><div class="quizResultBox"><h2>🎉 문제 완료</h2><div class="quizBig" id="quizRate">0%</div><div class="quizSummary" id="quizSummary"></div><div class="quizResultBtns"><button class="quizHome" id="quizResultHome">처음으로</button><button class="quizAgain" id="quizAgain">다시 풀기</button></div></div></section><section id="simpleOx" style="display:none;position:fixed;inset:0;z-index:80;background:linear-gradient(180deg,#f7fbff,#fffdf8);padding:18px;overflow:auto">
 <div style="max-width:1120px;margin:auto">
