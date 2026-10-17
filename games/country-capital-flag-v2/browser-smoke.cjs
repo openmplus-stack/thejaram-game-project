@@ -66,6 +66,7 @@ const assert=require('node:assert/strict');
   const scrollCheck=await page.locator('#countryGrid').evaluate(el=>{const initial=el.scrollTop;el.scrollTop=el.scrollHeight;const last=el.querySelector('.country-card:last-child');const outer=el.getBoundingClientRect(),inner=last.getBoundingClientRect();const info={scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,scrollTop:el.scrollTop,lastBottom:inner.bottom,gridBottom:outer.bottom,visible:inner.bottom<=outer.bottom+2&&inner.top>=outer.top-2};el.scrollTop=initial;return info});
   assert(scrollCheck.visible,'last country must be visible at scroll end: '+JSON.stringify(scrollCheck));
   assert(scrollCheck.scrollTop>0,'country list must be scrollable when its content exceeds the viewport: '+JSON.stringify(scrollCheck));
+  assert(scrollCheck.gridBottom-scrollCheck.lastBottom>=8,'last country needs bottom breathing room: '+JSON.stringify(scrollCheck));
   await page.locator('#countryGrid').evaluate(el=>el.scrollTop=el.scrollHeight);
   const endLayout=await page.locator('#countries').evaluate(root=>{
    const panel=root.querySelector('.country-main-panel'),grid=root.querySelector('#countryGrid'),next=root.querySelector('#countryNext');
