@@ -839,7 +839,7 @@ async function loadRewardManifest(){
  }catch(e){console.info('Reward manifest fallback:',e.message)}
 }
 function getTreasureCollection(){try{const value=JSON.parse(localStorage.getItem('countryTreasureCollection')||'[]');return Array.isArray(value)?[...new Set(value.filter(x=>typeof x==='string'))]:[]}catch(e){return[]}}
-function setTreasureCollection(v){localStorage.setItem('countryTreasureCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]))}
+function setTreasureCollection(v){try{localStorage.setItem('countryTreasureCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]));return true}catch(e){console.warn('Treasure collection save failed:',e);return false}}
 function normalizedTreasures(){return getTreasureCollection().filter(x=>typeof x==='string')}
 function treasureOwned(file,code){const saved=normalizedTreasures();if(saved.includes(file))return true;if(!saved.includes(code))return false;/* Legacy country-code rewards represent one earned item, not every item in that country. */const first=rewardItemsFor(code)[0];return !!first&&first.file===file}
 function openQuizReward(){
@@ -855,7 +855,7 @@ function openQuizReward(){
  $('#quizRewardHint').textContent=count?'보물을 하나 선택해 주세요.':'이번 문제에 나온 나라의 보상 이미지는 아직 준비 중이에요.';
  $('#saveTreasure').disabled=true;showFlow('#quizRewardFlow')
 }
-$('#saveTreasure').onclick=()=>{if(!selectedTreasureFile)return;const saved=normalizedTreasures();if(!saved.includes(selectedTreasureFile)){saved.push(selectedTreasureFile);setTreasureCollection(saved)}renderTreasureCollection();showFlow('#treasureCollectionFlow')};
+$('#saveTreasure').onclick=()=>{if(!selectedTreasureFile||!rewardFiles.includes(selectedTreasureFile))return;const saved=normalizedTreasures();if(!saved.includes(selectedTreasureFile)){saved.push(selectedTreasureFile);if(!setTreasureCollection(saved)){$('#quizRewardHint').textContent='저장하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.';return}}renderTreasureCollection();showFlow('#treasureCollectionFlow')};
 function renderTreasureCollection(){
  const saved=normalizedTreasures(),grid=$('#treasureCollectionGrid');grid.innerHTML='';
  const availableFiles=rewardFiles.filter(f=>items.some(it=>it.flag===rewardCountryCode(f)));
@@ -885,14 +885,14 @@ loadRewardManifest().then(()=>{if(document.querySelector('#treasureCollectionFlo
 $('#treasureCollectionBack').onclick=()=>showFlow('#home');
 let rewardFlagCode=null;
 function getFlagCollection(){try{const value=JSON.parse(localStorage.getItem('countryFlagCollection')||'[]');return Array.isArray(value)?[...new Set(value.filter(x=>typeof x==='string'))]:[]}catch(e){return[]}}
-function setFlagCollection(v){localStorage.setItem('countryFlagCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]))}
+function setFlagCollection(v){try{localStorage.setItem('countryFlagCollection',JSON.stringify([...new Set(v.filter(x=>typeof x==='string'))]));return true}catch(e){console.warn('Flag collection save failed:',e);return false}}
 function openLearnReward(){
  recordLearnComplete();
  rewardFlagCode=null; const grid=$('#rewardFlagGrid');grid.innerHTML='';
  activeItems().forEach(it=>{const b=document.createElement('button');b.className='rewardFlag';b.dataset.code=it.flag;b.innerHTML='<img src="'+flagUrl(it.flag)+'" alt="'+it.country+' 국기"><span>'+it.country+'</span>';b.onclick=()=>{rewardFlagCode=it.flag;document.querySelectorAll('.rewardFlag').forEach(x=>x.classList.toggle('selected',x.dataset.code===rewardFlagCode));$('#rewardHint').textContent=it.country+' 국기를 선택했어요.';$('#saveRewardFlag').disabled=false};grid.appendChild(b)});
  $('#rewardHint').textContent='국기를 하나 선택해 주세요.';$('#saveRewardFlag').disabled=true;showFlow('#learnRewardFlow')
 }
-$('#saveRewardFlag').onclick=()=>{if(!rewardFlagCode)return;const saved=getFlagCollection();if(!saved.includes(rewardFlagCode)){saved.push(rewardFlagCode);setFlagCollection(saved)}renderFlagCollection();showFlow('#flagCollectionFlow')};
+$('#saveRewardFlag').onclick=()=>{if(!rewardFlagCode||!items.some(it=>it.flag===rewardFlagCode))return;const saved=getFlagCollection();if(!saved.includes(rewardFlagCode)){saved.push(rewardFlagCode);if(!setFlagCollection(saved)){$('#rewardHint').textContent='저장하지 못했어요. 저장 공간을 확인하고 다시 시도해 주세요.';return}}renderFlagCollection();showFlow('#flagCollectionFlow')};
 function renderFlagCollection(){
  const saved=getFlagCollection(),grid=$('#flagCollectionGrid');grid.innerHTML='';const validCodes=new Set(items.map(it=>it.flag));const ownedCodes=new Set(saved.filter(code=>validCodes.has(code)));$('#flagCollectionCount').textContent=ownedCodes.size+' / '+validCodes.size+'개 모았어요.';
  ['아시아','유럽','아프리카','북아메리카','남아메리카','오세아니아'].forEach(cont=>{
