@@ -88,9 +88,9 @@ const assert=require('node:assert/strict');
   await page.locator('#countryClearAll').click();
   await choices.nth(0).click();await choices.nth(1).click();
   assert.equal(await page.locator('#countryNext').isEnabled(),true);
-  await page.locator('#countryGrid').evaluate(el=>el.scrollTop=el.scrollHeight);
+  await page.locator('#countries .country-grid').evaluate(el=>el.scrollTop=el.scrollHeight);
   const endLayout=await page.locator('#countries').evaluate(root=>{
-   const panel=root.querySelector('.country-main-panel'),grid=root.querySelector('#countryGrid'),next=root.querySelector('#countryNext');
+   const panel=root.querySelector('.country-main-panel'),grid=root.querySelector('.country-grid'),next=root.querySelector('#countryNext');
    const p=panel.getBoundingClientRect(),g=grid.getBoundingClientRect(),n=next.getBoundingClientRect();
    const last=grid.querySelector('.country-card:last-child').getBoundingClientRect();
    return {panelBottom:p.bottom,gridBottom:g.bottom,nextTop:n.top,lastBottom:last.bottom,
@@ -103,7 +103,7 @@ const assert=require('node:assert/strict');
   const endHit=await page.locator('#countryGrid .country-card').last().evaluate(el=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,top=document.elementFromPoint(x,y);return {visible:!!top&&(top===el||el.contains(top)),x,y};});
   assert(endHit.visible,'last scrolled country must be touch-accessible: '+JSON.stringify(endHit));
   await shot('countries-scroll-end-'+topic);
-  await page.locator('#countryGrid').evaluate(el=>el.scrollTop=0);
+  await page.locator('#countries .country-grid').evaluate(el=>el.scrollTop=0);
   await shot('countries-'+topic);
   await page.locator('#countryNext').click();
   assert(await page.locator('#activities').isVisible());
