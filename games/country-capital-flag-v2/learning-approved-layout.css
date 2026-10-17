@@ -31,8 +31,8 @@
    Artboard coordinates use the approved 4:3 screen; no changes to learning logic. */
 #learning .learning-board{
  background-image:url('./assets/ui-collection-parchment.png'),url('./assets/bg-world-clean.png')!important;
- background-position:center 41%,center center!important;
- background-size:84% 62%,100% 100%!important;
+ background-position:center 39%,center center!important;
+ background-size:84% 66%,100% 100%!important;
  background-repeat:no-repeat!important;
 }
 #learning .learning-top{left:16%!important;top:18%!important;width:68%!important}
