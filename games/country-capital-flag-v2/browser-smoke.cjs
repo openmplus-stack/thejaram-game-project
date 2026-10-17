@@ -93,13 +93,13 @@ const assert=require('node:assert/strict');
  assert(await page.locator('#learning').isVisible());
  assert.equal(await page.locator('#learningFlag').isHidden(),true,'capital mode hides flag');
  assert((await page.locator('#learningCapital').innerText()).trim().length>0);
- await shot('learning-country-capital');
  // Verify long Korean names wrap inside the fixed half-card without clipping.
  const longNameLayout=await page.evaluate(()=>{
   const panel=document.querySelector('#learning .learning-name-panel');
   const country=document.querySelector('#learningCountry');
   const capital=document.querySelector('#learningCapital');
   const previous=[country.textContent,capital.textContent];
+  const originalDisplay=[country.style.display,capital.style.display];
   const results=[];
   for(const [el,value] of [[country,'보스니아 헤르체고비나'],[capital,'스리자야와르데네푸라코테']]){
    el.textContent=value;el.style.display='block';
@@ -109,12 +109,14 @@ const assert=require('node:assert/strict');
     overflowY:box.height>parent.height+2});
   }
   country.textContent=previous[0];capital.textContent=previous[1];
-  capital.style.removeProperty('display');
+  country.style.display=originalDisplay[0];capital.style.display=originalDisplay[1];
   return results;
  });
  assert(longNameLayout.every(x=>!x.overflowX&&!x.overflowY),
   'long country/capital labels must fit within learning card: '+JSON.stringify(longNameLayout));
 
+
+ await shot('learning-country-capital');
  await page.locator('#learning [data-go="countries"]').click();
  await page.locator('#countryNext').click();
  await page.locator('#activities .activity-hit-quiz:visible, #activities .activity-legacy button[data-go="quiz"]:visible').first().click();
