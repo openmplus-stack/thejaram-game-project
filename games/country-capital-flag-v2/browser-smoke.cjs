@@ -120,7 +120,7 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#learningFlag').isHidden(),false,'flag is visible');
  assert((await page.locator('#learningCountry').innerText()).trim().length>0);
  const learningArtwork=await page.locator('#learning .learning-board').evaluate(el=>({background:getComputedStyle(el).backgroundImage,border:getComputedStyle(el).borderTopWidth}));
- assert(learningArtwork.background.includes('screen-learning-approved.webp'), 'learning board must use approved parchment screen artwork: '+JSON.stringify(learningArtwork));
+ assert(learningArtwork.background.includes('ui-collection-parchment.png') && learningArtwork.background.includes('bg-world-clean.png'), 'learning board must retain approved parchment and world background: '+JSON.stringify(learningArtwork));
  await shot('learning-flag-country');
  const firstLearningCountry=(await page.locator('#learningCountry').innerText()).trim();
  assert.equal(await page.locator('#learningCount').innerText(),'1 / 2');
