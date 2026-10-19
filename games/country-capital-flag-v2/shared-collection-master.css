@@ -98,7 +98,7 @@
  border:0!important;border-radius:0!important;box-shadow:none!important;
  background-image:url("./assets/ui-collection-parchment.png")!important;
  background-repeat:no-repeat!important;background-position:center!important;
- background-size:100% 100%!important;
+ background-size:contain!important;
 }
 :is(#flags .flags-parchment,#treasures .treasure-parchment,#quizReward .gift-parchment)::before{
  content:none!important;display:none!important;
@@ -156,7 +156,7 @@
 #learning .learning-board::before,#quiz .quiz-board::before{content:none!important;display:none!important;background-image:none!important}
 
 /* Flag collection: match the full-width five-icon footer of country selection. */
-#flags .flags-bottom-nav{left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;aspect-ratio:auto!important;background-size:100% 100%!important}
+#flags .flags-bottom-nav{left:3%!important;top:81.5%!important;width:94%!important;height:18.5%!important;aspect-ratio:auto!important;background-size:contain!important}
 
 /* Match full-size footer on both collection pages (override all earlier artboard rules). */
 #flags.screen.active .flags-artboard > nav.flags-bottom-nav,
