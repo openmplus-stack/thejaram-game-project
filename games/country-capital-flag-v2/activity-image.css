@@ -1,0 +1,19 @@
+/* Final 4:3 artboard: artwork is a single image; hotspots scale with it. */
+#activities.screen.active{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;background:#66c1e6!important;overflow:hidden!important}
+#activities .activity-artboard{position:relative!important;width:min(100vw,133.333333dvh)!important;height:auto!important;aspect-ratio:4/3!important;max-width:none!important;max-height:100dvh!important;margin:auto!important;padding:0!important;overflow:hidden!important}
+#activities .activity-image-ui{display:none;position:absolute;inset:0;z-index:10}
+#activities .activity-artboard.activity-image-ready .activity-image-ui{display:block}
+#activities .activity-artboard.activity-image-ready .activity-legacy{display:none!important}
+#activities .activity-artboard.activity-image-ready::before,#activities .activity-artboard.activity-image-ready::after{display:none!important;content:none!important}
+#activities .activity-master-image{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+#activities .activity-hit,#activities .activity-image-nav button{position:absolute;display:block;border:0!important;box-shadow:none!important;border-radius:0!important;background:transparent!important;padding:0!important;margin:0!important;cursor:pointer;touch-action:manipulation;min-width:0!important;min-height:0!important;transform:none!important}
+#activities .activity-hit-learning{left:22.1%;top:28.8%;width:27.2%;height:43.4%}
+#activities .activity-hit-quiz{left:51.2%;top:28.8%;width:28.1%;height:43.4%}
+#activities .activity-image-nav{position:absolute;inset:0;pointer-events:none}
+#activities .activity-image-nav button{top:85.5%;height:11.3%;width:17.1%;pointer-events:auto}
+#activities .activity-image-nav button:nth-child(1){left:7.2%}
+#activities .activity-image-nav button:nth-child(2){left:24.4%}
+#activities .activity-image-nav button:nth-child(3){left:41.6%}
+#activities .activity-image-nav button:nth-child(4){left:58.8%}
+#activities .activity-image-nav button:nth-child(5){left:76%}
+#activities .activity-hit:focus-visible,#activities .activity-image-nav button:focus-visible{outline:4px solid #fff!important;outline-offset:-5px!important;border-radius:18px!important}

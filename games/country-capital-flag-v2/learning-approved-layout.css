@@ -1,0 +1,56 @@
+/* Approved 4:3 learning screen. Data and navigation remain in the existing DOM. */
+#learning.screen.active{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;overflow:hidden!important;background:#54bce9!important}
+#learning .learning-board{position:relative!important;display:block!important;flex:none!important;width:min(100vw,133.333333dvh)!important;height:auto!important;aspect-ratio:4/3!important;min-height:0!important;max-height:100dvh!important;max-width:none!important;margin:auto!important;padding:0!important;overflow:hidden!important;gap:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;backdrop-filter:none!important;background:transparent url('./assets/screen-learning-approved.webp?v=20261015-1') center/100% 100% no-repeat!important}
+#learning .learning-sign{display:none!important}
+#learning .learning-top{position:absolute!important;z-index:2!important;left:16.1%!important;top:20.3%!important;width:67.8%!important;height:7.0%!important;display:flex!important;justify-content:space-between!important;align-items:center!important;font-size:clamp(17px,2.1vw,32px)!important;color:#3b2012!important;background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+#learning .learning-card{position:absolute!important;z-index:2!important;left:16.0%!important;top:28.0%!important;width:68.0%!important;height:35.5%!important;display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:1fr!important;gap:0!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow:hidden!important}
+#learning .learning-flag-panel,#learning .learning-name-panel{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;min-height:0!important;margin:0!important;padding:3%!important;background:transparent!important;border:0!important;box-shadow:none!important}
+#learning .learning-flag-panel{border-right:1px solid #c9a77a!important}
+#learning #learningFlag{display:block!important;width:90%!important;height:85%!important;max-width:90%!important;max-height:85%!important;object-fit:contain!important}
+#learning .learning-country{font-size:clamp(28px,5.4vw,82px)!important;font-weight:950!important;color:#083566!important;text-align:center!important;line-height:1.12!important;overflow-wrap:anywhere!important}
+
+#learning .learning-actions{position:absolute!important;z-index:3!important;left:15.9%!important;top:65.2%!important;width:68.1%!important;height:8.0%!important;display:flex!important;justify-content:space-between!important;gap:16%!important;padding:0!important;margin:0!important}
+#learning .learning-actions button{flex:1!important;min-width:0!important;min-height:0!important;height:100%!important;padding:0 1%!important;border:2px solid #71401f!important;border-radius:18px!important;background:linear-gradient(#fff4cf,#ffe0a3)!important;box-shadow:none!important;color:#3d2415!important;font-size:clamp(15px,2vw,30px)!important;font-weight:900!important;touch-action:manipulation}
+#learning #learningNotice{position:absolute!important;z-index:2!important;left:20%!important;top:74%!important;width:60%!important;font-size:clamp(12px,1.4vw,20px)!important}
+#learning .learning-bottom-nav{position:absolute!important;z-index:4!important;inset:0!important;display:block!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;pointer-events:none!important}
+#learning .learning-bottom-nav button{position:absolute!important;top:85.6%!important;width:17.0%!important;height:11.2%!important;min-width:0!important;min-height:0!important;display:block!important;padding:0!important;margin:0!important;opacity:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;pointer-events:auto!important;cursor:pointer!important;touch-action:manipulation!important}
+#learning .learning-bottom-nav button:nth-child(1){left:7.1%!important}
+#learning .learning-bottom-nav button:nth-child(2){left:24.3%!important}
+#learning .learning-bottom-nav button:nth-child(3){left:41.5%!important}
+#learning .learning-bottom-nav button:nth-child(4){left:58.7%!important}
+#learning .learning-bottom-nav button:nth-child(5){left:75.9%!important}
+#learning .learning-bottom-nav button:focus-visible{opacity:.3!important;outline:4px solid #174c87!important;outline-offset:-5px!important}
+
+/* Capital names use the same type size as country names in learning mode. */
+#learning .learning-capital{font-size:clamp(28px,5.4vw,82px)!important;font-weight:950!important;line-height:1.12!important;color:#083566!important;overflow-wrap:anywhere!important}
+
+/* Completion message: below parchment, centered in the gap above bottom navigation. */
+#learning #learningNotice{left:18%!important;top:79.2%!important;width:64%!important;margin:0!important;padding:0!important;text-align:center!important;font-size:clamp(14px,1.9vw,27px)!important;font-weight:900!important;line-height:1.3!important;color:#123d68!important;text-shadow:0 1px 2px #fff9!important;pointer-events:none!important;z-index:7!important}
+
+/* Single authoritative learning layout. Avoid repeated positional overrides.
+   Artboard coordinates use the approved 4:3 screen; no changes to learning logic. */
+#learning .learning-board{
+ background-image:url('./assets/ui-collection-parchment.png'),url('./assets/bg-world-clean.png')!important;
+ background-position:center 39%,center center!important;
+ background-size:84% 66%,100% 100%!important;
+ background-repeat:no-repeat!important;
+}
+#learning .learning-top{left:16%!important;top:18%!important;width:68%!important}
+#learning .learning-card{left:15%!important;top:25%!important;width:70%!important;height:32%!important}
+#learning .learning-actions{left:15%!important;top:60%!important;width:70%!important}
+#learning #learningNotice{top:74%!important}
+#learning .learning-bottom-nav{
+ inset:auto!important;left:6%!important;bottom:-9.2%!important;top:auto!important;
+ width:88%!important;height:auto!important;aspect-ratio:2172 / 724!important;
+ background:transparent url('./assets/ui-bottom-navigation.png') center/contain no-repeat!important;
+}
+#learning .learning-bottom-nav button{top:55%!important;width:20%!important;height:35%!important}
+#learning .learning-bottom-nav button:nth-child(1){left:0!important}
+#learning .learning-bottom-nav button:nth-child(2){left:20%!important}
+#learning .learning-bottom-nav button:nth-child(3){left:40%!important}
+#learning .learning-bottom-nav button:nth-child(4){left:60%!important}
+#learning .learning-bottom-nav button:nth-child(5){left:80%!important}
+
+/* Keep long country and capital names legible within the fixed half-card. */
+#learning .learning-name-panel{overflow:hidden!important}
+#learning .learning-country,#learning .learning-capital{max-width:100%!important;max-height:100%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;hyphens:none!important;font-size:clamp(22px,4.5vw,66px)!important;line-height:1.15!important}

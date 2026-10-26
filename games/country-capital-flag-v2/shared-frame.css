@@ -1,0 +1,104 @@
+/* Country selection V2: approved illustrated artwork; isolated screen-only layout.
+   No changes to learning data, controls, or other approved screens. */
+#countries .country-artboard,
+#countries .country-artboard[data-asset-state="ready"]{
+  position:relative!important;
+  background:#86cdef url("./assets/bg-world-clean.png") center/100% 100% no-repeat!important;
+}
+#countries .country-artboard::after,
+#countries .country-artboard::before{
+  content:none!important;
+  display:none!important;
+  background-image:none!important;
+}
+#countries .country-wood-sign{
+  box-sizing:border-box!important;
+  position:absolute!important;
+  left:29%!important;top:1.5%!important;
+  width:42%!important;height:18%!important;
+  margin:0!important;padding:0 2%!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  white-space:nowrap!important;
+  background:transparent url("./assets/title-country-select-master.png?v=20261014-master-1") center/contain no-repeat!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  color:transparent!important;font-size:0!important;text-shadow:none!important;-webkit-text-stroke:0!important;
+  z-index:6!important;
+}
+#countries .country-wood-sign::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+
+}
+#countries .country-main-panel{
+  box-sizing:border-box!important;
+  position:absolute!important;
+  left:8%!important;top:19%!important;
+  width:84%!important;height:64%!important;
+  min-width:0!important;min-height:0!important;
+  margin:0!important;padding:6% 8% 5%!important;
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  overflow:hidden!important;
+  border:0!important;border-radius:0!important;
+  background:transparent url("./assets/ui-collection-parchment.png") center/100% 100% no-repeat!important;
+  box-shadow:none!important;
+  z-index:3!important;
+}
+#countries .country-grid{
+  box-sizing:border-box!important;
+  width:100%!important;
+  flex:1 1 auto!important;min-height:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  align-content:start!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+}
+#countries #countryNext{
+  flex:0 0 auto!important;
+  align-self:center!important;
+  margin-left:auto!important;margin-right:auto!important;
+  position:relative!important;
+  z-index:4!important;
+}
+#countries .country-bottom-nav{
+  box-sizing:border-box!important;
+  position:absolute!important;
+  left:6%!important;bottom:-9.2%!important;
+  width:88%!important;height:auto!important;
+  aspect-ratio:2172 / 724!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:0!important;margin:0!important;padding:0!important;
+  background:transparent url("./assets/ui-bottom-navigation.png") center/contain no-repeat!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  z-index:8!important;pointer-events:none!important;
+}
+#countries .country-bottom-nav button{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:100%!important;height:32%!important;
+  align-self:center!important;
+  min-height:0!important;margin:0!important;padding:0!important;
+  background:transparent!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;color:transparent!important;font-size:0!important;
+  text-shadow:none!important;pointer-events:auto!important;touch-action:manipulation!important;
+}
+#countries .country-bottom-nav button:focus-visible{
+  outline:4px solid white!important;outline-offset:-4px!important;
+}
+@media(max-width:680px){
+  #countries .country-wood-sign{font-size:clamp(26px,5.1vw,45px)!important}
+}
+
+/* Continent title is already painted into screen-continent-select.png.
+   Never render an additional title or wooden board on this screen. */
+#continents .continent-master-sign,
+#continents .continent-master-sign::before,
+#continents .continent-master-sign::after,
+#continents .continent-title-overlay,
+#continents .continent-title-overlay::before,
+#continents .continent-title-overlay::after{display:none!important;content:none!important;background:none!important}
+#continents .continent-artboard::before,
+#continents .continent-artboard::after{content:none!important;display:none!important;background-image:none!important}
+#continents .continent-artboard,
+#continents .continent-artboard[data-asset-state="ready"]{background-image:url("./assets/screen-continent-select.png")!important}
