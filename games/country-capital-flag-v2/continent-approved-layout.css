@@ -1,0 +1,18 @@
+/* Only activate after the exact approved asset is available. Previous layout remains otherwise. */
+#continents .continent-approved-image{display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none;z-index:2}
+#continents .continent-artboard.continent-approved-ready{background-image:none!important;overflow:hidden!important}
+#continents .continent-artboard.continent-approved-ready .continent-approved-image{display:block!important}
+#continents .continent-artboard.continent-approved-ready .continent-header{display:none!important}
+#continents .continent-artboard.continent-approved-ready .continent-choices{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;pointer-events:none!important;z-index:5!important;margin:0!important;padding:0!important}
+#continents .continent-artboard.continent-approved-ready .continent-choice{position:absolute!important;width:21.8%!important;height:27.6%!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important;min-height:0!important;padding:0!important;pointer-events:auto!important;transform:none!important}
+#continents .continent-artboard.continent-approved-ready .continent-asia{left:19.3%!important;top:17.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-europe{left:42.7%!important;top:17.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-africa{left:66.2%!important;top:17.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-north{left:19.3%!important;top:45.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-south{left:42.7%!important;top:45.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-oceania{left:66.2%!important;top:45.4%!important}
+#continents .continent-artboard.continent-approved-ready .continent-all{display:none!important}
+#continents .continent-artboard.continent-approved-ready .continent-bottom-nav{position:absolute!important;left:5.5%!important;top:84.4%!important;bottom:auto!important;width:89%!important;height:13.4%!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:0!important;margin:0!important;padding:0!important;z-index:9!important;pointer-events:none!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important}
+#continents .continent-artboard.continent-approved-ready .continent-bottom-nav button{display:block!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;pointer-events:auto!important;border:0!important;background:transparent!important;box-shadow:none!important;color:transparent!important;font-size:0!important}
+#continents .continent-artboard.continent-approved-ready .continent-bottom-nav button span{display:none!important}
+#continents .continent-artboard.continent-approved-ready button:focus-visible{outline:4px solid #fff!important;outline-offset:-4px!important;border-radius:15px!important}

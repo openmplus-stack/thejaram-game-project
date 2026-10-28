@@ -1,0 +1,114 @@
+{
+  "source_folder": "https://drive.google.com/drive/folders/10RNGxzFvP6I6gvX7qYCidTC3IP3qGJwD",
+  "status": "Audited 2026-10-28: 2 already present, 16 missing. Binary upload attempted but connector transport failed; no binary commit made.",
+  "files": [
+    {
+      "name": "reward-ir-persian-carpet.png",
+      "drive_id": "1JgAz-kDii_N1snHouVxu29zdWYjnS8JN",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-ir-persian-carpet.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-jo-petra.png",
+      "drive_id": "1NJcmhGDEcNIDxOXe8IlQViUuIzLxd-m9",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-jo-petra.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-pk-truck-art.png",
+      "drive_id": "1zlfe_cMk0IZKMUu5DL6TGfx0RG3Y71MP",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-pk-truck-art.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-iq-cuneiform-tablet.png",
+      "drive_id": "1GyoTwlqrkSxyaOPO7XiuXz0abTUBDo_4",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-iq-cuneiform-tablet.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-sy-mosaic-box.png",
+      "drive_id": "1pti1_hquQHwau6sPM86SOLOplbdWlY-O",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-sy-mosaic-box.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-ke-maasai-necklace.png",
+      "drive_id": "1NWYk_EJGs570XorL7BSAUU3FNIzFiXRq",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-ke-maasai-necklace.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-bd-rickshaw.png",
+      "drive_id": "1YhkSmN9Ztj6DAN-qEnoA4VLJ6cw7M1dS",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-bd-rickshaw.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-kh-angkor-wat.png",
+      "drive_id": "14JTqdbKdhVWNvXvdXDgnMBWgDymrFhqB",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-kh-angkor-wat.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-bh-pearl-oyster.png",
+      "drive_id": "1605sGYbVEo4FHLrevAZZEppTCCZlqEV_",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-bh-pearl-oyster.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-lb-cedar-tree.png",
+      "drive_id": "1n2xfZUDNB7EutkadGGtb8knFycMqYn5k",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-lb-cedar-tree.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-ye-jambiya.png",
+      "drive_id": "1W5KQAIqLX7XxsjV4J1e1Y-q5lJjrfqcV",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-ye-jambiya.png",
+      "github_present": true
+    },
+    {
+      "name": "reward-ae-bakhoor-burner.png",
+      "drive_id": "1X0VIlUXVJaSEfFUq1s53-Vd2dm23Hrcf",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-ae-bakhoor-burner.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-om-frankincense-burner.png",
+      "drive_id": "1BsjLIBuNBeODS8UL6UEkqs9mzNcvqEEs",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-om-frankincense-burner.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-mv-dhoni-boat.png",
+      "drive_id": "12NMiFyGYDoSNvAtwS2bMttdLvbFZep9c",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-mv-dhoni-boat.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-il-menorah.png",
+      "drive_id": "1qGfW12c0LurMwTAiE4hEeD4OuT8wozgj",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-il-menorah.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-tr-nazar-amulet.png",
+      "drive_id": "1DbqMWnd62R7QSqmTWTLJF6HYCLWaYHOB",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-tr-nazar-amulet.png",
+      "github_present": true
+    },
+    {
+      "name": "reward-qa-pearl-jewelry.png",
+      "drive_id": "1WTYbAo2vfxBpufkWhhgShOuRWlEuLhT9",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-qa-pearl-jewelry.png",
+      "github_present": false
+    },
+    {
+      "name": "reward-sa-dallah-coffee-pot.png",
+      "drive_id": "1D_lzhg4jv4FeNXcLAtDtFf_e5SajDr5N",
+      "github_path": "games/country-capital-flag-v2/assets/rewards/reward-sa-dallah-coffee-pot.png",
+      "github_present": false
+    }
+  ]
+}

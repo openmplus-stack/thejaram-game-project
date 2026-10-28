@@ -1,0 +1,30 @@
+name: Country UI Unification QA
+on:
+  push:
+    branches:
+      - refactor/country-ui-unification-20261017
+  workflow_dispatch:
+jobs:
+  static-and-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static structure audit
+        run: node games/country-capital-flag/check-ui-structure.cjs
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Browser layout and navigation audit (1024x768)
+        run: node games/country-capital-flag/check-ui-layout.cjs
+      - name: Save visual audit screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: country-ui-audit-1024x768
+          path: games/country-capital-flag/audit-*-1024x768.png
+          if-no-files-found: ignore

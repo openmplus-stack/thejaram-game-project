@@ -1,0 +1,9 @@
+/* Approved title removal: retain baked artwork until separately approved image edits. */
+#continents .continent-header h2,#topics .topic-header h2,#countries .country-main-panel>h2,#activities .activity-header h2{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+/* Reclaim the country heading's panel space for live selection cards. */
+#countries .country-main-panel{top:17.5%!important;height:71%!important;min-height:0!important;gap:clamp(3px,.6vh,9px)!important}
+#countries .country-grid{flex:1 1 auto!important;min-height:0!important}
+/* Header navigation remains functional and is not deleted. */
+#continents .continent-header,#topics .topic-header{pointer-events:none!important}
+#continents .continent-header button,#topics .topic-header button{pointer-events:auto!important}
+/* Image-backed activity screen retains its exact responsive hotspots. */
