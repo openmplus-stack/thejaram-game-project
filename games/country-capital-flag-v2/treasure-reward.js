@@ -8,7 +8,7 @@
  function read(){try{const value=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(value)?value.filter(x=>typeof x==='string'):[]}catch{return []}}
  function draw(){
   const grid=$('treasureRewardChoices');grid.replaceChildren();
-  for(const item of eligible){const b=document.createElement('button');b.type='button';b.className='treasure-reward-option';b.dataset.treasureFile=item.file;b.setAttribute('aria-pressed',String(selected===item.file));const img=document.createElement('img');img.src='../country-capital-flag/assets/rewards/'+encodeURIComponent(item.file);img.alt=item.name;img.loading='lazy';const country=window.CountryV2Data.byCode(item.code);const name=document.createElement('strong');name.textContent=country?.country||item.code;const label=document.createElement('span');label.textContent=item.name;b.append(img,name,label);grid.append(b)}
+  for(const item of eligible){const b=document.createElement('button');b.type='button';b.className='treasure-reward-option';b.dataset.treasureFile=item.file;b.setAttribute('aria-pressed',String(selected===item.file));const img=document.createElement('img');img.src='./assets/'+encodeURIComponent(item.file);img.alt=item.name;img.loading='lazy';const country=window.CountryV2Data.byCode(item.code);const name=document.createElement('strong');name.textContent=country?.country||item.code;const label=document.createElement('span');label.textContent=item.name;b.append(img,name,label);grid.append(b)}
   $('treasureRewardSave').disabled=!selected||claimed||!qualified;
   $('treasureRewardMessage').textContent=claimed?'선택한 보물을 도감에 저장했습니다.':eligible.length?'보물 하나를 선택하세요.':'해당 국가의 보물 이미지가 아직 등록되지 않았습니다.';
  }
