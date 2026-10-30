@@ -5,7 +5,7 @@
  const entries=(window.CountryV2RewardFiles||[]).map(file=>{const m=file.match(/^(?:\d+[-_])?reward-([a-z]{2})-(.+)\.png$/i);if(!m)return null;const country=window.CountryV2Data.byCode(m[1]);return {file,code:m[1],name:m[2].replace(/-/g,' '),country:country?.country||m[1].toUpperCase(),continent:country?.continent||'기타'}}).filter(Boolean);
  const continents=[...new Set(entries.map(x=>x.continent))];
  for(const name of continents){const option=document.createElement('option');option.value=name;option.textContent=name;$('treasureBookContinent').append(option)}
- function owned(){try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');return new Set(Array.isArray(saved)?saved.filter(x=>typeof x==='string'):[])}catch{return new Set()}}
+ function owned(){try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');return new Set(Array.isArray(saved)?saved.filter(x=>typeof x==='string').map(x=>x.match(/^(?:\d+[-_])?reward-([a-z]{2})-/i)?.[1]||x):[])}catch{return new Set()}}
  function render(){
   const collection=owned(),mode=$('treasureBookFilter').value,continent=$('treasureBookContinent').value;
   const count=entries.filter(x=>collection.has(x.file)||collection.has(x.code)).length;
