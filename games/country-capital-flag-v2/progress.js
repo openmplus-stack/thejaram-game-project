@@ -18,13 +18,14 @@
   data.history=data.history.slice(0,MAX);save(data);
  }
  function collectionCount(key){const v=json(key,[]);return Array.isArray(v)?new Set(v.map(x=>typeof x==='string'?x:x?.flag||x?.code).filter(Boolean)).size:0}
+ function treasureCount(){const v=json('countryTreasureCollection',[]);return Array.isArray(v)?new Set(v.filter(x=>typeof x==='string').map(x=>x.match(/^(?:\d+[-_])?reward-([a-z]{2})-/i)?.[1]||x)).size:0}
  function render(){
   const data=load(),n=data.quizzes.length;
   $('progressLearned').textContent=data.learned.length;
   $('progressQuizRuns').textContent=n;
   $('progressAverage').textContent=n?Math.round(data.quizzes.reduce((sum,x)=>sum+x.percentage,0)/n)+'%':'—';
   $('progressFlags').textContent=collectionCount('countryFlagCollection');
-  $('progressTreasures').textContent=collectionCount('countryTreasureCollection');
+  $('progressTreasures').textContent=treasureCount();
   const list=$('progressHistory');list.replaceChildren();
   for(const item of data.history.slice(0,20)){
    const li=document.createElement('li'),date=new Date(item.at);
