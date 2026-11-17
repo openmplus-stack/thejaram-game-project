@@ -73,6 +73,12 @@
       "title": "루시와 수상한 책방",
       "description": "전래동화 속 사라진 이야기를 찾아가는 한국어 모험 게임 (11단계 개발용 프로토타입)",
       "status": "prototype"
+    },
+    {
+      "slug": "ramen",
+      "title": "라면을 끓여요",
+      "description": "라면 끓이기 9개 장면을 보고 낱말을 배열하며 생활 순서와 문장 만들기를 연습하는 일상생활적응 학습 앱",
+      "status": "published"
     }
   ]
 }
